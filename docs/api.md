@@ -26,6 +26,8 @@ conversion rates and quantities are decimal/integer strings as stated below.
 
 Health endpoints are unauthenticated. Admin endpoints require `admin`.
 Group creation requires `group_creators` or `admin`.
+The reviewed runtime contract is snapshotted in `docs/openapi.json`; regenerate
+it with `backend/.venv/bin/python backend/scripts/export_openapi.py`.
 
 ## 2. Health and features
 
@@ -136,8 +138,13 @@ parameters: `status=recent|starred|archived|all` (auth only).
 Full group with participants, or `404`.
 
 ### `GET /api/groups/{group_id}/details`
+`participants_with_expenses` is the reference-compatible list of participant IDs
+that appear as payer or paid-for on an expense. The same participants are also
+returned as objects in `participants_with_expense_details`.
 ```json
-{ "group": { "...": "..." }, "participants_with_expenses": [ { "id": "p1", "name": "Ada" } ] }
+{ "group": { "...": "..." },
+  "participants_with_expenses": ["p1"],
+  "participants_with_expense_details": [ { "id": "p1", "name": "Ada" } ] }
 ```
 
 ### `PATCH /api/groups/{group_id}`
@@ -245,14 +252,15 @@ frames and receive future frames after synchronization.
 
 ### Documents
 - `POST /api/groups/{group_id}/expenses/{expense_id}/documents` — multipart
-  upload. Limits: 10 MB, `image/jpeg|png|webp`, S3 or local disk.
+  upload (`file`, optional `width`/`height`). Limits: 10 MB,
+  `image/jpeg|png|webp`, local disk (S3 in Stage 7).
 - `GET /api/groups/{group_id}/expenses/{expense_id}/documents/{document_id}` —
-  returns/redirects to the blob with `Content-Disposition`.
+  returns the blob inline with `Content-Disposition`.
 - `DELETE /api/groups/{group_id}/expenses/{expense_id}/documents/{document_id}` —
   `204`.
 
 Uploads reject path traversal, executable content types and oversized files.
-S3 keys are server-generated.
+Storage keys are server-generated.
 
 ## 7. Balances
 

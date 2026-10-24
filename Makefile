@@ -3,6 +3,9 @@
 PYTHON ?= python3
 PYTEST = PYTHONPATH=. .venv/bin/pytest
 RUFF = .venv/bin/ruff
+# Prefer the backend virtualenv interpreter, but fall back to the system Python
+# when a stale/broken venv cannot import PyYAML (CI installs it explicitly).
+PARITY_PYTHON = $(shell backend/.venv/bin/python -c 'import yaml' >/dev/null 2>&1 && echo backend/.venv/bin/python || echo $(PYTHON))
 
 install:
 	cd backend && $(PYTHON) -m venv .venv
@@ -32,7 +35,7 @@ build:
 	cd frontend && npm run build
 
 parity:
-	backend/.venv/bin/python scripts/check_parity_matrix.py
+	$(PARITY_PYTHON) scripts/check_parity_matrix.py
 
 clean:
 	rm -rf backend/.pytest_cache backend/.ruff_cache backend/htmlcov backend/.coverage backend/coverage.xml

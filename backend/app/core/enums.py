@@ -9,6 +9,27 @@ from __future__ import annotations
 from enum import StrEnum
 
 
+class SplitMode(StrEnum):
+    EVENLY = "EVENLY"
+    BY_SHARES = "BY_SHARES"
+    BY_PERCENTAGE = "BY_PERCENTAGE"
+    BY_AMOUNT = "BY_AMOUNT"
+
+
+class RecurrenceRule(StrEnum):
+    NONE = "NONE"
+    DAILY = "DAILY"
+    WEEKLY = "WEEKLY"
+    MONTHLY = "MONTHLY"
+
+
+class ActivityType(StrEnum):
+    UPDATE_GROUP = "UPDATE_GROUP"
+    CREATE_EXPENSE = "CREATE_EXPENSE"
+    UPDATE_EXPENSE = "UPDATE_EXPENSE"
+    DELETE_EXPENSE = "DELETE_EXPENSE"
+
+
 class UserTier(StrEnum):
     """Account tiers. Order is from least to most privileged."""
 
