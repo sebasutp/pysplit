@@ -1,0 +1,153 @@
+{
+  "source": "spliit.db",
+  "source_checksum": "ef53ca0d847a833fcd162dd88bd2d833100dc47a589ffbffbe313a0c1fe39538",
+  "generated_by": "spliit/src/lib/balances.ts::getBalances",
+  "groups": {
+    "33cntwlBd1zYmnILif3eB": {
+      "u8FXruVarhmzQzFD0zY--": {
+        "paid": 39000,
+        "paidFor": 14074,
+        "total": 24926
+      },
+      "PIMy1I0raaS8NciP58BWV": {
+        "paid": 0,
+        "paidFor": 14268,
+        "total": -14268
+      },
+      "ftQZ6ympLQfhM-Fhgq54j": {
+        "paid": 0,
+        "paidFor": 10658,
+        "total": -10658
+      }
+    },
+    "O3u60nLtPlF9ef_2H4QHN": {
+      "I_i1sh_pYQdlDWFZvkX1w": {
+        "paid": 283000,
+        "paidFor": 283000,
+        "total": 0
+      },
+      "Dww81cn9-yx6-sdnXIjZ3": {
+        "paid": 84477,
+        "paidFor": 84477,
+        "total": 0
+      },
+      "OhpwmJpF88j8goE3xsc_W": {
+        "paid": 101557,
+        "paidFor": 101557,
+        "total": 0
+      },
+      "SbgKY5j-HQs8jNiwtUjxM": {
+        "paid": 101566,
+        "paidFor": 101566,
+        "total": 0
+      },
+      "cXurbQBR9lwRg6qUbK8h3": {
+        "paid": 79540,
+        "paidFor": 79540,
+        "total": 0
+      }
+    },
+    "S6fZgqxkRdbISsaTUW5OQ": {
+      "u2WdRCsWNIQye0AkexzBe": {
+        "paid": 6600,
+        "paidFor": 58109,
+        "total": -51509
+      },
+      "CVavcYDKTKcfZil2n-hsg": {
+        "paid": 116772,
+        "paidFor": 69963,
+        "total": 46809
+      },
+      "Pq56WdHhI-PkbbvG4R26d": {
+        "paid": 0,
+        "paidFor": 80563,
+        "total": -80563
+      },
+      "V-ueBOYIW8UO4q0qgD-ab": {
+        "paid": 0,
+        "paidFor": 80010,
+        "total": -80010
+      },
+      "u1mlOeaGNcC8Kv42g2u31": {
+        "paid": 40673,
+        "paidFor": 61935,
+        "total": -21262
+      },
+      "icH8sHu0q7heEwWWJ-Ziu": {
+        "paid": 252214,
+        "paidFor": 65679,
+        "total": 186535
+      }
+    },
+    "lY97yKDHXmh13yvdrA8Ur": {
+      "V4PKD0zXeeqrvoFLiDCJ6": {
+        "paid": 267400,
+        "paidFor": 267400,
+        "total": 0
+      },
+      "FBPNr5T8r_O7yqwPnvMiX": {
+        "paid": 243131,
+        "paidFor": 243131,
+        "total": 0
+      },
+      "G5qoJdhQtvN435-9L0sLI": {
+        "paid": 243130,
+        "paidFor": 243130,
+        "total": 0
+      },
+      "Oj4yz64ezFKYF80tUwu4l": {
+        "paid": 563700,
+        "paidFor": 563700,
+        "total": 0
+      }
+    },
+    "v8Bv34OGFx8QIu4MVNMfu": {},
+    "wE-yGRAxmj7IJBWH-rEuC": {
+      "HjYcjepdy60QDRJ77iSin": {
+        "paid": 168544,
+        "paidFor": 168544,
+        "total": 0
+      },
+      "5F6_ntrv3TUGM3Vc6Npjx": {
+        "paid": 23364,
+        "paidFor": 23364,
+        "total": 0
+      },
+      "8wcBQip8KJAc5YQH1TS1z": {
+        "paid": 23454,
+        "paidFor": 23454,
+        "total": 0
+      },
+      "9SusyGZVFVbodGCr89UwC": {
+        "paid": 20836,
+        "paidFor": 20836,
+        "total": 0
+      },
+      "BpOieQBzQCpgabS8UMeJR": {
+        "paid": 15136,
+        "paidFor": 15136,
+        "total": 0
+      },
+      "aGB_E4gtvJ2TuumGBbAoe": {
+        "paid": 23086,
+        "paidFor": 23086,
+        "total": 0
+      },
+      "dRe20oUDRaNTAEd_FF4zp": {
+        "paid": 23086,
+        "paidFor": 23086,
+        "total": 0
+      },
+      "vTLIYD6j2WwufRlM39csK": {
+        "paid": 23363,
+        "paidFor": 23363,
+        "total": 0
+      },
+      "xXL9eyN2FfRPmgbaEeqyN": {
+        "paid": 23732,
+        "paidFor": 23732,
+        "total": 0
+      }
+    }
+  }
+}
