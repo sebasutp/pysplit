@@ -17,7 +17,9 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 
+from app.core.config import Settings, get_settings
 from app.core.database import get_session
+from app.core.limits import auth_rate_limiter
 from app.main import create_app
 
 
@@ -64,3 +66,39 @@ def client(engine) -> Generator[TestClient, None, None]:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def make_client(engine):
+    """Build a client with optional settings overrides for one test."""
+    clients: list[TestClient] = []
+
+    def factory(**settings_overrides):
+        app = create_app()
+
+        def override_session() -> Generator[Session, None, None]:
+            with Session(engine) as db_session:
+                yield db_session
+
+        app.dependency_overrides[get_session] = override_session
+        if settings_overrides:
+            app.dependency_overrides[get_settings] = lambda: Settings(
+                _env_file=None, **settings_overrides
+            )
+        test_client = TestClient(app)
+        test_client.__enter__()
+        clients.append(test_client)
+        return test_client
+
+    yield factory
+
+    for test_client in clients:
+        test_client.__exit__(None, None, None)
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    """Keep in-process rate-limit windows from leaking between tests."""
+    auth_rate_limiter.reset()
+    yield
+    auth_rate_limiter.reset()
