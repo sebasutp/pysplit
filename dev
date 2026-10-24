@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+#
+# Start the API and the Vite dev server together against data/dev/.
+#
+# Everything is reached through the web port; Vite proxies /api to the API.
+# Set WEB_HOST to the hostname clients use (for example a Tailscale name):
+#
+#   ./dev                                  # http://127.0.0.1:5173
+#   WEB_HOST=myhost.tailnet.ts.net ./dev   # http://myhost.tailnet.ts.net:5173
+#   WEB_HOST=myhost.tailnet.ts.net WEB_PORT=5180 ./dev
+#
+# The API itself always binds to loopback and is not exposed directly.
+#
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND="$ROOT/backend"
+FRONTEND="$ROOT/frontend"
+DATA_DIR="${DATA_DIR:-$ROOT/data/dev}"
+
+# WEB_HOST is the single hostname knob: Vite accepts it in the Host header and
+# prints it in the URL (binding all interfaces when it is not loopback). The
+# API is only reachable through the Vite proxy on this host.
+WEB_HOST="${WEB_HOST:-127.0.0.1}"
+WEB_PORT="${WEB_PORT:-5173}"
+
+# Internal only. Clients never connect to this address directly.
+API_BIND_HOST="127.0.0.1"
+DEFAULT_API_PORT=8000
+API_PORT_EXPLICIT="${API_PORT:-}"
+API_PORT="${API_PORT:-$DEFAULT_API_PORT}"
+
+# Return 0 when host:port can be bound. Used only to keep the default API port
+# from colliding with an unrelated local service.
+port_is_free() {
+  python3 - "$1" "$2" <<'PY'
+import socket
+import sys
+
+host, port = sys.argv[1], int(sys.argv[2])
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    try:
+        sock.bind((host, port))
+    except OSError:
+        raise SystemExit(1)
+PY
+}
+
+if ! port_is_free "$API_BIND_HOST" "$API_PORT"; then
+  if [ -n "$API_PORT_EXPLICIT" ]; then
+    echo "API port $API_PORT is already in use. Set API_PORT to a free port." >&2
+    exit 1
+  fi
+  while ! port_is_free "$API_BIND_HOST" "$API_PORT"; do
+    API_PORT=$((API_PORT + 1))
+    if [ "$API_PORT" -gt 65535 ]; then
+      echo "No free API port found." >&2
+      exit 1
+    fi
+  done
+  echo "Port $DEFAULT_API_PORT is busy; using API port $API_PORT." >&2
+fi
+
+if [ ! -x "$BACKEND/.venv/bin/uvicorn" ]; then
+  echo "Missing backend virtualenv. Run: make install" >&2
+  exit 1
+fi
+
+if [ ! -d "$FRONTEND/node_modules" ]; then
+  echo "Missing frontend dependencies. Run: make install" >&2
+  exit 1
+fi
+
+mkdir -p "$DATA_DIR"
+
+export DATABASE_URL="${DATABASE_URL:-sqlite:///$DATA_DIR/pysplit.db}"
+export WEB_HOST
+export WEB_PORT
+export VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-http://$API_BIND_HOST:$API_PORT}"
+
+cleanup() {
+  trap - EXIT INT TERM
+  if [ -n "${API_PID:-}" ]; then kill "$API_PID" 2>/dev/null || true; fi
+  if [ -n "${WEB_PID:-}" ]; then kill "$WEB_PID" 2>/dev/null || true; fi
+  wait 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+(
+  cd "$BACKEND"
+  PYTHONPATH=. exec .venv/bin/uvicorn app.main:app \
+    --host "$API_BIND_HOST" --port "$API_PORT" --reload
+) &
+API_PID=$!
+
+(
+  cd "$FRONTEND"
+  # Run Vite directly so the PID we track is the server itself, not npm.
+  # WEB_HOST/WEB_PORT/VITE_API_PROXY_TARGET are exported above; vite.config.js
+  # uses them for binding, allowed Host headers and the /api proxy.
+  exec ./node_modules/.bin/vite
+) &
+WEB_PID=$!
+
+echo "Web:  http://$WEB_HOST:$WEB_PORT"
+echo "API:  proxied at http://$WEB_HOST:$WEB_PORT/api (internal: http://$API_BIND_HOST:$API_PORT)"
+echo "Data: $DATA_DIR"
+
+wait -n "$API_PID" "$WEB_PID"

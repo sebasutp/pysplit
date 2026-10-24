@@ -1,0 +1,1021 @@
+# Executable parity matrix.
+#
+# One row per reference behavior. Stable `id` values must never be reused.
+# The checker (scripts/check_parity_matrix.py) requires every reference page,
+# tRPC procedure file, Jest suite and Playwright spec to appear in a
+# `reference`, and every row to name at least one verification test.
+#
+# category: standard | custom
+# offline:  read-write | read-only | queued | online-only
+# stage:    stage number from MIGRATION_PLAN.md
+- id: PAGE-HOME
+  category: standard
+  reference: spliit/src/app/page.tsx
+  api: GET /api/groups
+  ui: /
+  stage: 8A
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  offline: read-only
+- id: PAGE-GROUPS
+  category: standard
+  reference: spliit/src/app/groups/page.tsx
+  api: GET /api/groups
+  ui: /groups
+  stage: 8A
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  - frontend/e2e/global-balance.spec.ts
+  offline: read-write
+- id: PAGE-GROUP-CREATE
+  category: standard
+  reference: spliit/src/app/groups/create/page.tsx
+  api: POST /api/groups
+  ui: /groups/create
+  stage: 8A
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  offline: read-write
+- id: PAGE-GROUP-EXPENSES
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/expenses/page.tsx
+  api: GET /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses
+  stage: 8B
+  tests:
+  - frontend/e2e/core.spec.ts
+  - frontend/e2e/expense-variants.spec.ts
+  offline: read-write
+- id: PAGE-GROUP-ACTIVITY
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/activity/page.tsx
+  api: GET /api/groups/{group_id}/activities
+  ui: /groups/:groupId/activity
+  stage: 8B
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  offline: read-only
+- id: PAGE-GROUP-BALANCES
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/balances/page.tsx
+  api: GET /api/groups/{group_id}/balances
+  ui: /groups/:groupId/balances
+  stage: 8C
+  tests:
+  - frontend/e2e/reimbursements.spec.ts
+  - frontend/e2e/repayment-currency.spec.ts
+  offline: read-write
+- id: PAGE-GROUP-EDIT
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/edit/page.tsx
+  api: PATCH /api/groups/{group_id}
+  ui: /groups/:groupId/edit
+  stage: 8B
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  offline: read-write
+- id: PAGE-GROUP-INFO
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/information/page.tsx
+  api: GET /api/groups/{group_id}/details
+  ui: /groups/:groupId/information
+  stage: 8B
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  offline: read-only
+- id: PAGE-GROUP-STATS
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/stats/page.tsx
+  api: GET /api/groups/{group_id}/stats
+  ui: /groups/:groupId/stats
+  stage: 8C
+  tests:
+  - frontend/e2e/stats.spec.ts
+  - frontend/e2e/stats-breakdown.spec.ts
+  offline: read-only
+- id: PAGE-EXPENSE-CREATE
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/expenses/create/page.tsx
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 8B
+  tests:
+  - frontend/e2e/split-modes.spec.ts
+  - frontend/e2e/multi-currency.spec.ts
+  offline: read-write
+- id: PAGE-EXPENSE-EDIT
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/expenses/[expenseId]/edit/page.tsx
+  api: PATCH /api/groups/{group_id}/expenses/{expense_id}
+  ui: /groups/:groupId/expenses/:expenseId/edit
+  stage: 8B
+  tests:
+  - frontend/e2e/expense-edit-delete.spec.ts
+  offline: read-write
+- id: PAGE-EXPENSE-ITEMS
+  category: custom
+  reference: spliit/src/app/groups/[groupId]/expenses/[expenseId]/items/page.tsx
+  api: GET /api/groups/{group_id}/receipts/{receipt_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: 8D
+  tests:
+  - frontend/e2e/receipts.spec.ts
+  offline: read-write
+- id: PAGE-ADMIN
+  category: custom
+  reference: spliit/src/app/admin/page.tsx
+  api: GET /api/admin/metrics
+  ui: /admin
+  stage: 8D
+  tests:
+  - frontend/e2e/admin.spec.ts
+  offline: online-only
+- id: PAGE-GROUP-REDIRECT
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/page.tsx
+  api: GET /api/groups/{group_id}
+  ui: /groups/:groupId
+  stage: 8A
+  tests:
+  - frontend/e2e/core.spec.ts
+  offline: read-write
+- id: CAT-LIST
+  category: standard
+  reference: spliit/src/trpc/routers/categories/list.procedure.ts::listCategoriesProcedure
+  api: GET /api/categories
+  ui: /groups/:groupId/expenses/create
+  stage: 5C
+  tests:
+  - backend/tests/test_categories_api.py::test_list_categories
+  offline: read-only
+- id: GROUP-CREATE
+  category: standard
+  reference: spliit/src/trpc/routers/groups/create.procedure.ts::createGroupProcedure
+  api: POST /api/groups
+  ui: /groups/create
+  stage: 5A
+  tests:
+  - backend/tests/test_groups_api.py::test_create_group
+  offline: read-write
+- id: GROUP-LIST
+  category: standard
+  reference: spliit/src/trpc/routers/groups/list.procedure.ts::listGroupsProcedure
+  api: GET /api/groups?ids=
+  ui: /groups
+  stage: 5A
+  tests:
+  - backend/tests/test_groups_api.py::test_list_groups
+  offline: read-write
+- id: GROUP-GET
+  category: standard
+  reference: spliit/src/trpc/routers/groups/get.procedure.ts::getGroupProcedure
+  api: GET /api/groups/{group_id}
+  ui: /groups/:groupId
+  stage: 5A
+  tests:
+  - backend/tests/test_groups_api.py::test_get_group
+  offline: read-write
+- id: GROUP-GET-DETAILS
+  category: standard
+  reference: spliit/src/trpc/routers/groups/getDetails.procedure.ts::getGroupDetailsProcedure
+  api: GET /api/groups/{group_id}/details
+  ui: /groups/:groupId/information
+  stage: 5A
+  tests:
+  - backend/tests/test_groups_api.py::test_group_details
+  offline: read-only
+- id: GROUP-UPDATE
+  category: standard
+  reference: spliit/src/trpc/routers/groups/update.procedure.ts::updateGroupProcedure
+  api: PATCH /api/groups/{group_id}
+  ui: /groups/:groupId/edit
+  stage: 5A
+  tests:
+  - backend/tests/test_groups_api.py::test_update_group
+  offline: read-write
+- id: GROUP-SYNC
+  category: custom
+  reference: spliit/src/trpc/routers/groups/sync.procedure.ts::syncGroupsProcedure
+  api: POST /api/groups/sync
+  ui: /groups
+  stage: 5A
+  tests:
+  - backend/tests/test_group_sync.py::test_merge_local_groups
+  offline: read-write
+- id: GROUP-RECORD-ACCESS
+  category: custom
+  reference: spliit/src/trpc/routers/groups/sync.procedure.ts::recordAccessProcedure
+  api: POST /api/groups/{group_id}/access
+  ui: /groups/:groupId
+  stage: 5A
+  tests:
+  - backend/tests/test_group_sync.py::test_record_access
+  offline: queued
+- id: GROUP-TOGGLE-STAR
+  category: custom
+  reference: spliit/src/trpc/routers/groups/sync.procedure.ts::toggleStarProcedure
+  api: PATCH /api/groups/{group_id}/membership
+  ui: /groups
+  stage: 5A
+  tests:
+  - backend/tests/test_group_sync.py::test_toggle_star
+  offline: queued
+- id: GROUP-TOGGLE-ARCHIVE
+  category: custom
+  reference: spliit/src/trpc/routers/groups/sync.procedure.ts::toggleArchiveProcedure
+  api: PATCH /api/groups/{group_id}/membership
+  ui: /groups
+  stage: 5A
+  tests:
+  - backend/tests/test_group_sync.py::test_toggle_archive
+  offline: queued
+- id: GROUP-REMOVE-MEMBERSHIP
+  category: custom
+  reference: spliit/src/trpc/routers/groups/sync.procedure.ts::removeUserGroupProcedure
+  api: DELETE /api/groups/{group_id}/membership
+  ui: /groups
+  stage: 5A
+  tests:
+  - backend/tests/test_group_sync.py::test_remove_membership
+  offline: queued
+- id: EXP-LIST
+  category: standard
+  reference: spliit/src/trpc/routers/groups/expenses/list.procedure.ts::listGroupExpensesProcedure
+  api: GET /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses
+  stage: 5B
+  tests:
+  - backend/tests/test_expenses_api.py::test_list_expenses
+  offline: read-write
+- id: EXP-CREATE
+  category: standard
+  reference: spliit/src/trpc/routers/groups/expenses/create.procedure.ts::createGroupExpenseProcedure
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 5B
+  tests:
+  - backend/tests/test_expenses_api.py::test_create_by_amount
+  - frontend/e2e/split-modes.spec.ts
+  offline: read-write
+- id: EXP-GET
+  category: standard
+  reference: spliit/src/trpc/routers/groups/expenses/get.procedure.ts::getGroupExpenseProcedure
+  api: GET /api/groups/{group_id}/expenses/{expense_id}
+  ui: /groups/:groupId/expenses/:expenseId/edit
+  stage: 5B
+  tests:
+  - backend/tests/test_expenses_api.py::test_get_expense
+  offline: read-write
+- id: EXP-UPDATE
+  category: standard
+  reference: spliit/src/trpc/routers/groups/expenses/update.procedure.ts::updateGroupExpenseProcedure
+  api: PATCH /api/groups/{group_id}/expenses/{expense_id}
+  ui: /groups/:groupId/expenses/:expenseId/edit
+  stage: 5B
+  tests:
+  - backend/tests/test_expenses_api.py::test_update_expense
+  - frontend/e2e/expense-edit-delete.spec.ts
+  offline: read-write
+- id: EXP-DELETE
+  category: standard
+  reference: spliit/src/trpc/routers/groups/expenses/delete.procedure.ts::deleteGroupExpenseProcedure
+  api: DELETE /api/groups/{group_id}/expenses/{expense_id}
+  ui: /groups/:groupId/expenses
+  stage: 5B
+  tests:
+  - backend/tests/test_expenses_api.py::test_delete_expense
+  offline: read-write
+- id: BAL-LIST
+  category: standard
+  reference: spliit/src/trpc/routers/groups/balances/list.procedure.ts::listGroupBalancesProcedure
+  api: GET /api/groups/{group_id}/balances
+  ui: /groups/:groupId/balances
+  stage: 5C
+  tests:
+  - backend/tests/test_balances_api.py::test_group_balances
+  - frontend/e2e/reimbursements.spec.ts
+  offline: read-only
+- id: BAL-FOR-USER
+  category: standard
+  reference: spliit/src/trpc/routers/groups/balances/forUser.procedure.ts::forUserBalancesProcedure
+  api: GET /api/balances?groups=
+  ui: /groups
+  stage: 5C
+  tests:
+  - backend/tests/test_balances_api.py::test_global_balance
+  - frontend/e2e/global-balance.spec.ts
+  offline: read-only
+- id: STAT-OVERVIEW
+  category: standard
+  reference: spliit/src/trpc/routers/groups/stats/overview.procedure.ts::getStatsOverviewProcedure
+  api: GET /api/groups/{group_id}/stats
+  ui: /groups/:groupId/stats
+  stage: 5C
+  tests:
+  - backend/tests/test_stats_api.py::test_stats_overview
+  - frontend/e2e/stats.spec.ts
+  offline: read-only
+- id: STAT-CATEGORY-EXPENSES
+  category: standard
+  reference: spliit/src/trpc/routers/groups/stats/category-expenses.procedure.ts::getStatsCategoryExpensesProcedure
+  api: GET /api/groups/{group_id}/stats/categories/{category_id}/expenses
+  ui: /groups/:groupId/stats
+  stage: 5C
+  tests:
+  - backend/tests/test_stats_api.py::test_category_drilldown
+  - frontend/e2e/stats-breakdown.spec.ts
+  offline: read-only
+- id: STAT-MONTH-EXPENSES
+  category: standard
+  reference: spliit/src/trpc/routers/groups/stats/month-expenses.procedure.ts::getStatsMonthExpensesProcedure
+  api: GET /api/groups/{group_id}/stats/months/{month}/expenses
+  ui: /groups/:groupId/stats
+  stage: 5C
+  tests:
+  - backend/tests/test_stats_api.py::test_month_drilldown
+  - frontend/e2e/stats-breakdown.spec.ts
+  offline: read-only
+- id: ACT-LIST
+  category: standard
+  reference: spliit/src/trpc/routers/groups/activities/list.procedure.ts::listGroupActivitiesProcedure
+  api: GET /api/groups/{group_id}/activities
+  ui: /groups/:groupId/activity
+  stage: 5C
+  tests:
+  - backend/tests/test_activities_api.py::test_list_activities
+  offline: read-only
+- id: RCPT-GET
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/get.procedure.ts::getGroupReceiptProcedure
+  api: GET /api/groups/{group_id}/receipts/{receipt_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_get_receipt_split
+  offline: queued
+- id: RCPT-ADD-ITEM
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/add-item.procedure.ts::addGroupReceiptItemProcedure
+  api: POST /api/groups/{group_id}/receipts/{receipt_id}/items
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_add_item
+  offline: read-write
+- id: RCPT-UPDATE-ITEM
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/update-item.procedure.ts::updateGroupReceiptItemProcedure
+  api: PATCH /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_update_item
+  offline: read-write
+- id: RCPT-DELETE-ITEM
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/delete-item.procedure.ts::deleteGroupReceiptItemProcedure
+  api: DELETE /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_delete_item
+  offline: read-write
+- id: RCPT-SET-PORTIONS
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/set-item-portions.procedure.ts::setGroupReceiptItemPortionsProcedure
+  api: PUT /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}/portions
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_set_portions
+  offline: read-write
+- id: RCPT-SET-OPT-OUT
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/set-opt-out.procedure.ts::setGroupReceiptOptOutProcedure
+  api: PUT /api/groups/{group_id}/receipts/{receipt_id}/opt-outs/{participant_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_set_opt_out
+  offline: read-write
+- id: RCPT-APPLY
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/apply-to-expense.procedure.ts::applyGroupReceiptToExpenseProcedure
+  api: POST /api/groups/{group_id}/receipts/{receipt_id}/apply
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipt_apply.py::test_apply_split
+  offline: read-write
+- id: RCPT-LINK
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/link.procedure.ts::linkGroupReceiptToExpenseProcedure
+  api: POST /api/groups/{group_id}/receipts/{receipt_id}/link
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_link_receipt
+  offline: read-write
+- id: ADMIN-METRICS
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::getMetrics
+  api: GET /api/admin/metrics
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_metrics
+  offline: online-only
+- id: ADMIN-LIST-USERS
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::listUsers
+  api: GET /api/admin/users
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_list_users
+  offline: online-only
+- id: ADMIN-PREAUTHORIZE
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::preAuthorizeUser
+  api: POST /api/admin/users/preauthorize
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_preauthorize_user
+  offline: online-only
+- id: ADMIN-UPDATE-TIER
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::updateUserTier
+  api: PATCH /api/admin/users/{user_id}/tier
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_update_tier
+  offline: online-only
+- id: ADMIN-DELETE-USER
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::deleteUser
+  api: DELETE /api/admin/users/{user_id}
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_delete_user
+  offline: online-only
+- id: ADMIN-LIST-GROUPS
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::listGroups
+  api: GET /api/admin/groups
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_list_groups
+  offline: online-only
+- id: ADMIN-DELETE-GROUP
+  category: custom
+  reference: spliit/src/trpc/routers/admin/index.ts::deleteGroup
+  api: DELETE /api/admin/groups/{group_id}
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_delete_group
+  offline: online-only
+- id: AUTH-ME
+  category: custom
+  reference: spliit/src/trpc/routers/auth/index.ts::me
+  api: GET /api/auth/me
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_me
+  offline: online-only
+- id: API-HEALTH
+  category: standard
+  reference: spliit/src/app/api/health/route.ts::GET
+  api: GET /api/health
+  ui: n/a
+  stage: '1'
+  tests:
+  - backend/tests/test_health.py::test_health
+  offline: read-only
+- id: API-HEALTH-LIVE
+  category: standard
+  reference: spliit/src/app/api/health/liveness/route.ts::GET
+  api: GET /api/health/liveness
+  ui: n/a
+  stage: '1'
+  tests:
+  - backend/tests/test_health.py::test_liveness
+  offline: read-only
+- id: API-HEALTH-READY
+  category: standard
+  reference: spliit/src/app/api/health/readiness/route.ts::GET
+  api: GET /api/health/readiness
+  ui: n/a
+  stage: '1'
+  tests:
+  - backend/tests/test_health.py::test_readiness
+  offline: read-only
+- id: API-AUTH-SESSION
+  category: custom
+  reference: spliit/src/app/api/auth/[...auth]/route.ts::GET session
+  api: GET /api/auth/me
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_session
+  offline: online-only
+- id: API-AUTH-SIGNIN
+  category: custom
+  reference: spliit/src/app/api/auth/[...auth]/route.ts::GET signin
+  api: GET /api/auth/oauth/{provider}/start
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_oauth_start
+  offline: online-only
+- id: API-AUTH-CALLBACK
+  category: custom
+  reference: spliit/src/app/api/auth/[...auth]/route.ts::GET callback
+  api: GET /api/auth/oauth/{provider}/callback
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_oauth_callback
+  offline: online-only
+- id: API-AUTH-SIGNOUT
+  category: custom
+  reference: spliit/src/app/api/auth/[...auth]/route.ts::POST signout
+  api: POST /api/auth/logout
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_logout
+  offline: online-only
+- id: API-AUTH-MOCK
+  category: custom
+  reference: spliit/src/app/api/auth/[...auth]/route.ts::POST mock-login
+  api: POST /api/auth/mock-login
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_mock_login_dev_only
+  offline: online-only
+- id: API-S3-UPLOAD
+  category: custom
+  reference: spliit/src/app/api/s3-upload/route.ts::POST
+  api: POST /api/groups/{group_id}/expenses/{expense_id}/documents
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_document_upload
+  offline: queued
+- id: API-EXPORT-CSV
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/expenses/export/csv/route.ts::GET
+  api: GET /api/groups/{group_id}/expenses/export.csv
+  ui: /groups/:groupId/expenses
+  stage: 5D
+  tests:
+  - backend/tests/test_exports.py::test_csv_export
+  offline: read-only
+- id: API-EXPORT-JSON
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/expenses/export/json/route.ts::GET
+  api: GET /api/groups/{group_id}/expenses/export.json
+  ui: /groups/:groupId/expenses
+  stage: 5D
+  tests:
+  - backend/tests/test_exports.py::test_json_export
+  offline: read-only
+- id: TEST-CREATE-FROM-RECEIPT-BUTTON-ACTIONS
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/expenses/create-from-receipt-button-actions.test.ts
+  api: POST /api/groups/{group_id}/receipts/{receipt_id}/apply
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipt_apply.py::test_apply_from_button
+  offline: read-write
+- id: TEST-RECEIPT-FOOTER
+  category: custom
+  reference: spliit/src/app/groups/[groupId]/expenses/[expenseId]/items/receipt-footer.test.tsx
+  api: GET /api/groups/{group_id}/receipts/{receipt_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: 8D
+  tests:
+  - frontend/src/components/receipts/ReceiptFooter.test.jsx::renders provisional totals
+  offline: read-write
+- id: TEST-STATS-RANGE
+  category: standard
+  reference: spliit/src/app/groups/[groupId]/stats/stats-range.test.ts
+  api: GET /api/groups/{group_id}/stats
+  ui: /groups/:groupId/stats
+  stage: 5C
+  tests:
+  - backend/tests/test_stats_api.py::test_date_range
+  offline: read-only
+- id: TEST-EXPENSE-FORM-ACTIONS
+  category: standard
+  reference: spliit/src/components/expense-form-actions.test.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 8B
+  tests:
+  - frontend/src/components/expenses/ExpenseForm.test.jsx::saves splitting defaults
+  offline: read-write
+- id: TEST-FORM
+  category: standard
+  reference: spliit/src/components/ui/form.test.tsx
+  api: GET /api/health
+  ui: /groups
+  stage: 8A
+  tests:
+  - frontend/src/components/ui/Form.test.jsx::renders labelled fields
+  offline: read-only
+- id: TEST-AI-CLIENT
+  category: custom
+  reference: spliit/src/lib/ai/client.test.ts
+  api: POST /api/ai/receipts/extract
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_ai_config_precedence
+  offline: online-only
+- id: TEST-AI-PROMPTS
+  category: custom
+  reference: spliit/src/lib/ai/prompts.test.ts
+  api: POST /api/ai/receipts/items
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_prompt_contract
+  offline: online-only
+- id: TEST-ANALYTICS-ANONYMIZE-PATH
+  category: standard
+  reference: spliit/src/lib/analytics/anonymize-path.test.ts
+  api: GET /api/health
+  ui: /groups
+  stage: 8A
+  tests:
+  - frontend/src/lib/analytics.test.js::anonymizes group and expense ids
+  offline: read-only
+- id: TEST-AUTH-SESSION
+  category: standard
+  reference: spliit/src/lib/auth/session.test.ts
+  api: GET /api/auth/me
+  ui: /groups
+  stage: '4'
+  tests:
+  - backend/tests/test_auth.py::test_session_token
+  offline: online-only
+- id: TEST-BALANCES
+  category: standard
+  reference: spliit/src/lib/balances.test.ts
+  api: GET /api/groups/{group_id}/balances
+  ui: /groups/:groupId/balances
+  stage: 5C
+  tests:
+  - backend/tests/test_balances_api.py::test_balance_math
+  offline: read-only
+- id: TEST-COMPRESS-IMAGE
+  category: standard
+  reference: spliit/src/lib/compress-image.test.ts
+  api: POST /api/groups/{group_id}/expenses/{expense_id}/documents
+  ui: /groups/:groupId/expenses/create
+  stage: 8D
+  tests:
+  - frontend/src/lib/compress-image.test.js::compresses large images
+  offline: queued
+- id: TEST-CURRENCY-CONVERSION
+  category: standard
+  reference: spliit/src/lib/currency-conversion.test.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: '3'
+  tests:
+  - backend/tests/test_domain_parity.py::test_currency_conversion
+  offline: read-only
+- id: TEST-DATE-GROUPS
+  category: standard
+  reference: spliit/src/lib/date-groups.test.ts
+  api: GET /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses
+  stage: 8B
+  tests:
+  - backend/tests/test_domain_parity.py::test_date_groups
+  offline: read-only
+- id: TEST-ENV
+  category: standard
+  reference: spliit/src/lib/env.test.ts
+  api: GET /api/health
+  ui: n/a
+  stage: '1'
+  tests:
+  - backend/tests/test_health.py::test_config_defaults
+  offline: read-only
+- id: TEST-FEATUREFLAGS
+  category: standard
+  reference: spliit/src/lib/featureFlags.test.ts
+  api: GET /api/features
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_feature_flags
+  offline: online-only
+- id: TEST-PUBLIC-UPLOAD-URL
+  category: standard
+  reference: spliit/src/lib/public-upload-url.test.ts
+  api: POST /api/groups/{group_id}/expenses/{expense_id}/documents
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_public_upload_url
+  offline: queued
+- id: TEST-RECEIPT-APPLY
+  category: custom
+  reference: spliit/src/lib/receipt-apply.test.ts
+  api: POST /api/groups/{group_id}/receipts/{receipt_id}/apply
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipt_apply.py::test_apply_invariants
+  offline: read-write
+- id: TEST-RECEIPT-DRAFT
+  category: custom
+  reference: spliit/src/lib/receipt-draft.test.ts
+  api: POST /api/ai/receipts/items
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_receipt_draft
+  offline: queued
+- id: TEST-RECEIPT-EXTRACTION
+  category: custom
+  reference: spliit/src/lib/receipt-extraction.test.ts
+  api: POST /api/ai/receipts/extract
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_receipt_extraction
+  offline: queued
+- id: TEST-RECEIPT-SPLIT
+  category: custom
+  reference: spliit/src/lib/receipt-split.test.ts
+  api: GET /api/groups/{group_id}/receipts/{receipt_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_provisional_split
+  offline: read-write
+- id: TEST-RECEIPTS
+  category: custom
+  reference: spliit/src/lib/receipts.test.ts
+  api: GET /api/groups/{group_id}/receipts/{receipt_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_receipt_lifecycle
+  offline: read-write
+- id: TEST-SHARES
+  category: standard
+  reference: spliit/src/lib/shares.test.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: '3'
+  tests:
+  - backend/tests/test_domain_parity.py::test_shares
+  offline: read-only
+- id: TEST-TOTALS
+  category: standard
+  reference: spliit/src/lib/totals.test.ts
+  api: GET /api/groups/{group_id}/stats
+  ui: /groups/:groupId/stats
+  stage: '3'
+  tests:
+  - backend/tests/test_domain_parity.py::test_totals
+  offline: read-only
+- id: TEST-UPLOADED-IMAGE-URL
+  category: standard
+  reference: spliit/src/lib/uploaded-image-url.test.ts
+  api: POST /api/groups/{group_id}/expenses/{expense_id}/documents
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_uploaded_image_url
+  offline: queued
+- id: TEST-UTILS
+  category: standard
+  reference: spliit/src/lib/utils.test.ts
+  api: GET /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses
+  stage: 8B
+  tests:
+  - frontend/src/lib/utils.test.js::formats amounts and dates
+  offline: read-only
+- id: TEST-MAKE-ADMIN
+  category: custom
+  reference: spliit/src/scripts/make-admin.test.ts
+  api: POST /api/admin/users/preauthorize
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_bootstrap_cli
+  offline: online-only
+- id: TEST-TRPC-ADMIN
+  category: custom
+  reference: spliit/src/trpc/admin.test.ts
+  api: GET /api/admin/metrics
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_admin.py::test_admin_router
+  offline: online-only
+- id: TEST-TRPC-GROUPS-SYNC
+  category: standard
+  reference: spliit/src/trpc/groups-sync.test.ts
+  api: POST /api/groups/sync
+  ui: /groups
+  stage: 5A
+  tests:
+  - backend/tests/test_group_sync.py::test_sync_router
+  offline: read-write
+- id: TEST-TRPC-RBAC
+  category: custom
+  reference: spliit/src/trpc/rbac.test.ts
+  api: GET /api/admin/metrics
+  ui: /admin
+  stage: '4'
+  tests:
+  - backend/tests/test_rbac.py::test_tier_matrix
+  offline: online-only
+- id: TEST-TRPC-RECEIPTS
+  category: standard
+  reference: spliit/src/trpc/receipts.test.ts
+  api: GET /api/groups/{group_id}/receipts/{receipt_id}
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_receipt_router
+  offline: read-write
+- id: E2E-ACTIVE-USER
+  category: standard
+  reference: spliit/e2e/active-user.spec.ts
+  api: GET /api/groups/{group_id}
+  ui: /groups/:groupId
+  stage: 8C
+  tests:
+  - frontend/e2e/active-user.spec.ts
+  offline: read-write
+- id: E2E-CORE
+  category: standard
+  reference: spliit/e2e/core.spec.ts
+  api: GET /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses
+  stage: 8B
+  tests:
+  - frontend/e2e/core.spec.ts
+  offline: read-write
+- id: E2E-EXPENSE-EDIT-DELETE
+  category: standard
+  reference: spliit/e2e/expense-edit-delete.spec.ts
+  api: PATCH /api/groups/{group_id}/expenses/{expense_id}
+  ui: /groups/:groupId/expenses
+  stage: 8B
+  tests:
+  - frontend/e2e/expense-edit-delete.spec.ts
+  offline: read-write
+- id: E2E-EXPENSE-VARIANTS
+  category: standard
+  reference: spliit/e2e/expense-variants.spec.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 8B
+  tests:
+  - frontend/e2e/expense-variants.spec.ts
+  offline: read-write
+- id: E2E-GLOBAL-BALANCE
+  category: standard
+  reference: spliit/e2e/global-balance.spec.ts
+  api: GET /api/balances?groups=
+  ui: /groups
+  stage: 8C
+  tests:
+  - frontend/e2e/global-balance.spec.ts
+  offline: read-only
+- id: E2E-GROUP-MANAGEMENT
+  category: standard
+  reference: spliit/e2e/group-management.spec.ts
+  api: GET /api/groups
+  ui: /groups
+  stage: 8A
+  tests:
+  - frontend/e2e/group-management.spec.ts
+  offline: read-write
+- id: E2E-MULTI-CURRENCY
+  category: standard
+  reference: spliit/e2e/multi-currency.spec.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 8B
+  tests:
+  - frontend/e2e/multi-currency.spec.ts
+  offline: read-write
+- id: E2E-PWA
+  category: standard
+  reference: spliit/e2e/pwa.spec.ts
+  api: GET /api/health
+  ui: n/a
+  stage: 10A
+  tests:
+  - frontend/e2e/pwa.spec.ts
+  offline: read-only
+- id: E2E-RECURRENCE
+  category: standard
+  reference: spliit/e2e/recurrence.spec.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 8B
+  tests:
+  - frontend/e2e/recurrence.spec.ts
+  offline: read-write
+- id: E2E-REIMBURSEMENTS
+  category: standard
+  reference: spliit/e2e/reimbursements.spec.ts
+  api: GET /api/groups/{group_id}/balances
+  ui: /groups/:groupId/balances
+  stage: 8C
+  tests:
+  - frontend/e2e/reimbursements.spec.ts
+  offline: read-write
+- id: E2E-REPAYMENT-CURRENCY
+  category: standard
+  reference: spliit/e2e/repayment-currency.spec.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/balances
+  stage: 8C
+  tests:
+  - frontend/e2e/repayment-currency.spec.ts
+  offline: read-write
+- id: E2E-SPLIT-MODES
+  category: standard
+  reference: spliit/e2e/split-modes.spec.ts
+  api: POST /api/groups/{group_id}/expenses
+  ui: /groups/:groupId/expenses/create
+  stage: 8B
+  tests:
+  - frontend/e2e/split-modes.spec.ts
+  offline: read-write
+- id: E2E-STATS-BREAKDOWN
+  category: standard
+  reference: spliit/e2e/stats-breakdown.spec.ts
+  api: GET /api/groups/{group_id}/stats
+  ui: /groups/:groupId/stats
+  stage: 8C
+  tests:
+  - frontend/e2e/stats-breakdown.spec.ts
+  offline: read-only
+- id: E2E-STATS
+  category: standard
+  reference: spliit/e2e/stats.spec.ts
+  api: GET /api/groups/{group_id}/stats
+  ui: /groups/:groupId/stats
+  stage: 8C
+  tests:
+  - frontend/e2e/stats.spec.ts
+  offline: read-only
+- id: E2E-ADMIN
+  category: custom
+  reference: spliit/e2e/admin.spec.ts
+  api: GET /api/admin/metrics
+  ui: /admin
+  stage: '11'
+  tests:
+  - frontend/e2e/admin.spec.ts
+  offline: online-only
+- id: E2E-GROUP-SYNC
+  category: custom
+  reference: spliit/e2e/group-sync.spec.ts
+  api: POST /api/groups/sync
+  ui: /groups
+  stage: '11'
+  tests:
+  - frontend/e2e/group-sync.spec.ts
+  offline: read-write
+- id: E2E-OFFLINE-SYNC
+  category: standard
+  reference: spliit/e2e/offline-sync.spec.ts
+  api: POST /api/sync/push
+  ui: /groups
+  stage: 9B
+  tests:
+  - frontend/e2e/offline-sync.spec.ts
+  offline: queued
+- id: E2E-PWA-OFFLINE
+  category: standard
+  reference: spliit/e2e/pwa-offline.spec.ts
+  api: GET /api/health
+  ui: n/a
+  stage: 10A
+  tests:
+  - frontend/e2e/pwa-offline.spec.ts
+  offline: read-only
