@@ -8,11 +8,10 @@ Readiness is the only one that touches the database.
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import text
-from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.deps import SessionDep, SettingsDep
 from app.schemas.health import HealthResponse, LivenessResponse, ReadinessResponse
+from app.services.health import database_is_ready
 
 router = APIRouter(prefix="/health", tags=["health"])
 
@@ -32,11 +31,9 @@ def liveness() -> LivenessResponse:
 @router.get("/readiness", response_model=ReadinessResponse)
 def readiness(session: SessionDep) -> ReadinessResponse:
     """Prove the database is reachable with the configured credentials."""
-    try:
-        session.execute(text("SELECT 1"))
-    except SQLAlchemyError as exc:
+    if not database_is_ready(session):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="database unavailable",
-        ) from exc
+        )
     return ReadinessResponse(status="ready", checks={"database": "ok"})

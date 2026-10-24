@@ -23,6 +23,23 @@ from app.core.limits import auth_rate_limiter
 from app.main import create_app
 
 
+def pytest_configure(config) -> None:
+    """Enforce the global coverage gate only for a full-suite run.
+
+    Focused stage verification commands select individual files; judging them
+    against the repository-wide 80% threshold would fail even when every
+    selected test passes. The full suite (``make test`` / CI, no file
+    arguments) still enforces ``--cov-fail-under=80``.
+    """
+    selected = [str(item) for item in config.args]
+    full_suite = not selected or selected == ["tests"] or selected == ["tests/"]
+    if not full_suite and config.getoption("cov_fail_under", None):
+        config.option.cov_fail_under = 0
+        for _name, plugin in config.pluginmanager.list_name_plugin():
+            if plugin.__class__.__name__ == "CovPlugin":
+                plugin.options.cov_fail_under = 0
+
+
 @event.listens_for(Engine, "connect")
 def _sqlite_foreign_keys(dbapi_connection, _connection_record) -> None:
     """Every test connection enforces foreign keys, as production does."""

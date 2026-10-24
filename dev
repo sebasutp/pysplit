@@ -74,6 +74,7 @@ fi
 mkdir -p "$DATA_DIR"
 
 export DATABASE_URL="${DATABASE_URL:-sqlite:///$DATA_DIR/pysplit.db}"
+export UPLOAD_DIR="${UPLOAD_DIR:-$DATA_DIR/uploads}"
 export WEB_HOST
 export WEB_PORT
 export VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-http://$API_BIND_HOST:$API_PORT}"

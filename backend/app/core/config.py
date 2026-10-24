@@ -67,6 +67,16 @@ class Settings(BaseSettings):
     auth_account_rate_limit_per_minute: int = 60
     auth_rate_limit_window_seconds: int = 60
 
+    # --- Uploads and runtime feature flags ------------------------------
+    # Local disk is the default blob backend; Stage 7 adds an S3 adapter.
+    upload_dir: str = "data/uploads"
+    max_upload_bytes: int = 10 * 1024 * 1024
+    upload_allowed_types: str = "image/jpeg,image/png,image/webp"
+    enable_receipt_extract: bool = False
+    enable_receipt_items: bool = False
+    enable_category_extract: bool = False
+    enable_expense_documents: bool = False
+
     @field_validator("api_prefix")
     @classmethod
     def _normalise_prefix(cls, value: str) -> str:
@@ -113,6 +123,21 @@ class Settings(BaseSettings):
             raise ValueError("must be positive")
         return value
 
+    @field_validator("max_upload_bytes")
+    @classmethod
+    def _positive_upload_limit(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("must be positive")
+        return value
+
+    @field_validator("upload_dir")
+    @classmethod
+    def _normalise_upload_dir(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned:
+            raise ValueError("upload_dir must not be empty")
+        return cleaned
+
     @model_validator(mode="after")
     def _require_production_secret(self) -> Settings:
         if self.environment.lower() == "production":
@@ -146,6 +171,16 @@ class Settings(BaseSettings):
         if self.auth_github_id and self.auth_github_secret:
             providers.append("github")
         return providers
+
+    @property
+    def upload_allowed_type_list(self) -> list[str]:
+        return [
+            item.strip().lower() for item in self.upload_allowed_types.split(",") if item.strip()
+        ]
+
+    @property
+    def receipt_extract_enabled(self) -> bool:
+        return self.enable_receipt_extract or self.enable_receipt_items
 
 
 @lru_cache(maxsize=1)
