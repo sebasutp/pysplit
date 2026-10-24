@@ -1,0 +1,31 @@
+{
+  "source": "legacy_fixture.db",
+  "source_checksum": "04d55380a48cee62aad159c1f401d47e1ed7f3067ca8a890ecccd9a8847f9e01",
+  "generated_by": "spliit/src/lib/balances.ts::getBalances",
+  "groups": {
+    "group-1": {
+      "p1": {
+        "paid": 2400,
+        "paidFor": 1049,
+        "total": 1351
+      },
+      "p2": {
+        "paid": 3000,
+        "paidFor": 2734,
+        "total": 266
+      },
+      "p3": {
+        "paid": 999,
+        "paidFor": 2616,
+        "total": -1617
+      }
+    },
+    "group-2": {
+      "p4": {
+        "paid": 12000,
+        "paidFor": 12000,
+        "total": 0
+      }
+    }
+  }
+}

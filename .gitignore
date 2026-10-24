@@ -3,6 +3,7 @@
 
 # Python
 backend/.venv/
+backend/.venv-work/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -25,6 +26,8 @@ data/
 *.db
 *.db-wal
 *.db-shm
+# Committed legacy test fixture (small, deterministic, built by its script)
+!backend/tests/fixtures/legacy/legacy_fixture.db
 
 # Secrets and local environment
 .env
