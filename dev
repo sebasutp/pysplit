@@ -77,6 +77,9 @@ export DATABASE_URL="${DATABASE_URL:-sqlite:///$DATA_DIR/pysplit.db}"
 export WEB_HOST
 export WEB_PORT
 export VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-http://$API_BIND_HOST:$API_PORT}"
+# The browser talks to Vite, so OAuth redirect URIs and CSRF origin checks must
+# use the public web origin rather than the internal API address.
+export BASE_URL="${BASE_URL:-http://$WEB_HOST:$WEB_PORT}"
 
 cleanup() {
   trap - EXIT INT TERM

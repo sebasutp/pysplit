@@ -59,7 +59,9 @@ Returns server-enforced flags so the SPA never enables a disabled feature.
 ## 3. Authentication
 
 ### `GET /api/auth/me`
-`200` with the user, or `200 { "user": null }` when anonymous.
+`200` with the user, or `200 { "user": null }` when anonymous. `providers`
+mirrors the reference discovery endpoint and reports which OAuth providers have
+both credentials configured.
 ```json
 {
   "user": {
@@ -68,7 +70,8 @@ Returns server-enforced flags so the SPA never enables a disabled feature.
     "email": "ada@example.com",
     "image": null,
     "tier": "sync_users"
-  }
+  },
+  "providers": { "google": true, "github": false }
 }
 ```
 
@@ -82,7 +85,9 @@ cookie, and redirects to `return_to` (default `/groups`). Errors redirect with
 `?error=InvalidOAuthState|OAuthExchangeFailed|OAuthNotConfigured`.
 
 ### `POST /api/auth/refresh`
-Requires the refresh cookie and CSRF header. Rotates the refresh token.
+Requires the refresh cookie, the readable `pysplit_csrf` cookie echoed in
+`X-CSRF-Token`, and a same-origin `Origin` (or `Referer`). Rotates the refresh
+token and returns a new access token.
 ```json
 { "access_token": "eyJ...", "token_type": "bearer", "expires_in": 900,
   "user": { "id": "usr_...", "tier": "sync_users" } }
@@ -90,7 +95,8 @@ Requires the refresh cookie and CSRF header. Rotates the refresh token.
 Reuse of an already-rotated token returns `401` and revokes the family.
 
 ### `POST /api/auth/logout`
-Revokes the refresh token, clears the cookie, returns `204`.
+Requires the same CSRF and origin checks. Revokes the refresh token, clears the
+session cookies, returns `204`.
 
 ### `POST /api/auth/mock-login` (development/test only)
 `404` in production. Used by the Playwright helpers.
@@ -392,13 +398,21 @@ All admin endpoints require tier `admin`; unauthenticated â†’ 401, wrong tier â†
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/admin/metrics` | user/group/expense counts, recent activity |
-| GET | `/api/admin/users?q=&limit=&offset=` | search users |
+| GET | `/api/admin/metrics` | user/group/expense counts and tier breakdown |
+| GET | `/api/admin/users?q=&tier=&limit=&offset=` | search users |
 | POST | `/api/admin/users/preauthorize` | pre-authorize an email/tier |
 | PATCH | `/api/admin/users/{user_id}/tier` | change tier |
-| DELETE | `/api/admin/users/{user_id}` | delete user |
+| DELETE | `/api/admin/users/{user_id}` | delete user (`204`) |
 | GET | `/api/admin/groups?q=&limit=&offset=` | search groups |
-| DELETE | `/api/admin/groups/{group_id}` | delete group and children |
+| DELETE | `/api/admin/groups/{group_id}` | delete group and children (`204`) |
+
+List endpoints use `{ "items": [...], "total": N, "limit": N, "offset": N }`.
+User items carry `id`, `name`, `email`, `image`, `tier`, `created_at`,
+`providers` and `groups_count`; group items carry `id`, `name`, `currency`,
+`currency_code`, `created_at`, `participants_count`, `expenses_count` and
+`synced_users_count`. `POST /preauthorize` returns `{ "user": ..., "is_new":
+bool }`. Authentication failures are `401`; authenticated non-admin callers
+receive `403`.
 
 ## 13. Synchronization
 

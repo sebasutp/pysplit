@@ -9,8 +9,10 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+DEVELOPMENT_JWT_SECRET = "development-only-jwt-secret-change-me"
 
 
 class Settings(BaseSettings):
@@ -39,6 +41,32 @@ class Settings(BaseSettings):
     request_id_header: str = "X-Request-ID"
     log_level: str = "INFO"
 
+    # --- Authentication -------------------------------------------------
+    # The development default is deliberately rejected in production.
+    jwt_secret: str = DEVELOPMENT_JWT_SECRET
+    access_token_ttl_seconds: int = 15 * 60
+    refresh_token_ttl_days: int = 30
+    oauth_state_ttl_seconds: int = 10 * 60
+    # None means "secure when running in production or over HTTPS".
+    cookie_secure: bool | None = None
+    refresh_cookie_name: str = "pysplit_refresh"
+    csrf_cookie_name: str = "pysplit_csrf"
+    oauth_state_cookie_name: str = "pysplit_oauth_state"
+    oauth_return_to_cookie_name: str = "pysplit_oauth_return_to"
+    auth_cookie_path: str = "/api/auth"
+    # Public origin used for OAuth redirect URIs and CSRF origin checks.
+    base_url: str | None = None
+
+    auth_google_id: str | None = None
+    auth_google_secret: str | None = None
+    auth_github_id: str | None = None
+    auth_github_secret: str | None = None
+
+    # Shared limiter for authentication endpoints.
+    auth_rate_limit_per_minute: int = 30
+    auth_account_rate_limit_per_minute: int = 60
+    auth_rate_limit_window_seconds: int = 60
+
     @field_validator("api_prefix")
     @classmethod
     def _normalise_prefix(cls, value: str) -> str:
@@ -57,9 +85,67 @@ class Settings(BaseSettings):
                 path.parent.mkdir(parents=True, exist_ok=True)
         return value
 
+    @field_validator("base_url")
+    @classmethod
+    def _normalise_base_url(cls, value: str | None) -> str | None:
+        if value is None or not value.strip():
+            return None
+        return value.strip().rstrip("/")
+
+    @field_validator("jwt_secret")
+    @classmethod
+    def _normalise_secret(cls, value: str) -> str:
+        # An empty environment value means "use the development default" in
+        # development; production validation below still rejects it.
+        return value.strip() or DEVELOPMENT_JWT_SECRET
+
+    @field_validator("access_token_ttl_seconds", "oauth_state_ttl_seconds")
+    @classmethod
+    def _positive_seconds(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("must be positive")
+        return value
+
+    @field_validator("refresh_token_ttl_days")
+    @classmethod
+    def _positive_days(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("must be positive")
+        return value
+
+    @model_validator(mode="after")
+    def _require_production_secret(self) -> Settings:
+        if self.environment.lower() == "production":
+            if not self.jwt_secret or self.jwt_secret == DEVELOPMENT_JWT_SECRET:
+                raise ValueError("JWT_SECRET must be set to a unique value in production")
+            if len(self.jwt_secret) < 32:
+                raise ValueError("JWT_SECRET must be at least 32 characters")
+        return self
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() == "production"
+
+    @property
+    def secure_cookies(self) -> bool:
+        if self.cookie_secure is not None:
+            return self.cookie_secure
+        if self.is_production:
+            return True
+        return bool(self.base_url and self.base_url.startswith("https://"))
+
+    @property
+    def enabled_oauth_providers(self) -> list[str]:
+        providers: list[str] = []
+        if self.auth_google_id and self.auth_google_secret:
+            providers.append("google")
+        if self.auth_github_id and self.auth_github_secret:
+            providers.append("github")
+        return providers
 
 
 @lru_cache(maxsize=1)

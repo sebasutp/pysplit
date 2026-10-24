@@ -49,3 +49,36 @@ def test_sqlite_parent_directory_is_created(tmp_path: Path) -> None:
 def test_memory_database_is_left_alone() -> None:
     settings = Settings(database_url="sqlite://", _env_file=None)
     assert settings.database_url == "sqlite://"
+
+
+def test_production_requires_a_unique_jwt_secret() -> None:
+    with pytest.raises(ValidationError):
+        Settings(environment="production", _env_file=None)
+    with pytest.raises(ValidationError):
+        Settings(
+            environment="production",
+            jwt_secret="short",
+            _env_file=None,
+        )
+
+    settings = Settings(
+        environment="production",
+        jwt_secret="x" * 40,
+        _env_file=None,
+    )
+    assert settings.is_production
+    assert settings.secure_cookies is True
+
+
+def test_development_allows_the_default_secret() -> None:
+    settings = Settings(_env_file=None)
+    assert not settings.is_production
+    assert settings.jwt_secret
+    assert settings.secure_cookies is False
+
+
+def test_enabled_oauth_providers_require_both_credentials() -> None:
+    assert Settings(auth_google_id="id", _env_file=None).enabled_oauth_providers == []
+    assert Settings(
+        auth_google_id="id", auth_google_secret="secret", _env_file=None
+    ).enabled_oauth_providers == ["google"]
