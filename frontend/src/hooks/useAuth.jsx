@@ -24,8 +24,13 @@ export function AuthProvider({ children }) {
   const load = useCallback(
     /** @param {AbortSignal} [signal] */
     async (signal) => {
+      // Ask /me first: with a split origin the CSRF cookie belongs to the API
+      // host and cannot be read by the SPA, but /me returns the token that the
+      // following refresh must echo. It also discovers enabled providers.
+      /** @type {User | null} */
+      let currentUser = null
       try {
-        await repository.auth.refresh()
+        currentUser = /** @type {User | null} */ (await repository.auth.me({ signal }))
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
           return
@@ -34,16 +39,17 @@ export function AuthProvider({ children }) {
       if (signal?.aborted) return
 
       try {
-        const current = await repository.auth.me({ signal })
-        if (signal?.aborted) return
-        setUser(/** @type {User | null} */ (current))
-        setProviders(repository.auth.providers())
+        const refreshed = await repository.auth.refresh({ signal })
+        if (refreshed?.user) currentUser = /** @type {User} */ (refreshed.user)
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
           return
         }
-        if (!signal?.aborted) setUser(null)
       }
+      if (signal?.aborted) return
+
+      setUser(currentUser)
+      setProviders(repository.auth.providers())
     },
     [],
   )

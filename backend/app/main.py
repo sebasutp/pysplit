@@ -27,7 +27,7 @@ from app.api import (
     sync,
 )
 from app.api.errors import service_error
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.services.errors import ServiceError
 from app.storage import close_storage
 
@@ -41,15 +41,18 @@ async def _lifespan(_app: FastAPI):
         close_storage()
 
 
-def create_app() -> FastAPI:
-    settings = get_settings()
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
 
+    api_prefix = settings.api_prefix.rstrip("/")
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
         debug=settings.debug,
-        docs_url="/api/docs",
-        openapi_url="/api/openapi.json",
+        docs_url=f"{api_prefix}/docs",
+        openapi_url=f"{api_prefix}/openapi.json",
+        redoc_url=f"{api_prefix}/redoc",
+        swagger_ui_oauth2_redirect_url=f"{api_prefix}/docs/oauth2-redirect",
         lifespan=_lifespan,
     )
 
@@ -60,7 +63,8 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins_list,
+        allow_origins=settings.allowed_origins_list,
+        allow_origin_regex=settings.cors_origin_regex,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "X-CSRF-Token", "X-Request-ID"],

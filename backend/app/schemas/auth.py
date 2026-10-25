@@ -25,6 +25,8 @@ class AuthProviders(BaseModel):
 class MeResponse(BaseModel):
     user: UserRead | None = None
     providers: AuthProviders = Field(default_factory=AuthProviders)
+    # Exposed so a SPA on another origin can echo it in ``X-CSRF-Token``.
+    csrf_token: str | None = None
 
 
 class RefreshResponse(BaseModel):
@@ -32,6 +34,7 @@ class RefreshResponse(BaseModel):
     token_type: Literal["bearer"] = "bearer"
     expires_in: int
     user: UserRead
+    csrf_token: str
 
 
 class MockLoginRequest(BaseModel):
@@ -43,3 +46,4 @@ class MockLoginRequest(BaseModel):
 class MockLoginResponse(BaseModel):
     success: bool = True
     user: UserRead
+    csrf_token: str | None = None

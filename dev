@@ -2,12 +2,25 @@
 #
 # Start the API and the Vite dev server together against data/dev/.
 #
+# Put local settings in .env at the repository root (see .env.example); shell
+# variables still take precedence. Set ENV_FILE to load a different file.
+#   ./dev
+#
 # Everything is reached through the web port; Vite proxies /api to the API.
 # Set WEB_HOST to the hostname clients use (for example a Tailscale name):
 #
 #   ./dev                                  # http://127.0.0.1:5173
 #   WEB_HOST=myhost.tailnet.ts.net ./dev   # http://myhost.tailnet.ts.net:5173
 #   WEB_HOST=myhost.tailnet.ts.net WEB_PORT=5180 ./dev
+#
+# When an HTTPS reverse proxy (Tailscale Serve, Caddy, nginx, a tunnel)
+# terminates TLS in front of Vite, set PUBLIC_ORIGIN to the exact browser
+# origin. BASE_URL, OAuth redirect URIs and secure cookies all follow it:
+#
+#   WEB_HOST=app.example.com PUBLIC_ORIGIN=https://app.example.com ./dev
+#
+# Google OAuth redirect URI to register in that case:
+#   https://app.example.com/api/auth/oauth/google/callback
 #
 # The API itself always binds to loopback and is not exposed directly.
 #
@@ -16,6 +29,55 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND="$ROOT/backend"
 FRONTEND="$ROOT/frontend"
+
+# Load local development settings from .env (or ENV_FILE). Variables already
+# exported in the caller's shell win, so `WEB_PORT=5180 ./dev` still behaves as
+# expected. This deliberately uses a small parser instead of `source` so values
+# containing spaces, quotes or `#` are handled predictably.
+declare -A DOTENV_PRESET=()
+for _name in $(compgen -e); do DOTENV_PRESET["$_name"]=1; done
+
+load_dotenv() {
+  local file="$1" line key value
+  [ -f "$file" ] || return 0
+
+  while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%$'\r'}"
+    line="${line#"${line%%[![:space:]]*}"}"
+
+    case "$line" in
+      '' | '#'*) continue ;;
+      export[[:space:]]*) line="${line#export}"; line="${line#"${line%%[![:space:]]*}"}" ;;
+    esac
+
+    key="${line%%=*}"
+    [ "$key" = "$line" ] && continue
+    value="${line#*=}"
+
+    key="${key%"${key##*[![:space:]]}"}"
+    key="${key#"${key%%[![:space:]]*}"}"
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+
+    value="${value#"${value%%[![:space:]]*}"}"
+    if [[ "$value" == \"* ]]; then
+      value="${value:1}"
+      value="${value%%\"*}"
+    elif [[ "$value" == \'* ]]; then
+      value="${value:1}"
+      value="${value%%\'*}"
+    else
+      value="${value%%[[:space:]]#*}"
+      value="${value%"${value##*[![:space:]]}"}"
+    fi
+
+    [ -n "${DOTENV_PRESET[$key]:-}" ] && continue
+    export "$key=$value"
+  done <"$file"
+}
+
+ENV_FILE="${ENV_FILE:-$ROOT/.env}"
+load_dotenv "$ENV_FILE"
+
 DATA_DIR="${DATA_DIR:-$ROOT/data/dev}"
 
 # WEB_HOST is the single hostname knob: Vite accepts it in the Host header and
@@ -23,6 +85,12 @@ DATA_DIR="${DATA_DIR:-$ROOT/data/dev}"
 # API is only reachable through the Vite proxy on this host.
 WEB_HOST="${WEB_HOST:-127.0.0.1}"
 WEB_PORT="${WEB_PORT:-5173}"
+
+# Browser-facing origin. Keep the default when you open Vite directly, or set
+# PUBLIC_ORIGIN (or BASE_URL) to the public HTTPS URL when a reverse proxy
+# fronts the dev server. BASE_URL is what the API uses for OAuth redirect URIs,
+# CSRF checks and cookie security, so it must match the browser's address.
+PUBLIC_ORIGIN="${PUBLIC_ORIGIN:-http://$WEB_HOST:$WEB_PORT}"
 
 # Internal only. Clients never connect to this address directly.
 API_BIND_HOST="127.0.0.1"
@@ -80,12 +148,12 @@ export WEB_PORT
 export VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-http://$API_BIND_HOST:$API_PORT}"
 # The browser talks to Vite, so OAuth redirect URIs and CSRF origin checks must
 # use the public web origin rather than the internal API address.
-export BASE_URL="${BASE_URL:-http://$WEB_HOST:$WEB_PORT}"
+export BASE_URL="${BASE_URL:-$PUBLIC_ORIGIN}"
 # Passwordless login is used by local development and the Playwright suite. It
 # is opt-in in the application and always disabled in production.
 export ENABLE_MOCK_LOGIN="${ENABLE_MOCK_LOGIN:-true}"
 # Local development defaults to the Stage 8D online features. Production keeps
-# the opt-in defaults from .env.example.
+# the opt-in defaults from the application settings.
 export ENABLE_RECEIPT_EXTRACT="${ENABLE_RECEIPT_EXTRACT:-true}"
 export ENABLE_RECEIPT_ITEMS="${ENABLE_RECEIPT_ITEMS:-true}"
 export ENABLE_CATEGORY_EXTRACT="${ENABLE_CATEGORY_EXTRACT:-true}"
@@ -94,6 +162,15 @@ export ENABLE_EXPENSE_DOCUMENTS="${ENABLE_EXPENSE_DOCUMENTS:-true}"
 # throttling a full run. Production keeps the conservative defaults.
 export AUTH_RATE_LIMIT_PER_MINUTE="${AUTH_RATE_LIMIT_PER_MINUTE:-1000}"
 export AUTH_ACCOUNT_RATE_LIMIT_PER_MINUTE="${AUTH_ACCOUNT_RATE_LIMIT_PER_MINUTE:-1000}"
+
+# Keep the local database in step with the checked-in migrations before the API
+# opens it. `upgrade head` applies only pending revisions and is a no-op when
+# the schema is already current, so it is safe on every dev start.
+echo "Applying database migrations (if any)..."
+(
+  cd "$BACKEND"
+  PYTHONPATH=. .venv/bin/alembic upgrade head
+)
 
 cleanup() {
   trap - EXIT INT TERM
@@ -119,8 +196,8 @@ API_PID=$!
 ) &
 WEB_PID=$!
 
-echo "Web:  http://$WEB_HOST:$WEB_PORT"
-echo "API:  proxied at http://$WEB_HOST:$WEB_PORT/api (internal: http://$API_BIND_HOST:$API_PORT)"
+echo "Web:  $BASE_URL"
+echo "API:  proxied at $BASE_URL/api (internal: http://$API_BIND_HOST:$API_PORT)"
 echo "Data: $DATA_DIR"
 
 wait -n "$API_PID" "$WEB_PID"

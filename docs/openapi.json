@@ -5332,6 +5332,17 @@
           },
           "providers": {
             "$ref": "#/components/schemas/AuthProviders"
+          },
+          "csrf_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Csrf Token"
           }
         },
         "type": "object",
@@ -5414,6 +5425,17 @@
           },
           "user": {
             "$ref": "#/components/schemas/UserRead"
+          },
+          "csrf_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Csrf Token"
           }
         },
         "type": "object",
@@ -6690,13 +6712,18 @@
           },
           "user": {
             "$ref": "#/components/schemas/UserRead"
+          },
+          "csrf_token": {
+            "type": "string",
+            "title": "Csrf Token"
           }
         },
         "type": "object",
         "required": [
           "access_token",
           "expires_in",
-          "user"
+          "user",
+          "csrf_token"
         ],
         "title": "RefreshResponse"
       },

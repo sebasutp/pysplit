@@ -6,14 +6,26 @@ directly with ``_env_file=None`` so a developer's ``.env`` cannot affect them.
 
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlsplit
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEVELOPMENT_JWT_SECRET = "development-only-jwt-secret-change-me"
+
+
+def _origin_from_url(value: str | None) -> str | None:
+    """Return a normalised scheme://host origin for a configured URL."""
+    if not value:
+        return None
+    parsed = urlsplit(value.strip())
+    if parsed.scheme.lower() not in {"http", "https"} or not parsed.netloc:
+        return None
+    return f"{parsed.scheme.lower()}://{parsed.netloc.lower()}"
 
 
 class Settings(BaseSettings):
@@ -38,6 +50,10 @@ class Settings(BaseSettings):
 
     # Comma-separated list; parsed into a list by `cors_origins_list`.
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    # Optional regular expression for development domains whose subdomain is
+    # a port number (for example ``https://5173.test.example.com``). The
+    # expression is matched against the full origin, not just the host.
+    cors_origin_regex: str | None = None
 
     # --- Authentication -------------------------------------------------
     # The development default is deliberately rejected in production.
@@ -52,8 +68,25 @@ class Settings(BaseSettings):
     oauth_state_cookie_name: str = "pysplit_oauth_state"
     oauth_return_to_cookie_name: str = "pysplit_oauth_return_to"
     auth_cookie_path: str = "/api/auth"
-    # Public origin used for OAuth redirect URIs and CSRF origin checks.
+    # Public origin the browser uses to reach the app. In the normal
+    # same-origin setup the frontend dev server / reverse proxy forwards
+    # ``/api`` to this process, so set this to the frontend origin (for example
+    # ``https://5173.test.example.com``). OAuth redirect URIs and CSRF origin
+    # checks use it.
     base_url: str | None = None
+    # Optional. Only set this when the SPA and API are deliberately served
+    # from different origins. With a same-origin ``/api`` proxy, leave it
+    # unset: relative redirects already land back on the SPA.
+    frontend_url: str | None = None
+    # Optional parent cookie domain (for example ``.test.example.com``). Leave
+    # unset for host-only cookies. Setting it lets sibling development
+    # subdomains share the readable CSRF cookie; the refresh cookie remains
+    # scoped to the API host.
+    cookie_domain: str | None = None
+    # ``none`` is required when the frontend and API are on unrelated sites and
+    # the browser must send cookies on cross-site fetches. It requires HTTPS
+    # and therefore secure cookies.
+    cookie_samesite: Literal["lax", "strict", "none"] = "lax"
     # Only trust X-Forwarded-Proto/X-Forwarded-Host when a known reverse proxy
     # sets them. Without this, clients can spoof the origin used for CSRF
     # checks and OAuth redirect URIs.
@@ -149,12 +182,48 @@ class Settings(BaseSettings):
                 path.parent.mkdir(parents=True, exist_ok=True)
         return value
 
-    @field_validator("base_url")
+    @field_validator("base_url", "frontend_url")
     @classmethod
     def _normalise_base_url(cls, value: str | None) -> str | None:
         if value is None or not value.strip():
             return None
         return value.strip().rstrip("/")
+
+    @field_validator("frontend_url")
+    @classmethod
+    def _require_http_frontend_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        parsed = urlsplit(value)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            raise ValueError("frontend_url must be an http(s) URL")
+        return value
+
+    @field_validator("cors_origin_regex")
+    @classmethod
+    def _valid_cors_regex(cls, value: str | None) -> str | None:
+        if value is None or not value.strip():
+            return None
+        cleaned = value.strip()
+        try:
+            re.compile(cleaned)
+        except re.error as exc:
+            raise ValueError(f"cors_origin_regex is not a valid regular expression: {exc}") from exc
+        return cleaned
+
+    @field_validator("cookie_domain")
+    @classmethod
+    def _normalise_cookie_domain(cls, value: str | None) -> str | None:
+        if value is None or not value.strip():
+            return None
+        return value.strip()
+
+    @field_validator("cookie_samesite", mode="before")
+    @classmethod
+    def _normalise_samesite(cls, value: object) -> object:
+        if isinstance(value, str):
+            return value.strip().lower()
+        return value
 
     @field_validator("jwt_secret")
     @classmethod
@@ -280,6 +349,23 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def allowed_origins_list(self) -> list[str]:
+        """Explicit browser origins allowed to call the API.
+
+        ``CORS_ORIGINS`` remains the source of truth, but the configured
+        public API and SPA origins are always included. That makes the common
+        split-origin development setup work without duplicating the same URL in
+        two variables.
+        """
+        candidates = [*self.cors_origins_list, self.base_url, self.frontend_url]
+        origins: list[str] = []
+        for candidate in candidates:
+            origin = _origin_from_url(candidate)
+            if origin and origin not in origins:
+                origins.append(origin)
+        return origins
 
     @property
     def is_production(self) -> bool:

@@ -43,6 +43,19 @@ describe('repository contract', () => {
     }
   })
 
+  it('starts OAuth on the configured API origin', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'https://api.example.com/api')
+    vi.resetModules()
+    const { oauthStartUrl } = await import('./online')
+
+    expect(oauthStartUrl('google', '/groups/trip?tab=expenses')).toBe(
+      'https://api.example.com/api/auth/oauth/google/start?return_to=%2Fgroups%2Ftrip%3Ftab%3Dexpenses',
+    )
+
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
   it('passes group ids as a comma-separated filter', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ items: [], total: 0, limit: 50, offset: 0 }))
     vi.stubGlobal('fetch', fetchMock)

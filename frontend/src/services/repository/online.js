@@ -6,6 +6,7 @@
  */
 
 import { api } from '../api'
+import { API_BASE_URL } from '../config'
 import { run } from './contract'
 
 /** @typedef {{ signal?: AbortSignal }} ReadOptions */
@@ -38,6 +39,17 @@ function query(params) {
  */
 function groupPath(groupId) {
   return `/groups/${encodeURIComponent(groupId)}`
+}
+
+/**
+ * OAuth entry point on the configured API origin.
+ *
+ * @param {'google'|'github'} provider
+ * @param {string} [returnTo]
+ * @returns {string}
+ */
+export function oauthStartUrl(provider, returnTo = '/groups') {
+  return `${API_BASE_URL}/auth/oauth/${provider}/start?return_to=${encodeURIComponent(returnTo)}`
 }
 
 const auth = {
@@ -75,6 +87,7 @@ const auth = {
       })
     })
     api.clearAccessToken()
+    api.clearCsrfToken()
   },
   /**
    * @param {'google'|'github'} provider
@@ -82,8 +95,9 @@ const auth = {
    * @returns {void}
    */
   startOAuth(provider, returnTo = '/groups') {
-    const target = encodeURIComponent(returnTo)
-    window.location.href = `/api/auth/oauth/${provider}/start?return_to=${target}`
+    // Use the configured API origin so a split frontend/backend dev setup
+    // lands on the backend instead of the static frontend dev server.
+    window.location.assign(oauthStartUrl(provider, returnTo))
   },
   /** @returns {{google: boolean, github: boolean}} */
   providers() {

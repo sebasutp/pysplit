@@ -36,11 +36,15 @@ The UI and documentation must not imply that shared links are private. See
   rest, delivered in an `HttpOnly` cookie scoped to `/api/auth`, and rotated on
   every refresh. Reuse of an already-rotated token revokes the whole token
   family. Logout revokes the family, not just the presented token.
-- **Cookies are `SameSite=Lax`.** The refresh cookie is `HttpOnly`; the readable
-  `pysplit_csrf` cookie is the double-submit value. Cookies are `Secure` in
-  production (or when `BASE_URL` is https).
+- **Cookies are `SameSite=Lax` by default.** The refresh cookie is `HttpOnly`;
+  the readable `pysplit_csrf` cookie is the double-submit value. Cookies are
+  `Secure` in production (or when `BASE_URL` is https). A split SPA/API setup on
+  unrelated sites must set `COOKIE_SAMESITE=none` (HTTPS only); sibling
+  development subdomains can stay on `Lax`.
 - **Cookie mutations are CSRF-protected.** Refresh and logout require a
   same-origin `Origin`/`Referer` and `X-CSRF-Token` matching the CSRF cookie.
+  `/api/auth/me` and `/api/auth/refresh` also return the token so a
+  cross-origin SPA, which cannot read the API host's cookie, can echo it.
   Bearer-token API calls are not sent automatically by browsers and are not
   subject to this check.
 - **Access tokens are memory-only.** The 15-minute access token is held by the

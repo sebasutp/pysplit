@@ -73,18 +73,16 @@ def session(engine) -> Generator[Session, None, None]:
 
 @pytest.fixture()
 def client(engine) -> Generator[TestClient, None, None]:
-    app = create_app()
+    # Most tests authenticate through the mock-login helper, which is opt-in.
+    settings = Settings(_env_file=None, enable_mock_login=True)
+    app = create_app(settings)
 
     def override_session() -> Generator[Session, None, None]:
         with Session(engine) as db_session:
             yield db_session
 
     app.dependency_overrides[get_session] = override_session
-    # Most tests authenticate through the mock-login helper, which is opt-in.
-    app.dependency_overrides[get_settings] = lambda: Settings(
-        _env_file=None,
-        enable_mock_login=True,
-    )
+    app.dependency_overrides[get_settings] = lambda: settings
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
@@ -96,17 +94,18 @@ def make_client(engine):
     clients: list[TestClient] = []
 
     def factory(**settings_overrides):
-        app = create_app()
+        # Pass the settings to the app factory as well as the dependency
+        # override: middleware such as CORS is configured at app creation time
+        # and would otherwise ignore the override.
+        settings = Settings(_env_file=None, **settings_overrides)
+        app = create_app(settings)
 
         def override_session() -> Generator[Session, None, None]:
             with Session(engine) as db_session:
                 yield db_session
 
         app.dependency_overrides[get_session] = override_session
-        if settings_overrides:
-            app.dependency_overrides[get_settings] = lambda: Settings(
-                _env_file=None, **settings_overrides
-            )
+        app.dependency_overrides[get_settings] = lambda: settings
         test_client = TestClient(app)
         test_client.__enter__()
         clients.append(test_client)
