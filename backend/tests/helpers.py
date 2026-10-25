@@ -16,6 +16,10 @@ from app.models.expense import Expense
 from app.models.expense_paid_for import ExpensePaidFor
 from app.models.group import Group
 from app.models.participant import Participant
+from app.models.receipt import Receipt
+from app.models.receipt_item import ReceiptItem
+from app.models.receipt_item_portion import ReceiptItemPortion
+from app.models.receipt_opt_out import ReceiptOptOut
 from app.models.user import User
 from app.services.categories import ensure_default_categories
 from app.utils.dates import date_to_datetime
@@ -180,3 +184,88 @@ def make_expense(
     session.commit()
     session.refresh(expense)
     return expense
+
+
+def make_receipt(
+    session: Session,
+    *,
+    group: Group,
+    items: list[dict],
+    opt_outs: tuple[str, ...] = (),
+    status: str = "EXTRACTED",
+    image_url: str | None = None,
+    total: int | None = None,
+    expense_id: str | None = None,
+) -> Receipt:
+    """Insert a receipt with ordered items, portions and opt-outs.
+
+    This bypasses the AI path so receipt/apply tests are deterministic and
+    never touch the network.
+    """
+    now = datetime.now(UTC)
+    receipt = Receipt(
+        id=new_id("rcpt"),
+        group_id=group.id,
+        image_url=image_url or f"https://uploads.example.com/{uuid4().hex}.png",
+        status=status,
+        total=total,
+        expense_id=expense_id,
+        created_at=now,
+        updated_at=now,
+        version=1,
+    )
+    session.add(receipt)
+    session.flush()
+    for index, item in enumerate(items):
+        item_id = new_id("ritem")
+        session.add(
+            ReceiptItem(
+                id=item_id,
+                receipt_id=receipt.id,
+                name=item.get("name", f"Item {index}"),
+                quantity_milli=int(item.get("quantity_milli", 1000)),
+                unit_price=item.get("unit_price"),
+                amount=int(item["amount"]),
+                is_shared=bool(item.get("is_shared", False)),
+                is_adjustment=bool(item.get("is_adjustment", False)),
+                position=int(item.get("position", index)),
+                created_at=now,
+                updated_at=now,
+                version=1,
+            )
+        )
+        for portion in item.get("portions", []):
+            target = portion.get("target", "PARTICIPANT")
+            session.add(
+                ReceiptItemPortion(
+                    id=new_id("rport"),
+                    item_id=item_id,
+                    target=target,
+                    participant_id=(
+                        None
+                        if target == "SHARED"
+                        else (portion.get("participant_id") or portion.get("participant"))
+                    ),
+                    quantity_milli=int(portion.get("quantity_milli", 1000)),
+                    created_at=now,
+                    updated_at=now,
+                    version=1,
+                )
+            )
+    for participant_id in opt_outs:
+        session.add(
+            ReceiptOptOut(
+                id=new_id("ropt"),
+                receipt_id=receipt.id,
+                participant_id=participant_id,
+                created_at=now,
+                updated_at=now,
+                version=1,
+            )
+        )
+    if total is None:
+        receipt.total = sum(int(item["amount"]) for item in items)
+        session.add(receipt)
+    session.commit()
+    session.refresh(receipt)
+    return receipt

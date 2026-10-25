@@ -15,6 +15,10 @@ class ConflictError(ServiceError):
     """The request conflicts with current state (HTTP 409)."""
 
 
+class ForbiddenError(ServiceError):
+    """A feature flag or policy forbids the action (HTTP 403)."""
+
+
 class InvalidInputError(ServiceError):
     """A business-rule validation error (HTTP 422)."""
 

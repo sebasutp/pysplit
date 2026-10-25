@@ -15,7 +15,6 @@ from fastapi import (
     UploadFile,
     status,
 )
-from fastapi.responses import FileResponse
 
 from app.api.deps import SessionDep, SettingsDep
 from app.api.errors import raise_service_error
@@ -31,7 +30,7 @@ from app.services import documents as documents_service
 from app.services import expenses as expenses_service
 from app.services import exports as exports_service
 from app.services.errors import ServiceError
-from app.storage import LocalBlobStorage
+from app.storage import build_storage
 
 router = APIRouter(prefix="/groups", tags=["expenses"])
 
@@ -193,7 +192,7 @@ async def upload_document(
     try:
         return documents_service.save_document(
             session,
-            LocalBlobStorage(settings.upload_dir),
+            build_storage(settings),
             group_id=group_id,
             expense_id=expense_id,
             data=data,
@@ -214,22 +213,21 @@ def download_document(
     document_id: str,
     session: SessionDep,
     settings: SettingsDep,
-) -> FileResponse:
+) -> Response:
     try:
-        _document, path, media_type, filename = documents_service.resolve_document(
+        _document, data, media_type, filename = documents_service.resolve_document(
             session,
-            LocalBlobStorage(settings.upload_dir),
+            build_storage(settings),
             group_id=group_id,
             expense_id=expense_id,
             document_id=document_id,
         )
     except ServiceError as exc:
         raise_service_error(exc)
-    return FileResponse(
-        path,
+    return Response(
+        content=data,
         media_type=media_type,
-        filename=filename,
-        content_disposition_type="inline",
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
     )
 
 
@@ -247,7 +245,7 @@ def delete_document(
     try:
         documents_service.delete_document(
             session,
-            LocalBlobStorage(settings.upload_dir),
+            build_storage(settings),
             group_id=group_id,
             expense_id=expense_id,
             document_id=document_id,

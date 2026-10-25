@@ -421,7 +421,7 @@
   ui: /groups/:groupId/expenses/:expenseId/items
   stage: '7'
   tests:
-  - backend/tests/test_receipts.py::test_add_item
+  - backend/tests/test_receipts.py::test_add_update_delete_item
   offline: read-write
 - id: RCPT-UPDATE-ITEM
   category: custom
@@ -430,7 +430,7 @@
   ui: /groups/:groupId/expenses/:expenseId/items
   stage: '7'
   tests:
-  - backend/tests/test_receipts.py::test_update_item
+  - backend/tests/test_receipts.py::test_add_update_delete_item
   offline: read-write
 - id: RCPT-DELETE-ITEM
   category: custom
@@ -439,7 +439,7 @@
   ui: /groups/:groupId/expenses/:expenseId/items
   stage: '7'
   tests:
-  - backend/tests/test_receipts.py::test_delete_item
+  - backend/tests/test_receipts.py::test_add_update_delete_item
   offline: read-write
 - id: RCPT-SET-PORTIONS
   category: custom
@@ -475,8 +475,66 @@
   ui: /groups/:groupId/expenses/:expenseId/items
   stage: '7'
   tests:
-  - backend/tests/test_receipts.py::test_link_receipt
+  - backend/tests/test_receipts.py::test_get_receipt_for_expense
+  - backend/tests/test_receipts.py::test_link_cross_group_is_rejected
   offline: read-write
+- id: RCPT-UPLOAD
+  category: custom
+  reference: spliit/src/app/api/s3-upload/route.ts::POST
+  api: POST /api/groups/{group_id}/receipts/upload
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_upload_receipt_image
+  offline: queued
+- id: RCPT-EXTRACT-TOTAL
+  category: custom
+  reference: spliit/src/app/groups/[groupId]/expenses/create-from-receipt-button-actions.ts::extractExpenseInformationFromImage
+  api: POST /api/groups/{group_id}/receipts/extract-total
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_extract_total_endpoint
+  offline: queued
+- id: RCPT-EXTRACT-ITEMS
+  category: custom
+  reference: spliit/src/app/groups/[groupId]/expenses/create-from-receipt-button-actions.ts::extractReceiptItemsForImage
+  api: POST /api/groups/{group_id}/receipts/extract-items
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_extract_items_endpoint
+  - backend/tests/test_ai.py::test_malformed_ai_output_fails_receipt
+  offline: queued
+- id: RCPT-CLAIM
+  category: custom
+  reference: spliit/src/lib/receipts.ts::claimReceiptForExtraction
+  api: POST /api/groups/{group_id}/receipts/extract-items
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_claim_receipt_once
+  - backend/tests/test_receipts.py::test_receipt_lifecycle
+  offline: online-only
+- id: RCPT-ITEM-LIMITS
+  category: custom
+  reference: spliit/src/trpc/routers/groups/receipts/shared.ts::MAX_RECEIPT_ITEM_AMOUNT
+  api: POST /api/groups/{group_id}/receipts/{receipt_id}/items
+  ui: /groups/:groupId/expenses/:expenseId/items
+  stage: '7'
+  tests:
+  - backend/tests/test_receipts.py::test_item_limits
+  offline: read-write
+- id: AI-CATEGORY-INFER
+  category: custom
+  reference: spliit/src/components/expense-form-actions.tsx::extractCategoryFromTitle
+  api: POST /api/ai/categories/infer
+  ui: /groups/:groupId/expenses/create
+  stage: '7'
+  tests:
+  - backend/tests/test_ai.py::test_category_inference_endpoint
+  - backend/tests/test_ai.py::test_category_inference_truncates_title
+  offline: online-only
 - id: ADMIN-METRICS
   category: custom
   reference: spliit/src/trpc/routers/admin/index.ts::getMetrics
@@ -799,7 +857,8 @@
   ui: /groups/:groupId/expenses/:expenseId/items
   stage: '7'
   tests:
-  - backend/tests/test_receipt_apply.py::test_apply_invariants
+  - backend/tests/test_receipt_apply.py::test_apply_invariants_all_opted_out
+  - backend/tests/test_receipt_apply.py::test_apply_invariants_empty_and_negative
   offline: read-write
 - id: TEST-RECEIPT-DRAFT
   category: custom
@@ -808,7 +867,7 @@
   ui: /groups/:groupId/expenses/create
   stage: '7'
   tests:
-  - backend/tests/test_receipts.py::test_receipt_draft
+  - backend/tests/test_receipts.py::test_receipt_draft_shared_fallback
   offline: queued
 - id: TEST-RECEIPT-EXTRACTION
   category: custom
@@ -817,7 +876,8 @@
   ui: /groups/:groupId/expenses/create
   stage: '7'
   tests:
-  - backend/tests/test_ai.py::test_receipt_extraction
+  - backend/tests/test_ai.py::test_receipt_extraction_returns_none_for_bad_output
+  - backend/tests/test_ai.py::test_receipt_extraction_normalizes_adjustments_and_quantities
   offline: queued
 - id: TEST-RECEIPT-SPLIT
   category: custom
@@ -826,7 +886,7 @@
   ui: /groups/:groupId/expenses/:expenseId/items
   stage: '7'
   tests:
-  - backend/tests/test_receipts.py::test_provisional_split
+  - backend/tests/test_receipts.py::test_provisional_split_unassigned_and_shared
   offline: read-write
 - id: TEST-RECEIPTS
   category: custom

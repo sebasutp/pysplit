@@ -19,6 +19,7 @@ from app.api import (
     features,
     groups,
     health,
+    receipts,
     stats,
     sync,
 )
@@ -55,6 +56,8 @@ def create_app() -> FastAPI:
     app.include_router(stats.router, prefix=settings.api_prefix)
     app.include_router(activities.router, prefix=settings.api_prefix)
     app.include_router(expenses.router, prefix=settings.api_prefix)
+    app.include_router(receipts.router, prefix=settings.api_prefix)
+    app.include_router(receipts.ai_router, prefix=settings.api_prefix)
     app.include_router(sync.router, prefix=settings.api_prefix)
 
     return app

@@ -8,6 +8,7 @@ BACKEND = Path(__file__).resolve().parents[1]
 ROUTERS = (
     "groups.py",
     "expenses.py",
+    "receipts.py",
     "balances.py",
     "stats.py",
     "activities.py",
@@ -23,6 +24,8 @@ UTILS = (
     "recurrence.py",
     "currency.py",
     "dates.py",
+    "receipt_split.py",
+    "receipt_extraction.py",
 )
 
 
@@ -73,3 +76,29 @@ def test_stage_six_sync_router_does_not_import_models_or_sql():
     source = (BACKEND / "app" / "api" / "sync.py").read_text()
     for forbidden in ("app.models", "sqlmodel", "sqlalchemy", "app.core.database"):
         assert forbidden not in source, f"sync.py imports {forbidden}"
+
+
+def test_stage_seven_specs_exist():
+    for name in ("test_receipts.py", "test_ai.py", "test_receipt_apply.py"):
+        assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
+
+
+def test_stage_seven_receipt_router_is_http_only():
+    source = (BACKEND / "app" / "api" / "receipts.py").read_text()
+    for forbidden in ("app.models", "sqlmodel", "sqlalchemy", "app.core.database"):
+        assert forbidden not in source, f"receipts.py imports {forbidden}"
+
+
+def test_stage_seven_receipt_parsers_are_pure():
+    for name in ("receipt_split.py", "receipt_extraction.py"):
+        source = (BACKEND / "app" / "utils" / name).read_text()
+        for forbidden in (
+            "app.models",
+            "sqlmodel",
+            "sqlalchemy",
+            "app.storage",
+            "app.core.config",
+            "fastapi",
+            "httpx",
+        ):
+            assert forbidden not in source, f"utils/{name} imports {forbidden}"

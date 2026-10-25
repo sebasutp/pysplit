@@ -320,8 +320,23 @@ Both return `{ "expenses": [ { "id", "title", "amount", "expense_date" } ] }`.
 
 ## 10. Receipts and AI
 
-All receipt endpoints require the `receipt_items`/`receipt_extract` flags.
-AI extraction is online-only.
+Receipt GET/item/apply/link endpoints require `receipt_items` to be enabled.
+`extract-total` requires `receipt_extract` (which is implied by
+`receipt_items`). AI extraction is online-only. All limits and flags are
+enforced server-side, not only by the UI.
+
+### `POST /api/groups/{group_id}/receipts/upload`
+Multipart upload (`file`, optional `width`, `height`). Accepts the configured
+image types, enforces `MAX_UPLOAD_BYTES`, and returns a server-generated URL:
+```json
+{ "url": "/api/groups/g1/receipts/images/img_…", "width": 800, "height": 600 }
+```
+When S3/R2 public storage is configured the URL points directly at storage.
+Uploads are rate-limited and keys are server-generated, so traversal is not
+possible.
+
+### `GET /api/groups/{group_id}/receipts/images/{image_id}`
+Returns the stored image bytes. Used for local-disk storage only.
 
 ### `GET /api/groups/{group_id}/receipts/{receipt_id}`
 ### `GET /api/groups/{group_id}/expenses/{expense_id}/receipt`
@@ -333,32 +348,54 @@ AI extraction is online-only.
   "items": [ { "id": "i1", "name": "Pasta", "quantity_milli": 1000,
     "unit_price": 1200, "amount": 1200, "is_shared": false,
     "is_adjustment": false, "position": 0,
-    "portions": [ { "target": "PARTICIPANT", "participant_id": "p1",
-      "quantity_milli": 1000 } ] } ],
+    "portions": [ { "id": "rp1", "target": "PARTICIPANT",
+      "participant_id": "p1", "quantity_milli": 1000 } ] } ],
   "opt_outs": [ "p2" ],
   "split": { "participant_totals": [ { "participant_id": "p1", "amount": 1200 } ],
-    "unassigned": 0, "shared": 0, "adjustments": 0, "total": 1200 }
+    "participants": [ { "participant_id": "p1", "direct": 1200, "shared": 0,
+      "unassigned": 0, "total": 1200 } ],
+    "unassigned": 0, "unassigned_pool": 0, "shared": 0, "shared_pool": 0,
+    "adjustments": 0, "items_total": 1200, "total": 1200,
+    "all_opted_out": false }
 }
 ```
+Provisional totals are always recomputed from stored items and live
+participants. Client-supplied totals are never trusted.
 
 ### `POST /api/groups/{group_id}/receipts/extract-total`
 ```json
-{ "image_url": "https://…/receipt.jpg" }
+{ "image_url": "/api/groups/g1/receipts/images/img_…" }
 ```
-Creates/updates a `Receipt` and returns it. Server fetches only allowlisted
-hosts (SSRF protection); malformed model output becomes `status: "FAILED"`,
-never a 500.
+```json
+{ "amount": 42.5, "category_id": "7", "date": "2026-04-01", "title": "Lunch" }
+```
+The reference-shaped result is returned without persisting a receipt, so the
+follow-up line-item extraction still performs the single paid call. Malformed
+model output or a provider failure returns all-null fields, never a 500.
 
 ### `POST /api/groups/{group_id}/receipts/extract-items`
-Same input; returns `ReceiptState` with ordered items.
+Same input plus optional `image_width`/`image_height`. The first successful
+call per `(group_id, image_url)` persists an `EXTRACTED` receipt; re-posting the
+same image reuses it without another paid call. Returns:
+```json
+{ "status": "EXTRACTED", "receipt_id": "r1", "total": 2400,
+  "items_total": 2400, "merchant": "Cafe", "date": "2026-04-01",
+  "currency_code": "EUR", "category_id": "7",
+  "receipt": { "…": "ReceiptRead" }, "items": [], "opt_outs": [],
+  "split": { "…": "ReceiptSplitRead" } }
+```
+Malformed output or a provider failure records `status: "FAILED"` on the
+receipt and returns `status: "FAILED"` with an empty split. Concurrent callers
+race on an atomic claim; a stale `EXTRACTING` claim is recoverable after
+`RECEIPT_EXTRACTION_STALE_SECONDS`. The loser receives `409`.
 
 ### `POST /api/groups/{group_id}/receipts/{receipt_id}/items`
 ### `PATCH /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}`
 ### `DELETE /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}`
-Item fields: `name`, `quantity_milli`, `unit_price`, `amount`, `is_shared`,
-`is_adjustment`, `position`.
-Concurrent extraction claims are atomic; a stale `EXTRACTING` claim is
-recoverable.
+Create fields: `name`, `quantity_milli`, `amount`, `is_shared`.
+Update fields: any of `name`, `quantity_milli`, `amount`, `is_shared`.
+Limits: name ≤ 200 characters, amount ≤ 1,000,000,000 minor units,
+quantity ≤ 1,000,000,000 thousandths. Every mutation returns `ReceiptState`.
 
 ### `PUT /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}/portions`
 Replace-set:
@@ -366,29 +403,36 @@ Replace-set:
 { "portions": [ { "target": "PARTICIPANT", "participant_id": "p1", "quantity_milli": 500 },
                 { "target": "SHARED", "quantity_milli": 500 } ] }
 ```
+At most 100 portions. Participant portions must name a live group participant,
+and the summed quantities may not exceed the item quantity. An empty list
+returns the item to the unassigned pool and clears `is_shared`.
 
 ### `PUT /api/groups/{group_id}/receipts/{receipt_id}/opt-outs/{participant_id}`
-`{ "opted_out": true }`; `204` or `ReceiptState`.
+`{ "opted_out": true }`; returns `ReceiptState`.
 
 ### `POST /api/groups/{group_id}/receipts/{receipt_id}/apply`
 ```json
-{ "expense_id": "e1", "title": "Dinner", "category_id": 1,
-  "expense_date": "2026-09-03", "paid_by_id": "p1" }
+{ "expense_id": "e1", "participant_id": "p1" }
 ```
-Creates/updates a `BY_AMOUNT` expense from the server-recomputed split and
-links the receipt. Re-applying after a manual edit is refused.
+Updates the expense to a `BY_AMOUNT` split using the server-recomputed split,
+preserves its notes/documents/paid-by/recurrence, and links the receipt.
+All-opted-out, empty and negative-share receipts are rejected with `422`.
+Returns `{ "receipt", "expense", "split" }`.
 
 ### `POST /api/groups/{group_id}/receipts/{receipt_id}/link`
-`{ "expense_id": "e1" }`; `409` if either side belongs to another group.
+`{ "expense_id": "e1" }`; `404` if either side belongs to another group.
 
 ### `POST /api/ai/categories/infer`
 ```json
 { "title": "Team dinner" }
 ```
 ```json
-{ "category_id": 1, "confidence": "high" }
+{ "category_id": 1 }
 ```
-Online-only and rate-limited.
+The title is truncated to 40 characters before the model call. Unknown or
+malformed model output falls back to category `0` (General). Rate-limited and
+flag-gated.
+
 
 ## 11. Exports
 
