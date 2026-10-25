@@ -1,4 +1,4 @@
-import { addExpenseViaApi as addExpense, createGroup, setActiveUser, uniqueSuffix } from './app'
+import { addExpense, createGroup, setActiveUser, uniqueSuffix } from './app'
 import { expect, test } from './fixtures'
 import { cardByTitle, money } from './ui'
 

@@ -41,7 +41,23 @@ PURE_UTILS = (
     "receipt_split.py",
     "receipt_extraction.py",
 )
-REQUIRED_E2E = ("group-management.spec.ts", "global-balance.spec.ts")
+REQUIRED_E2E = (
+    "group-management.spec.ts",
+    "global-balance.spec.ts",
+    "core.spec.ts",
+    "expense-edit-delete.spec.ts",
+    "expense-variants.spec.ts",
+    "split-modes.spec.ts",
+    "multi-currency.spec.ts",
+    "recurrence.spec.ts",
+    "stats.spec.ts",
+    "stats-breakdown.spec.ts",
+    "reimbursements.spec.ts",
+    "repayment-currency.spec.ts",
+    "active-user.spec.ts",
+    "receipts.spec.ts",
+    "admin.spec.ts",
+)
 FORBIDDEN_FRONTEND = re.compile(
     r"from\s+['\"][^'\"]*services/(?:api|db|outbox|sync)(?:\.js)?['\"]"
 )

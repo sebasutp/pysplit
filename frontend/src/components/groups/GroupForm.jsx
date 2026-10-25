@@ -67,13 +67,20 @@ const ERROR_LABELS = /** @type {Record<string, string>} */ ({
 })
 
 /**
- * @param {{defaultCurrencyCode?: string, initial?: any, onSubmit: (values: GroupFormValues) => Promise<void>, submitLabel?: string}} props
+ * @param {{
+ *   defaultCurrencyCode?: string,
+ *   initial?: any,
+ *   onSubmit: (values: GroupFormValues) => Promise<void>,
+ *   submitLabel?: string,
+ *   lockedParticipantIds?: string[],
+ * }} props
  */
 export function GroupForm({
   defaultCurrencyCode = 'USD',
   initial,
   onSubmit,
   submitLabel,
+  lockedParticipantIds = [],
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -255,7 +262,18 @@ export function GroupForm({
                     size="icon"
                     className="text-destructive"
                     aria-label={`Remove participant ${index + 1}`}
-                    disabled={values.participants.length === 1}
+                    title={
+                      participant.id && lockedParticipantIds.includes(participant.id)
+                        ? t(
+                            'GroupForm.Participants.cannotRemove',
+                            'This participant is part of an expense and cannot be removed.',
+                          )
+                        : undefined
+                    }
+                    disabled={
+                      values.participants.length === 1 ||
+                      Boolean(participant.id && lockedParticipantIds.includes(participant.id))
+                    }
                     onClick={() =>
                       setValues((previous) => ({
                         ...previous,

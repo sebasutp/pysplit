@@ -115,7 +115,7 @@ test('exports the expenses as JSON', async ({ page }) => {
   })
 
   const response = await page.request.get(
-    `/groups/${groupId}/expenses/export/json`,
+    `/api/groups/${groupId}/expenses/export.json`,
   )
   expect(response.status()).toBe(200)
 
@@ -136,7 +136,7 @@ test('exports the expenses as CSV', async ({ page }) => {
   })
 
   const response = await page.request.get(
-    `/groups/${groupId}/expenses/export/csv`,
+    `/api/groups/${groupId}/expenses/export.csv`,
   )
   expect(response.status()).toBe(200)
   expect(await response.text()).toContain('Parking')

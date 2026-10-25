@@ -115,6 +115,11 @@ function readIds(key) {
   }
 }
 
+/** @param {string} groupId @returns {boolean} */
+export function hasActiveUserKey(groupId) {
+  return read(`${groupId}-activeUser`) !== null
+}
+
 /** @param {string} groupId @returns {string | null} */
 export function getActiveUser(groupId) {
   const value = read(`${groupId}-activeUser`)
@@ -126,6 +131,20 @@ export function getActiveUser(groupId) {
 export function setActiveUser(groupId, participantId) {
   try {
     localStorage.setItem(`${groupId}-activeUser`, participantId || 'None')
+  } catch {
+    // ignored
+  }
+}
+
+/** @returns {boolean} */
+export function hasPendingActiveUser() {
+  return read('newGroup-activeUser') !== null
+}
+
+/** Remove the pending value after it has been applied to a group. */
+export function clearPendingActiveUser() {
+  try {
+    localStorage.removeItem('newGroup-activeUser')
   } catch {
     // ignored
   }
