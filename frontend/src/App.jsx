@@ -1,33 +1,22 @@
-import { Link, NavLink } from 'react-router-dom'
-
-import { HealthIndicator } from './components/system/HealthIndicator'
+import { AuthProvider } from './hooks/useAuth'
+import { ToastProvider } from './hooks/useToast'
+import { Footer } from './components/layout/Footer'
+import { Header } from './components/layout/Header'
 import { AppRoutes } from './router'
-import { APP_NAME } from './services/config'
+import './services/i18n'
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-4 px-4 py-3">
-          <Link to="/groups" className="text-lg font-semibold tracking-tight">
-            {APP_NAME}
-          </Link>
-          <nav aria-label="Main" className="flex items-center gap-3 text-sm">
-            <NavLink className="hover:text-primary" to="/groups">
-              Groups
-            </NavLink>
-            <NavLink className="hover:text-primary" to="/admin">
-              Admin
-            </NavLink>
-          </nav>
-          <div className="ml-auto">
-            <HealthIndicator />
-          </div>
+    <AuthProvider>
+      <ToastProvider>
+        <div className="flex min-h-screen flex-col bg-background text-foreground">
+          <Header />
+          <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+            <AppRoutes />
+          </main>
+          <Footer />
         </div>
-      </header>
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <AppRoutes />
-      </main>
-    </div>
+      </ToastProvider>
+    </AuthProvider>
   )
 }

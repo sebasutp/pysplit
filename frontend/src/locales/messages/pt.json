@@ -1,0 +1,644 @@
+{
+  "Homepage": {
+    "title": "Partilha <strong>Despesas</strong> com <strong>Amigos e Família</strong>",
+    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "description": "Bem-vindo/a à tua nova instância <strong>Spliit</strong> !",
+    "button": {
+      "groups": "Ir para grupos",
+      "github": "GitHub"
+    }
+  },
+  "Header": {
+    "groups": "Grupos"
+  },
+  "Footer": {
+    "madeIn": "Feito em Montréal, Québec 🇨🇦",
+    "builtBy": "Construído por <author>Sebastien Castiel</author> e <source>contribuidores</source>"
+  },
+  "Expenses": {
+    "title": "Despesas",
+    "description": "Aqui estão as despesas que criaste para o teu grupo.",
+    "create": "Criar despesa",
+    "createFirst": "Criar a primeira",
+    "noExpenses": "O teu grupo ainda não tem nenhuma despesa.",
+    "export": "Exportar",
+    "exportJson": "Exportar para JSON",
+    "exportCsv": "Exportar para CSV",
+    "searchPlaceholder": "Pesquisar uma despesa…",
+    "ActiveUserModal": {
+      "title": "Quem és?",
+      "description": "Diz-nos que participante és para nos permitir customizar como a informação é apresentada.",
+      "nobody": "Não quero selecionar ninguém",
+      "save": "Guardar alterações",
+      "footer": "Esta definição pode ser alterada posteriormente nas definições do grupo."
+    },
+    "Groups": {
+      "upcoming": "Em breve",
+      "thisWeek": "Esta semana",
+      "earlierThisMonth": "No início deste mês",
+      "lastMonth": "Mês passado",
+      "earlierThisYear": "No início deste ano",
+      "lastYear": "Ano passado",
+      "older": "Mais antigos"
+    }
+  },
+  "ExpenseCard": {
+    "paidBy": "Pago por <strong>{paidBy}</strong> para <paidFor></paidFor>",
+    "everyone": "todos",
+    "receivedBy": "Recebido por <strong>{paidBy}</strong> para <paidFor></paidFor>",
+    "yourBalance": "O teu saldo:",
+    "notInvolved": "Não participaste"
+  },
+  "Groups": {
+    "myGroups": "Os meus grupos",
+    "create": "Criar",
+    "createGroup": "Create group",
+    "loadingRecent": "A carregar grupos recentes…",
+    "NoRecent": {
+      "description": "Não visitaste nenhum grupo recentemente.",
+      "create": "Criar um",
+      "orAsk": "ou pergunta a um amigo para te mandar o link de um já existente."
+    },
+    "GlobalBalance": {
+      "title": "Your total balance",
+      "description": "Your combined balance across all your groups.",
+      "owedToYou": "You are owed",
+      "youOwe": "You owe",
+      "settledUp": "You are all settled up across your groups."
+    },
+    "recent": "Grupos recentes",
+    "starred": "Grupos favoritos",
+    "archived": "Grupos arquivados",
+    "archive": "Arquivar grupo",
+    "unarchive": "Desarquivar grupo",
+    "removeRecent": "Remover dos grupos recentes",
+    "RecentRemovedToast": {
+      "title": "O grupo foi removido",
+      "description": "O grupo foi removido da tua lista de grupos recentes.",
+      "undoAlt": "Desfazer remoção do grupo",
+      "undo": "Desfazer"
+    },
+    "AddByURL": {
+      "button": "Adicionar por URL",
+      "title": "Adicionar um grupo por URL",
+      "description": "Se um grupo foi partilhado contigo, podes colar o URL aqui para o adicionar à tua lista.",
+      "error": "Oops, não conseguimos encontrar o grupo pelo URL que indicaste…",
+      "urlMode": "Enter URL",
+      "qrMode": "Scan QR",
+      "scanner": {
+        "startCamera": "Start Camera",
+        "stopScanning": "Stop Scanning",
+        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
+        "noCamera": "No camera found on this device.",
+        "cameraError": "Failed to start camera. Please try again.",
+        "permissionError": "Unable to access camera. Please check permissions."
+      }
+    },
+    "NotFound": {
+      "text": "Este grupo não existe.",
+      "link": "Ir para os grupos visitados recentemente"
+    }
+  },
+  "GroupForm": {
+    "title": "Informações do grupo",
+    "NameField": {
+      "label": "Nome do grupo",
+      "placeholder": "Férias de verão",
+      "description": "Introduz um nome para o teu grupo."
+    },
+    "InformationField": {
+      "label": "Informações do grupo",
+      "placeholder": "Que informações são relevantes para os participantes do grupo?"
+    },
+    "CurrencyField": {
+      "label": "Símbolo da moeda",
+      "placeholder": "$, €, £…",
+      "description": "Utilizá-lo-emos para mostrar montantes."
+    },
+    "CurrencyCodeField": {
+      "label": "Moeda principal",
+      "createDescription": "Todos os montantes e saldos vão estar nesta moeda.",
+      "editDescription": "Todos os montantes e saldos vão estar nesta moeda. Ao alterares isto NÃO vão ser convertidas despesas já inseridas, excepto quando a moeda tem \"unidades monetárias menores\" diferentes da atual (ex. alterar de Dólar Americano para Yen Japonês)",
+      "customOption": "Customizado"
+    },
+    "Participants": {
+      "title": "Participantes",
+      "description": "Introduz o nome de cada participante.",
+      "protectedParticipant": "Este participante faz parte de despesas e não pode ser removido.",
+      "new": "Novo",
+      "add": "Adicionar participante",
+      "John": "João",
+      "Jane": "Joana",
+      "Jack": "Joaquim"
+    },
+    "Settings": {
+      "title": "Definições locais",
+      "description": "Estas definições são definidas por dispositivo, e são utilizadas para customizar a tua experiência.",
+      "ActiveUserField": {
+        "label": "Utilizador ativo",
+        "placeholder": "Selecionar um participante",
+        "none": "Nenhum",
+        "description": "Utilizador usado por defeito para pagar despesas."
+      },
+      "save": "Gravar",
+      "saving": "A guardar…",
+      "create": "Criar",
+      "creating": "A criar…",
+      "cancel": "Cancelar"
+    }
+  },
+  "ExpenseForm": {
+    "Income": {
+      "create": "Registar ganho",
+      "edit": "Editar ganho",
+      "TitleField": {
+        "label": "Título",
+        "placeholder": "Restaurante de segunda à noite",
+        "description": "Descrição do ganho."
+      },
+      "DateField": {
+        "label": "Data",
+        "description": "Data em que recebeste o montante."
+      },
+      "currencyField": {
+        "label": "Moeda",
+        "description": "A moeda em que recebeste o montante."
+      },
+      "categoryFieldDescription": "A categoria deste ganho.",
+      "paidByField": {
+        "label": "Recebido por",
+        "description": "Seleciona o participante que recebeu o montante."
+      },
+      "paidFor": {
+        "title": "Recebido para",
+        "description": "Selecione para quem a receita foi recebida."
+      },
+      "splitModeDescription": "Como dividir o ganho.",
+      "attachDescription": "Consulta e anexa recibos ao ganho."
+    },
+    "Expense": {
+      "create": "Registar despesa",
+      "edit": "Editar despesa",
+      "TitleField": {
+        "label": "Título",
+        "placeholder": "Restaurante de segunda à noite",
+        "description": "Descrição da despesa."
+      },
+      "DateField": {
+        "label": "Data",
+        "description": "Data em que a despesa foi paga."
+      },
+      "currencyField": {
+        "label": "Moeda",
+        "description": "A moeda na qual a despesa foi paga."
+      },
+      "categoryFieldDescription": "Categoria da despesa.",
+      "paidByField": {
+        "label": "Paga por",
+        "placeholder": "Seleciona um participante",
+        "description": "Seleciona o participante que pagou esta despesa."
+      },
+      "recurrenceRule": {
+        "label": "Recorrência",
+        "description": "Frequência com que a despesa se deve repetir.",
+        "none": "Nenhuma",
+        "daily": "Diária",
+        "weekly": "Semanal",
+        "monthly": "Mensal"
+      },
+      "paidFor": {
+        "title": "Paga a",
+        "description": "A quem a despesa foi paga."
+      },
+      "splitModeDescription": "Como dividir a despesa.",
+      "attachDescription": "Consulta e anexa recibos à despesa."
+    },
+    "amountField": {
+      "label": "Montante"
+    },
+    "conversionUnavailable": "Para definir uma moeda diferente por despesa e converter valores, selecione uma moeda não personalizada para o grupo.",
+    "originalAmountField": {
+      "label": "Valor a converter",
+      "repaymentLabel": "Amount to transfer",
+      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+    },
+    "conversionRateField": {
+      "useApi": "Use as taxas da Frankfurter",
+      "useCustom": "Use taxa personalizada",
+      "label": "Taxa de câmbio"
+    },
+    "conversionRateState": {
+      "loading": "A obter taxas de câmbio…",
+      "success": "Taxas obtidas:",
+      "error": "Opa, não conseguimos obter as taxas mais recentes.",
+      "staleRate": "Usando taxa:",
+      "noRate": "Insira uma taxa personalizada abaixo.",
+      "currencyNotFound": "Opa, a Frankfurter não tem a taxa para esta moeda neste dia.",
+      "noDate": "Insira a data da despesa para obter uma taxa de conversão.",
+      "dateMismatch": "Taxas a partir da data: {date}",
+      "refresh": "Atualizar",
+      "customRate": "Usando taxa personalizada"
+    },
+    "isReimbursementField": {
+      "label": "Isto é um reembolso"
+    },
+    "categoryField": {
+      "label": "Categoria"
+    },
+    "notesField": {
+      "label": "Notas"
+    },
+    "selectNone": "Remover seleção",
+    "selectAll": "Selecionar todos(as)",
+    "shares": "parte(s)",
+    "advancedOptions": "Opções avançadas de divisão…",
+    "SplitModeField": {
+      "label": "Modo de divisão",
+      "evenly": "Igualmente",
+      "byShares": "Desigualmente - Por partes",
+      "byPercentage": "Desigualmente - Por percentagem",
+      "byAmount": "Desigualmente - Por valor",
+      "saveAsDefault": "Gravar como opções de divisão padrão"
+    },
+    "DeletePopup": {
+      "label": "Apagar",
+      "title": "Apagar esta despesa?",
+      "description": "Realmente deseja apagar esta despesa? Esta ação é irreversível.",
+      "yes": "Sim",
+      "cancel": "Cancelar"
+    },
+    "attachDocuments": "Anexar documentos",
+    "create": "Criar",
+    "creating": "A criar…",
+    "save": "Gravar",
+    "saving": "A gravar…",
+    "cancel": "Cancelar",
+    "reimbursement": "Reembolso",
+    "itemizedSplit": "Itemized Split"
+  },
+  "ExpenseDocumentsInput": {
+    "TooBigToast": {
+      "title": "O ficheiro é muito grande",
+      "description": "O tamanho máximo de ficheiro que pode enviar é {maxSize}. O seu é ${size}."
+    },
+    "ErrorToast": {
+      "title": "Erro ao enviar documento",
+      "description": "Algo deu errado ao enviar o documento. Por favor, tente novamente mais tarde ou selecione um ficheiro diferente.",
+      "retry": "Tentar novamente"
+    }
+  },
+  "CreateFromReceipt": {
+    "Dialog": {
+      "triggerTitle": "Criar despesa a partir de recibo",
+      "title": "Criar a partir de recibo",
+      "description": "Extraia as informações da despesa a partir de uma foto de recibo.",
+      "body": "Faça upload da foto de um recibo e vamos escaneá-la para extrair as informações da despesa, se possível.",
+      "selectImage": "Selecionar imagem…",
+      "titleLabel": "Título:",
+      "categoryLabel": "Categoria:",
+      "amountLabel": "Valor:",
+      "dateLabel": "Data:",
+      "editNext": "Poderá editar as informações da despesa a seguir.",
+      "continue": "Continuar"
+    },
+    "unknown": "Desconhecido",
+    "TooBigToast": {
+      "title": "O ficheiro é muito grande",
+      "description": "O tamanho máximo de ficheiro que pode enviar é {maxSize}. O seu é ${size}."
+    },
+    "ErrorToast": {
+      "title": "Erro ao enviar documento",
+      "description": "Algo deu errado ao enviar o documento. Por favor, tente novamente mais tarde ou selecione um ficheiro diferente.",
+      "retry": "Tentar novamente"
+    }
+  },
+  "ReceiptItems": {
+    "title": "Receipt items",
+    "backToExpense": "Back to expense",
+    "merchant": "Merchant",
+    "printedTotal": "Printed total",
+    "noReceipt": "No receipt is linked to this expense yet.",
+    "empty": "No items yet. Add one to start splitting.",
+    "saveError": {
+      "title": "Couldn’t save your change",
+      "description": "We reloaded the receipt so you can try again."
+    },
+    "addItem": "Add item",
+    "quantitySummary": "{count} · {quantity} units",
+    "AddItemDialog": {
+      "title": "Add item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "sharedLabel": "Shared (whole-bill charge)",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "item": {
+      "quantity": "{assigned} of {total}",
+      "remaining": "{quantity} left",
+      "assign": "Assign",
+      "edit": "Edit",
+      "delete": "Delete",
+      "removePortion": "Remove portion",
+      "editTitle": "Edit item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "save": "Save",
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this item?",
+      "deleteDescription": "This removes the item and its assignments."
+    },
+    "sections": {
+      "unassigned": "Unassigned",
+      "unassignedHint": "Not assigned to anyone yet",
+      "shared": "Shared",
+      "sharedHint": "Split equally by everyone",
+      "participantHint": "Items assigned to {name}"
+    },
+    "assign": {
+      "title": "Assign item",
+      "description": "Choose who pays for “{name}”.",
+      "whole": "Assign the whole item",
+      "everyone": "Everyone (shared)",
+      "even": "Split evenly",
+      "evenHint": "Choose the participants to split between.",
+      "custom": "Custom split",
+      "customHint": "Enter quantities in units for each target.",
+      "shared": "Shared",
+      "selectParticipant": "Select a participant",
+      "exceeds": "The assigned quantity exceeds the item quantity.",
+      "confirm": "Assign",
+      "cancel": "Cancel"
+    },
+    "footer": {
+      "own": "Own",
+      "shared": "Shared",
+      "unassigned": "Unassigned",
+      "optOut": "Shares unassigned items",
+      "reconciles": "Reconciles",
+      "offBy": "Off by {amount}",
+      "itemsTotal": "Items total",
+      "apply": "Apply to expense",
+      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
+      "divergent": "Receipt values differ · Apply again"
+    },
+    "applySuccess": {
+      "title": "Expense updated",
+      "description": "The receipt items were applied to the expense."
+    },
+    "applyError": {
+      "title": "Couldn’t apply the receipt"
+    },
+    "applyConfirm": {
+      "title": "Update the expense?",
+      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "total": "total {current} → {new}",
+      "cancel": "Cancel",
+      "confirm": "Apply"
+    }
+  },
+  "Balances": {
+    "title": "Saldos",
+    "description": "Este é o valor que cada participante pagou ou recebeu.",
+    "Reimbursements": {
+      "title": "Reembolsos sugeridos",
+      "description": "Aqui estão sugestões para reembolsos otimizados entre os participantes.",
+      "noImbursements": "Parece que o seu grupo não precisa de nenhum reembolso 😁",
+      "owes": "<strong>{from}</strong> deve <strong>{to}</strong>",
+      "markAsPaid": "Marcar como pago"
+    }
+  },
+  "Stats": {
+    "title": "Estatísticas",
+    "range": {
+      "label": "Period",
+      "all": "All time",
+      "thisMonth": "This month",
+      "last30": "Last 30 days",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "from": "From",
+      "to": "To"
+    },
+    "Totals": {
+      "title": "Totais",
+      "description": "Resumo de gastos de todo o grupo.",
+      "groupSpendings": "Total de gastos do grupo",
+      "groupEarnings": "Total de receitas do grupo",
+      "yourSpendings": "Os seus gastos totais",
+      "yourEarnings": "As suas receitas totais",
+      "yourShare": "A sua participação total"
+    },
+    "Summary": {
+      "title": "Summary",
+      "description": "Key figures for the selected period.",
+      "empty": "There are no expenses yet.",
+      "expenseCount": "Expenses",
+      "averageExpense": "Average expense",
+      "largestExpense": "Largest expense",
+      "activeSpan": "Active period"
+    },
+    "OverTime": {
+      "title": "Spending over time",
+      "description": "Total group spending per month. Select a month to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {month}",
+      "detailsDescription": "Expenses in this month for the selected period.",
+      "detailsEmpty": "There are no expenses in this month."
+    },
+    "ByParticipant": {
+      "title": "Spending by participant",
+      "description": "How much each participant paid and their share of the expenses.",
+      "empty": "There are no expenses yet.",
+      "participant": "Participant",
+      "paid": "Paid",
+      "count": "Count",
+      "share": "Share"
+    },
+    "ByCategory": {
+      "title": "Spending by category",
+      "description": "Total amount spent in each category. Select a category to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {category}",
+      "detailsDescription": "Expenses in this category for the selected period.",
+      "detailsEmpty": "There are no expenses in this category."
+    },
+    "Recurring": {
+      "title": "Recurring expenses",
+      "description": "Estimated cost of the group's active recurring expenses.",
+      "estimatedMonthly": "Estimated monthly cost",
+      "estimatedYearly": "{amount} per year",
+      "period": {
+        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
+        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
+        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+      }
+    }
+  },
+  "Activity": {
+    "title": "Atividade",
+    "description": "Visão geral de toda a atividade neste grupo.",
+    "noActivity": "Ainda não há atividades no seu grupo.",
+    "someone": "Alguém",
+    "settingsModified": "As configurações do grupo foram modificadas por <strong>{participant}</strong>.",
+    "expenseCreated": "Despesa <em>{expense}</em> criada por <strong>{participant}</strong>.",
+    "expenseUpdated": "Despesa <em>{expense}</em> atualizada por <strong>{participant}</strong>.",
+    "expenseDeleted": "Despesa <em>{expense}</em> apagada por <strong>{participant}</strong>.",
+    "Groups": {
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "earlierThisWeek": "Anteriormente nesta semana",
+      "lastWeek": "Semana passada",
+      "earlierThisMonth": "Anteriormente neste mês",
+      "lastMonth": "Mês passado",
+      "earlierThisYear": "Anteriormente neste ano",
+      "lastYear": "Ano passado",
+      "older": "Mais antigas"
+    }
+  },
+  "Information": {
+    "title": "Informação",
+    "description": "Use este espaço para adicionar qualquer informação que possa ser relevante para os participantes do grupo.",
+    "empty": "Nenhuma informação do grupo ainda."
+  },
+  "Settings": {
+    "title": "Configurações"
+  },
+  "Share": {
+    "title": "Partilhar",
+    "description": "Para que outros participantes vejam o grupo e adicionem despesas, partilhe a ligação com eles.",
+    "copyLink": "Copy link",
+    "shareLink": "Share link",
+    "warning": "Aviso!",
+    "warningHelp": "Todos com a ligação do grupo poderão ver e editar despesas. Partilhe com cautela!",
+    "qrCode": {
+      "title": "Share via QR Code",
+      "description": "Scan this QR code to open the group on any device.",
+      "download": "Download QR Code"
+    }
+  },
+  "SchemaErrors": {
+    "min1": "Digite pelo menos um caractere.",
+    "min2": "Digite pelo menos dois caracteres.",
+    "max5": "Digite no máximo cinco caracteres.",
+    "max50": "Digite no máximo 50 caracteres.",
+    "duplicateParticipantName": "Outro participante já tem este nome.",
+    "titleRequired": "Por favor, insira um título.",
+    "invalidNumber": "Número inválido.",
+    "amountRequired": "Deve inserir um valor.",
+    "amountNotZero": "O valor não deve ser zero.",
+    "amountTenMillion": "O valor deve ser inferior a 10.000.000.",
+    "ratePositive": "A taxa deve ser maior que zero.",
+    "paidByRequired": "Deve selecionar um participante.",
+    "paidForMin1": "A despesa deve ser paga para pelo menos um participante.",
+    "noZeroShares": "Todas as partes devem ser maiores que 0.",
+    "amountSum": "A soma dos valores deve ser igual ao valor da despesa.",
+    "percentageSum": "A soma das percentagens deve ser igual a 100."
+  },
+  "Categories": {
+    "search": "Pesquisar categoria...",
+    "noCategory": "Nenhuma categoria encontrada.",
+    "Uncategorized": {
+      "heading": "Sem categoria",
+      "General": "Geral",
+      "Payment": "Pagamento"
+    },
+    "Entertainment": {
+      "heading": "Entretenimento",
+      "Entertainment": "Entretenimento",
+      "Games": "Jogos",
+      "Movies": "Filmes",
+      "Music": "Música",
+      "Sports": "Desportos"
+    },
+    "Food and Drink": {
+      "heading": "Comida e Bebida",
+      "Food and Drink": "Comida e Bebida",
+      "Dining Out": "Jantar fora",
+      "Groceries": "Mercearia",
+      "Liquor": "Bebidas alcoólicas"
+    },
+    "Home": {
+      "heading": "Casa",
+      "Home": "Casa",
+      "Electronics": "Eletrônicos",
+      "Furniture": "Móveis",
+      "Household Supplies": "Suprimentos domésticos",
+      "Maintenance": "Manutenção",
+      "Mortgage": "Financiamento Habitacional",
+      "Pets": "Animais de estimação",
+      "Rent": "Aluguel",
+      "Services": "Serviços"
+    },
+    "Life": {
+      "heading": "Vida",
+      "Childcare": "Cuidados infantis",
+      "Clothing": "Roupas",
+      "Donation": "Doação",
+      "Education": "Educação",
+      "Gifts": "Presentes",
+      "Insurance": "Seguro",
+      "Medical Expenses": "Despesas médicas",
+      "Taxes": "Impostos"
+    },
+    "Transportation": {
+      "heading": "Transporte",
+      "Transportation": "Transporte",
+      "Bicycle": "Bicicleta",
+      "Bus/Train": "Autocarro/Comboio",
+      "Car": "Carro",
+      "Gas/Fuel": "Gasolina/Combustível",
+      "Hotel": "Hotel",
+      "Parking": "Estacionamento",
+      "Plane": "Avião",
+      "Taxi": "Táxi"
+    },
+    "Utilities": {
+      "heading": "Utilitários",
+      "Utilities": "Utilitários",
+      "Cleaning": "Limpeza",
+      "Electricity": "Eletricidade",
+      "Heat/Gas": "Calor/Gás",
+      "Trash": "Lixo",
+      "TV/Phone/Internet": "TV/Telefone/Internet",
+      "Water": "Água"
+    }
+  },
+  "Currencies": {
+    "search": "Pesquisar moeda...",
+    "noCurrency": "Nenhuma moeda encontrada.",
+    "custom": {
+      "heading": "Customizado"
+    },
+    "common": {
+      "heading": "Mais comum"
+    },
+    "other": {
+      "heading": "Outras moedas"
+    }
+  },
+  "Pwa": {
+    "updateTitle": "Update available",
+    "updateDescription": "A new version of Spliit is available.",
+    "reload": "Reload"
+  },
+  "Auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "admin": "Admin",
+    "groupCreator": "Group Creator",
+    "syncUser": "Sync User",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "Admin": {
+    "title": "Administration Dashboard",
+    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
+    "totalGroups": "Total Groups",
+    "totalExpenses": "Total Expenses",
+    "registeredUsers": "Registered Users",
+    "userManagement": "User Management & Permission Tiers"
+  }
+}

@@ -21,6 +21,9 @@ frontend/test-results/
 frontend/playwright-report/
 *.tsbuildinfo
 
+# Local sandbox caches (Playwright browser libraries, etc.)
+/.cache/
+
 # Runtime data and databases
 data/
 *.db

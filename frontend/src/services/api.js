@@ -1,10 +1,11 @@
 /**
  * The single HTTP client.
  *
- * Every request in the application goes through `request()` in this module.
- * Hooks and components must import the repository, not this file (see
+ * Every request in the application goes through this module. Hooks and
+ * components must import the repository, not this file (see
  * docs/repository-contract.md). Keeping the transport here means retries,
- * auth headers, error normalisation and cancellation exist in one place.
+ * auth headers, refresh rotation, CSRF, error normalisation and cancellation
+ * exist in one place.
  */
 
 import { API_BASE_URL } from './config'
@@ -17,6 +18,16 @@ import { API_BASE_URL } from './config'
  * @property {AbortSignal} [signal]
  * @property {Record<string, string>} [headers]
  * @property {boolean} [keepalive]
+ * @property {boolean} [retryAuth] Retry once after refreshing (default true)
+ * @property {boolean} [auth] Attach the in-memory bearer token (default true)
+ * @property {boolean} [csrf] Attach the double-submit CSRF header
+ */
+
+/**
+ * @typedef {Object} TextResponse
+ * @property {string} content
+ * @property {string | null} filename
+ * @property {string | null} contentType
  */
 
 export class ApiError extends Error {
@@ -39,6 +50,13 @@ export class ApiError extends Error {
     this.retryable = options.retryable ?? false
   }
 }
+
+/** @type {string | null} */
+let accessToken = null
+/** @type {Promise<boolean> | null} */
+let refreshInFlight = null
+/** @type {Promise<{access_token: string, user: unknown} | null> | null} */
+let sessionRefreshInFlight = null
 
 /**
  * DOMException is not an Error subclass in every JS environment, so inspect
@@ -85,15 +103,56 @@ function detailFrom(value, fallback) {
 }
 
 /**
- * Perform an HTTP request and normalise success/failure.
+ * Read a browser cookie without pulling in a dependency. Returns null in
+ * non-browser environments such as Vitest without a document.
  *
- * @param {string} path Path beginning with `/` (for example `/health`)
+ * @param {string} name
+ * @returns {string | null}
+ */
+function readCookie(name) {
+  if (typeof document === 'undefined' || !document.cookie) return null
+  for (const part of document.cookie.split(';')) {
+    const separator = part.indexOf('=')
+    if (separator < 0) continue
+    if (part.slice(0, separator).trim() === name) {
+      return decodeURIComponent(part.slice(separator + 1).trim())
+    }
+  }
+  return null
+}
+
+/** @param {string | null} token */
+export function setAccessToken(token) {
+  accessToken = token || null
+}
+
+/** @returns {string | null} */
+export function getAccessToken() {
+  return accessToken
+}
+
+export function clearAccessToken() {
+  accessToken = null
+}
+
+/**
+ * Perform one HTTP call and normalise its result. No auth retry happens here.
+ *
+ * @param {string} path
  * @param {string} method
  * @param {RequestOptions} [options]
+ * @param {'json'|'text'} [parseAs]
  * @returns {Promise<unknown>}
  */
-async function request(path, method, options = {}) {
-  const { body, signal, headers = {}, keepalive = false } = options
+async function send(path, method, options = {}, parseAs = 'json') {
+  const {
+    body,
+    signal,
+    headers = {},
+    keepalive = false,
+    auth = true,
+    csrf = false,
+  } = options
 
   /** @type {Record<string, string>} */
   const requestHeaders = { Accept: 'application/json', ...headers }
@@ -108,6 +167,14 @@ async function request(path, method, options = {}) {
   } else if (body !== undefined) {
     requestBody = JSON.stringify(body)
     requestHeaders['Content-Type'] = 'application/json'
+  }
+
+  if (auth && accessToken) {
+    requestHeaders.Authorization = `Bearer ${accessToken}`
+  }
+  if (csrf) {
+    const token = readCookie('pysplit_csrf')
+    if (token) requestHeaders['X-CSRF-Token'] = token
   }
 
   let response
@@ -127,9 +194,31 @@ async function request(path, method, options = {}) {
     throw new ApiError('Network request failed', { code: 'network', retryable: true })
   }
 
-  if (response.status === 204) return undefined
+  if (response.status === 204) {
+    return parseAs === 'text'
+      ? { content: '', filename: null, contentType: null }
+      : undefined
+  }
 
   const contentType = response.headers.get('content-type') || ''
+
+  if (parseAs === 'text') {
+    const content = await response.text()
+    if (!response.ok) {
+      throw new ApiError(content || response.statusText, {
+        status: response.status,
+        code: codeForStatus(response.status),
+        detail: content || response.statusText,
+        retryable: response.status === 429 || response.status >= 500,
+      })
+    }
+    return {
+      content,
+      filename: filenameFrom(response.headers.get('content-disposition')),
+      contentType: contentType || null,
+    }
+  }
+
   /** @type {unknown} */
   let payload
   if (contentType.includes('application/json')) {
@@ -154,6 +243,112 @@ async function request(path, method, options = {}) {
   }
 
   return payload
+}
+
+/**
+ * @param {string | null} header
+ * @returns {string | null}
+ */
+function filenameFrom(header) {
+  if (!header) return null
+  const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(header)
+  if (utf8) return decodeURIComponent(utf8[1])
+  const plain = /filename="?([^";]+)"?/i.exec(header)
+  return plain ? plain[1] : null
+}
+
+/**
+ * Rotate the refresh cookie and store the new access token. Returns null when
+ * there is no valid session. Shared by boot, explicit refresh and the
+ * one-retry path on 401.
+ *
+ * @param {{ signal?: AbortSignal }} [options]
+ * @returns {Promise<{access_token: string, user: unknown}|null>}
+ */
+export async function refreshSession(options = {}) {
+  // React StrictMode mounts the auth provider twice in development, and an
+  // automatic 401 retry may race the boot refresh. Rotating the same refresh
+  // token twice revokes the family, so all callers share one request.
+  if (sessionRefreshInFlight) return sessionRefreshInFlight
+  sessionRefreshInFlight = (async () => {
+    try {
+      const payload = await send(
+        '/auth/refresh',
+        'POST',
+        { signal: options.signal, auth: false, csrf: true },
+        'json',
+      )
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        'access_token' in payload &&
+        typeof /** @type {{access_token?: unknown}} */ (payload).access_token === 'string'
+      ) {
+        accessToken = /** @type {{access_token: string}} */ (payload).access_token
+        return /** @type {{access_token: string, user: unknown}} */ (payload)
+      }
+      accessToken = null
+      return null
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'unauthorized') {
+        accessToken = null
+        return null
+      }
+      throw error
+    } finally {
+      sessionRefreshInFlight = null
+    }
+  })()
+  return sessionRefreshInFlight
+}
+
+/**
+ * @returns {Promise<boolean>}
+ */
+async function refreshAccessToken() {
+  if (refreshInFlight) return refreshInFlight
+  refreshInFlight = (async () => {
+    try {
+      const result = await refreshSession()
+      return Boolean(result)
+    } catch {
+      return false
+    } finally {
+      refreshInFlight = null
+    }
+  })()
+  return refreshInFlight
+}
+
+/**
+ * Perform an HTTP request and normalise success/failure. A 401 on an
+ * authenticated call triggers exactly one refresh attempt.
+ *
+ * @param {string} path
+ * @param {string} method
+ * @param {RequestOptions} [options]
+ * @param {'json'|'text'} [parseAs]
+ * @returns {Promise<unknown>}
+ */
+async function request(path, method, options = {}, parseAs = 'json') {
+  const { retryAuth = true, auth = true } = options
+  try {
+    return await send(path, method, options, parseAs)
+  } catch (error) {
+    if (
+      retryAuth &&
+      auth &&
+      error instanceof ApiError &&
+      error.code === 'unauthorized' &&
+      !path.startsWith('/auth/')
+    ) {
+      const refreshed = await refreshAccessToken()
+      if (refreshed) {
+        return await send(path, method, options, parseAs)
+      }
+    }
+    throw error
+  }
 }
 
 export const api = {
@@ -182,4 +377,20 @@ export const api = {
    * @param {RequestOptions} [options]
    */
   delete: (path, options) => request(path, 'DELETE', options),
+  /**
+   * Fetch a text file (exports). Keeps filename/content-type metadata next to
+   * the body so callers never need a second HTTP path.
+   *
+   * @param {string} path
+   * @param {RequestOptions} [options]
+   * @returns {Promise<TextResponse>}
+   */
+  text: async (path, options) => {
+    const result = await request(path, 'GET', options, 'text')
+    return /** @type {TextResponse} */ (result)
+  },
+  refreshSession,
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
 }
