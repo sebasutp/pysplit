@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { anonymizePath } from './analytics'
+import { anonymizePath } from '../utils/analytics'
 
 describe('anonymizePath', () => {
   it('anonymizes group and expense ids', () => {

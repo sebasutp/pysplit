@@ -513,6 +513,28 @@ const receipts = {
     })
   },
   /**
+   * Upload a receipt image (online only in M1).
+   *
+   * @param {string} groupId
+   * @param {File|Blob} file
+   * @param {{signal?: AbortSignal, width?: number, height?: number}} [options]
+   * @returns {Promise<{url: string, width: number, height: number}>}
+   */
+  async upload(groupId, file, options = {}) {
+    return run(async () => {
+      const form = new FormData()
+      form.append('file', file)
+      form.append('width', String(options.width || 1))
+      form.append('height', String(options.height || 1))
+      return /** @type {{url: string, width: number, height: number}} */ (
+        await api.post(`${groupPath(groupId)}/receipts/upload`, {
+          body: form,
+          signal: options.signal,
+        })
+      )
+    })
+  },
+  /**
    * @param {string} groupId
    * @param {{image_url: string}} input
    * @param {ReadOptions} [options]
@@ -779,6 +801,100 @@ const sync = {
   },
 }
 
+const features = {
+  /**
+   * @param {ReadOptions} [options]
+   * @returns {Promise<any>}
+   */
+  async get(options = {}) {
+    return run(async () => api.get('/features', { signal: options.signal }))
+  },
+}
+
+const admin = {
+  /**
+   * @param {ReadOptions} [options]
+   * @returns {Promise<any>}
+   */
+  async metrics(options = {}) {
+    return run(async () => api.get('/admin/metrics', { signal: options.signal }))
+  },
+  users: {
+    /**
+     * @param {{q?: string, tier?: string, limit?: number, offset?: number}} [input]
+     * @param {ReadOptions} [options]
+     * @returns {Promise<any>}
+     */
+    async list(input = {}, options = {}) {
+      return run(async () =>
+        api.get(
+          `/admin/users${query({ q: input.q, tier: input.tier, limit: input.limit, offset: input.offset })}`,
+          { signal: options.signal },
+        ),
+      )
+    },
+    /**
+     * @param {{email: string, tier?: string, name?: string}} input
+     * @param {ReadOptions} [options]
+     * @returns {Promise<any>}
+     */
+    async preauthorize(input, options = {}) {
+      return run(async () =>
+        api.post('/admin/users/preauthorize', { body: input, signal: options.signal }),
+      )
+    },
+    /**
+     * @param {string} userId
+     * @param {string} tier
+     * @param {ReadOptions} [options]
+     * @returns {Promise<any>}
+     */
+    async setTier(userId, tier, options = {}) {
+      return run(async () =>
+        api.patch(`/admin/users/${encodeURIComponent(userId)}/tier`, {
+          body: { tier },
+          signal: options.signal,
+        }),
+      )
+    },
+    /**
+     * @param {string} userId
+     * @param {ReadOptions} [options]
+     * @returns {Promise<void>}
+     */
+    async remove(userId, options = {}) {
+      await run(async () =>
+        api.delete(`/admin/users/${encodeURIComponent(userId)}`, { signal: options.signal }),
+      )
+    },
+  },
+  groups: {
+    /**
+     * @param {{q?: string, limit?: number, offset?: number}} [input]
+     * @param {ReadOptions} [options]
+     * @returns {Promise<any>}
+     */
+    async list(input = {}, options = {}) {
+      return run(async () =>
+        api.get(
+          `/admin/groups${query({ q: input.q, limit: input.limit, offset: input.offset })}`,
+          { signal: options.signal },
+        ),
+      )
+    },
+    /**
+     * @param {string} groupId
+     * @param {ReadOptions} [options]
+     * @returns {Promise<void>}
+     */
+    async remove(groupId, options = {}) {
+      await run(async () =>
+        api.delete(`/admin/groups/${encodeURIComponent(groupId)}`, { signal: options.signal }),
+      )
+    },
+  },
+}
+
 /**
  * @param {any} input
  * @returns {any}
@@ -806,4 +922,6 @@ export const onlineRepository = {
   documents,
   exports: exportsRepository,
   sync,
+  features,
+  admin,
 }

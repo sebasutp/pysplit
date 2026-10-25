@@ -255,8 +255,9 @@ activities.list(groupId, { cursor, limit, signal })
 ```js
 receipts.get(groupId, { receipt_id?, expense_id?, signal })
   // → { receipt, items, opt_outs, split } | null
+receipts.upload(groupId, file, { width, height, signal })   // → { url, width, height }
 receipts.extractTotal(groupId, { image_url }, { signal })   // → Receipt
-receipts.extractItems(groupId, { image_url }, { signal })   // → Receipt
+receipts.extractItems(groupId, { image_url, image_width, image_height }, { signal }) // → Receipt
 receipts.addItem(groupId, receiptId, input, { signal })     // → ReceiptState
 receipts.updateItem(groupId, receiptId, itemId, input, { signal }) // → ReceiptState
 receipts.deleteItem(groupId, receiptId, itemId, { signal }) // → ReceiptState
@@ -305,7 +306,24 @@ sync.conflicts.resolve(conflictId, resolution) // 'keep_mine'|'use_server'|'dupl
 These are repository services, not UI data reads. The online implementation
 returns an empty/online status and no conflicts.
 
-## 14. Offline capability declaration
+## 14. Runtime features and administration
+
+```js
+features.get({ signal })                     // → FeatureFlags
+admin.metrics({ signal })                    // → AdminMetrics
+admin.users.list({ q, tier, limit, offset, signal }) // → AdminUserList
+admin.users.preauthorize({ email, tier, name }, { signal }) // → { user, is_new }
+admin.users.setTier(userId, tier, { signal }) // → { id, tier }
+admin.users.remove(userId, { signal })        // → void
+admin.groups.list({ q, limit, offset, signal }) // → AdminGroupList
+admin.groups.remove(groupId, { signal })      // → void
+```
+
+`features` is a public read. Admin methods are **online-only** and reject with
+`offline_unsupported` in the local implementation. Tier changes take effect on
+the next request because the server reloads the user row.
+
+## 15. Offline capability declaration
 
 | Method group | Offline |
 |---|---|
@@ -321,7 +339,7 @@ returns an empty/online status and no conflicts.
 | Auth refresh | deferred, retried on reconnect |
 | Exports | yes, from local data |
 
-## 15. Contract tests
+## 16. Contract tests
 
 `contract.test.js` must assert, for both `online.js` and `local.js`:
 

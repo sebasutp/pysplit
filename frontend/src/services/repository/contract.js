@@ -67,6 +67,7 @@ export const REPOSITORY_METHODS = [
   'stats.monthExpenses',
   'activities.list',
   'receipts.get',
+  'receipts.upload',
   'receipts.extractTotal',
   'receipts.extractItems',
   'receipts.addItem',
@@ -85,6 +86,14 @@ export const REPOSITORY_METHODS = [
   'sync.onStatus',
   'sync.conflicts.list',
   'sync.conflicts.resolve',
+  'features.get',
+  'admin.metrics',
+  'admin.users.list',
+  'admin.users.preauthorize',
+  'admin.users.setTier',
+  'admin.users.remove',
+  'admin.groups.list',
+  'admin.groups.remove',
 ]
 
 /**

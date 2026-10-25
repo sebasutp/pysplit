@@ -54,26 +54,43 @@ export function uniqueSuffix(): string {
  * Development-only login used by the migrated suite. Group creation requires
  * the `group_creators` tier, unlike upstream Spliit which had no accounts.
  */
-export async function signInAsCreator(page: Page): Promise<void> {
+export async function signInAsTier(
+  page: Page,
+  tier: 'sync_users' | 'group_creators' | 'admin',
+  email: string,
+  name: string,
+): Promise<void> {
   if (!page.url().startsWith('http')) await page.goto('/groups')
-  const alreadySignedIn = await page
-    .evaluate(() => window.localStorage.getItem('e2e-authenticated') === '1')
-    .catch(() => false)
-  if (alreadySignedIn) return
-
   const origin = process.env.BASE_URL ?? process.env.E2E_BASE_URL ?? 'http://127.0.0.1:5173'
   const response = await page.request.post('/api/auth/mock-login', {
     headers: { Origin: origin },
-    data: {
-      email: 'e2e-creator@example.com',
-      name: 'E2E Creator',
-      tier: 'group_creators',
-    },
+    data: { email, name, tier },
   })
   expect(response.ok()).toBeTruthy()
   await page
-    .evaluate(() => window.localStorage.setItem('e2e-authenticated', '1'))
+    .evaluate((value) => window.localStorage.setItem('e2e-authenticated', value), tier)
     .catch(() => {})
+  // Reload and wait for the session boot to finish. Navigating away while the
+  // refresh request is still in flight can abort the response after the server
+  // rotated the token, which would make the next load look like token reuse.
+  await page.reload()
+  await expect(page.getByRole('button', { name: 'User menu' })).toBeVisible({
+    timeout: 20_000,
+  })
+}
+
+export async function signInAsCreator(page: Page): Promise<void> {
+  if (!page.url().startsWith('http')) await page.goto('/groups')
+  const alreadySignedIn = await page
+    .evaluate(() => window.localStorage.getItem('e2e-authenticated') === 'group_creators')
+    .catch(() => false)
+  if (alreadySignedIn) return
+  await signInAsTier(page, 'group_creators', 'e2e-creator@example.com', 'E2E Creator')
+}
+
+export async function signInAsAdmin(page: Page): Promise<void> {
+  if (!page.url().startsWith('http')) await page.goto('/groups')
+  await signInAsTier(page, 'admin', 'e2e-admin@example.com', 'E2E Admin')
 }
 
 export async function createGroup(

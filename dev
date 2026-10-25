@@ -81,6 +81,16 @@ export VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-http://$API_BIND_HOST:$AP
 # The browser talks to Vite, so OAuth redirect URIs and CSRF origin checks must
 # use the public web origin rather than the internal API address.
 export BASE_URL="${BASE_URL:-http://$WEB_HOST:$WEB_PORT}"
+# Local development defaults to the Stage 8D online features. Production keeps
+# the opt-in defaults from .env.example.
+export ENABLE_RECEIPT_EXTRACT="${ENABLE_RECEIPT_EXTRACT:-true}"
+export ENABLE_RECEIPT_ITEMS="${ENABLE_RECEIPT_ITEMS:-true}"
+export ENABLE_CATEGORY_EXTRACT="${ENABLE_CATEGORY_EXTRACT:-true}"
+export ENABLE_EXPENSE_DOCUMENTS="${ENABLE_EXPENSE_DOCUMENTS:-true}"
+# The Playwright suite signs in per test context; keep the local limiter from
+# throttling a full run. Production keeps the conservative defaults.
+export AUTH_RATE_LIMIT_PER_MINUTE="${AUTH_RATE_LIMIT_PER_MINUTE:-1000}"
+export AUTH_ACCOUNT_RATE_LIMIT_PER_MINUTE="${AUTH_ACCOUNT_RATE_LIMIT_PER_MINUTE:-1000}"
 
 cleanup() {
   trap - EXIT INT TERM
