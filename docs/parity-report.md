@@ -5,8 +5,8 @@ Generated from `docs/parity-matrix.yml` by
 
 ## Summary
 
-- Features: **111** (69 standard, 42 custom)
-- Offline classes: online-only=22, queued=12, read-only=32, read-write=45
+- Features: **117** (69 standard, 48 custom)
+- Offline classes: online-only=22, queued=15, read-only=35, read-write=45
 - Reference pages discovered: 14
 - Procedure files discovered: 28
 - Jest suites discovered: 30
@@ -97,6 +97,17 @@ Generated from `docs/parity-matrix.yml` by
 |---|---|---|---|---|---|---|
 | API-EXPORT-CSV | standard | `spliit/src/app/groups/[groupId]/expenses/export/csv/route.ts::GET` | `GET /api/groups/{group_id}/expenses/export.csv` | `/groups/:groupId/expenses` | read-only | `backend/tests/test_exports.py::test_csv_export` |
 | API-EXPORT-JSON | standard | `spliit/src/app/groups/[groupId]/expenses/export/json/route.ts::GET` | `GET /api/groups/{group_id}/expenses/export.json` | `/groups/:groupId/expenses` | read-only | `backend/tests/test_exports.py::test_json_export` |
+
+## Stage 6 (6 features)
+
+| ID | Class | Reference | Target API | UI | Offline | Tests |
+|---|---|---|---|---|---|---|
+| SYNC-BOOTSTRAP | custom | `docs/adr/0002-offline-sync.md::Pull and bootstrap` | `GET /api/sync/bootstrap` | `n/a` | read-only | `backend/tests/test_sync.py::test_push_create_pull_and_bootstrap`<br>`backend/tests/test_sync.py::test_bootstrap_includes_receipts_and_user_membership` |
+| SYNC-CLAIM | custom | `docs/adr/0002-offline-sync.md::Entity versioning` | `POST /api/sync/push` | `/groups` | queued | `backend/tests/test_sync.py::test_claim_groups_merges_without_duplication`<br>`backend/tests/test_sync.py::test_user_group_is_lww_and_scoped_to_its_user` |
+| SYNC-COMPACTION | custom | `docs/adr/0002-offline-sync.md::Idempotency and ordering` | `POST /api/sync/pull` | `n/a` | read-only | `backend/tests/test_sync.py::test_expired_and_future_cursors_require_bootstrap` |
+| SYNC-CONFLICT | custom | `docs/adr/0002-offline-sync.md::Conflict rules` | `POST /api/sync/push` | `n/a` | queued | `backend/tests/test_sync_conflicts.py::test_stale_update_returns_conflict_then_next_edit_applies`<br>`backend/tests/test_sync_conflicts.py::test_delete_tombstone_wins_over_updates` |
+| SYNC-PULL | custom | `docs/adr/0002-offline-sync.md::Pull and bootstrap` | `POST /api/sync/pull` | `n/a` | read-only | `backend/tests/test_sync.py::test_pagination_and_has_more`<br>`backend/tests/test_sync.py::test_participant_crud_tombstone_and_last_writer_wins` |
+| SYNC-PUSH | custom | `docs/adr/0002-offline-sync.md::Push` | `POST /api/sync/push` | `n/a` | queued | `backend/tests/test_sync.py::test_replayed_operation_applies_once`<br>`backend/tests/test_sync.py::test_duplicate_create_with_new_operation_is_idempotent`<br>`backend/tests/test_sync_conflicts.py::test_concurrent_creates_do_not_duplicate_recurrence_frames`<br>`backend/tests/test_sync_conflicts.py::test_two_clients_converge_and_replay_delete_once` |
 
 ## Stage 7 (21 features)
 

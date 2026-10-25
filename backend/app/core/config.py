@@ -67,6 +67,12 @@ class Settings(BaseSettings):
     auth_account_rate_limit_per_minute: int = 60
     auth_rate_limit_window_seconds: int = 60
 
+    # --- Synchronization ------------------------------------------------
+    # Operations are replayable for seven days. Change-log rows are retained
+    # for 30 days; a cursor older than the retained window must bootstrap.
+    sync_operation_retention_days: int = 7
+    sync_change_retention_days: int = 30
+
     # --- Uploads and runtime feature flags ------------------------------
     # Local disk is the default blob backend; Stage 7 adds an S3 adapter.
     upload_dir: str = "data/uploads"
@@ -121,6 +127,13 @@ class Settings(BaseSettings):
     def _positive_days(cls, value: int) -> int:
         if value <= 0:
             raise ValueError("must be positive")
+        return value
+
+    @field_validator("sync_operation_retention_days", "sync_change_retention_days")
+    @classmethod
+    def _positive_retention(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("retention must be positive")
         return value
 
     @field_validator("max_upload_bytes")

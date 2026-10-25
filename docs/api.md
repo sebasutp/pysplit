@@ -451,6 +451,27 @@ See ADR 0002 for the full protocol.
 ```
 Returns one result per operation plus a cursor; see ADR 0002.
 
+Supported `entity_type` values and their allowed payload fields are defined by
+the server whitelist (`backend/app/services/sync.py::ENTITY_FIELDS`):
+
+| Entity | Operations | Payload |
+|---|---|---|
+| `group` | create, update | `name`, `information`, `currency`, `currency_code`; create also accepts `participants` |
+| `participant` | create, update, delete | `name` for create/update |
+| `expense` | create, update, delete | the `ExpenseCreate`/`ExpenseUpdate` fields (`expense_date`, `title`, `amount`, `paid_for`, ...) |
+| `user_group` | create, update, delete | `is_starred`, `is_archived`; requires authentication |
+
+Unknown entity types and unknown top-level or nested fields are rejected per
+operation with `status: "error"`; other operations in the batch are still
+applied. Group metadata, participant names and star/archive membership are
+last-writer-wins. Expense updates and deletes require a matching
+`base_version`; stale writes return `status: "conflict"` with `server_entity`.
+Deletes are tombstones and win over later updates.
+
+A pull cursor older than the 30-day retained change log (or newer than the
+server feed) returns `409` with `{ "detail": "bootstrap_required" }`; call
+`GET /api/sync/bootstrap` and restart from its cursor.
+
 ## 14. Status codes
 
 | Code | Use |
