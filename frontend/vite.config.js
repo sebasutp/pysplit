@@ -2,9 +2,20 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// The SPA always calls same-origin /api. Vite proxies it to the API in
-// development; nginx proxies it in production. No CORS is needed either way.
+// The SPA calls /api by default and Vite proxies it to the API. When
+// VITE_API_BASE_URL is an absolute URL the browser calls that origin directly
+// and this proxy is unused. No CORS is needed for the proxy setup.
 const apiTarget = process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000'
+
+// Keep the browser-facing Host header by default so the backend builds OAuth
+// redirect URIs and cookies for the domain the user opened, even when no
+// BASE_URL is configured. Set VITE_API_PROXY_CHANGE_ORIGIN=true when the
+// target is a virtual-hosted remote API that needs its own Host header.
+const proxyChangeOrigin = process.env.VITE_API_PROXY_CHANGE_ORIGIN === 'true'
+
+// Local HTTPS targets often use a self-signed certificate. Prefer a trusted
+// certificate; set VITE_API_PROXY_SECURE=false only for local development.
+const proxySecure = process.env.VITE_API_PROXY_SECURE !== 'false'
 
 // Public hostname clients use (e.g. a Tailscale MagicDNS name). It is added to
 // allowedHosts; without that Vite rejects non-localhost Host headers with 403
@@ -20,7 +31,8 @@ const listenHost = loopbackHosts.has(webHost) ? '127.0.0.1' : true
 const proxy = {
   '/api': {
     target: apiTarget,
-    changeOrigin: true,
+    changeOrigin: proxyChangeOrigin,
+    secure: proxySecure,
   },
 }
 

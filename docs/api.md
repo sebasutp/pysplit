@@ -63,7 +63,8 @@ Returns server-enforced flags so the SPA never enables a disabled feature.
 ### `GET /api/auth/me`
 `200` with the user, or `200 { "user": null }` when anonymous. `providers`
 mirrors the reference discovery endpoint and reports which OAuth providers have
-both credentials configured.
+both credentials configured. `csrf_token` repeats the readable CSRF cookie so a
+cross-origin SPA can send it in `X-CSRF-Token`.
 ```json
 {
   "user": {
@@ -79,7 +80,9 @@ both credentials configured.
 
 ### `GET /api/auth/oauth/{provider}/start?return_to=/groups`
 `provider` is `google` or `github`. Sets an `HttpOnly` state cookie and
-redirects to the provider. `return_to` must be a relative same-origin path.
+redirects to the provider. `return_to` is normally a relative same-origin path;
+an absolute URL is accepted only when its origin is the configured
+`FRONTEND_URL` (or the public API origin).
 
 ### `GET /api/auth/oauth/{provider}/callback?code=…&state=…`
 Validates state, exchanges the code, links/creates the user, sets the refresh
@@ -479,6 +482,12 @@ rate-limited (`429`).
 
 All admin endpoints require tier `admin`; unauthenticated → 401, wrong tier →
 403.
+
+The first account created on an empty database is assigned the `admin` tier so
+a fresh deployment can be managed without running the bootstrap CLI. Every
+later account starts as `sync_users`. The CLI
+(`python -m app.scripts.make_admin --email owner@example.com`) is still useful
+for promoting accounts that already exist.
 
 | Method | Path | Purpose |
 |---|---|---|

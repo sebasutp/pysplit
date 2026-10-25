@@ -72,6 +72,19 @@ def find_user_by_email(session: Session, email: str) -> User | None:
     return session.exec(statement).first()
 
 
+def default_tier_for_new_user(session: Session) -> UserTier:
+    """Return the tier for a freshly provisioned account.
+
+    The first account bootstraps the deployment, so it becomes an
+    administrator without requiring the ``make_admin`` CLI. Every later
+    account starts with the least-privileged tier. Soft-deleted rows still
+    count, so removing the first user does not silently grant admin to the
+    next person who signs in.
+    """
+    has_users = session.exec(select(func.count()).select_from(User)).one() > 0
+    return UserTier.SYNC_USERS if has_users else UserTier.ADMIN
+
+
 def _new_refresh_record(
     user: User,
     *,
@@ -309,7 +322,7 @@ def upsert_oauth_user(session: Session, profile: OAuthProfile) -> User:
         name=profile.name,
         email=email,
         image=profile.image,
-        tier=UserTier.SYNC_USERS.value,
+        tier=default_tier_for_new_user(session).value,
     )
     session.add(user)
     session.flush()
@@ -342,7 +355,7 @@ def mock_login(
             id=new_id("usr"),
             email=address,
             name=name or "Test User",
-            tier=(tier or UserTier.SYNC_USERS).value,
+            tier=(tier or default_tier_for_new_user(session)).value,
         )
         session.add(user)
         session.commit()

@@ -54,6 +54,14 @@ export class ApiError extends Error {
 
 /** @type {string | null} */
 let accessToken = null
+/**
+ * CSRF token returned by the API. A SPA on another origin cannot read the
+ * double-submit cookie, so the API also sends the value in auth responses.
+ * Falls back to the cookie for the normal same-origin setup.
+ *
+ * @type {string | null}
+ */
+let csrfToken = null
 /** @type {Promise<boolean> | null} */
 let refreshInFlight = null
 /** @type {Promise<{access_token: string, user: unknown} | null> | null} */
@@ -112,6 +120,30 @@ export function clearAccessToken() {
   accessToken = null
 }
 
+export function clearCsrfToken() {
+  csrfToken = null
+}
+
+/**
+ * Remember a CSRF value returned in an auth response. Responses from a
+ * same-origin setup still carry the value; split origins rely on it because
+ * the cookie belongs to the API host.
+ *
+ * @param {unknown} payload
+ */
+function rememberCsrfToken(payload) {
+  if (!payload || typeof payload !== 'object' || !('csrf_token' in payload)) return
+  const value = /** @type {{csrf_token?: unknown}} */ (payload).csrf_token
+  if (typeof value === 'string' && value) csrfToken = value
+}
+
+/**
+ * @returns {string | null}
+ */
+function currentCsrfToken() {
+  return csrfToken || readCookie('pysplit_csrf')
+}
+
 /**
  * Perform one HTTP call and normalise its result. No auth retry happens here.
  *
@@ -150,7 +182,7 @@ async function send(path, method, options = {}, parseAs = 'json') {
     requestHeaders.Authorization = `Bearer ${accessToken}`
   }
   if (csrf) {
-    const token = readCookie('pysplit_csrf')
+    const token = currentCsrfToken()
     if (token) requestHeaders['X-CSRF-Token'] = token
   }
 
@@ -162,7 +194,9 @@ async function send(path, method, options = {}, parseAs = 'json') {
       ...(requestBody !== undefined ? { body: requestBody } : {}),
       signal,
       keepalive,
-      credentials: 'same-origin',
+      // Include cookies for a split-origin dev setup (VITE_API_BASE_URL set to
+      // the backend's HTTPS origin); this is identical for same-origin calls.
+      credentials: 'include',
     })
   } catch (error) {
     if (isAbortError(error)) {
@@ -200,6 +234,7 @@ async function send(path, method, options = {}, parseAs = 'json') {
   let payload
   if (contentType.includes('application/json')) {
     payload = await response.json()
+    rememberCsrfToken(payload)
   } else {
     payload = await response.text()
   }
@@ -269,6 +304,7 @@ export async function refreshSession(options = {}) {
     } catch (error) {
       if (error instanceof ApiError && error.code === 'unauthorized') {
         accessToken = null
+        csrfToken = null
         return null
       }
       throw error
@@ -369,4 +405,5 @@ export const api = {
   refreshSession,
   getAccessToken,
   clearAccessToken,
+  clearCsrfToken,
 }

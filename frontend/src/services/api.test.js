@@ -18,6 +18,8 @@ function jsonResponse(body, status = 200) {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  api.clearAccessToken()
+  api.clearCsrfToken()
 })
 
 describe('api client', () => {
@@ -28,7 +30,7 @@ describe('api client', () => {
     await expect(api.get('/health')).resolves.toEqual({ status: 'ok' })
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/health',
-      expect.objectContaining({ method: 'GET', credentials: 'same-origin' }),
+      expect.objectContaining({ method: 'GET', credentials: 'include' }),
     )
   })
 
@@ -88,5 +90,22 @@ describe('api client', () => {
     )
 
     await expect(api.delete('/groups/g1')).resolves.toBeUndefined()
+  })
+
+  it('reuses the CSRF token returned by an auth response', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ user: null, csrf_token: 'csrf-from-me' }))
+      .mockResolvedValueOnce(jsonResponse({ access_token: 'token' }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await api.get('/auth/me')
+    await api.post('/auth/refresh', { auth: false, csrf: true })
+
+    expect(fetchMock.mock.calls[1][1]).toEqual(
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'X-CSRF-Token': 'csrf-from-me' }),
+      }),
+    )
   })
 })

@@ -141,7 +141,7 @@ def test_refresh_rotates_tokens(client: TestClient) -> None:
     payload = response.json()
     assert payload["token_type"] == "bearer"
     assert payload["expires_in"] == 900
-    assert payload["user"]["tier"] == "sync_users"
+    assert payload["user"]["tier"] == "admin"
 
     new_refresh = client.cookies.get("pysplit_refresh")
     new_csrf = client.cookies.get("pysplit_csrf")
@@ -516,7 +516,7 @@ def test_oauth_callback_creates_user_and_session(
     user = session.exec(select(User)).one()
     assert user.email == "grace@example.com"
     assert user.name == "Grace Hopper"
-    assert user.tier == "sync_users"
+    assert user.tier == "admin"
     account = session.exec(select(Account)).one()
     assert account.provider == "google"
     assert account.provider_account_id == "google-123"
@@ -524,6 +524,24 @@ def test_oauth_callback_creates_user_and_session(
     refresh = client.post("/api/auth/refresh", headers=csrf_headers(client))
     assert refresh.status_code == 200
     assert refresh.json()["user"]["email"] == "grace@example.com"
+
+
+def test_oauth_first_user_is_admin_and_later_users_are_not(session) -> None:
+    def profile(account_id: str, email: str) -> OAuthProfile:
+        return OAuthProfile(
+            provider="google",
+            provider_account_id=account_id,
+            name=email.split("@")[0],
+            email=email,
+            image=None,
+            email_verified=True,
+        )
+
+    first = auth_service.upsert_oauth_user(session, profile("google-first", "first@example.com"))
+    second = auth_service.upsert_oauth_user(session, profile("google-second", "second@example.com"))
+
+    assert first.tier == "admin"
+    assert second.tier == "sync_users"
 
 
 def test_oauth_callback_state_mismatch(
@@ -881,6 +899,10 @@ def test_mock_login_disabled_in_production(make_client) -> None:
 
 
 def test_mock_login_assigns_default_and_explicit_tiers(client: TestClient) -> None:
+    first = mock_login(client, email="first@example.com")
+    assert first.status_code == 200
+    assert first.json()["user"]["tier"] == "admin"
+
     response = mock_login(client, email="tiered@example.com")
     assert response.status_code == 200
     assert response.json()["user"]["tier"] == "sync_users"
