@@ -19,6 +19,7 @@ NO_RESPONSE_SCHEMA_PATHS = {
     "/api/groups/{group_id}/expenses/export.csv",
     "/api/groups/{group_id}/expenses/export.json",
     "/api/groups/{group_id}/expenses/{expense_id}/documents/{document_id}",
+    "/api/groups/{group_id}/receipts/images/{image_id}",
     "/api/auth/oauth/{provider}/start",
     "/api/auth/oauth/{provider}/callback",
 }
@@ -46,6 +47,19 @@ REQUIRED_PATHS = {
     "/api/groups/{group_id}/activities",
     "/api/categories",
     "/api/features",
+    "/api/groups/{group_id}/receipts/upload",
+    "/api/groups/{group_id}/receipts/images/{image_id}",
+    "/api/groups/{group_id}/receipts/extract-total",
+    "/api/groups/{group_id}/receipts/extract-items",
+    "/api/groups/{group_id}/receipts/{receipt_id}",
+    "/api/groups/{group_id}/expenses/{expense_id}/receipt",
+    "/api/groups/{group_id}/receipts/{receipt_id}/items",
+    "/api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}",
+    "/api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}/portions",
+    "/api/groups/{group_id}/receipts/{receipt_id}/opt-outs/{participant_id}",
+    "/api/groups/{group_id}/receipts/{receipt_id}/apply",
+    "/api/groups/{group_id}/receipts/{receipt_id}/link",
+    "/api/ai/categories/infer",
 }
 
 

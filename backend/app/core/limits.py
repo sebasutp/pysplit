@@ -72,6 +72,8 @@ class SlidingWindowRateLimiter:
 
 
 auth_rate_limiter = SlidingWindowRateLimiter()
+ai_rate_limiter = SlidingWindowRateLimiter()
+upload_rate_limiter = SlidingWindowRateLimiter()
 
 
 def client_key(request: Request) -> str:
@@ -113,3 +115,49 @@ def enforce_rate_limit(
                 detail="Too many authentication attempts. Try again later.",
                 headers={"Retry-After": str(account_result.retry_after)},
             )
+
+
+def _enforce_shared_limit(
+    limiter: SlidingWindowRateLimiter,
+    request: Request,
+    *,
+    scope: str,
+    limit: int,
+    window_seconds: int,
+    detail: str,
+) -> None:
+    result = limiter.check(
+        f"ip:{client_key(request)}:{scope}",
+        limit=limit,
+        window_seconds=window_seconds,
+    )
+    if not result.allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=detail,
+            headers={"Retry-After": str(result.retry_after)},
+        )
+
+
+def enforce_ai_rate_limit(request: Request, settings: Settings) -> None:
+    """Throttle paid AI calls per caller."""
+    _enforce_shared_limit(
+        ai_rate_limiter,
+        request,
+        scope="ai",
+        limit=settings.ai_rate_limit_per_minute,
+        window_seconds=settings.auth_rate_limit_window_seconds,
+        detail="Too many AI requests. Try again later.",
+    )
+
+
+def enforce_upload_rate_limit(request: Request, settings: Settings) -> None:
+    """Throttle uploads per caller."""
+    _enforce_shared_limit(
+        upload_rate_limiter,
+        request,
+        scope="upload",
+        limit=settings.upload_rate_limit_per_minute,
+        window_seconds=settings.auth_rate_limit_window_seconds,
+        detail="Too many uploads. Try again later.",
+    )

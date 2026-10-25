@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import contextlib
 from datetime import UTC, datetime
-from pathlib import Path
 
 from sqlmodel import Session
 
@@ -14,7 +13,7 @@ from app.models.expense_document import ExpenseDocument
 from app.models.group import Group
 from app.schemas.expenses import ExpenseDocumentRead
 from app.services.errors import InvalidInputError, NotFoundError, PayloadTooLargeError
-from app.storage import LocalBlobStorage, StorageError
+from app.storage import BlobStorage, StorageError
 
 CONTENT_TYPE_EXTENSIONS = {
     "image/jpeg": ".jpg",
@@ -52,7 +51,7 @@ def storage_key(document_id: str, content_type: str) -> str:
 
 def save_document(
     session: Session,
-    storage: LocalBlobStorage,
+    storage: BlobStorage,
     *,
     group_id: str,
     expense_id: str,
@@ -76,12 +75,12 @@ def save_document(
 
     document_id = new_id("doc")
     key = storage_key(document_id, normalized_type)
-    storage.save(key, data)
+    storage.save(key, data, content_type=normalized_type)
 
     moment = now or datetime.now(UTC)
     document = ExpenseDocument(
         id=document_id,
-        url=_upload_url(group_id, expense_id, document_id),
+        url=storage.public_url(key) or _upload_url(group_id, expense_id, document_id),
         width=max(1, int(width)),
         height=max(1, int(height)),
         expense_id=expense_id,
@@ -108,12 +107,12 @@ def save_document(
 
 def resolve_document(
     session: Session,
-    storage: LocalBlobStorage,
+    storage: BlobStorage,
     *,
     group_id: str,
     expense_id: str,
     document_id: str,
-) -> tuple[ExpenseDocument, Path, str, str]:
+) -> tuple[ExpenseDocument, bytes, str, str]:
     _active_expense(session, group_id, expense_id)
     document = session.get(ExpenseDocument, document_id)
     if document is None or document.expense_id != expense_id:
@@ -123,7 +122,7 @@ def resolve_document(
         key = f"documents/{document_id}{extension}"
         try:
             if storage.exists(key):
-                return document, storage.path_for(key), media_type, f"{document_id}{extension}"
+                return document, storage.read(key), media_type, f"{document_id}{extension}"
         except StorageError:
             continue
     raise NotFoundError("document file not found")
@@ -131,7 +130,7 @@ def resolve_document(
 
 def delete_document(
     session: Session,
-    storage: LocalBlobStorage,
+    storage: BlobStorage,
     *,
     group_id: str,
     expense_id: str,

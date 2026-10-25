@@ -30,6 +30,20 @@ class ActivityType(StrEnum):
     DELETE_EXPENSE = "DELETE_EXPENSE"
 
 
+class ReceiptStatus(StrEnum):
+    """Receipt extraction lifecycle, mirroring the reference enum."""
+
+    PENDING = "PENDING"
+    EXTRACTING = "EXTRACTING"
+    EXTRACTED = "EXTRACTED"
+    FAILED = "FAILED"
+
+
+class ReceiptPortionTarget(StrEnum):
+    PARTICIPANT = "PARTICIPANT"
+    SHARED = "SHARED"
+
+
 class UserTier(StrEnum):
     """Account tiers. Order is from least to most privileged."""
 

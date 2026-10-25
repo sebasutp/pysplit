@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 
 from app.services.errors import (
     ConflictError,
+    ForbiddenError,
     InvalidInputError,
     NotFoundError,
     PayloadTooLargeError,
@@ -16,6 +17,8 @@ from app.services.errors import (
 def service_error(exc: ServiceError) -> HTTPException:
     if isinstance(exc, NotFoundError):
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+    if isinstance(exc, ForbiddenError):
+        return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc))
     if isinstance(exc, ConflictError):
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
     if isinstance(exc, PayloadTooLargeError):

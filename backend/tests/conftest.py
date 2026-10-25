@@ -19,7 +19,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import Settings, get_settings
 from app.core.database import get_session
-from app.core.limits import auth_rate_limiter
+from app.core.limits import ai_rate_limiter, auth_rate_limiter, upload_rate_limiter
 from app.main import create_app
 
 
@@ -116,6 +116,8 @@ def make_client(engine):
 @pytest.fixture(autouse=True)
 def _reset_rate_limiter():
     """Keep in-process rate-limit windows from leaking between tests."""
-    auth_rate_limiter.reset()
+    for limiter in (auth_rate_limiter, ai_rate_limiter, upload_rate_limiter):
+        limiter.reset()
     yield
-    auth_rate_limiter.reset()
+    for limiter in (auth_rate_limiter, ai_rate_limiter, upload_rate_limiter):
+        limiter.reset()

@@ -74,14 +74,52 @@ class Settings(BaseSettings):
     sync_change_retention_days: int = 30
 
     # --- Uploads and runtime feature flags ------------------------------
-    # Local disk is the default blob backend; Stage 7 adds an S3 adapter.
+    # Local disk is the default blob backend; S3-compatible storage is used
+    # when the S3_* variables are configured.
     upload_dir: str = "data/uploads"
     max_upload_bytes: int = 10 * 1024 * 1024
     upload_allowed_types: str = "image/jpeg,image/png,image/webp"
+    upload_rate_limit_per_minute: int = 60
     enable_receipt_extract: bool = False
     enable_receipt_items: bool = False
     enable_category_extract: bool = False
     enable_expense_documents: bool = False
+
+    # --- S3-compatible document storage ---------------------------------
+    # All optional. When the key/secret/bucket/region quartet is present the
+    # storage factory selects the S3 adapter instead of local disk.
+    s3_upload_key: str | None = None
+    s3_upload_secret: str | None = None
+    s3_upload_bucket: str | None = None
+    s3_upload_region: str | None = None
+    s3_upload_endpoint: str | None = None
+    s3_public_url: str | None = None
+
+    # --- AI receipt/category extraction ---------------------------------
+    # AI_* variables take precedence over the historical OPENAI_* names, as in
+    # the reference application.
+    ai_api_key: str | None = None
+    openai_api_key: str | None = None
+    ai_base_url: str | None = None
+    openai_base_url: str | None = None
+    ai_model_receipt_extract: str | None = None
+    openai_model_receipt_extract: str | None = None
+    ai_model_receipt_items_extract: str | None = None
+    openai_model_receipt_items_extract: str | None = None
+    ai_model_category_extract: str | None = None
+    openai_model_category_extract: str | None = None
+    ai_timeout_seconds: float = 60.0
+    ai_rate_limit_per_minute: int = 20
+
+    # --- Receipt item limits --------------------------------------------
+    # Mirror the reference server-side caps. The item amount matches the
+    # expense form's 10,000,000.00 ceiling in minor units.
+    max_receipt_items: int = 200
+    max_receipt_item_name_length: int = 200
+    max_receipt_item_amount: int = 10_000_000_00
+    max_receipt_item_quantity_milli: int = 1_000_000_000
+    max_receipt_item_portions: int = 100
+    receipt_extraction_stale_seconds: int = 5 * 60
 
     @field_validator("api_prefix")
     @classmethod
@@ -143,6 +181,68 @@ class Settings(BaseSettings):
             raise ValueError("must be positive")
         return value
 
+    @field_validator(
+        "upload_rate_limit_per_minute",
+        "ai_rate_limit_per_minute",
+        "max_receipt_items",
+        "max_receipt_item_name_length",
+        "max_receipt_item_amount",
+        "max_receipt_item_quantity_milli",
+        "max_receipt_item_portions",
+        "receipt_extraction_stale_seconds",
+    )
+    @classmethod
+    def _positive_receipt_limit(cls, value: int) -> int:
+        if value <= 0:
+            raise ValueError("must be positive")
+        return value
+
+    @field_validator("ai_timeout_seconds")
+    @classmethod
+    def _positive_ai_timeout(cls, value: float) -> float:
+        if value <= 0:
+            raise ValueError("must be positive")
+        return value
+
+    @field_validator(
+        "s3_upload_key",
+        "s3_upload_secret",
+        "s3_upload_bucket",
+        "s3_upload_region",
+        "s3_upload_endpoint",
+        "s3_public_url",
+        "ai_api_key",
+        "openai_api_key",
+        "ai_base_url",
+        "openai_base_url",
+        "ai_model_receipt_extract",
+        "openai_model_receipt_extract",
+        "ai_model_receipt_items_extract",
+        "openai_model_receipt_items_extract",
+        "ai_model_category_extract",
+        "openai_model_category_extract",
+        mode="before",
+    )
+    @classmethod
+    def _blank_to_none(cls, value: object) -> object:
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
+    @field_validator("s3_public_url")
+    @classmethod
+    def _normalise_public_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value.strip().rstrip("/") or None
+
+    @field_validator("ai_base_url", "openai_base_url", "s3_upload_endpoint")
+    @classmethod
+    def _normalise_optional_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value.strip().rstrip("/") or None
+
     @field_validator("upload_dir")
     @classmethod
     def _normalise_upload_dir(cls, value: str) -> str:
@@ -194,6 +294,75 @@ class Settings(BaseSettings):
     @property
     def receipt_extract_enabled(self) -> bool:
         return self.enable_receipt_extract or self.enable_receipt_items
+
+    @property
+    def ai_api_key_resolved(self) -> str | None:
+        """Provider-neutral ``AI_API_KEY`` wins over ``OPENAI_API_KEY``."""
+        return self.ai_api_key or self.openai_api_key
+
+    @property
+    def ai_base_url_resolved(self) -> str | None:
+        """Provider-neutral ``AI_BASE_URL`` wins over ``OPENAI_BASE_URL``."""
+        return self.ai_base_url or self.openai_base_url
+
+    @property
+    def ai_provider(self) -> str:
+        return self.ai_base_url_resolved or "openai"
+
+    @property
+    def receipt_extract_model(self) -> str:
+        return self.ai_model_receipt_extract or self.openai_model_receipt_extract or "gpt-5-nano"
+
+    @property
+    def receipt_items_model(self) -> str:
+        return (
+            self.ai_model_receipt_items_extract
+            or self.openai_model_receipt_items_extract
+            or self.receipt_extract_model
+        )
+
+    @property
+    def category_extract_model(self) -> str:
+        return self.ai_model_category_extract or self.openai_model_category_extract or "gpt-5-nano"
+
+    @property
+    def s3_configured(self) -> bool:
+        return bool(
+            self.s3_upload_key
+            and self.s3_upload_secret
+            and self.s3_upload_bucket
+            and self.s3_upload_region
+        )
+
+    @property
+    def allowed_upload_hosts(self) -> list[str]:
+        """Hosts the AI may receive image URLs for (SSRF allowlist).
+
+        Mirrors the reference precedence: a dedicated public base URL wins
+        over the S3 API endpoint, which wins over the AWS bucket/region
+        fallback. The application's own ``BASE_URL`` host is also trusted so
+        locally stored receipt images can be resolved safely.
+        """
+        from urllib.parse import urlsplit
+
+        hosts: list[str] = []
+        if self.s3_public_url:
+            host = urlsplit(self.s3_public_url).hostname
+            if host:
+                hosts.append(host)
+        elif self.s3_upload_endpoint:
+            host = urlsplit(self.s3_upload_endpoint).hostname
+            if host:
+                hosts.append(host)
+        elif self.s3_upload_bucket and self.s3_upload_region:
+            hosts.append(f"{self.s3_upload_bucket}.s3.{self.s3_upload_region}.amazonaws.com")
+
+        if self.base_url:
+            host = urlsplit(self.base_url).hostname
+            if host and host not in hosts:
+                hosts.append(host)
+
+        return hosts
 
 
 @lru_cache(maxsize=1)
