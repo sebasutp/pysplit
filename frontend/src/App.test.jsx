@@ -18,8 +18,20 @@ function jsonResponse(body, status = 200) {
   }
 }
 
+/** @param {string} url */
+function route(url) {
+  if (url.endsWith('/auth/refresh')) return jsonResponse({ detail: 'no session' }, 401)
+  if (url.endsWith('/auth/me')) {
+    return jsonResponse({ user: null, providers: { google: false, github: false } })
+  }
+  if (url.endsWith('/groups/sync')) {
+    return jsonResponse({ is_authenticated: false, groups: [], user_groups: [] })
+  }
+  return jsonResponse({ items: [], total: 0, limit: 50, offset: 0 })
+}
+
 beforeEach(() => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok', version: '0.1.0' })))
+  vi.stubGlobal('fetch', vi.fn((url) => Promise.resolve(route(String(url)))))
 })
 
 afterEach(() => {
@@ -27,19 +39,17 @@ afterEach(() => {
 })
 
 describe('App shell', () => {
-  it('renders the groups route and reports API health', async () => {
+  it('renders the groups route and the empty recent state', async () => {
     render(
       <MemoryRouter initialEntries={['/groups']}>
         <App />
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: 'Groups' })).toBeInTheDocument()
-    expect(await screen.findByText('API ok')).toBeInTheDocument()
-    expect(vi.mocked(fetch)).toHaveBeenCalledWith(
-      '/api/health',
-      expect.objectContaining({ method: 'GET' }),
-    )
+    expect(await screen.findByRole('heading', { name: 'My groups' })).toBeInTheDocument()
+    expect(
+      await screen.findByText('You have not visited any group recently.'),
+    ).toBeInTheDocument()
   })
 
   it('redirects / to /groups', async () => {
@@ -49,18 +59,17 @@ describe('App shell', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByRole('heading', { name: 'Groups' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'My groups' })).toBeInTheDocument()
   })
 
-  it('shows an offline indicator when the health request fails', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')))
-
+  it('requires sign-in on the create group page', async () => {
     render(
-      <MemoryRouter initialEntries={['/groups']}>
+      <MemoryRouter initialEntries={['/groups/create']}>
         <App />
       </MemoryRouter>,
     )
 
-    expect(await screen.findByText('API offline')).toBeInTheDocument()
+    expect(await screen.findByText('Authentication Required')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sign in to Create Group' })).toBeInTheDocument()
   })
 })

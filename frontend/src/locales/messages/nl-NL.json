@@ -1,0 +1,644 @@
+{
+  "Homepage": {
+    "title": "Deel <strong>Uitgaven</strong> met <strong>Vrienden & Familie</strong>",
+    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "description": "Welkom op je nieuwe <strong>Spliit</strong>-instantie!",
+    "button": {
+      "groups": "Ga naar groepen",
+      "github": "GitHub"
+    }
+  },
+  "Header": {
+    "groups": "Groepen"
+  },
+  "Footer": {
+    "madeIn": "Gemaakt in Montréal, Québec 🇨🇦",
+    "builtBy": "Geschreven door <author>Sebastien Castiel</author> en <source>bijdragers</source>"
+  },
+  "Expenses": {
+    "title": "Uitgaven",
+    "description": "Dit zijn de uitgaven die je gemaakt hebt voor je groep.",
+    "create": "Maak uitgave",
+    "createFirst": "Maak de eerste",
+    "noExpenses": "Je groep heeft nog geen uitgaven.",
+    "export": "Exporteren",
+    "exportJson": "Exporteren naar JSON",
+    "exportCsv": "Exporteren naar CSV",
+    "searchPlaceholder": "Zoek naar een uitgave…",
+    "ActiveUserModal": {
+      "title": "Wie ben jij?",
+      "description": "Zeg ons welke deelnemer je bent zodat wij persoonlijke informatie kunnen aantonen.",
+      "nobody": "Ik wil niemand selecteren",
+      "save": "Opslaan",
+      "footer": "Deze instelling kan later worden gewijzigd in de instellingen van de groep."
+    },
+    "Groups": {
+      "upcoming": "Aankomend",
+      "thisWeek": "Deze week",
+      "earlierThisMonth": "Eerder deze maand",
+      "lastMonth": "Vorige maand",
+      "earlierThisYear": "Eerder dit jaar",
+      "lastYear": "Vorig jaar",
+      "older": "Ouder"
+    }
+  },
+  "ExpenseCard": {
+    "paidBy": "Betaald door <strong>{paidBy}</strong> voor <paidFor></paidFor>",
+    "everyone": "iedereen",
+    "receivedBy": "Ontvangen door <strong>{paidBy}</strong> voor <paidFor></paidFor>",
+    "yourBalance": "Jouw balans:",
+    "notInvolved": "Je bent hier niet bij betrokken"
+  },
+  "Groups": {
+    "myGroups": "Mijn groepen",
+    "create": "Maak",
+    "createGroup": "Create group",
+    "loadingRecent": "Recente groepen laden…",
+    "NoRecent": {
+      "description": "Je hebt de laatste tijd geen groepen bezocht.",
+      "create": "Maak er één",
+      "orAsk": "of vraag een vriend om je de link naar een bestaande groep te sturen."
+    },
+    "GlobalBalance": {
+      "title": "Your total balance",
+      "description": "Your combined balance across all your groups.",
+      "owedToYou": "You are owed",
+      "youOwe": "You owe",
+      "settledUp": "You are all settled up across your groups."
+    },
+    "recent": "Recente groepen",
+    "starred": "Favoriete groepen",
+    "archived": "Gearchiveerde groepen",
+    "archive": "Archiveer groep",
+    "unarchive": "Herstel groep",
+    "removeRecent": "Verwijder uit recente groepen",
+    "RecentRemovedToast": {
+      "title": "Groep verwijderd",
+      "description": "Deze groep is verwijderd uit je recente groepen.",
+      "undoAlt": "Maak het verwijderen van de groep ongedaan",
+      "undo": "Ongedaan maken"
+    },
+    "AddByURL": {
+      "button": "Voeg toe met URL",
+      "title": "Voeg een groep toe met een URL",
+      "description": "Als een groep met je gedeeld is, kun je de URL hier plakken om deze aan je lijst toe te voegen.",
+      "error": "Oeps, we kunnen de groep niet vinden met de URL die je hebt opgegeven…",
+      "urlMode": "Enter URL",
+      "qrMode": "Scan QR",
+      "scanner": {
+        "startCamera": "Start Camera",
+        "stopScanning": "Stop Scanning",
+        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
+        "noCamera": "No camera found on this device.",
+        "cameraError": "Failed to start camera. Please try again.",
+        "permissionError": "Unable to access camera. Please check permissions."
+      }
+    },
+    "NotFound": {
+      "text": "Deze groep bestaat niet.",
+      "link": "Ga naar je recente groepen"
+    }
+  },
+  "GroupForm": {
+    "title": "Groepsinformatie",
+    "NameField": {
+      "label": "Groepsnaam",
+      "placeholder": "Zomervakantie",
+      "description": "Geef je groep een naam."
+    },
+    "InformationField": {
+      "label": "Groepsinformatie",
+      "placeholder": "Welke informatie is relevant voor de groep?"
+    },
+    "CurrencyField": {
+      "label": "Symbool van de valuta",
+      "placeholder": "€, $, £…",
+      "description": "Die gebruiken we om de bedragen in de groep aan te geven."
+    },
+    "CurrencyCodeField": {
+      "label": "Hoofdvaluta",
+      "createDescription": "Alle hoeveelheden en saldi worden in deze valuta weergegeven.",
+      "editDescription": "Alle bedragen en saldi worden in deze valuta weergegeven. Als je dit wijzigt, worden reeds ingevoerde uitgaven NIET omgerekend, behalve wanneer de valuta andere \"kleinste eenheden\" heeft dan de huidige (bijvoorbeeld bij een wijziging van Amerikaanse dollar naar Japanse yen)",
+      "customOption": "Aangepast"
+    },
+    "Participants": {
+      "title": "Deelnemers",
+      "description": "Voer de naam in van de deelnemers in de groep.",
+      "protectedParticipant": "Deze deelnemer maakt deel uit van de uitgaven en kan niet worden verwijderd.",
+      "new": "Nieuwe deelnemer",
+      "add": "Voeg deelnemer toe",
+      "John": "Jan",
+      "Jane": "Julia",
+      "Jack": "Jacob"
+    },
+    "Settings": {
+      "title": "Lokale instellingen",
+      "description": "Deze instellingen worden per apparaat ingesteld en worden gebruikt om je ervaring aan te passen.",
+      "ActiveUserField": {
+        "label": "Huidige gebruiker",
+        "placeholder": "Selecteer een deelnemer",
+        "none": "Geen",
+        "description": "De deelnemer die automatisch wordt geselecteerd als je een uitgave maakt."
+      },
+      "save": "Opslaan",
+      "saving": "Aan het opslaan…",
+      "create": "Groep maken",
+      "creating": "Aan het maken…",
+      "cancel": "Annuleren"
+    }
+  },
+  "ExpenseForm": {
+    "Income": {
+      "create": "Maak inkomen",
+      "edit": "Bewerk inkomen",
+      "TitleField": {
+        "label": "Titel inkomen",
+        "placeholder": "Restaurant maandagavond",
+        "description": "Voer een beschrijving in voor het inkomen."
+      },
+      "DateField": {
+        "label": "Datum inkomen",
+        "description": "Voer de datum in waarop het inkomen is ontvangen."
+      },
+      "currencyField": {
+        "label": "Munteenheid van inkomen",
+        "description": "De munteenheid waar het inkomen in is ontvangen."
+      },
+      "categoryFieldDescription": "Selecteer de inkomencategorie.",
+      "paidByField": {
+        "label": "Ontvangen door",
+        "description": "Selecteer de deelnemer die het inkomen heeft ontvangen."
+      },
+      "paidFor": {
+        "title": "Ontvangen voor",
+        "description": "Selecteer voor wie het inkomen is ontvangen."
+      },
+      "splitModeDescription": "Selecteer hoe het inkomen verdeeld moet worden.",
+      "attachDescription": "Bekijk en voeg bijlagen toe aan het inkomen."
+    },
+    "Expense": {
+      "create": "Maak uitgave",
+      "edit": "Bewerk uitgave",
+      "TitleField": {
+        "label": "Titel uitgave",
+        "placeholder": "Restaurant maandagavond",
+        "description": "Voer een beschrijving in voor de uitgave."
+      },
+      "DateField": {
+        "label": "Datum uitgave",
+        "description": "Voer de datum in waarop de uitgave is gedaan."
+      },
+      "currencyField": {
+        "label": "Munteenheid van uitgave",
+        "description": "De munteenheid waar de uitgave in is betaald."
+      },
+      "categoryFieldDescription": "Selecteer de uitgavecategorie.",
+      "paidByField": {
+        "label": "Betaald door",
+        "placeholder": "Selecteer een deelnemer",
+        "description": "Selecteer de deelnemer die de uitgave heeft gedaan."
+      },
+      "recurrenceRule": {
+        "label": "Terugkerende uitgave",
+        "description": "Kies hoe vaak de uitgave herhaald wordt.",
+        "none": "Niet",
+        "daily": "Dagelijks",
+        "weekly": "Wekelijks",
+        "monthly": "Maandelijks"
+      },
+      "paidFor": {
+        "title": "Betaald voor",
+        "description": "Selecteer voor wie de uitgave is gedaan."
+      },
+      "splitModeDescription": "Selecteer hoe de uitgave verdeeld moet worden.",
+      "attachDescription": "Bekijk en voeg bijlagen toe aan de uitgave."
+    },
+    "amountField": {
+      "label": "Bedrag"
+    },
+    "conversionUnavailable": "Om een andere munteenheid in te stellen voor een uitgave en bedragen om te rekenen, kies een standaard munteenheid voor de groep.",
+    "originalAmountField": {
+      "label": "Om te rekenen bedrag",
+      "repaymentLabel": "Amount to transfer",
+      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+    },
+    "conversionRateField": {
+      "useApi": "Gebruik koersen van Frankfurter",
+      "useCustom": "Gebruik aangepaste koers",
+      "label": "Wisselkoers"
+    },
+    "conversionRateState": {
+      "loading": "Wisselkoers aan het ophalen…",
+      "success": "Verkregen wisselkoers:",
+      "error": "Oeps, we konden de nieuwste wisselkoersen niet verkrijgen.",
+      "staleRate": "Gebruikte wisselkoers:",
+      "noRate": "Voer hieronder een aangepaste koers in.",
+      "currencyNotFound": "Oeps, Frankfurter heeft geen koersen voor deze munteenheid op deze dag.",
+      "noDate": "Voer de datum van de uitgave in om een wisselkoers te krijgen.",
+      "dateMismatch": "Wisselkoers van: {date}",
+      "refresh": "Ververs",
+      "customRate": "Aangepaste wisselkoers wordt gebruikt"
+    },
+    "isReimbursementField": {
+      "label": "Dit is een terugbetaling"
+    },
+    "categoryField": {
+      "label": "Categorie"
+    },
+    "notesField": {
+      "label": "Notities"
+    },
+    "selectNone": "Selecteer niemand",
+    "selectAll": "Selecteer iedereen",
+    "shares": "deel/delen",
+    "advancedOptions": "Andere split-opties…",
+    "SplitModeField": {
+      "label": "Split soort",
+      "evenly": "Gelijk verdeeld",
+      "byShares": "Ongelijk – Met delen",
+      "byPercentage": "Ongelijk – Met percentage",
+      "byAmount": "Ongelijk – Met bedrag",
+      "saveAsDefault": "Opslaan als standaard-optie"
+    },
+    "DeletePopup": {
+      "label": "Verwijderen",
+      "title": "Deze uitgave verwijderen?",
+      "description": "Wil je deze uitgave echt verwijderen? Dit kan niet ongedaan worden.",
+      "yes": "Ja",
+      "cancel": "Annuleer"
+    },
+    "attachDocuments": "Voeg documenten toe",
+    "create": "Maken",
+    "creating": "Aan het maken…",
+    "save": "Opslaan",
+    "saving": "Aan het opslaan…",
+    "cancel": "Annuleren",
+    "reimbursement": "Terugbetaling",
+    "itemizedSplit": "Itemized Split"
+  },
+  "ExpenseDocumentsInput": {
+    "TooBigToast": {
+      "title": "Het bestand is te groot",
+      "description": "De maximum bestandsgrootte {maxSize}. Jouw bestand is {size}."
+    },
+    "ErrorToast": {
+      "title": "Fout bij het uploaden van document",
+      "description": "Er is iets mis gegaan bij het uploaden van het document. Probeer het later opnieuw of kies een ander bestand.",
+      "retry": "Probeer opnieuw"
+    }
+  },
+  "CreateFromReceipt": {
+    "Dialog": {
+      "triggerTitle": "Uitgave maken van foto",
+      "title": "Maak uitgave van foto",
+      "description": "Uitgave-informatie van een foto van een bon lezen.",
+      "body": "Upload de foto van een bon, en we lezen de uitgave-informatie eruit.",
+      "selectImage": "Selecteer foto…",
+      "titleLabel": "Titel:",
+      "categoryLabel": "Categorie:",
+      "amountLabel": "Bedrag:",
+      "dateLabel": "Datum:",
+      "editNext": "Hierna kun je de uitgave-informatie bewerken.",
+      "continue": "Doorgaan"
+    },
+    "unknown": "Onbekend",
+    "TooBigToast": {
+      "title": "Het bestand is te groot",
+      "description": "De maximum bestandsgrootte {maxSize}. Jouw bestand is {size}."
+    },
+    "ErrorToast": {
+      "title": "Fout bij het uploaden van document",
+      "description": "Er is iets mis gegaan bij het uploaden van het document. Probeer het later opnieuw of kies een ander bestand.",
+      "retry": "Probeer opnieuw"
+    }
+  },
+  "ReceiptItems": {
+    "title": "Receipt items",
+    "backToExpense": "Back to expense",
+    "merchant": "Merchant",
+    "printedTotal": "Printed total",
+    "noReceipt": "No receipt is linked to this expense yet.",
+    "empty": "No items yet. Add one to start splitting.",
+    "saveError": {
+      "title": "Couldn’t save your change",
+      "description": "We reloaded the receipt so you can try again."
+    },
+    "addItem": "Add item",
+    "quantitySummary": "{count} · {quantity} units",
+    "AddItemDialog": {
+      "title": "Add item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "sharedLabel": "Shared (whole-bill charge)",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "item": {
+      "quantity": "{assigned} of {total}",
+      "remaining": "{quantity} left",
+      "assign": "Assign",
+      "edit": "Edit",
+      "delete": "Delete",
+      "removePortion": "Remove portion",
+      "editTitle": "Edit item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "save": "Save",
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this item?",
+      "deleteDescription": "This removes the item and its assignments."
+    },
+    "sections": {
+      "unassigned": "Unassigned",
+      "unassignedHint": "Not assigned to anyone yet",
+      "shared": "Shared",
+      "sharedHint": "Split equally by everyone",
+      "participantHint": "Items assigned to {name}"
+    },
+    "assign": {
+      "title": "Assign item",
+      "description": "Choose who pays for “{name}”.",
+      "whole": "Assign the whole item",
+      "everyone": "Everyone (shared)",
+      "even": "Split evenly",
+      "evenHint": "Choose the participants to split between.",
+      "custom": "Custom split",
+      "customHint": "Enter quantities in units for each target.",
+      "shared": "Shared",
+      "selectParticipant": "Select a participant",
+      "exceeds": "The assigned quantity exceeds the item quantity.",
+      "confirm": "Assign",
+      "cancel": "Cancel"
+    },
+    "footer": {
+      "own": "Own",
+      "shared": "Shared",
+      "unassigned": "Unassigned",
+      "optOut": "Shares unassigned items",
+      "reconciles": "Reconciles",
+      "offBy": "Off by {amount}",
+      "itemsTotal": "Items total",
+      "apply": "Apply to expense",
+      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
+      "divergent": "Receipt values differ · Apply again"
+    },
+    "applySuccess": {
+      "title": "Expense updated",
+      "description": "The receipt items were applied to the expense."
+    },
+    "applyError": {
+      "title": "Couldn’t apply the receipt"
+    },
+    "applyConfirm": {
+      "title": "Update the expense?",
+      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "total": "total {current} → {new}",
+      "cancel": "Cancel",
+      "confirm": "Apply"
+    }
+  },
+  "Balances": {
+    "title": "Balans",
+    "description": "Dit zijn de bedragen die elke deelnemer heeft betaald of waarvoor is betaald.",
+    "Reimbursements": {
+      "title": "Voorgestelde terugbetalingen",
+      "description": "Dit zijn de voorgestelde terugbetalingen tussen deelnemers.",
+      "noImbursements": "Lijkt erop dat je groep geen terugbetalingen nodig heeft 😁",
+      "owes": "<strong>{from}</strong> betaalt aan <strong>{to}</strong>",
+      "markAsPaid": "Markeer als betaald"
+    }
+  },
+  "Stats": {
+    "title": "Statistieken",
+    "range": {
+      "label": "Period",
+      "all": "All time",
+      "thisMonth": "This month",
+      "last30": "Last 30 days",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "from": "From",
+      "to": "To"
+    },
+    "Totals": {
+      "title": "Totaaluitgaven",
+      "description": "Uitgavenoverzicht van de hele groep.",
+      "groupSpendings": "Totale uitgaven van de groep",
+      "groupEarnings": "Totale inkomsten van de groep",
+      "yourSpendings": "Jouw totale uitgaven",
+      "yourEarnings": "Jouw totale inkomsten",
+      "yourShare": "Jouw totale aandeel"
+    },
+    "Summary": {
+      "title": "Summary",
+      "description": "Key figures for the selected period.",
+      "empty": "There are no expenses yet.",
+      "expenseCount": "Expenses",
+      "averageExpense": "Average expense",
+      "largestExpense": "Largest expense",
+      "activeSpan": "Active period"
+    },
+    "OverTime": {
+      "title": "Spending over time",
+      "description": "Total group spending per month. Select a month to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {month}",
+      "detailsDescription": "Expenses in this month for the selected period.",
+      "detailsEmpty": "There are no expenses in this month."
+    },
+    "ByParticipant": {
+      "title": "Spending by participant",
+      "description": "How much each participant paid and their share of the expenses.",
+      "empty": "There are no expenses yet.",
+      "participant": "Participant",
+      "paid": "Paid",
+      "count": "Count",
+      "share": "Share"
+    },
+    "ByCategory": {
+      "title": "Spending by category",
+      "description": "Total amount spent in each category. Select a category to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {category}",
+      "detailsDescription": "Expenses in this category for the selected period.",
+      "detailsEmpty": "There are no expenses in this category."
+    },
+    "Recurring": {
+      "title": "Recurring expenses",
+      "description": "Estimated cost of the group's active recurring expenses.",
+      "estimatedMonthly": "Estimated monthly cost",
+      "estimatedYearly": "{amount} per year",
+      "period": {
+        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
+        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
+        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+      }
+    }
+  },
+  "Activity": {
+    "title": "Gebeurtenissen",
+    "description": "Overzicht van de gebeurtenissen in je groep.",
+    "noActivity": "Er zijn geen gebeurtenissen in deze groep.",
+    "someone": "Iemand",
+    "settingsModified": "Groepsinstellingen zijn aangepast door <strong>{participant}</strong>.",
+    "expenseCreated": "Uitgave <em>{expense}</em> gemaakt door <strong>{participant}</strong>.",
+    "expenseUpdated": "Uitgave <em>{expense}</em> bewerkt door <strong>{participant}</strong>.",
+    "expenseDeleted": "Uitgave <em>{expense}</em> verwijderd door <strong>{participant}</strong>.",
+    "Groups": {
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "earlierThisWeek": "Eerder deze week",
+      "lastWeek": "Vorige week",
+      "earlierThisMonth": "Eerder deze maand",
+      "lastMonth": "Vorige maand",
+      "earlierThisYear": "Eerder dit jaar",
+      "lastYear": "Vorig jaar",
+      "older": "Ouder"
+    }
+  },
+  "Information": {
+    "title": "Informatie",
+    "description": "Gebruike deze plek om informatie toe te voegen die relevant kan zijn voor de groepsleden.",
+    "empty": "Nog geen informatie toegevoegd."
+  },
+  "Settings": {
+    "title": "Instellingen"
+  },
+  "Share": {
+    "title": "Delen",
+    "description": "Om andere deelnemers de groep te laten zien en uitgaven toe te voegen, deel je de URL met hen.",
+    "copyLink": "Copy link",
+    "shareLink": "Share link",
+    "warning": "Waarschuwing!",
+    "warningHelp": "Iedereen met de groeps-URL kan de uitgaven zien en bewerken. Deel voorzichtig!",
+    "qrCode": {
+      "title": "Share via QR Code",
+      "description": "Scan this QR code to open the group on any device.",
+      "download": "Download QR Code"
+    }
+  },
+  "SchemaErrors": {
+    "min1": "Vul ten minste één karakter in.",
+    "min2": "Vul ten minste twee karakters in.",
+    "max5": "Vul maximaal vijf karakters in.",
+    "max50": "Vul maximaal 50 karakters in.",
+    "duplicateParticipantName": "Er is al een deelnemer met deze naam.",
+    "titleRequired": "Vul een titel in.",
+    "invalidNumber": "Ongeldig getal.",
+    "amountRequired": "Vul een bedrag in.",
+    "amountNotZero": "Het bedrag moet hoger zijn dan 0.",
+    "amountTenMillion": "Het bedrag mag niet hoger zijn dan 10,000,000.",
+    "ratePositive": "De koers moet groter dan nul zijn.",
+    "paidByRequired": "Selecteer een deelnemer die de uitgave heeft gedaan.",
+    "paidForMin1": "De uitgave moet voor ten minste één deelnemer zijn gedaan.",
+    "noZeroShares": "Een deel mag niet 0 zijn.",
+    "amountSum": "Het totaalbedrag moet gelijk zijn aan het uitgavebedrag.",
+    "percentageSum": "Het totaalpercentage moet gelijk zijn aan 100%."
+  },
+  "Categories": {
+    "search": "Categorie zoeken…",
+    "noCategory": "Geen categorieën gevonden.",
+    "Uncategorized": {
+      "heading": "Geen categorie",
+      "General": "Algemeen",
+      "Payment": "Betaling"
+    },
+    "Entertainment": {
+      "heading": "Vermaak",
+      "Entertainment": "Vermaak",
+      "Games": "Games",
+      "Movies": "Film",
+      "Music": "Muziek",
+      "Sports": "Sport"
+    },
+    "Food and Drink": {
+      "heading": "Eten en Drinken",
+      "Food and Drink": "Eten en Drinken",
+      "Dining Out": "Uit eten",
+      "Groceries": "Boodschappen",
+      "Liquor": "Drank"
+    },
+    "Home": {
+      "heading": "Thuis",
+      "Home": "Thuis",
+      "Electronics": "Elektronica",
+      "Furniture": "Meubels",
+      "Household Supplies": "Huishoudelijke artikelen",
+      "Maintenance": "Onderhoud",
+      "Mortgage": "Hypotheek",
+      "Pets": "Huisdieren",
+      "Rent": "Huur",
+      "Services": "Diensten"
+    },
+    "Life": {
+      "heading": "Leven",
+      "Childcare": "Kinderopvang",
+      "Clothing": "Kleding",
+      "Donation": "Donatie",
+      "Education": "Onderwijs",
+      "Gifts": "Cadeaus",
+      "Insurance": "Verzekering",
+      "Medical Expenses": "Medische kosten",
+      "Taxes": "Belastingen"
+    },
+    "Transportation": {
+      "heading": "Vervoer",
+      "Transportation": "Vervoer",
+      "Bicycle": "Fiets",
+      "Bus/Train": "Bus/Trein",
+      "Car": "Auto",
+      "Gas/Fuel": "Tanken",
+      "Hotel": "Hotel",
+      "Parking": "Parkeren",
+      "Plane": "Vliegtuig",
+      "Taxi": "Taxi"
+    },
+    "Utilities": {
+      "heading": "Nutsvoorzieningen",
+      "Utilities": "Nutsvoorzieningen",
+      "Cleaning": "Schoonmaak",
+      "Electricity": "Elektriciteit",
+      "Heat/Gas": "Verwarming/Gas",
+      "Trash": "Afval",
+      "TV/Phone/Internet": "Internet/TV/Telefoon",
+      "Water": "Water"
+    }
+  },
+  "Currencies": {
+    "search": "Valuta zoeken...",
+    "noCurrency": "Geen valuta gevonden.",
+    "custom": {
+      "heading": "Aangepast"
+    },
+    "common": {
+      "heading": "Meest voorkomend"
+    },
+    "other": {
+      "heading": "Andere valuta"
+    }
+  },
+  "Pwa": {
+    "updateTitle": "Update available",
+    "updateDescription": "A new version of Spliit is available.",
+    "reload": "Reload"
+  },
+  "Auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "admin": "Admin",
+    "groupCreator": "Group Creator",
+    "syncUser": "Sync User",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "Admin": {
+    "title": "Administration Dashboard",
+    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
+    "totalGroups": "Total Groups",
+    "totalExpenses": "Total Expenses",
+    "registeredUsers": "Registered Users",
+    "userManagement": "User Management & Permission Tiers"
+  }
+}

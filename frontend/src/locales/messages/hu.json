@@ -1,0 +1,644 @@
+{
+  "Homepage": {
+    "title": "Oszd szét a <strong>kiadásokat</strong> a <strong>barátaiddal és családoddal</strong>",
+    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "description": "Üdv az <strong>Spliit</strong> alkalmazásban!",
+    "button": {
+      "groups": "Irány a csoportjaid",
+      "github": "GitHub"
+    }
+  },
+  "Header": {
+    "groups": "Csoportok"
+  },
+  "Footer": {
+    "madeIn": "Készült: Montréal, Québec 🇨🇦",
+    "builtBy": "Készítette: <author>Sebastien Castiel</author> és <source>további közreműködők</source>"
+  },
+  "Expenses": {
+    "title": "Kiadások",
+    "description": "Itt vannak a kiadások, amiket létrehoztál a csoportodnak.",
+    "create": "Új kiadás",
+    "createFirst": "Add hozzá az elsőt",
+    "noExpenses": "A csoportod még nem tartalmaz semmilyen kiadást.",
+    "export": "Exportálás",
+    "exportJson": "Exportálás JSON fájlba",
+    "exportCsv": "Exportálás CSV fájlba",
+    "searchPlaceholder": "Keresés kiadások közt…",
+    "ActiveUserModal": {
+      "title": "Ki vagy?",
+      "description": "Mond meg, melyik résztvevő vagy te, hogy személyre tudjuk szabni a megjelenített információkat.",
+      "nobody": "Nem szeretnék senki választani",
+      "save": "Változások mentése",
+      "footer": "Ez a beállítás később is módosítható a csoport beállításainál."
+    },
+    "Groups": {
+      "upcoming": "Hamarosan",
+      "thisWeek": "Ezen a héten",
+      "earlierThisMonth": "Korábban a hónapban",
+      "lastMonth": "Múlt hónapban",
+      "earlierThisYear": "Korábban az évben",
+      "lastYear": "Tavaly",
+      "older": "Régebben"
+    }
+  },
+  "ExpenseCard": {
+    "paidBy": "Fizette: <strong>{paidBy}</strong>, nekik: <paidFor></paidFor>",
+    "everyone": "mindenki",
+    "receivedBy": "Fogadta: <strong>{paidBy}</strong>, nekik: <paidFor></paidFor>",
+    "yourBalance": "Egyenleged:",
+    "notInvolved": "Nem vagy érintett"
+  },
+  "Groups": {
+    "myGroups": "Saját csoportok",
+    "create": "Új csoport",
+    "createGroup": "Create group",
+    "loadingRecent": "Legutóbbi csoportok betöltése…",
+    "NoRecent": {
+      "description": "Mostanában nem néztél meg egy csoportot sem.",
+      "create": "Hozz létre egyet",
+      "orAsk": "vagy kérd meg egy barátod, hogy küldje el egy létezőnek a linkjét."
+    },
+    "GlobalBalance": {
+      "title": "Your total balance",
+      "description": "Your combined balance across all your groups.",
+      "owedToYou": "You are owed",
+      "youOwe": "You owe",
+      "settledUp": "You are all settled up across your groups."
+    },
+    "recent": "Legutóbbi csoportok",
+    "starred": "Csillaggal megjelölt csoportok",
+    "archived": "Archivált csoportok",
+    "archive": "Csoport archiválása",
+    "unarchive": "Archiválás visszavonása",
+    "removeRecent": "Eltávolítás a legutóbbi csoportok közül",
+    "RecentRemovedToast": {
+      "title": "A csoport el lett távolítva",
+      "description": "A csoport el lett távolítva a legutóbbi csoportjaid közül.",
+      "undoAlt": "Csoport eltávolítás visszavonása",
+      "undo": "Visszavonás"
+    },
+    "AddByURL": {
+      "button": "Hozzáadás URL alapján",
+      "title": "Adj hozzá csoportot URL alapján",
+      "description": "Ha egy csoport meg lett veled osztva, másold be az URL-jét ide, hogy hozzá add a listádhoz.",
+      "error": "Hoppá, nem találunk csoportot az URL alapján, amit megadtál…",
+      "urlMode": "Enter URL",
+      "qrMode": "Scan QR",
+      "scanner": {
+        "startCamera": "Start Camera",
+        "stopScanning": "Stop Scanning",
+        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
+        "noCamera": "No camera found on this device.",
+        "cameraError": "Failed to start camera. Please try again.",
+        "permissionError": "Unable to access camera. Please check permissions."
+      }
+    },
+    "NotFound": {
+      "text": "Ez a csoport nem létezik.",
+      "link": "Irány a legutóbb megtekintett csoportok"
+    }
+  },
+  "GroupForm": {
+    "title": "Csoport információ",
+    "NameField": {
+      "label": "Csoport név",
+      "placeholder": "Nyaralás",
+      "description": "Add meg a csoportod nevét."
+    },
+    "InformationField": {
+      "label": "Csoport információ",
+      "placeholder": "Milyen információ releváns még a csoport résztvevői számára?"
+    },
+    "CurrencyField": {
+      "label": "Pénznem szimbólum",
+      "placeholder": "$, €, £…",
+      "description": "Ezt fogjuk használni az összegek megjelenítésénél."
+    },
+    "CurrencyCodeField": {
+      "label": "Elsődleges pénznem",
+      "createDescription": "Minden összeg és egyenleg ebben a pénznemben lesz.",
+      "editDescription": "Minden összeg és egyenleg ebben a pénznemben lesz. Megváltoztatása NEM konvertálja át a korábban megadott kiadásokat, kivéve, ha egy pénznem eltérő \"kis egység\"-gel rendelkezik a jelenlegihez képest (pl. váltás amerika dollárról japán jenre)",
+      "customOption": "Egyéni"
+    },
+    "Participants": {
+      "title": "Résztvevők",
+      "description": "Add meg a résztvevők neveit.",
+      "protectedParticipant": "Ez a résztvevő a kiadások részese, nem lehet eltávolítani.",
+      "new": "Új",
+      "add": "Résztvevő hozzáadása",
+      "John": "Aladár",
+      "Jane": "Béla",
+      "Jack": "Cecília"
+    },
+    "Settings": {
+      "title": "Helyi beállítások",
+      "description": "Ezek a beállítások eszköz szintűek és a felhasználói felület testreszabásához használjuk.",
+      "ActiveUserField": {
+        "label": "Aktív felhasználó",
+        "placeholder": "Válassz egy résztvevőt",
+        "none": "Senki",
+        "description": "Ez a felhasználó lesz az alapértelmezett fizető a kiadásoknál."
+      },
+      "save": "Mentés",
+      "saving": "Mentés…",
+      "create": "Létrehozás",
+      "creating": "Létrehozás…",
+      "cancel": "Mégse"
+    }
+  },
+  "ExpenseForm": {
+    "Income": {
+      "create": "Új bevétel",
+      "edit": "Bevétel szerkesztése",
+      "TitleField": {
+        "label": "Bevétel címe",
+        "placeholder": "Hétfő esti étterem",
+        "description": "Adj meg egy leírást a bevételhez."
+      },
+      "DateField": {
+        "label": "Beérkezés dátuma",
+        "description": "Adj meg egy dátumot, amikor a bevétel megérkezett."
+      },
+      "currencyField": {
+        "label": "Bevétel pénzneme",
+        "description": "A pénznem, amiben a bevétel érkezett."
+      },
+      "categoryFieldDescription": "Válassz bevétel kategóriát.",
+      "paidByField": {
+        "label": "Fogadta:",
+        "description": "Válassz egy résztvevőt, aki fogadta a bevételt."
+      },
+      "paidFor": {
+        "title": "Részére:",
+        "description": "Válaszd ki, hogy kinek a részére érkezett bevétel."
+      },
+      "splitModeDescription": "Válassz, hogyan osszátok szét a bevételt.",
+      "attachDescription": "Tekintsd meg és csatolj nyugtákat a bevételhez."
+    },
+    "Expense": {
+      "create": "Új kiadás",
+      "edit": "Kiadás szerkesztése",
+      "TitleField": {
+        "label": "Kiadás címe",
+        "placeholder": "Hétfő esti étterem",
+        "description": "Adj meg egy leírást a kiadáshoz."
+      },
+      "DateField": {
+        "label": "Kiadás dátuma",
+        "description": "Adj meg egy dátumot, amikor a kiadás ki lett fizetve."
+      },
+      "currencyField": {
+        "label": "Kiadás pénzneme",
+        "description": "A pénznem, amiben a kiadás fizetve lett."
+      },
+      "categoryFieldDescription": "Válassz kiadás kategóriát.",
+      "paidByField": {
+        "label": "Fizette:",
+        "placeholder": "Válassz egy résztvevőt",
+        "description": "Válaszd ki a résztvevőt, aki a kiadást fizette."
+      },
+      "recurrenceRule": {
+        "label": "Kiadás ismétlődése",
+        "description": "Válaszd ki, milyen gyakran ismétlődjön a kiadás.",
+        "none": "Soha",
+        "daily": "Naponta",
+        "weekly": "Hetente",
+        "monthly": "Havonta"
+      },
+      "paidFor": {
+        "title": "Részére:",
+        "description": "Válasz ki, kinek a részére fizették ki a kadást."
+      },
+      "splitModeDescription": "Válassz, hogyan osszátok szét a kiadást.",
+      "attachDescription": "Tekintsd meg és csatolj nyugtákat a kiadáshoz."
+    },
+    "amountField": {
+      "label": "Összeg"
+    },
+    "conversionUnavailable": "Kiadásonként eltérő pénznem beállításához és az összegek átváltásához válassz egy nem egyéni pénznemet a csoporthoz.",
+    "originalAmountField": {
+      "label": "Átváltandó összeg",
+      "repaymentLabel": "Amount to transfer",
+      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+    },
+    "conversionRateField": {
+      "useApi": "Használd a Frankfurter árfolyamát",
+      "useCustom": "Használj egyedi árfolyamot",
+      "label": "Árfolyam"
+    },
+    "conversionRateState": {
+      "loading": "Árfolyam lekérése…",
+      "success": "Lekért árfolyam:",
+      "error": "Hoppá, nem tudtuk lekérni a legfrissebb árfolyamot.",
+      "staleRate": "Árfolyam:",
+      "noRate": "Adj meg egy egyedi árfolyamot alább.",
+      "currencyNotFound": "Hoppá, Frankfurter nem rendelkezik árfolyammal ehhez a pénznemmel ezen a napon.",
+      "noDate": "Add meg a kiadási dátumot az árfolyam lekéréséhez.",
+      "dateMismatch": "Árfolyam dátuma: {date}",
+      "refresh": "Frissítés",
+      "customRate": "Egyedi árfolyamot használunk"
+    },
+    "isReimbursementField": {
+      "label": "Ez egy költségtérítés"
+    },
+    "categoryField": {
+      "label": "Kategória"
+    },
+    "notesField": {
+      "label": "Megjegyzések"
+    },
+    "selectNone": "Kijelölés törlése",
+    "selectAll": "Összes kijelölése",
+    "shares": "rész",
+    "advancedOptions": "Speciális szétosztási lehetőség…",
+    "SplitModeField": {
+      "label": "Szétosztás módja",
+      "evenly": "Egyenlő arányban",
+      "byShares": "Nem egyenlően - részarányosan",
+      "byPercentage": "Nem egyenlően - százalékosan",
+      "byAmount": "Nem egyenlően - összeg szerint",
+      "saveAsDefault": "Mentés alapértelmezett szétosztási beállításként"
+    },
+    "DeletePopup": {
+      "label": "Törlés",
+      "title": "Törlöd ezt a kiadást?",
+      "description": "Biztosan szeretnéd törölni ezt a kiadást? Ez a művelet nem visszavonható.",
+      "yes": "Igen",
+      "cancel": "Mégse"
+    },
+    "attachDocuments": "Csatolt dokumentumok",
+    "create": "Létrehozás",
+    "creating": "Létrehozás…",
+    "save": "Mentés",
+    "saving": "Mentés…",
+    "cancel": "Mégse",
+    "reimbursement": "Költségtérítés",
+    "itemizedSplit": "Itemized Split"
+  },
+  "ExpenseDocumentsInput": {
+    "TooBigToast": {
+      "title": "A fájl túl nagy",
+      "description": "A maximális fájl méret amit feltölthetsz: {maxSize}. Általad feltöltött: {size}."
+    },
+    "ErrorToast": {
+      "title": "Hiba a dokumentum feltöltésekor",
+      "description": "Valami hiba történt a dokumentum feltöltésekor. Kérjük próbáld újra később vagy válassz egy másik fájlt.",
+      "retry": "Próbáld újra"
+    }
+  },
+  "CreateFromReceipt": {
+    "Dialog": {
+      "triggerTitle": "Kiadás létrehozása nyugta alapán",
+      "title": "Létrehozás nyugta alapján",
+      "description": "Kiadási információk kinyerése egy nyugtáról készült fotóról.",
+      "body": "Töltsd fel egy nyugta fotóját és mi átnézzük, hogy kinyerhető-e belőle kiadással kapcsolatos információk.",
+      "selectImage": "Kép kiválasztása…",
+      "titleLabel": "Cím:",
+      "categoryLabel": "Kategória:",
+      "amountLabel": "Összeg:",
+      "dateLabel": "Dátum:",
+      "editNext": "Következő lépésben szerkesztheted a kiadás részleteit.",
+      "continue": "Folytatás"
+    },
+    "unknown": "Ismeretlen",
+    "TooBigToast": {
+      "title": "A fájl túl nagy",
+      "description": "A maximális fájl méret amit feltölthetsz: {maxSize}. Általad feltöltött: {size}."
+    },
+    "ErrorToast": {
+      "title": "Hiba a dokumentum feltöltésekor",
+      "description": "Valami hiba történt a dokumentum feltöltésekor. Kérjük próbáld újra később vagy válassz egy másik fájlt.",
+      "retry": "Próbáld újra"
+    }
+  },
+  "ReceiptItems": {
+    "title": "Receipt items",
+    "backToExpense": "Back to expense",
+    "merchant": "Merchant",
+    "printedTotal": "Printed total",
+    "noReceipt": "No receipt is linked to this expense yet.",
+    "empty": "No items yet. Add one to start splitting.",
+    "saveError": {
+      "title": "Couldn’t save your change",
+      "description": "We reloaded the receipt so you can try again."
+    },
+    "addItem": "Add item",
+    "quantitySummary": "{count} · {quantity} units",
+    "AddItemDialog": {
+      "title": "Add item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "sharedLabel": "Shared (whole-bill charge)",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "item": {
+      "quantity": "{assigned} of {total}",
+      "remaining": "{quantity} left",
+      "assign": "Assign",
+      "edit": "Edit",
+      "delete": "Delete",
+      "removePortion": "Remove portion",
+      "editTitle": "Edit item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "save": "Save",
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this item?",
+      "deleteDescription": "This removes the item and its assignments."
+    },
+    "sections": {
+      "unassigned": "Unassigned",
+      "unassignedHint": "Not assigned to anyone yet",
+      "shared": "Shared",
+      "sharedHint": "Split equally by everyone",
+      "participantHint": "Items assigned to {name}"
+    },
+    "assign": {
+      "title": "Assign item",
+      "description": "Choose who pays for “{name}”.",
+      "whole": "Assign the whole item",
+      "everyone": "Everyone (shared)",
+      "even": "Split evenly",
+      "evenHint": "Choose the participants to split between.",
+      "custom": "Custom split",
+      "customHint": "Enter quantities in units for each target.",
+      "shared": "Shared",
+      "selectParticipant": "Select a participant",
+      "exceeds": "The assigned quantity exceeds the item quantity.",
+      "confirm": "Assign",
+      "cancel": "Cancel"
+    },
+    "footer": {
+      "own": "Own",
+      "shared": "Shared",
+      "unassigned": "Unassigned",
+      "optOut": "Shares unassigned items",
+      "reconciles": "Reconciles",
+      "offBy": "Off by {amount}",
+      "itemsTotal": "Items total",
+      "apply": "Apply to expense",
+      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
+      "divergent": "Receipt values differ · Apply again"
+    },
+    "applySuccess": {
+      "title": "Expense updated",
+      "description": "The receipt items were applied to the expense."
+    },
+    "applyError": {
+      "title": "Couldn’t apply the receipt"
+    },
+    "applyConfirm": {
+      "title": "Update the expense?",
+      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "total": "total {current} → {new}",
+      "cancel": "Cancel",
+      "confirm": "Apply"
+    }
+  },
+  "Balances": {
+    "title": "Egyenlegek",
+    "description": "Ez az az összeg, amelye az egyes résztvevők fizettek vagy nekik fizetve lett.",
+    "Reimbursements": {
+      "title": "Javasolt költségtérítés",
+      "description": "Íme néhány javaslat a résztvevők közötti optimális kifizetésekre.",
+      "noImbursements": "Úgy tűnik, a csoportodnak nincs szüksége költségtérítésre 😁",
+      "owes": "<strong>{from}</strong> tartozik neki: <strong>{to}</strong>",
+      "markAsPaid": "Megjelölés kifizetettként"
+    }
+  },
+  "Stats": {
+    "title": "Statisztika",
+    "range": {
+      "label": "Period",
+      "all": "All time",
+      "thisMonth": "This month",
+      "last30": "Last 30 days",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "from": "From",
+      "to": "To"
+    },
+    "Totals": {
+      "title": "Összegzés",
+      "description": "A teljes csoport kiadásainak összesítése.",
+      "groupSpendings": "Teljes csoport kiadása",
+      "groupEarnings": "Teljes csoport bevétele",
+      "yourSpendings": "Te összes kiadásod",
+      "yourEarnings": "Te összes bevételed",
+      "yourShare": "Te részesedésed"
+    },
+    "Summary": {
+      "title": "Summary",
+      "description": "Key figures for the selected period.",
+      "empty": "There are no expenses yet.",
+      "expenseCount": "Expenses",
+      "averageExpense": "Average expense",
+      "largestExpense": "Largest expense",
+      "activeSpan": "Active period"
+    },
+    "OverTime": {
+      "title": "Spending over time",
+      "description": "Total group spending per month. Select a month to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {month}",
+      "detailsDescription": "Expenses in this month for the selected period.",
+      "detailsEmpty": "There are no expenses in this month."
+    },
+    "ByParticipant": {
+      "title": "Spending by participant",
+      "description": "How much each participant paid and their share of the expenses.",
+      "empty": "There are no expenses yet.",
+      "participant": "Participant",
+      "paid": "Paid",
+      "count": "Count",
+      "share": "Share"
+    },
+    "ByCategory": {
+      "title": "Spending by category",
+      "description": "Total amount spent in each category. Select a category to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {category}",
+      "detailsDescription": "Expenses in this category for the selected period.",
+      "detailsEmpty": "There are no expenses in this category."
+    },
+    "Recurring": {
+      "title": "Recurring expenses",
+      "description": "Estimated cost of the group's active recurring expenses.",
+      "estimatedMonthly": "Estimated monthly cost",
+      "estimatedYearly": "{amount} per year",
+      "period": {
+        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
+        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
+        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+      }
+    }
+  },
+  "Activity": {
+    "title": "Történések",
+    "description": "A csoport összes történésének áttekintése.",
+    "noActivity": "Még nincs történés a csoportodban.",
+    "someone": "Valaki",
+    "settingsModified": "Csoport beállítás módosítva általa: <strong>{participant}</strong>.",
+    "expenseCreated": "Kiadás <em>{expense}</em> létrehozva általa: <strong>{participant}</strong>.",
+    "expenseUpdated": "Kiadás <em>{expense}</em> módosítva általa: <strong>{participant}</strong>.",
+    "expenseDeleted": "Kiadás <em>{expense}</em> törölve általa: <strong>{participant}</strong>.",
+    "Groups": {
+      "today": "Ma",
+      "yesterday": "Tegnap",
+      "earlierThisWeek": "Korábban a héten",
+      "lastWeek": "Múlt héten",
+      "earlierThisMonth": "Korábban a hónapban",
+      "lastMonth": "Múlt hónapban",
+      "earlierThisYear": "Korábban az évben",
+      "lastYear": "Tavaly",
+      "older": "Régebben"
+    }
+  },
+  "Information": {
+    "title": "Információ",
+    "description": "Ide írhatsz bármilyen információt, ami releváns lehet a csoport résztvevői számára.",
+    "empty": "Még nincsenek információk a csoportról."
+  },
+  "Settings": {
+    "title": "Beállítások"
+  },
+  "Share": {
+    "title": "Megosztás",
+    "description": "Ahhoz, hogy a többi résztvevő láthassa a csoportot és hozzáadhassa a kiadások, oszd meg velük az URL címet.",
+    "copyLink": "Copy link",
+    "shareLink": "Share link",
+    "warning": "Figyelem!",
+    "warningHelp": "A csoport URL címével rendelkező összes személy láthatja és szerkesztheti a kiadásokat. Oszd meg körültekintően!",
+    "qrCode": {
+      "title": "Share via QR Code",
+      "description": "Scan this QR code to open the group on any device.",
+      "download": "Download QR Code"
+    }
+  },
+  "SchemaErrors": {
+    "min1": "Adj meg legalább egy karaktert.",
+    "min2": "Adj meg legalább két karaktert.",
+    "max5": "Maxiumum öt karaktert adhatsz meg.",
+    "max50": "Maximum 50 karaktert adhatsz meg.",
+    "duplicateParticipantName": "Egy másik résztvevőnek már ez a neve.",
+    "titleRequired": "Kérjük adj meg egy címet.",
+    "invalidNumber": "Érvénytelen szám.",
+    "amountRequired": "Meg kell adj egy összeget.",
+    "amountNotZero": "Az összeg nem lehet nulla.",
+    "amountTenMillion": "Az összegnek kisebbnek kell lennie, mint 10,000,000.",
+    "ratePositive": "Az árfolyamnak nagyobbnak kell lennie, mint nulla.",
+    "paidByRequired": "Ki kell válassz egy résztvevőt.",
+    "paidForMin1": "A kiadáshoz legalább egy résztvevőt ki kell jelölj.",
+    "noZeroShares": "Összes résznek nagyobbnak kell lennie, mint 0.",
+    "amountSum": "Az összegek összegének egyenlőnek kell lennie a kiadás összegével.",
+    "percentageSum": "A százalékok összegének egyenlőnek kell lennie 100-zal."
+  },
+  "Categories": {
+    "search": "Keresés kategóriák közt...",
+    "noCategory": "Nem található kategória.",
+    "Uncategorized": {
+      "heading": "Nincs kategorizálva",
+      "General": "Általános",
+      "Payment": "Fizetés"
+    },
+    "Entertainment": {
+      "heading": "Szórakozás",
+      "Entertainment": "Szórakozás",
+      "Games": "Játék",
+      "Movies": "Film",
+      "Music": "Zene",
+      "Sports": "Sport"
+    },
+    "Food and Drink": {
+      "heading": "Étel és ital",
+      "Food and Drink": "Étel és ital",
+      "Dining Out": "Étterem",
+      "Groceries": "Élelmiszer",
+      "Liquor": "Ital"
+    },
+    "Home": {
+      "heading": "Otthon",
+      "Home": "Otthon",
+      "Electronics": "Elektronika",
+      "Furniture": "Bútor",
+      "Household Supplies": "Háztartási kellék",
+      "Maintenance": "Karbantartás",
+      "Mortgage": "Jelzálog",
+      "Pets": "Háziállat",
+      "Rent": "Lakbér",
+      "Services": "Szolgáltatás"
+    },
+    "Life": {
+      "heading": "Élet",
+      "Childcare": "Gyerektartás",
+      "Clothing": "Ruházat",
+      "Donation": "Adomány",
+      "Education": "Oktatás",
+      "Gifts": "Ajándék",
+      "Insurance": "Biztosítás",
+      "Medical Expenses": "Egészségügyi kiadás",
+      "Taxes": "Adó"
+    },
+    "Transportation": {
+      "heading": "Közlekedés",
+      "Transportation": "Közlekedés",
+      "Bicycle": "Kerékpár",
+      "Bus/Train": "Tömegközlekedés",
+      "Car": "Autó",
+      "Gas/Fuel": "Üzemanyag",
+      "Hotel": "Szálloda",
+      "Parking": "Parkolás",
+      "Plane": "Repülés",
+      "Taxi": "Taxi"
+    },
+    "Utilities": {
+      "heading": "Közüzemi díjak",
+      "Utilities": "Közüzemi díj",
+      "Cleaning": "Takarítás",
+      "Electricity": "Villany",
+      "Heat/Gas": "Fűtés/Gáz",
+      "Trash": "Szemét",
+      "TV/Phone/Internet": "TV/Telefon/Internet",
+      "Water": "Víz"
+    }
+  },
+  "Currencies": {
+    "search": "Keresés pénznemek közt...",
+    "noCurrency": "Nem található pénznem.",
+    "custom": {
+      "heading": "Egyéni"
+    },
+    "common": {
+      "heading": "Leggyakoribb"
+    },
+    "other": {
+      "heading": "További pénznemek"
+    }
+  },
+  "Pwa": {
+    "updateTitle": "Update available",
+    "updateDescription": "A new version of Spliit is available.",
+    "reload": "Reload"
+  },
+  "Auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "admin": "Admin",
+    "groupCreator": "Group Creator",
+    "syncUser": "Sync User",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "Admin": {
+    "title": "Administration Dashboard",
+    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
+    "totalGroups": "Total Groups",
+    "totalExpenses": "Total Expenses",
+    "registeredUsers": "Registered Users",
+    "userManagement": "User Management & Permission Tiers"
+  }
+}

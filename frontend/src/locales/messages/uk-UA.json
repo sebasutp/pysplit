@@ -1,0 +1,644 @@
+{
+  "Homepage": {
+    "title": "Ділися <strong>витратами</strong> з <strong>друзями та родиною</strong>",
+    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "description": "Ласкаво просимо у ваш новий <strong>Spliit</strong>!",
+    "button": {
+      "groups": "Перейти до груп",
+      "github": "GitHub"
+    }
+  },
+  "Header": {
+    "groups": "Групи"
+  },
+  "Footer": {
+    "madeIn": "Зроблено в Монреалі, Квебек 🇨🇦",
+    "builtBy": "Створено <author>Себастіаном Кастіелем</author> та <source>учасниками</source>"
+  },
+  "Expenses": {
+    "title": "Витрати",
+    "description": "Тут знаходяться витрати вашої групи",
+    "create": "Створити витрату",
+    "createFirst": "Створіть першу витрату",
+    "noExpenses": "У вашій групі ще немає витрат",
+    "export": "Export",
+    "exportJson": "Експортувати у JSON",
+    "exportCsv": "Експортувати у CSV",
+    "searchPlaceholder": "Пошук витрат...",
+    "ActiveUserModal": {
+      "title": "Хто ви?",
+      "description": "Скажіть нам, хто ви серед учасників, щоб ми могли налаштувати відображення інформації під вас",
+      "nobody": "Я не хочу нікого обирати",
+      "save": "Зберегти зміни",
+      "footer": "Це налаштування можна змінити пізніше в налаштуваннях групи"
+    },
+    "Groups": {
+      "upcoming": "Майбутні",
+      "thisWeek": "Цього тижня",
+      "earlierThisMonth": "Раніше цього місяця",
+      "lastMonth": "Минулого місяця",
+      "earlierThisYear": "Раніше цього року",
+      "lastYear": "Минулого року",
+      "older": "Старіші"
+    }
+  },
+  "ExpenseCard": {
+    "paidBy": "Сплачено <strong>{paidBy}</strong> за <paidFor></paidFor>",
+    "everyone": "everyone",
+    "receivedBy": "Отримано <strong>{paidBy}</strong> за <paidFor></paidFor>",
+    "yourBalance": "Ваш баланс:",
+    "notInvolved": "You are not involved"
+  },
+  "Groups": {
+    "myGroups": "Мої групи",
+    "create": "Створити",
+    "createGroup": "Create group",
+    "loadingRecent": "Завантаження нещодавніх груп...",
+    "NoRecent": {
+      "description": "Ви не відвідували жодних груп останнім часом",
+      "create": "Створіть групу",
+      "orAsk": "або попросіть друга надіслати вам посилання на існуючу"
+    },
+    "GlobalBalance": {
+      "title": "Your total balance",
+      "description": "Your combined balance across all your groups.",
+      "owedToYou": "You are owed",
+      "youOwe": "You owe",
+      "settledUp": "You are all settled up across your groups."
+    },
+    "recent": "Нещодавні групи",
+    "starred": "Обрані групи",
+    "archived": "Архівовані групи",
+    "archive": "Архівувати групу",
+    "unarchive": "Розархівувати групу",
+    "removeRecent": "Видалити з останніх груп",
+    "RecentRemovedToast": {
+      "title": "Група була видалена",
+      "description": "Група видалена зі списку ваших нещодавніх груп",
+      "undoAlt": "Скасувати видалення групи",
+      "undo": "Скасувати"
+    },
+    "AddByURL": {
+      "button": "Додати за URL",
+      "title": "Додати групу за URL",
+      "description": "Якщо з вами поділились групою, ви можете вставити її URL тут, щоб додати до свого списку",
+      "error": "На жаль, ми не змогли знайти групу за наданим URL",
+      "urlMode": "Enter URL",
+      "qrMode": "Scan QR",
+      "scanner": {
+        "startCamera": "Start Camera",
+        "stopScanning": "Stop Scanning",
+        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
+        "noCamera": "No camera found on this device.",
+        "cameraError": "Failed to start camera. Please try again.",
+        "permissionError": "Unable to access camera. Please check permissions."
+      }
+    },
+    "NotFound": {
+      "text": "Цієї групи не існує",
+      "link": "Перейти до нещодавно відвіданих груп"
+    }
+  },
+  "GroupForm": {
+    "title": "Інформація про групу",
+    "NameField": {
+      "label": "Назва групи",
+      "placeholder": "Літні канікули",
+      "description": "Введіть назву для вашої групи"
+    },
+    "InformationField": {
+      "label": "Інформація про групу",
+      "placeholder": "Яка інформація важлива для учасників групи?"
+    },
+    "CurrencyField": {
+      "label": "Символ валюти",
+      "placeholder": "₴, $, €, £..",
+      "description": "Ми будемо використовувати його для відображення сум"
+    },
+    "CurrencyCodeField": {
+      "label": "Main currency",
+      "createDescription": "All amounts and balances will be in this currency.",
+      "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
+      "customOption": "Custom"
+    },
+    "Participants": {
+      "title": "Учасники",
+      "description": "Введіть ім'я кожного учасника",
+      "protectedParticipant": "Цей учасник бере участь у витратах і не може бути видалений",
+      "new": "Новий",
+      "add": "Додати учасника",
+      "John": "Андрій",
+      "Jane": "Оксана",
+      "Jack": "Василь"
+    },
+    "Settings": {
+      "title": "Локальні налаштування",
+      "description": "Ці налаштування встановлюються на кожному пристрої окремо і використовуються для налаштування інтерфейсу під вас",
+      "ActiveUserField": {
+        "label": "Активний користувач",
+        "placeholder": "Обрати учасника",
+        "none": "Ніхто",
+        "description": "Користувач використовується за замовчуванням для оплати витрат"
+      },
+      "save": "Зберегти",
+      "saving": "Збереження...",
+      "create": "Створити",
+      "creating": "Створення...",
+      "cancel": "Скасувати"
+    }
+  },
+  "ExpenseForm": {
+    "Income": {
+      "create": "Створити дохід",
+      "edit": "Редагувати дохід",
+      "TitleField": {
+        "label": "Назва доходу",
+        "placeholder": "Ресторан в понеділок ввечері",
+        "description": "Введіть опис для доходу"
+      },
+      "DateField": {
+        "label": "Дата доходу",
+        "description": "Введіть дату, коли було отримано дохід"
+      },
+      "currencyField": {
+        "label": "Currency of income",
+        "description": "The currency in which the income was received."
+      },
+      "categoryFieldDescription": "Оберіть категорію доходу",
+      "paidByField": {
+        "label": "Отримав",
+        "description": "Оберіть учасника, який отримав дохід"
+      },
+      "paidFor": {
+        "title": "Учасники",
+        "description": "Виберіть тих, між ким цей дохід буде розподілено"
+      },
+      "splitModeDescription": "Оберіть, як розділити дохід між учасниками",
+      "attachDescription": "Перегляньте та прикріпіть чеки до доходу"
+    },
+    "Expense": {
+      "create": "Створити витрату",
+      "edit": "Редагувати витрату",
+      "TitleField": {
+        "label": "Назва витрати",
+        "placeholder": "Ресторан в понеділок ввечері",
+        "description": "Введіть опис для витрати"
+      },
+      "DateField": {
+        "label": "Дата витрати",
+        "description": "Введіть дату, коли було сплачено"
+      },
+      "currencyField": {
+        "label": "Currency of expense",
+        "description": "The currency in which the expense was paid."
+      },
+      "categoryFieldDescription": "Оберіть категорію витрати",
+      "paidByField": {
+        "label": "Сплатив",
+        "placeholder": "Select a participant",
+        "description": "Оберіть учасника, який сплатив"
+      },
+      "recurrenceRule": {
+        "label": "Expense Recurrence",
+        "description": "Select how often the expense should repeat.",
+        "none": "None",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "paidFor": {
+        "title": "Учасники",
+        "description": "Оберіть тих, між ким цю витрату буде розподілено. Якщо ця витрата - відшкодування учаснику (учасникам), виберіть тільки його (їх)."
+      },
+      "splitModeDescription": "Оберіть, як розділити витрату",
+      "attachDescription": "Перегляньте та прикріпіть чеки до витрати"
+    },
+    "amountField": {
+      "label": "Сума"
+    },
+    "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
+    "originalAmountField": {
+      "label": "Amount to convert",
+      "repaymentLabel": "Amount to transfer",
+      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+    },
+    "conversionRateField": {
+      "useApi": "Use rates from Frankfurter",
+      "useCustom": "Use custom rate",
+      "label": "Exchange rate"
+    },
+    "conversionRateState": {
+      "loading": "Getting exchange rates…",
+      "success": "Obtained rates:",
+      "error": "Oops, we could not get the most recent rates.",
+      "staleRate": "Using rate:",
+      "noRate": "Enter a custom rate below.",
+      "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
+      "noDate": "Enter the expense date to get a conversion rate.",
+      "dateMismatch": "Rates from date: {date}",
+      "refresh": "Refresh",
+      "customRate": "Using custom rate"
+    },
+    "isReimbursementField": {
+      "label": "Це відшкодування"
+    },
+    "categoryField": {
+      "label": "Категорія"
+    },
+    "notesField": {
+      "label": "Примітки"
+    },
+    "selectNone": "Обрати жодного",
+    "selectAll": "Обрати всіх",
+    "shares": "частка(и)",
+    "advancedOptions": "Розширені опції поділу..",
+    "SplitModeField": {
+      "label": "Режим поділу",
+      "evenly": "Рівномірно",
+      "byShares": "Нерівномірно – за частками",
+      "byPercentage": "Нерівномірно – за відсотками",
+      "byAmount": "Нерівномірно – за сумами",
+      "saveAsDefault": "Зберегти як параметри поділу за замовчуванням"
+    },
+    "DeletePopup": {
+      "label": "Видалити",
+      "title": "Видалити цю витрату?",
+      "description": "Ви дійсно хочете видалити цю витрату? Ця дія не може бути скасована",
+      "yes": "Так",
+      "cancel": "Скасувати"
+    },
+    "attachDocuments": "Прикріпити документи",
+    "create": "Створити",
+    "creating": "Створення..",
+    "save": "Зберегти",
+    "saving": "Збереження..",
+    "cancel": "Скасувати",
+    "reimbursement": "Відшкодування",
+    "itemizedSplit": "Itemized Split"
+  },
+  "ExpenseDocumentsInput": {
+    "TooBigToast": {
+      "title": "Файл занадто великий",
+      "description": "Максимальний розмір файлу, який можна завантажити, становить {maxSize}. Ваш файл {size}"
+    },
+    "ErrorToast": {
+      "title": "Помилка під час завантаження документа",
+      "description": "Виникла помилка під час завантаження документа. Будь ласка, спробуйте ще раз пізніше або виберіть інший файл",
+      "retry": "Спробувати ще раз"
+    }
+  },
+  "CreateFromReceipt": {
+    "Dialog": {
+      "triggerTitle": "Створити витрату з чека",
+      "title": "Створити з чека",
+      "description": "Отримайте інформацію про витрати з фото чека",
+      "body": "Завантажте фото чека, і ми спробуємо витягнути інформацію про витрати, якщо це можливо",
+      "selectImage": "Вибрати зображення..",
+      "titleLabel": "Назва:",
+      "categoryLabel": "Категорія:",
+      "amountLabel": "Сума:",
+      "dateLabel": "Дата:",
+      "editNext": "Ви зможете відредагувати інформацію про витрати пізніше",
+      "continue": "Продовжити"
+    },
+    "unknown": "Невідомо",
+    "TooBigToast": {
+      "title": "Файл занадто великий",
+      "description": "Максимальний розмір файлу, який можна завантажити, становить {maxSize}. Ваш файл {size}"
+    },
+    "ErrorToast": {
+      "title": "Помилка під час завантаження документа",
+      "description": "Виникла помилка під час завантаження документа. Будь ласка, спробуйте ще раз пізніше або виберіть інший файл",
+      "retry": "Спробувати ще раз"
+    }
+  },
+  "ReceiptItems": {
+    "title": "Receipt items",
+    "backToExpense": "Back to expense",
+    "merchant": "Merchant",
+    "printedTotal": "Printed total",
+    "noReceipt": "No receipt is linked to this expense yet.",
+    "empty": "No items yet. Add one to start splitting.",
+    "saveError": {
+      "title": "Couldn’t save your change",
+      "description": "We reloaded the receipt so you can try again."
+    },
+    "addItem": "Add item",
+    "quantitySummary": "{count} · {quantity} units",
+    "AddItemDialog": {
+      "title": "Add item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "sharedLabel": "Shared (whole-bill charge)",
+      "add": "Add",
+      "cancel": "Cancel"
+    },
+    "item": {
+      "quantity": "{assigned} of {total}",
+      "remaining": "{quantity} left",
+      "assign": "Assign",
+      "edit": "Edit",
+      "delete": "Delete",
+      "removePortion": "Remove portion",
+      "editTitle": "Edit item",
+      "nameLabel": "Name",
+      "quantityLabel": "Quantity",
+      "amountLabel": "Amount",
+      "save": "Save",
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this item?",
+      "deleteDescription": "This removes the item and its assignments."
+    },
+    "sections": {
+      "unassigned": "Unassigned",
+      "unassignedHint": "Not assigned to anyone yet",
+      "shared": "Shared",
+      "sharedHint": "Split equally by everyone",
+      "participantHint": "Items assigned to {name}"
+    },
+    "assign": {
+      "title": "Assign item",
+      "description": "Choose who pays for “{name}”.",
+      "whole": "Assign the whole item",
+      "everyone": "Everyone (shared)",
+      "even": "Split evenly",
+      "evenHint": "Choose the participants to split between.",
+      "custom": "Custom split",
+      "customHint": "Enter quantities in units for each target.",
+      "shared": "Shared",
+      "selectParticipant": "Select a participant",
+      "exceeds": "The assigned quantity exceeds the item quantity.",
+      "confirm": "Assign",
+      "cancel": "Cancel"
+    },
+    "footer": {
+      "own": "Own",
+      "shared": "Shared",
+      "unassigned": "Unassigned",
+      "optOut": "Shares unassigned items",
+      "reconciles": "Reconciles",
+      "offBy": "Off by {amount}",
+      "itemsTotal": "Items total",
+      "apply": "Apply to expense",
+      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
+      "divergent": "Receipt values differ · Apply again"
+    },
+    "applySuccess": {
+      "title": "Expense updated",
+      "description": "The receipt items were applied to the expense."
+    },
+    "applyError": {
+      "title": "Couldn’t apply the receipt"
+    },
+    "applyConfirm": {
+      "title": "Update the expense?",
+      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "total": "total {current} → {new}",
+      "cancel": "Cancel",
+      "confirm": "Apply"
+    }
+  },
+  "Balances": {
+    "title": "Баланси",
+    "description": "Це список балансів всіх учасників групи. Баланс збільшується у тих, хто слачує витрату, і зменшується в тих, між ким вона була розподілена",
+    "Reimbursements": {
+      "title": "Запропоновані відшкодування",
+      "description": "Ось пропозиції для оптимізованих відшкодувань між учасниками",
+      "noImbursements": "Схоже, ніхто нікому не винен 😁",
+      "owes": "<strong>{from}</strong> винен <strong>{to}</strong>",
+      "markAsPaid": "Позначити як сплачене"
+    }
+  },
+  "Stats": {
+    "title": "Статистика",
+    "range": {
+      "label": "Period",
+      "all": "All time",
+      "thisMonth": "This month",
+      "last30": "Last 30 days",
+      "thisYear": "This year",
+      "custom": "Custom range",
+      "from": "From",
+      "to": "To"
+    },
+    "Totals": {
+      "title": "Загальні дані",
+      "description": "Загальний огляд витрат групи",
+      "groupSpendings": "Загальні витрати групи",
+      "groupEarnings": "Загальні доходи групи",
+      "yourSpendings": "Ваші загальні витрати",
+      "yourEarnings": "Ваші загальні доходи",
+      "yourShare": "Ваша частка"
+    },
+    "Summary": {
+      "title": "Summary",
+      "description": "Key figures for the selected period.",
+      "empty": "There are no expenses yet.",
+      "expenseCount": "Expenses",
+      "averageExpense": "Average expense",
+      "largestExpense": "Largest expense",
+      "activeSpan": "Active period"
+    },
+    "OverTime": {
+      "title": "Spending over time",
+      "description": "Total group spending per month. Select a month to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {month}",
+      "detailsDescription": "Expenses in this month for the selected period.",
+      "detailsEmpty": "There are no expenses in this month."
+    },
+    "ByParticipant": {
+      "title": "Spending by participant",
+      "description": "How much each participant paid and their share of the expenses.",
+      "empty": "There are no expenses yet.",
+      "participant": "Participant",
+      "paid": "Paid",
+      "count": "Count",
+      "share": "Share"
+    },
+    "ByCategory": {
+      "title": "Spending by category",
+      "description": "Total amount spent in each category. Select a category to see its expenses.",
+      "empty": "There are no expenses yet.",
+      "showExpenses": "Show expenses for {category}",
+      "detailsDescription": "Expenses in this category for the selected period.",
+      "detailsEmpty": "There are no expenses in this category."
+    },
+    "Recurring": {
+      "title": "Recurring expenses",
+      "description": "Estimated cost of the group's active recurring expenses.",
+      "estimatedMonthly": "Estimated monthly cost",
+      "estimatedYearly": "{amount} per year",
+      "period": {
+        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
+        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
+        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+      }
+    }
+  },
+  "Activity": {
+    "title": "Активність",
+    "description": "Огляд усієї активності в цій групі",
+    "noActivity": "У вашій групі ще немає активності",
+    "someone": "Хтось",
+    "settingsModified": "Налаштування групи змінені <strong>{participant}</strong>",
+    "expenseCreated": "Витрата <em>{expense}</em> створена <strong>{participant}</strong>",
+    "expenseUpdated": "Витрата <em>{expense}</em> оновлена <strong>{participant}</strong>",
+    "expenseDeleted": "Витрата <em>{expense}</em> видалена <strong>{participant}</strong>",
+    "Groups": {
+      "today": "Сьогодні",
+      "yesterday": "Вчора",
+      "earlierThisWeek": "Раніше цього тижня",
+      "lastWeek": "Минулого тижня",
+      "earlierThisMonth": "Раніше цього місяця",
+      "lastMonth": "Минулого місяця",
+      "earlierThisYear": "Раніше цього року",
+      "lastYear": "Минулого року",
+      "older": "Старіші"
+    }
+  },
+  "Information": {
+    "title": "Інформація",
+    "description": "Використовуйте це місце, щоб додати будь-яку інформацію, яка може бути корисною для учасників групи",
+    "empty": "Ще немає інформації про групу"
+  },
+  "Settings": {
+    "title": "Налаштування"
+  },
+  "Share": {
+    "title": "Поділитися",
+    "description": "Щоб інші учасники могли побачити групу і додати витрати, поділіться з ними її URL",
+    "copyLink": "Copy link",
+    "shareLink": "Share link",
+    "warning": "Попередження!",
+    "warningHelp": "Кожна людина з URL групи зможе переглядати та редагувати витрати. Діліться з обережністю!",
+    "qrCode": {
+      "title": "Share via QR Code",
+      "description": "Scan this QR code to open the group on any device.",
+      "download": "Download QR Code"
+    }
+  },
+  "SchemaErrors": {
+    "min1": "Введіть принаймні один символ",
+    "min2": "Введіть принаймні два символи",
+    "max5": "Введіть не більше п'яти символів",
+    "max50": "Введіть не більше 50 символів",
+    "duplicateParticipantName": "Інший учасник уже має це ім'я",
+    "titleRequired": "Будь ласка, введіть назву",
+    "invalidNumber": "Невірний номер",
+    "amountRequired": "Необхідно ввести суму",
+    "amountNotZero": "Сума не повинна дорівнювати нулю",
+    "amountTenMillion": "Сума повинна бути меншою за 10,000,000",
+    "ratePositive": "The rate must be strictly greater than zero.",
+    "paidByRequired": "Ви повинні обрати учасника",
+    "paidForMin1": "Витрата повинна бути сплачена принаймні для одного учасника",
+    "noZeroShares": "Усі частки повинні бути більшими за 0",
+    "amountSum": "Сума повинна відповідати витраті",
+    "percentageSum": "Сума відсотків повинна дорівнювати 100"
+  },
+  "Categories": {
+    "search": "Шукати категорію..",
+    "noCategory": "Категорії не знайдено",
+    "Uncategorized": {
+      "heading": "Без категорії",
+      "General": "Загальне",
+      "Payment": "Оплата"
+    },
+    "Entertainment": {
+      "heading": "Розваги",
+      "Entertainment": "Розваги",
+      "Games": "Ігри",
+      "Movies": "Фільми",
+      "Music": "Музика",
+      "Sports": "Спорт"
+    },
+    "Food and Drink": {
+      "heading": "Їжа та напої",
+      "Food and Drink": "Їжа та напої",
+      "Dining Out": "Ресторани",
+      "Groceries": "Продукти",
+      "Liquor": "Алкоголь"
+    },
+    "Home": {
+      "heading": "Дім",
+      "Home": "Дім",
+      "Electronics": "Електроніка",
+      "Furniture": "Меблі",
+      "Household Supplies": "Домашні потреби",
+      "Maintenance": "Обслуговування",
+      "Mortgage": "Іпотека",
+      "Pets": "Домашні тварини",
+      "Rent": "Оренда",
+      "Services": "Послуги"
+    },
+    "Life": {
+      "heading": "Життя",
+      "Childcare": "Догляд за дітьми",
+      "Clothing": "Одяг",
+      "Donation": "Donation",
+      "Education": "Освіта",
+      "Gifts": "Подарунки",
+      "Insurance": "Страхування",
+      "Medical Expenses": "Медичні витрати",
+      "Taxes": "Податки"
+    },
+    "Transportation": {
+      "heading": "Транспорт",
+      "Transportation": "Транспорт",
+      "Bicycle": "Велосипед",
+      "Bus/Train": "Автобус/Поїзд",
+      "Car": "Автомобіль",
+      "Gas/Fuel": "Паливо",
+      "Hotel": "Готель",
+      "Parking": "Паркінг",
+      "Plane": "Літак",
+      "Taxi": "Таксі"
+    },
+    "Utilities": {
+      "heading": "Комунальні послуги",
+      "Utilities": "Комунальні послуги",
+      "Cleaning": "Прибирання",
+      "Electricity": "Електроенергія",
+      "Heat/Gas": "Опалення/Газ",
+      "Trash": "Сміття",
+      "TV/Phone/Internet": "ТБ/Телефон/Інтернет",
+      "Water": "Вода"
+    }
+  },
+  "Currencies": {
+    "search": "Search currency...",
+    "noCurrency": "No currencies found.",
+    "custom": {
+      "heading": "Custom"
+    },
+    "common": {
+      "heading": "Most common"
+    },
+    "other": {
+      "heading": "Other currencies"
+    }
+  },
+  "Pwa": {
+    "updateTitle": "Update available",
+    "updateDescription": "A new version of Spliit is available.",
+    "reload": "Reload"
+  },
+  "Auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "admin": "Admin",
+    "groupCreator": "Group Creator",
+    "syncUser": "Sync User",
+    "adminDashboard": "Admin Dashboard"
+  },
+  "Admin": {
+    "title": "Administration Dashboard",
+    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
+    "totalGroups": "Total Groups",
+    "totalExpenses": "Total Expenses",
+    "registeredUsers": "Registered Users",
+    "userManagement": "User Management & Permission Tiers"
+  }
+}

@@ -1,4 +1,4 @@
-.PHONY: install dev test lint typecheck e2e build parity clean
+.PHONY: install dev test lint typecheck e2e build parity architecture clean
 
 PYTHON ?= python3
 PYTEST = PYTHONPATH=. .venv/bin/pytest
@@ -36,6 +36,9 @@ build:
 
 parity:
 	$(PARITY_PYTHON) scripts/check_parity_matrix.py
+
+architecture:
+	$(PYTHON) scripts/check_architecture.py
 
 clean:
 	rm -rf backend/.pytest_cache backend/.ruff_cache backend/htmlcov backend/.coverage backend/coverage.xml

@@ -73,3 +73,5 @@ jobs:
         run: pip install pyyaml==6.0.3
       - name: Check parity matrix
         run: python scripts/check_parity_matrix.py
+      - name: Check architecture
+        run: python scripts/check_architecture.py
