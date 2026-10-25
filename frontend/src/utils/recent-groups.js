@@ -160,7 +160,8 @@ export function getPendingActiveUser() {
 /** @param {string | null} value */
 export function setPendingActiveUser(value) {
   try {
-    localStorage.setItem('newGroup-activeUser', value || 'None')
+    if (value) localStorage.setItem('newGroup-activeUser', value)
+    else localStorage.removeItem('newGroup-activeUser')
   } catch {
     // ignored
   }

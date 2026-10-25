@@ -85,9 +85,6 @@ const auth = {
     const target = encodeURIComponent(returnTo)
     window.location.href = `/api/auth/oauth/${provider}/start?return_to=${target}`
   },
-  isAuthenticated() {
-    return Boolean(api.getAccessToken())
-  },
   /** @returns {{google: boolean, github: boolean}} */
   providers() {
     return { ...providersCache }
@@ -211,7 +208,6 @@ const groups = {
       api.post('/groups/sync', {
         body: {
           group_ids: input.groupIds || [],
-          local_group_ids: input.groupIds || [],
           starred_group_ids: input.starredGroupIds || [],
           archived_group_ids: input.archivedGroupIds || [],
         },
@@ -754,53 +750,6 @@ const exportsRepository = {
   },
 }
 
-const sync = {
-  /** @type {Set<(status: any) => void>} */
-  _listeners: new Set(),
-  /** @returns {{online: boolean, syncing: boolean, pending: number, last_error: any}} */
-  status() {
-    return {
-      online: typeof navigator === 'undefined' ? true : navigator.onLine,
-      syncing: false,
-      pending: 0,
-      last_error: null,
-    }
-  },
-  /**
-   * @param {ReadOptions} [options]
-   * @returns {Promise<{pushed: number, pulled: number, cursor: number}>}
-   */
-  async now(options = {}) {
-    void options
-    return { pushed: 0, pulled: 0, cursor: 0 }
-  },
-  /**
-   * @param {(status: any) => void} listener
-   * @returns {() => void}
-   */
-  onStatus(listener) {
-    sync._listeners.add(listener)
-    return () => sync._listeners.delete(listener)
-  },
-  conflicts: {
-    /**
-     * @returns {Promise<any[]>}
-     */
-    async list() {
-      return []
-    },
-    /**
-     * @param {string} conflictId
-     * @param {string} resolution
-     * @returns {Promise<void>}
-     */
-    async resolve(conflictId, resolution) {
-      void conflictId
-      void resolution
-    },
-  },
-}
-
 const features = {
   /**
    * @param {ReadOptions} [options]
@@ -921,7 +870,6 @@ export const onlineRepository = {
   receipts,
   documents,
   exports: exportsRepository,
-  sync,
   features,
   admin,
 }

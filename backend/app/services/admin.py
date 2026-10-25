@@ -13,6 +13,7 @@ from app.core.enums import USER_TIERS, UserTier, normalize_user_tier
 from app.core.ids import new_id
 from app.core.validation import normalize_email
 from app.models.account import Account
+from app.models.base import utc_now
 from app.models.expense import Expense
 from app.models.group import Group
 from app.models.participant import Participant
@@ -28,25 +29,43 @@ from app.schemas.admin import (
     TierCounts,
     TierUpdateResponse,
 )
-from app.services.auth import utc_now
 from app.services.errors import NotFoundError
 
 
+def _admin_users(session: Session, users: list[User]) -> list[AdminUserRead]:
+    if not users:
+        return []
+    user_ids = [user.id for user in users]
+    providers_by_user: dict[str, list[str]] = {}
+    for user_id, provider in session.exec(
+        select(Account.user_id, Account.provider).where(Account.user_id.in_(user_ids))
+    ).all():
+        providers_by_user.setdefault(user_id, []).append(provider)
+    groups_by_user = {
+        user_id: int(count)
+        for user_id, count in session.exec(
+            select(UserGroup.user_id, func.count())
+            .where(UserGroup.user_id.in_(user_ids))
+            .group_by(UserGroup.user_id)
+        ).all()
+    }
+    return [
+        AdminUserRead(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            image=user.image,
+            tier=normalize_user_tier(user.tier),
+            created_at=user.created_at,
+            providers=sorted(set(providers_by_user.get(user.id, []))),
+            groups_count=groups_by_user.get(user.id, 0),
+        )
+        for user in users
+    ]
+
+
 def _admin_user(session: Session, user: User) -> AdminUserRead:
-    providers = session.exec(select(Account.provider).where(Account.user_id == user.id)).all()
-    groups_count = session.exec(
-        select(func.count()).select_from(UserGroup).where(UserGroup.user_id == user.id)
-    ).one()
-    return AdminUserRead(
-        id=user.id,
-        name=user.name,
-        email=user.email,
-        image=user.image,
-        tier=normalize_user_tier(user.tier),
-        created_at=user.created_at,
-        providers=sorted(set(providers)),
-        groups_count=int(groups_count),
-    )
+    return _admin_users(session, [user])[0]
 
 
 def get_metrics(session: Session) -> AdminMetrics:
@@ -95,7 +114,7 @@ def list_users(
     ).all()
 
     return AdminUserList(
-        items=[_admin_user(session, user) for user in users],
+        items=_admin_users(session, list(users)),
         total=total,
         limit=limit,
         offset=offset,
@@ -184,16 +203,36 @@ def list_groups(
     ).all()
 
     items: list[AdminGroupRead] = []
+    group_ids = [group.id for group in groups]
+    participants_by_group: dict[str, int] = {}
+    expenses_by_group: dict[str, int] = {}
+    users_by_group: dict[str, int] = {}
+    if group_ids:
+        participants_by_group = {
+            group_id: int(count)
+            for group_id, count in session.exec(
+                select(Participant.group_id, func.count())
+                .where(Participant.group_id.in_(group_ids))
+                .group_by(Participant.group_id)
+            ).all()
+        }
+        expenses_by_group = {
+            group_id: int(count)
+            for group_id, count in session.exec(
+                select(Expense.group_id, func.count())
+                .where(Expense.group_id.in_(group_ids))
+                .group_by(Expense.group_id)
+            ).all()
+        }
+        users_by_group = {
+            group_id: int(count)
+            for group_id, count in session.exec(
+                select(UserGroup.group_id, func.count())
+                .where(UserGroup.group_id.in_(group_ids))
+                .group_by(UserGroup.group_id)
+            ).all()
+        }
     for group in groups:
-        participants = session.exec(
-            select(func.count()).select_from(Participant).where(Participant.group_id == group.id)
-        ).one()
-        expenses = session.exec(
-            select(func.count()).select_from(Expense).where(Expense.group_id == group.id)
-        ).one()
-        synced_users = session.exec(
-            select(func.count()).select_from(UserGroup).where(UserGroup.group_id == group.id)
-        ).one()
         items.append(
             AdminGroupRead(
                 id=group.id,
@@ -201,9 +240,9 @@ def list_groups(
                 currency=group.currency,
                 currency_code=group.currency_code,
                 created_at=group.created_at,
-                participants_count=int(participants),
-                expenses_count=int(expenses),
-                synced_users_count=int(synced_users),
+                participants_count=participants_by_group.get(group.id, 0),
+                expenses_count=expenses_by_group.get(group.id, 0),
+                synced_users_count=users_by_group.get(group.id, 0),
             )
         )
 

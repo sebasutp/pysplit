@@ -57,14 +57,6 @@ export function balanceForParticipant(expense, participantId) {
 }
 
 /**
- * @param {ExpenseLike} expense
- * @returns {number}
- */
-export function paidForTotal(expense) {
-  return (expense.paid_for || []).reduce((sum, row) => sum + shareForParticipant(expense, row.participant_id), 0)
-}
-
-/**
  * @param {PaidFor[]|undefined} paidFor
  * @param {Participant[]} participants
  * @returns {string[]}

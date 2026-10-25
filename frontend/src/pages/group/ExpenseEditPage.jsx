@@ -22,16 +22,26 @@ export function ExpenseEditPage() {
   const [error, setError] = useState(/** @type {any} */ (null))
 
   useEffect(() => {
-    if (!expenseId) return undefined
+    // Clear the previous expense before loading a different one so the form
+    // can never render or PATCH the wrong record.
+    setExpense(null)
+    setLoading(true)
+    setError(null)
+    if (!expenseId) {
+      setLoading(false)
+      return undefined
+    }
     const controller = new AbortController()
     repository.expenses
       .get(group.id, expenseId, { signal: controller.signal })
       .then((payload) => {
+        if (controller.signal.aborted) return
         setExpense(payload)
         setLoading(false)
       })
       .catch((caught) => {
         if (caught && typeof caught === 'object' && caught.code === 'aborted') return
+        if (controller.signal.aborted) return
         setError(caught)
         setLoading(false)
       })

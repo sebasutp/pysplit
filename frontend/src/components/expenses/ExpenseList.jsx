@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useCategories } from '../../hooks/useCategories'
+import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { useExpenses } from '../../hooks/useExpenses'
 import { useToast } from '../../hooks/useToast'
 import { repository } from '../../services/repository'
@@ -27,11 +28,15 @@ export function ExpenseList({ group, activeUserId }) {
   const [query, setQuery] = useState('')
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
-  const { items, total, loading, error, reload } = useExpenses(group.id, {
-    q: query,
-    from: from || null,
-    to: to || null,
-  })
+  const debouncedQuery = useDebouncedValue(query, 300)
+  const { items, total, loading, loadingMore, error, hasMore, reload, loadMore } = useExpenses(
+    group.id,
+    {
+      q: debouncedQuery,
+      from: from || null,
+      to: to || null,
+    },
+  )
   const { categories } = useCategories()
   const groups = useMemo(
     () => groupExpensesByDate(items, i18n.resolvedLanguage || 'en-US'),
@@ -179,6 +184,19 @@ export function ExpenseList({ group, activeUserId }) {
                 total,
               })}
             </p>
+          ) : null}
+          {hasMore ? (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => void loadMore()}
+                disabled={loadingMore || loading}
+              >
+                {loadingMore
+                  ? t('Expenses.loadingMore', 'Loading…')
+                  : t('Expenses.loadMore', 'Load more')}
+              </Button>
+            </div>
           ) : null}
         </div>
       )}

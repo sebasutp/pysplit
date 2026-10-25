@@ -80,6 +80,11 @@ def client(engine) -> Generator[TestClient, None, None]:
             yield db_session
 
     app.dependency_overrides[get_session] = override_session
+    # Most tests authenticate through the mock-login helper, which is opt-in.
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        _env_file=None,
+        enable_mock_login=True,
+    )
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()

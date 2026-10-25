@@ -7,10 +7,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query, status
 
 from app.api.deps import SessionDep
-from app.api.errors import raise_service_error
 from app.schemas.balances import GroupBalances, UserBalanceList
 from app.services import balances as balances_service
-from app.services.errors import ServiceError
 
 group_router = APIRouter(prefix="/groups", tags=["balances"])
 global_router = APIRouter(tags=["balances"])
@@ -18,10 +16,7 @@ global_router = APIRouter(tags=["balances"])
 
 @group_router.get("/{group_id}/balances", response_model=GroupBalances)
 def group_balances(group_id: str, session: SessionDep) -> GroupBalances:
-    try:
-        return balances_service.get_group_balances(session, group_id)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return balances_service.get_group_balances(session, group_id)
 
 
 @global_router.get("/balances", response_model=UserBalanceList)

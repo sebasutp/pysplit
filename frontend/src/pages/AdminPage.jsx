@@ -1,10 +1,11 @@
 /** /admin — metrics, users, tiers and groups. */
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useAuth } from '../hooks/useAuth'
+import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { useToast } from '../hooks/useToast'
 import { repository } from '../services/repository'
 import { ErrorState, LoadingState } from '../components/common/States'
@@ -21,6 +22,27 @@ const TIERS = [
   { value: 'admin', label: 'Admin' },
 ]
 
+const PAGE_SIZE = 20
+
+/**
+ * @param {any[]} previous
+ * @param {any[]} next
+ */
+function appendUnique(previous, next) {
+  const seen = new Set(previous.map((item) => item.id))
+  const appended = next.filter((item) => !seen.has(item.id))
+  return appended.length ? [...previous, ...appended] : previous
+}
+
+/**
+ * @param {any} payload
+ * @param {number} seen number of rows accumulated so far
+ */
+function hasMoreFrom(payload, seen) {
+  if (typeof payload?.total === 'number') return seen < payload.total
+  return (payload?.items || []).length === PAGE_SIZE
+}
+
 export function AdminPage() {
   const { t } = useTranslation()
   const { user, loading: authLoading, isAdmin } = useAuth()
@@ -33,35 +55,149 @@ export function AdminPage() {
   const [email, setEmail] = useState('')
   const [tier, setTier] = useState('group_creators')
   const [loading, setLoading] = useState(true)
+  const [usersLoadingMore, setUsersLoadingMore] = useState(false)
+  const [groupsLoadingMore, setGroupsLoadingMore] = useState(false)
+  const [usersHasMore, setUsersHasMore] = useState(false)
+  const [groupsHasMore, setGroupsHasMore] = useState(false)
   const [error, setError] = useState(/** @type {any} */ (null))
   const [nonce, setNonce] = useState(0)
+  const debouncedQuery = useDebouncedValue(query, 300)
+  const debouncedGroupQuery = useDebouncedValue(groupQuery, 300)
+  const usersGeneration = useRef(0)
+  const groupsGeneration = useRef(0)
+  const usersLoadingMoreRef = useRef(false)
+  const groupsLoadingMoreRef = useRef(false)
 
   const reload = useCallback(() => setNonce((value) => value + 1), [])
 
+  // Metrics are independent of the search boxes, so they only load on mount
+  // and when reload() bumps the nonce.
   useEffect(() => {
     if (!isAdmin) return undefined
     const controller = new AbortController()
     setLoading(true)
-    Promise.all([
-      repository.admin.metrics({ signal: controller.signal }),
-      repository.admin.users.list({ q: query, limit: 20 }, { signal: controller.signal }),
-      repository.admin.groups.list({ q: groupQuery, limit: 20 }, { signal: controller.signal }),
-    ])
-      .then(([metricsPayload, usersPayload, groupsPayload]) => {
-        setMetrics(metricsPayload)
-        setUsers(usersPayload?.items || [])
-        setGroups(groupsPayload?.items || [])
+    repository.admin
+      .metrics({ signal: controller.signal })
+      .then((payload) => {
+        if (controller.signal.aborted) return
+        setMetrics(payload)
         setError(null)
       })
       .catch((caught) => {
         if (caught && typeof caught === 'object' && caught.code === 'aborted') return
-        setError(caught)
+        if (!controller.signal.aborted) setError(caught)
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false)
       })
     return () => controller.abort()
-  }, [isAdmin, query, groupQuery, nonce])
+  }, [isAdmin, nonce])
+
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    const controller = new AbortController()
+    const requestGeneration = usersGeneration.current + 1
+    usersGeneration.current = requestGeneration
+    usersLoadingMoreRef.current = false
+    setUsersLoadingMore(false)
+    setUsers([])
+    setUsersHasMore(false)
+    repository.admin.users
+      .list({ q: debouncedQuery, limit: PAGE_SIZE }, { signal: controller.signal })
+      .then((payload) => {
+        if (controller.signal.aborted || usersGeneration.current !== requestGeneration) return
+        const items = payload?.items || []
+        setUsers(items)
+        setUsersHasMore(hasMoreFrom(payload, items.length))
+        setError(null)
+      })
+      .catch((caught) => {
+        if (caught && typeof caught === 'object' && caught.code === 'aborted') return
+        if (controller.signal.aborted || usersGeneration.current !== requestGeneration) return
+        setError(caught)
+      })
+    return () => controller.abort()
+  }, [isAdmin, debouncedQuery, nonce])
+
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    const controller = new AbortController()
+    const requestGeneration = groupsGeneration.current + 1
+    groupsGeneration.current = requestGeneration
+    groupsLoadingMoreRef.current = false
+    setGroupsLoadingMore(false)
+    setGroups([])
+    setGroupsHasMore(false)
+    repository.admin.groups
+      .list({ q: debouncedGroupQuery, limit: PAGE_SIZE }, { signal: controller.signal })
+      .then((payload) => {
+        if (controller.signal.aborted || groupsGeneration.current !== requestGeneration) return
+        const items = payload?.items || []
+        setGroups(items)
+        setGroupsHasMore(hasMoreFrom(payload, items.length))
+        setError(null)
+      })
+      .catch((caught) => {
+        if (caught && typeof caught === 'object' && caught.code === 'aborted') return
+        if (controller.signal.aborted || groupsGeneration.current !== requestGeneration) return
+        setError(caught)
+      })
+    return () => controller.abort()
+  }, [isAdmin, debouncedGroupQuery, nonce])
+
+  const loadMoreUsers = useCallback(async () => {
+    if (!isAdmin || !usersHasMore || usersLoadingMoreRef.current) return
+    const requestGeneration = usersGeneration.current
+    const offset = users.length
+    usersLoadingMoreRef.current = true
+    setUsersLoadingMore(true)
+    try {
+      const payload = await repository.admin.users.list({
+        q: debouncedQuery,
+        limit: PAGE_SIZE,
+        offset,
+      })
+      if (usersGeneration.current !== requestGeneration) return
+      const nextItems = payload?.items || []
+      setUsers((previous) => appendUnique(previous, nextItems))
+      setUsersHasMore(hasMoreFrom(payload, offset + nextItems.length))
+    } catch (caught) {
+      if (/** @type {any} */ (caught)?.code === 'aborted') return
+      if (usersGeneration.current === requestGeneration) setError(caught)
+    } finally {
+      if (usersGeneration.current === requestGeneration) {
+        usersLoadingMoreRef.current = false
+        setUsersLoadingMore(false)
+      }
+    }
+  }, [isAdmin, usersHasMore, users.length, debouncedQuery])
+
+  const loadMoreGroups = useCallback(async () => {
+    if (!isAdmin || !groupsHasMore || groupsLoadingMoreRef.current) return
+    const requestGeneration = groupsGeneration.current
+    const offset = groups.length
+    groupsLoadingMoreRef.current = true
+    setGroupsLoadingMore(true)
+    try {
+      const payload = await repository.admin.groups.list({
+        q: debouncedGroupQuery,
+        limit: PAGE_SIZE,
+        offset,
+      })
+      if (groupsGeneration.current !== requestGeneration) return
+      const nextItems = payload?.items || []
+      setGroups((previous) => appendUnique(previous, nextItems))
+      setGroupsHasMore(hasMoreFrom(payload, offset + nextItems.length))
+    } catch (caught) {
+      if (/** @type {any} */ (caught)?.code === 'aborted') return
+      if (groupsGeneration.current === requestGeneration) setError(caught)
+    } finally {
+      if (groupsGeneration.current === requestGeneration) {
+        groupsLoadingMoreRef.current = false
+        setGroupsLoadingMore(false)
+      }
+    }
+  }, [isAdmin, groupsHasMore, groups.length, debouncedGroupQuery])
 
   if (authLoading) return <LoadingState />
   if (!user) {
@@ -193,6 +329,19 @@ export function AdminPage() {
               </li>
             ))}
           </ul>
+          {usersHasMore ? (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => void loadMoreUsers()}
+                disabled={usersLoadingMore}
+              >
+                {usersLoadingMore
+                  ? t('Admin.loadingMore', 'Loading…')
+                  : t('Admin.loadMoreUsers', 'Load more users')}
+              </Button>
+            </div>
+          ) : null}
 
           <div className="rounded-md border border-border p-3">
             <h3 className="mb-2 text-sm font-semibold">
@@ -278,6 +427,19 @@ export function AdminPage() {
               </li>
             ))}
           </ul>
+          {groupsHasMore ? (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => void loadMoreGroups()}
+                disabled={groupsLoadingMore}
+              >
+                {groupsLoadingMore
+                  ? t('Admin.loadingMore', 'Loading…')
+                  : t('Admin.loadMoreGroups', 'Load more groups')}
+              </Button>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
     </section>

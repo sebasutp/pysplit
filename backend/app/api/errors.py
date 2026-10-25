@@ -26,7 +26,3 @@ def service_error(exc: ServiceError) -> HTTPException:
     if isinstance(exc, InvalidInputError):
         return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=exc.detail)
     return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
-
-
-def raise_service_error(exc: ServiceError) -> None:
-    raise service_error(exc) from exc

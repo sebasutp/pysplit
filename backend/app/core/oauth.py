@@ -34,6 +34,7 @@ class OAuthProfile:
     name: str | None
     email: str | None
     image: str | None
+    email_verified: bool | None = None
 
 
 def _clean(value: str | None) -> str:
@@ -181,6 +182,7 @@ async def _exchange_google(
         name=profile.get("name") if isinstance(profile.get("name"), str) else None,
         email=profile.get("email") if isinstance(profile.get("email"), str) else None,
         image=profile.get("picture") if isinstance(profile.get("picture"), str) else None,
+        email_verified=profile.get("email_verified") is True,
     )
 
 
@@ -224,22 +226,27 @@ async def _exchange_github(
     if subject is None:
         return None
 
-    email = profile.get("email") if isinstance(profile.get("email"), str) else None
-    if not email:
-        emails_response = await client.get(GITHUB_EMAILS_URL, headers=headers)
-        if emails_response.status_code < 400:
-            emails = emails_response.json()
-            if isinstance(emails, list):
-                primary = next(
-                    (entry for entry in emails if isinstance(entry, dict) and entry.get("primary")),
-                    None,
-                )
-                candidate = primary or next(
-                    (entry for entry in emails if isinstance(entry, dict)),
-                    None,
-                )
-                if candidate and isinstance(candidate.get("email"), str):
-                    email = candidate["email"]
+    # Always consult the dedicated emails endpoint: the profile's public email
+    # is not proof that the address belongs to (or is verified by) this user.
+    email: str | None = None
+    email_verified: bool | None = None
+    emails_response = await client.get(GITHUB_EMAILS_URL, headers=headers)
+    if emails_response.status_code < 400:
+        emails = emails_response.json()
+        if isinstance(emails, list):
+            candidate = next(
+                (
+                    entry
+                    for entry in emails
+                    if isinstance(entry, dict)
+                    and entry.get("primary") is True
+                    and entry.get("verified") is True
+                ),
+                None,
+            )
+            if candidate and isinstance(candidate.get("email"), str):
+                email = candidate["email"]
+                email_verified = True
 
     name = profile.get("name")
     if not isinstance(name, str) or not name:
@@ -252,4 +259,5 @@ async def _exchange_github(
         name=name if isinstance(name, str) else None,
         email=email,
         image=image if isinstance(image, str) else None,
+        email_verified=email_verified,
     )

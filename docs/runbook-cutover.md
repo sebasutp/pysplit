@@ -12,7 +12,7 @@ its database and uploads remain untouched as the rollback source.
 - [ ] Stage 12 dry run passed on a copy of the production database.
 - [ ] Import verification: zero missing rows, zero FK violations, matching
       per-group counts/sums/balances, `integrity_check = ok`.
-- [ ] Full Playwright suite (14 reference + 4 new specs) green in staging.
+- [ ] Full Playwright suite (16 specs in `frontend/e2e/*.spec.ts`) green in staging.
 - [ ] PWA install/offline/update checks green.
 - [ ] Auth/RBAC matrix green; production refuses the development JWT secret.
 - [ ] Backups tested by restoring into a scratch directory.
@@ -55,12 +55,29 @@ Abort and roll back if any count, sum, balance or integrity check fails. Do not
 
 ## 5. Start the new stack
 
+**No production entrypoint exists yet.** This repository has no Dockerfile,
+production image or compose file; the deployable container stack is a Stage 12
+deliverable. The Stage 12 target (do not run before that stack exists) is:
+
 ```bash
 docker compose up -d
 curl -f http://localhost:8080/api/health/readiness
 ```
 
-Smoke test, in this order:
+`./dev` is development-only: it runs Vite and uvicorn with `--reload` against
+`data/dev` and must **not** be used for cutover. Until the production entrypoint
+lands, this section cannot be executed; record that blocker in the Stage 12
+report rather than substituting the development launcher.
+
+Smoke test once a production entrypoint exists (substitute its base URL):
+
+```bash
+# Placeholder origin; replace it with the Stage 12 production URL.
+export BASE_URL=https://pysplit.example.com
+curl -f "$BASE_URL/api/health"
+```
+
+Then, in this order:
 
 1. `GET /api/health`, liveness, readiness.
 2. Open an existing shared group URL and confirm participants/expenses.
@@ -72,7 +89,8 @@ Smoke test, in this order:
 
 ## 6. Switch the reverse proxy
 
-Point the public hostname at the new `web` service. Keep the old upstream
+Point the public hostname at the new stack's reverse proxy/web service, as
+defined by the Stage 12 production entrypoint. Keep the old upstream
 configuration saved. Verify HTTPS, cookies (`HttpOnly; Secure; SameSite=Lax`),
 CORS allowlist, and that `/api` is proxied, not served by nginx from disk.
 

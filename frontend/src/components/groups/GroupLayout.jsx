@@ -7,10 +7,11 @@ import { useActiveUser } from '../../hooks/useActiveUser'
 import { useGroup } from '../../hooks/useGroup'
 import { repository } from '../../services/repository'
 import {
+  clearPendingActiveUser,
+  getPendingActiveUser,
   hasActiveUserKey,
   hasPendingActiveUser,
   saveRecentGroup,
-  setPendingActiveUser,
 } from '../../utils/recent-groups'
 import { ErrorState, LoadingState } from '../common/States'
 import { ActiveUserDialog } from './ActiveUserDialog'
@@ -21,7 +22,9 @@ export function GroupLayout() {
   const { group, details, loading, error, reload } = useGroup(groupId)
   const { activeUserId, setActiveUserId } = useActiveUser(groupId || '')
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [pendingResolved, setPendingResolved] = useState(false)
+  const [pendingResolvedFor, setPendingResolvedFor] = useState(
+    /** @type {string|null} */ (null),
+  )
 
   // Persist the group in the recent list and record the visit for account sync.
   useEffect(() => {
@@ -38,21 +41,22 @@ export function GroupLayout() {
 
   // Apply `newGroup-activeUser` once, then decide whether to ask.
   useEffect(() => {
-    if (!group || pendingResolved) return
+    if (!group || pendingResolvedFor === group.id) return
     if (hasPendingActiveUser()) {
-      const pending = localStorage.getItem('newGroup-activeUser')
-      if (pending && pending !== 'None') {
+      const pending = getPendingActiveUser()
+      if (pending) {
         const match = group.participants?.find(
           (/** @type {any} */ participant) => participant.name === pending,
         )
         if (match) setActiveUserId(match.id)
       }
+      clearPendingActiveUser()
       setDialogOpen(false)
     } else if (!hasActiveUserKey(group.id)) {
       setDialogOpen(true)
     }
-    setPendingResolved(true)
-  }, [group, pendingResolved, setActiveUserId])
+    setPendingResolvedFor(group.id)
+  }, [group, pendingResolvedFor, setActiveUserId])
 
   if (loading && !group) return <LoadingState />
   if (error) {
@@ -78,7 +82,7 @@ export function GroupLayout() {
         onOpenChange={setDialogOpen}
         onSave={(participantId) => {
           setActiveUserId(participantId)
-          setPendingActiveUser(null)
+          clearPendingActiveUser()
           setDialogOpen(false)
         }}
       />

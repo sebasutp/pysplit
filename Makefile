@@ -1,4 +1,4 @@
-.PHONY: install dev test lint typecheck e2e build parity architecture clean
+.PHONY: install dev test test-coverage lint typecheck e2e build parity architecture clean
 
 PYTHON ?= python3
 PYTEST = PYTHONPATH=. .venv/bin/pytest
@@ -19,6 +19,9 @@ dev:
 test:
 	cd backend && $(PYTEST) -n auto
 	cd frontend && npm test -- --run
+
+test-coverage:
+	cd frontend && npm run test:coverage
 
 lint:
 	cd backend && $(RUFF) check .

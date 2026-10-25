@@ -100,8 +100,8 @@ export async function createGroup(
   await signInAsCreator(page)
   await page.goto('/groups/create')
 
-  // fillStable doubles as the hydration gate: once RHF keeps a value, React is
-  // live and later clicks are safe.
+  // fillStable doubles as the render gate: once React keeps a value, the
+  // controlled input is live and later clicks are safe.
   await fillStable(page.locator('input[name="name"]'), opts.name)
 
   for (let i = PREFILLED_PARTICIPANTS; i < opts.participants.length; i++) {
@@ -207,8 +207,8 @@ export async function addExpense(
 ): Promise<void> {
   await page.goto(`/groups/${groupId}/expenses/create`)
 
-  // CreateExpenseForm returns null until its tRPC queries resolve, so the
-  // submit button appearing means both hydrated and data-ready.
+  // ExpenseCreatePage renders a loading state until the group and categories
+  // resolve, so the submit button appearing means the form is data-ready.
   const submit = page.getByRole('button', { name: 'Create', exact: true })
   await expect(submit).toBeVisible({ timeout: 30_000 })
 
@@ -219,13 +219,13 @@ export async function addExpense(
   await selectRadixOption(page, page.getByTestId('paid-by'), expense.paidBy)
 
   if (expense.date) {
-    // The date input spreads no RHF field, so it has no name attribute.
+    // The date input has no form name binding, so select it by type.
     await fillStable(page.locator('input[type="date"]'), expense.date)
   }
 
   if (expense.category) {
-    // A cmdk Command in a Popover, not a Radix Select, but the trigger is still
-    // role=combobox and the items are still role=option.
+    // The category picker is the same custom Select: its trigger is
+    // role=combobox and its open items are role=option.
     await selectRadixOption(
       page,
       fieldByLabel(page, 'Category').getByRole('combobox'),
@@ -253,8 +253,8 @@ export async function addExpense(
 
   const splitMode = expense.splitMode ?? 'EVENLY'
   if (splitMode !== 'EVENLY') {
-    // Radix Collapsible unmounts its content, so the Split mode select does
-    // not exist in the DOM until this is opened.
+    // The advanced section is conditionally rendered, so the Split mode
+    // select does not exist in the DOM until the toggle is opened.
     await page
       .getByRole('button', { name: /Advanced splitting options/ })
       .click()
@@ -319,10 +319,9 @@ export function paidForRow(page: Page, participant: string): Locator {
 /**
  * Makes `name` the active user for this group.
  *
- * Stage 8A has no expense screen to run the reference `newGroup-activeUser`
- * migration, so resolve the participant through the public group API and write
- * the canonical `<groupId>-activeUser` key directly. Stage 9C moves these keys
- * into Dexie.
+ * The browser stores the active user per group in localStorage, so resolve
+ * the participant through the public group API and write the canonical
+ * `<groupId>-activeUser` key directly.
  */
 export async function setActiveUser(
   page: Page,

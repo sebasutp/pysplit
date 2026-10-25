@@ -1,8 +1,31 @@
-/** Seeded expense categories, fetched once per page mount. */
+/** Seeded expense categories, fetched once per process. */
 
 import { useEffect, useState } from 'react'
 
 import { repository } from '../services/repository'
+
+/** @type {Promise<any[]>|null} */
+let categoriesRequest = null
+
+/** Load the categories once per process and share the in-flight promise. */
+function loadCategories() {
+  if (!categoriesRequest) {
+    categoriesRequest = repository.categories
+      .list()
+      .then((payload) => payload?.items || payload || [])
+      .catch((error) => {
+        // Allow a later mount to retry after a transient failure.
+        categoriesRequest = null
+        throw error
+      })
+  }
+  return categoriesRequest
+}
+
+/** Drop the cached categories (used after a reload and by tests). */
+export function clearCategoriesCache() {
+  categoriesRequest = null
+}
 
 /** @returns {{categories: any[], loading: boolean, error: any}} */
 export function useCategories() {
@@ -11,32 +34,24 @@ export function useCategories() {
   const [error, setError] = useState(/** @type {any} */ (null))
 
   useEffect(() => {
-    const controller = new AbortController()
-    repository.categories
-      .list({ signal: controller.signal })
-      .then((payload) => setCategories(payload?.items || payload || []))
+    let active = true
+    loadCategories()
+      .then((items) => {
+        if (!active) return
+        setCategories(items)
+        setError(null)
+      })
       .catch((caught) => {
-        if (caught && typeof caught === 'object' && caught.code === 'aborted') return
+        if (!active) return
         setError(caught)
       })
       .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
+        if (active) setLoading(false)
       })
-    return () => controller.abort()
+    return () => {
+      active = false
+    }
   }, [])
 
   return { categories, loading, error }
-}
-
-/** @param {any[]} categories @param {number|null|undefined} categoryId */
-export function categoryName(categories, categoryId) {
-  return categories.find((category) => category.id === categoryId)?.name || 'General'
-}
-
-/** @param {any[]} categories */
-export function categoryOptions(categories) {
-  return categories.map((category) => ({
-    value: category.id,
-    label: category.name,
-  }))
 }

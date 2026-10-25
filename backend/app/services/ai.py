@@ -154,22 +154,6 @@ def get_ai_base_url(settings: Settings) -> str | None:
     return settings.ai_base_url_resolved
 
 
-def get_ai_provider(settings: Settings) -> str:
-    return settings.ai_provider
-
-
-def get_receipt_extract_model(settings: Settings) -> str:
-    return settings.receipt_extract_model
-
-
-def get_receipt_items_model(settings: Settings) -> str:
-    return settings.receipt_items_model
-
-
-def get_category_extract_model(settings: Settings) -> str:
-    return settings.category_extract_model
-
-
 class AiError(Exception):
     """The provider could not be reached or returned an unusable response."""
 

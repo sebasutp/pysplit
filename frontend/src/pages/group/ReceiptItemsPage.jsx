@@ -1,6 +1,6 @@
 /** /groups/:groupId/expenses/:expenseId/items — smart split editor. */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -68,9 +68,17 @@ export function ReceiptItemsPage() {
   )
   const [deleteItem, setDeleteItem] = useState(/** @type {any|null} */ (null))
 
+  const controllerRef = useRef(/** @type {AbortController|null} */ (null))
+
   const reload = useCallback(async () => {
     if (!expenseId) return
+    // Cancel any previous load so a slow response cannot overwrite a newer one.
+    controllerRef.current?.abort()
     const controller = new AbortController()
+    controllerRef.current = controller
+    setExpense(null)
+    setState(null)
+    setError(null)
     setLoading(true)
     try {
       const [expensePayload, receiptPayload] = await Promise.all([
@@ -79,6 +87,7 @@ export function ReceiptItemsPage() {
           ? repository.receipts.get(group.id, { expense_id: expenseId }, { signal: controller.signal })
           : Promise.resolve(null),
       ])
+      if (controller.signal.aborted) return
       setExpense(expensePayload)
       setState(receiptPayload)
       setError(null)
@@ -86,6 +95,7 @@ export function ReceiptItemsPage() {
       if (caught && typeof caught === 'object' && /** @type {any} */ (caught).code === 'aborted') {
         return
       }
+      if (controller.signal.aborted) return
       setError(caught)
     } finally {
       if (!controller.signal.aborted) setLoading(false)
@@ -95,6 +105,14 @@ export function ReceiptItemsPage() {
   useEffect(() => {
     if (!featuresLoading) void reload()
   }, [featuresLoading, reload])
+
+  // Abort the in-flight request when the page unmounts or the id changes.
+  useEffect(
+    () => () => {
+      controllerRef.current?.abort()
+    },
+    [],
+  )
 
   const grouped = useMemo(() => {
     const sections = new Map()

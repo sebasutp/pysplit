@@ -405,6 +405,115 @@ def test_update_expense(client, session: Session):
     )
 
 
+def test_update_expense_base_version_optimistic_concurrency(client, session: Session):
+    group, people = make_group(session)
+    created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
+    assert created["version"] == 1
+
+    stale = client.patch(
+        f"/api/groups/{group.id}/expenses/{created['id']}",
+        json={"title": "Stale title", "base_version": 0},
+    )
+    assert stale.status_code == 409, stale.text
+    session.expire_all()
+    unchanged = session.get(Expense, created["id"])
+    assert unchanged is not None
+    assert unchanged.title == "Dinner"
+    assert unchanged.version == 1
+
+    matching = client.patch(
+        f"/api/groups/{group.id}/expenses/{created['id']}",
+        json={"title": "Fresh title", "baseVersion": 1},
+    )
+    assert matching.status_code == 200, matching.text
+    assert matching.json()["title"] == "Fresh title"
+    assert matching.json()["version"] == 2
+
+    now_stale = client.patch(
+        f"/api/groups/{group.id}/expenses/{created['id']}",
+        json={"title": "Too late", "base_version": 1},
+    )
+    assert now_stale.status_code == 409
+    session.expire_all()
+    assert session.get(Expense, created["id"]).title == "Fresh title"
+
+    # Omitting base_version keeps the previous last-writer-wins behaviour.
+    omitted = client.patch(
+        f"/api/groups/{group.id}/expenses/{created['id']}",
+        json={"title": "No version supplied"},
+    )
+    assert omitted.status_code == 200, omitted.text
+    assert omitted.json()["version"] == 3
+
+
+def test_expense_input_bounds(client, session: Session):
+    group, people = make_group(session)
+    created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
+
+    long_title = client.post(
+        f"/api/groups/{group.id}/expenses",
+        json=_payload(people, title="x" * 201),
+    )
+    assert long_title.status_code == 422
+
+    too_many_paid_for = client.post(
+        f"/api/groups/{group.id}/expenses",
+        json=_payload(
+            people,
+            paid_for=[{"participant_id": people["Alice"].id} for _ in range(101)],
+        ),
+    )
+    assert too_many_paid_for.status_code == 422
+
+    too_many_documents = client.post(
+        f"/api/groups/{group.id}/expenses",
+        json=_payload(
+            people,
+            documents=[
+                {
+                    "id": f"doc-{index}",
+                    "url": "https://example.com/x.jpg",
+                    "width": 1,
+                    "height": 1,
+                }
+                for index in range(21)
+            ],
+        ),
+    )
+    assert too_many_documents.status_code == 422
+
+    absurd_rate = client.post(
+        f"/api/groups/{group.id}/expenses",
+        json=_payload(people, conversion_rate="1" * 30),
+    )
+    assert absurd_rate.status_code == 422
+
+    absurd_shares = client.post(
+        f"/api/groups/{group.id}/expenses",
+        json=_payload(
+            people,
+            split_mode="BY_SHARES",
+            paid_for=[
+                {"participant_id": people["Alice"].id, "shares": 1_000_001},
+                {"participant_id": people["Bob"].id, "shares": 1},
+            ],
+        ),
+    )
+    assert absurd_shares.status_code == 422
+
+    oversized_update = client.patch(
+        f"/api/groups/{group.id}/expenses/{created['id']}",
+        json={"title": "x" * 201},
+    )
+    assert oversized_update.status_code == 422
+
+    absurd_update_rate = client.patch(
+        f"/api/groups/{group.id}/expenses/{created['id']}",
+        json={"conversion_rate": "9" * 30},
+    )
+    assert absurd_update_rate.status_code == 422
+
+
 def test_by_amount_amount_change_requires_new_paid_for(client, session: Session):
     group, people = make_group(session)
     created = client.post(
@@ -493,7 +602,7 @@ def test_delete_expense(client, session: Session):
 
 
 def test_upload_download_and_delete_document(make_client, session: Session, tmp_path):
-    client = make_client(upload_dir=str(tmp_path))
+    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
     group, people = make_group(session)
     created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
 
@@ -543,7 +652,7 @@ def test_document_upload_rejects_invalid_types_and_empty(
     payload,
     expected,
 ):
-    client = make_client(upload_dir=str(tmp_path))
+    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
     group, people = make_group(session)
     created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
     response = client.post(
@@ -554,7 +663,9 @@ def test_document_upload_rejects_invalid_types_and_empty(
 
 
 def test_document_upload_enforces_size_limit(make_client, session: Session, tmp_path):
-    client = make_client(upload_dir=str(tmp_path), max_upload_bytes=3)
+    client = make_client(
+        enable_expense_documents=True, upload_dir=str(tmp_path), max_upload_bytes=3
+    )
     group, people = make_group(session)
     created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
     response = client.post(
@@ -565,7 +676,7 @@ def test_document_upload_enforces_size_limit(make_client, session: Session, tmp_
 
 
 def test_document_upload_requires_existing_expense(make_client, session: Session, tmp_path):
-    client = make_client(upload_dir=str(tmp_path))
+    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
     group, _people = make_group(session)
     response = client.post(
         f"/api/groups/{group.id}/expenses/missing/documents",

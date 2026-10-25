@@ -14,9 +14,9 @@ from sqlmodel import Session, select
 from app.core.config import Settings
 from app.core.enums import ReceiptPortionTarget, ReceiptStatus, SplitMode
 from app.core.ids import new_id
+from app.models.base import utc_now
 from app.models.category import Category
 from app.models.expense import Expense
-from app.models.group import Group
 from app.models.participant import Participant
 from app.models.receipt import Receipt
 from app.models.receipt_item import ReceiptItem
@@ -41,8 +41,9 @@ from app.services import categories as categories_service
 from app.services import expenses as expenses_service
 from app.services import groups as groups_service
 from app.services import uploads as uploads_service
+from app.services.common import require_group
 from app.services.errors import ConflictError, ForbiddenError, InvalidInputError, NotFoundError
-from app.storage import BlobStorage, build_storage
+from app.storage import BlobStorage, get_storage
 from app.utils.currency import decimal_digits
 from app.utils.receipt_extraction import (
     normalize_receipt,
@@ -54,14 +55,24 @@ from app.utils.receipt_split import (
     to_receipt_split_items,
 )
 
-
-def utc_now() -> datetime:
-    return datetime.now(UTC)
-
-
 # ---------------------------------------------------------------------------
 # Serializable views
 # ---------------------------------------------------------------------------
+
+
+_PUBLIC_PROVIDER_LABELS = {"openai-compatible", "google", "disabled"}
+
+
+def _public_provider(provider: str | None) -> str | None:
+    """Collapse legacy stored provider values that may contain a base URL."""
+    if provider is None:
+        return None
+    if provider in _PUBLIC_PROVIDER_LABELS:
+        return provider
+    lowered = provider.lower()
+    if "google" in lowered or "generativelanguage" in lowered:
+        return "google"
+    return "openai-compatible"
 
 
 def _receipt_read(receipt: Receipt) -> ReceiptRead:
@@ -72,12 +83,13 @@ def _receipt_read(receipt: Receipt) -> ReceiptRead:
         image_width=receipt.image_width,
         image_height=receipt.image_height,
         status=receipt.status,
+        attempts=receipt.attempts,
         merchant=receipt.merchant,
         receipt_date=receipt.receipt_date.date() if receipt.receipt_date else None,
         currency_code=receipt.currency_code,
         total=receipt.total,
         expense_id=receipt.expense_id,
-        provider=receipt.provider,
+        provider=_public_provider(receipt.provider),
         model=receipt.model,
         created_at=receipt.created_at,
         updated_at=receipt.updated_at,
@@ -148,10 +160,6 @@ def _split_read(split: ReceiptSplitResult, items: list[ReceiptItem]) -> ReceiptS
 # ---------------------------------------------------------------------------
 
 
-def _require_group(session: Session, group_id: str) -> Group:
-    return groups_service.get_active_group(session, group_id)
-
-
 def _require_receipt(
     session: Session,
     group_id: str,
@@ -159,7 +167,7 @@ def _require_receipt(
     *,
     include_deleted: bool = False,
 ) -> Receipt:
-    _require_group(session, group_id)
+    require_group(session, group_id)
     receipt = session.get(Receipt, receipt_id)
     if (
         receipt is None
@@ -167,13 +175,6 @@ def _require_receipt(
         or (receipt.deleted_at is not None and not include_deleted)
     ):
         raise NotFoundError("Receipt not found")
-    return receipt
-
-
-def get_receipt_by_id(session: Session, receipt_id: str) -> Receipt | None:
-    receipt = session.get(Receipt, receipt_id)
-    if receipt is None or receipt.deleted_at is not None:
-        return None
     return receipt
 
 
@@ -322,7 +323,7 @@ def create_pending_receipt(
     now: datetime | None = None,
 ) -> Receipt:
     """Create a PENDING receipt, returning the winner of a concurrent race."""
-    _require_group(session, group_id)
+    require_group(session, group_id)
     moment = now or utc_now()
     receipt = Receipt(
         id=new_id("rcpt"),
@@ -355,7 +356,12 @@ def claim_receipt_for_extraction(
     settings: Settings,
     now: datetime | None = None,
 ) -> bool:
-    """Atomically claim the single paid extraction for a receipt image."""
+    """Atomically claim a paid extraction, up to ``receipt_max_attempts``.
+
+    Returns ``False`` when another worker already owns the receipt. Once the
+    configured attempt budget is exhausted a :class:`ConflictError` is raised
+    so the caller gets a clear 409 instead of silently paying for another call.
+    """
     moment = now or utc_now()
     stale_before = moment - timedelta(seconds=settings.receipt_extraction_stale_seconds)
     result = session.execute(
@@ -363,6 +369,7 @@ def claim_receipt_for_extraction(
         .where(
             Receipt.id == receipt_id,
             Receipt.deleted_at.is_(None),
+            Receipt.attempts < settings.receipt_max_attempts,
             or_(
                 Receipt.status.in_([ReceiptStatus.PENDING.value, ReceiptStatus.FAILED.value]),
                 (Receipt.status == ReceiptStatus.EXTRACTING.value)
@@ -371,13 +378,31 @@ def claim_receipt_for_extraction(
         )
         .values(
             status=ReceiptStatus.EXTRACTING.value,
+            attempts=Receipt.attempts + 1,
             updated_at=moment,
             version=Receipt.version + 1,
         )
         .execution_options(synchronize_session=False)
     )
     session.commit()
-    return (result.rowcount or 0) == 1
+    if (result.rowcount or 0) == 1:
+        return True
+
+    receipt = session.get(Receipt, receipt_id)
+    if (
+        receipt is not None
+        and receipt.deleted_at is None
+        and receipt.attempts >= settings.receipt_max_attempts
+        and (
+            receipt.status in (ReceiptStatus.PENDING.value, ReceiptStatus.FAILED.value)
+            or (
+                receipt.status == ReceiptStatus.EXTRACTING.value
+                and receipt.updated_at < stale_before
+            )
+        )
+    ):
+        raise ConflictError("Receipt extraction attempts are exhausted. Upload the receipt again.")
+    return False
 
 
 def _parse_receipt_date(value: str | None) -> datetime | None:
@@ -539,6 +564,33 @@ def _check_item_values(
         raise InvalidInputError("Item amount is out of range", field="amount")
 
 
+def _validate_normalized_items(settings: Settings, normalized: dict[str, Any]) -> None:
+    """Apply the configured item caps to model output before storing it.
+
+    Charges are folded into the same item list by ``normalize_receipt``; the
+    adjustment row is allowed to have a negative amount because it reconciles
+    the printed total.
+    """
+    for item in normalized.get("items", []):
+        if item.get("is_adjustment"):
+            continue
+        _check_item_values(
+            settings,
+            name=item.get("name"),
+            quantity_milli=item.get("quantity_milli"),
+            amount=item.get("amount"),
+        )
+
+
+def _cap_extraction_lists(parsed: dict[str, Any], limit: int) -> dict[str, Any]:
+    """Bound both model-produced arrays, even if the provider ignored the schema."""
+    return {
+        **parsed,
+        "items": list(parsed.get("items", []))[:limit],
+        "charges": list(parsed.get("charges", []))[:limit],
+    }
+
+
 def add_item(
     session: Session,
     group_id: str,
@@ -555,6 +607,15 @@ def add_item(
         quantity_milli=payload.quantity_milli,
         amount=payload.amount,
     )
+    if settings is not None:
+        existing_count = session.exec(
+            select(func.count(ReceiptItem.id)).where(
+                ReceiptItem.receipt_id == receipt.id,
+                ReceiptItem.deleted_at.is_(None),
+            )
+        ).one()
+        if int(existing_count) >= settings.max_receipt_items:
+            raise InvalidInputError("Receipt has too many items", field="items")
     moment = now or utc_now()
     maximum = session.exec(
         select(func.max(ReceiptItem.position)).where(ReceiptItem.receipt_id == receipt.id)
@@ -918,8 +979,8 @@ def extract_total(
 ) -> ReceiptTotalExtraction:
     if not settings.receipt_extract_enabled:
         raise ForbiddenError("Receipt extraction is not enabled.")
-    _require_group(session, group_id)
-    storage = storage or build_storage(settings)
+    require_group(session, group_id)
+    storage = storage or get_storage(settings)
     image = uploads_service.resolve_image_for_ai(
         session,
         storage,
@@ -997,8 +1058,8 @@ def extract_items(
 ) -> ReceiptExtractionResult:
     if not settings.enable_receipt_items:
         raise ForbiddenError("Receipt items extraction is not enabled.")
-    group = _require_group(session, group_id)
-    storage = storage or build_storage(settings)
+    group = require_group(session, group_id)
+    storage = storage or get_storage(settings)
     image = uploads_service.resolve_image_for_ai(
         session,
         storage,
@@ -1031,7 +1092,7 @@ def extract_items(
     _categories, options = _category_options(session)
     prompt = ai_service.build_receipt_items_prompt(options)
     model = settings.receipt_items_model
-    provider = settings.ai_provider
+    provider = settings.ai_provider_label
 
     try:
         content = _call_ai(
@@ -1061,6 +1122,8 @@ def extract_items(
         )
 
     parsed = parse_receipt_items_response(content, limit=settings.max_receipt_items)
+    if parsed is not None:
+        parsed = _cap_extraction_lists(parsed, settings.max_receipt_items)
     if parsed is None:
         fail_receipt(
             session,
@@ -1078,6 +1141,23 @@ def extract_items(
         )
 
     normalized = normalize_receipt(parsed, decimal_digits(group.currency_code))
+    try:
+        _validate_normalized_items(settings, normalized)
+    except InvalidInputError:
+        fail_receipt(
+            session,
+            receipt.id,
+            raw_extraction=content,
+            provider=provider,
+            model=model,
+        )
+        session.refresh(receipt)
+        return _extraction_result(
+            session,
+            group_id,
+            receipt,
+            status=ReceiptStatus.FAILED.value,
+        )
     receipt = complete_receipt(
         session,
         receipt.id,

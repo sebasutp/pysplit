@@ -49,6 +49,7 @@ class ReceiptRead(BaseModel):
     image_width: int | None = None
     image_height: int | None = None
     status: Literal["PENDING", "EXTRACTING", "EXTRACTED", "FAILED"]
+    attempts: int = 0
     merchant: str | None = None
     receipt_date: date | None = None
     currency_code: str | None = None

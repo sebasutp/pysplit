@@ -9,6 +9,7 @@
  */
 
 import { API_BASE_URL } from './config'
+import { readCookie } from './cookies'
 
 /** @typedef {'not_found'|'validation'|'conflict'|'unauthorized'|'forbidden'|'rate_limited'|'network'|'offline_unsupported'|'server'|'aborted'} ErrorCode */
 
@@ -100,30 +101,6 @@ function detailFrom(value, fallback) {
     if (typeof detail === 'string') return detail
   }
   return fallback
-}
-
-/**
- * Read a browser cookie without pulling in a dependency. Returns null in
- * non-browser environments such as Vitest without a document.
- *
- * @param {string} name
- * @returns {string | null}
- */
-function readCookie(name) {
-  if (typeof document === 'undefined' || !document.cookie) return null
-  for (const part of document.cookie.split(';')) {
-    const separator = part.indexOf('=')
-    if (separator < 0) continue
-    if (part.slice(0, separator).trim() === name) {
-      return decodeURIComponent(part.slice(separator + 1).trim())
-    }
-  }
-  return null
-}
-
-/** @param {string | null} token */
-export function setAccessToken(token) {
-  accessToken = token || null
 }
 
 /** @returns {string | null} */
@@ -391,6 +368,5 @@ export const api = {
   },
   refreshSession,
   getAccessToken,
-  setAccessToken,
   clearAccessToken,
 }

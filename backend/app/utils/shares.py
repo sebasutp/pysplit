@@ -8,7 +8,7 @@ invariants.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -132,8 +132,3 @@ def get_participant_share(participant_id: str | None, expense: Mapping[str, Any]
     if participant_id is None:
         return 0
     return get_expense_shares(expense).get(participant_id, 0)
-
-
-def iter_share_amounts(expense: Mapping[str, Any]) -> Iterable[tuple[str, int]]:
-    """Yield ``(participant_id, amount)`` pairs in stable participant order."""
-    return get_expense_shares(expense).items()

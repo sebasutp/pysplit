@@ -30,10 +30,14 @@ engine = create_engine(settings.database_url, connect_args=_connect_args(setting
 
 @event.listens_for(Engine, "connect")
 def _enforce_sqlite_pragmas(dbapi_connection, _connection_record) -> None:
-    """Enable foreign keys on every SQLite connection.
+    """Enable SQLite integrity and concurrency settings on every connection.
 
     Prisma enforced foreign keys; SQLite disables them by default. Without this
     pragma an import could silently create orphan rows.
+
+    WAL and relaxed synchronous mode only apply to file-backed databases. They
+    are skipped for ``:memory:`` databases (the test engine), where WAL is not
+    supported and every connection already sees the same ``StaticPool``.
     """
     if not isinstance(dbapi_connection, sqlite3.Connection):
         return
@@ -41,6 +45,13 @@ def _enforce_sqlite_pragmas(dbapi_connection, _connection_record) -> None:
     try:
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.execute("PRAGMA busy_timeout=5000")
+        cursor.execute("PRAGMA database_list")
+        row = cursor.fetchone()
+        # (seq, name, file); ``file`` is empty for an in-memory database.
+        if row is not None and row[2]:
+            cursor.execute("PRAGMA journal_mode=WAL")
+            cursor.fetchone()
+            cursor.execute("PRAGMA synchronous=NORMAL")
     finally:
         cursor.close()
 

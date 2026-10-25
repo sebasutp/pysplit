@@ -35,6 +35,8 @@ export function groupExpensesByDate(expenses, locale = 'en-US') {
   const startOfLastMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
   const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1))
   const startOfLastYear = new Date(Date.UTC(now.getUTCFullYear() - 1, 0, 1))
+  // Build the formatter once instead of once per expense.
+  const monthShort = formatter(locale, { month: 'short' })
 
   /** @type {Map<string, ExpenseDateGroup>} */
   const groups = new Map()
@@ -50,8 +52,6 @@ export function groupExpensesByDate(expenses, locale = 'en-US') {
   for (const expense of expenses) {
     const value = String(expense.expense_date || '').slice(0, 10)
     const date = new Date(`${value}T00:00:00Z`)
-    const monthLong = formatter(locale, { month: 'long' })
-    const monthShort = formatter(locale, { month: 'short' })
     let group
     if (value === today) {
       group = add('today', 'Today')
@@ -68,13 +68,14 @@ export function groupExpensesByDate(expenses, locale = 'en-US') {
     } else {
       group = add('older', 'Older')
     }
-    // Attach a formatted date label for the row itself.
-    expense._groupLabel =
-      value === today
-        ? 'Today'
-        : `${monthShort.format(date)} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
-    void monthLong
-    group.expenses.push(expense)
+    // Copy the API object so the row label never mutates server data.
+    group.expenses.push({
+      ...expense,
+      _groupLabel:
+        value === today
+          ? 'Today'
+          : `${monthShort.format(date)} ${date.getUTCDate()}, ${date.getUTCFullYear()}`,
+    })
   }
 
   return [...groups.values()]

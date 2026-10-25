@@ -78,6 +78,3 @@ class LocalBlobStorage(BlobStorage):
 
     def exists(self, key: str) -> bool:
         return self._path(key).is_file()
-
-    def path_for(self, key: str) -> Path:
-        return self._path(key)

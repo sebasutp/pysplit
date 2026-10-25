@@ -251,7 +251,7 @@
           "auth"
         ],
         "summary": "Logout",
-        "description": "Revoke the presented refresh token and clear session cookies.",
+        "description": "Revoke the refresh-token family and clear session cookies.",
         "operationId": "logout_api_auth_logout_post",
         "responses": {
           "204": {
@@ -266,7 +266,7 @@
           "auth"
         ],
         "summary": "Mock Login",
-        "description": "Development/test login helper. Never available in production.",
+        "description": "Development/test login helper. Opt-in and never available in production.",
         "operationId": "mock_login_api_auth_mock_login_post",
         "requestBody": {
           "content": {
@@ -4106,6 +4106,7 @@
           },
           "title": {
             "type": "string",
+            "maxLength": 200,
             "minLength": 2,
             "title": "Title"
           },
@@ -4196,6 +4197,7 @@
               "$ref": "#/components/schemas/ExpensePaidForInput"
             },
             "type": "array",
+            "maxItems": 100,
             "minItems": 1,
             "title": "Paid For"
           },
@@ -4204,6 +4206,7 @@
               "$ref": "#/components/schemas/DocumentInput"
             },
             "type": "array",
+            "maxItems": 20,
             "title": "Documents"
           },
           "participant_id": {
@@ -4333,7 +4336,9 @@
           "shares": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 1000000.0,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -4347,7 +4352,9 @@
           "amount": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -4358,7 +4365,9 @@
           "percentage": {
             "anyOf": [
               {
-                "type": "number"
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
               },
               {
                 "type": "string"
@@ -4595,6 +4604,7 @@
             "anyOf": [
               {
                 "type": "string",
+                "maxLength": 200,
                 "minLength": 2
               },
               {
@@ -4729,7 +4739,8 @@
                 "items": {
                   "$ref": "#/components/schemas/ExpensePaidForInput"
                 },
-                "type": "array"
+                "type": "array",
+                "maxItems": 100
               },
               {
                 "type": "null"
@@ -4743,7 +4754,8 @@
                 "items": {
                   "$ref": "#/components/schemas/DocumentInput"
                 },
-                "type": "array"
+                "type": "array",
+                "maxItems": 20
               },
               {
                 "type": "null"
@@ -4762,6 +4774,18 @@
               }
             ],
             "title": "Participant Id"
+          },
+          "base_version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Version"
           }
         },
         "type": "object",
@@ -6220,6 +6244,11 @@
               "FAILED"
             ],
             "title": "Status"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts",
+            "default": 0
           },
           "merchant": {
             "anyOf": [

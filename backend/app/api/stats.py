@@ -8,10 +8,8 @@ from typing import Annotated
 from fastapi import APIRouter, Path, Query
 
 from app.api.deps import SessionDep
-from app.api.errors import raise_service_error
 from app.schemas.stats import ExpenseDrilldown, StatsOverview
 from app.services import stats as stats_service
-from app.services.errors import ServiceError
 
 router = APIRouter(prefix="/groups", tags=["stats"])
 
@@ -24,16 +22,13 @@ def stats_overview(
     date_from: Annotated[date | None, Query(alias="from")] = None,
     date_to: Annotated[date | None, Query(alias="to")] = None,
 ) -> StatsOverview:
-    try:
-        return stats_service.stats_overview(
-            session,
-            group_id,
-            participant_id=participant_id,
-            date_from=date_from,
-            date_to=date_to,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return stats_service.stats_overview(
+        session,
+        group_id,
+        participant_id=participant_id,
+        date_from=date_from,
+        date_to=date_to,
+    )
 
 
 @router.get(
@@ -47,16 +42,13 @@ def category_expenses(
     date_from: Annotated[date | None, Query(alias="from")] = None,
     date_to: Annotated[date | None, Query(alias="to")] = None,
 ) -> ExpenseDrilldown:
-    try:
-        return stats_service.category_expenses(
-            session,
-            group_id,
-            category_id,
-            date_from=date_from,
-            date_to=date_to,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return stats_service.category_expenses(
+        session,
+        group_id,
+        category_id,
+        date_from=date_from,
+        date_to=date_to,
+    )
 
 
 @router.get(
@@ -70,13 +62,10 @@ def month_expenses(
     date_from: Annotated[date | None, Query(alias="from")] = None,
     date_to: Annotated[date | None, Query(alias="to")] = None,
 ) -> ExpenseDrilldown:
-    try:
-        return stats_service.month_expenses(
-            session,
-            group_id,
-            month,
-            date_from=date_from,
-            date_to=date_to,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return stats_service.month_expenses(
+        session,
+        group_id,
+        month,
+        date_from=date_from,
+        date_to=date_to,
+    )

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 from sqlmodel import Session, select
 
@@ -10,7 +10,11 @@ from app.models.expense import Expense
 from app.models.expense_document import ExpenseDocument
 from app.models.expense_paid_for import ExpensePaidFor
 from app.models.recurring_expense_link import RecurringExpenseLink
-from app.services.expenses import materialize_due_recurring_expenses
+from app.services.expenses import (
+    MAX_RECURRENCE_FRAMES_PER_REQUEST,
+    list_expenses,
+    materialize_due_recurring_expenses,
+)
 from app.utils.recurrence import calculate_next_date
 from tests.helpers import make_expense, make_group
 
@@ -147,6 +151,59 @@ def test_materializes_due_frames_once_and_copies_relations(session: Session):
         )
         == 0
     )
+
+
+def test_materialization_is_capped_per_call_and_makes_progress(session: Session):
+    group, people = make_group(session)
+    moment = datetime.now(UTC)
+    total_due = MAX_RECURRENCE_FRAMES_PER_REQUEST + 51
+    first_frame = (moment - timedelta(days=total_due - 1)).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    expense = make_expense(
+        session,
+        group=group,
+        paid_by=people["Alice"],
+        paid_for=[(people["Alice"], 1), (people["Bob"], 1)],
+        amount=10000,
+        title="Daily",
+        expense_date=(first_frame - timedelta(days=1)).date(),
+        category_id=1,
+        recurrence_rule="DAILY",
+    )
+    link = RecurringExpenseLink(
+        id="link-daily",
+        group_id=group.id,
+        current_frame_expense_id=expense.id,
+        next_expense_date=first_frame,
+        next_expense_created_at=None,
+    )
+    expense.recurring_expense_link_id = link.id
+    session.add(link)
+    session.add(expense)
+    session.commit()
+
+    first = materialize_due_recurring_expenses(session, group_id=group.id, now=moment)
+    assert first == MAX_RECURRENCE_FRAMES_PER_REQUEST
+
+    session.expire_all()
+    pending = session.exec(
+        select(RecurringExpenseLink).where(RecurringExpenseLink.next_expense_created_at.is_(None))
+    ).one()
+    assert pending.next_expense_date < moment
+
+    second = materialize_due_recurring_expenses(session, group_id=group.id, now=moment)
+    assert second == total_due - MAX_RECURRENCE_FRAMES_PER_REQUEST
+    assert second < MAX_RECURRENCE_FRAMES_PER_REQUEST
+
+    assert materialize_due_recurring_expenses(session, group_id=group.id, now=moment) == 0
+
+    session.expire_all()
+    listed = list_expenses(session, group.id, limit=200)
+    assert listed.total == total_due + 1
+    assert len(listed.items) == total_due + 1
+    assert all(len(item.paid_for) == 2 for item in listed.items)
+    assert sum(item.amount for item in listed.items) == (total_due + 1) * 10000
 
 
 def test_update_recurrence_rule_creates_updates_and_deletes_link(client, session: Session):

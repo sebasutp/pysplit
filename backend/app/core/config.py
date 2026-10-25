@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -38,9 +39,6 @@ class Settings(BaseSettings):
     # Comma-separated list; parsed into a list by `cors_origins_list`.
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
-    request_id_header: str = "X-Request-ID"
-    log_level: str = "INFO"
-
     # --- Authentication -------------------------------------------------
     # The development default is deliberately rejected in production.
     jwt_secret: str = DEVELOPMENT_JWT_SECRET
@@ -56,6 +54,13 @@ class Settings(BaseSettings):
     auth_cookie_path: str = "/api/auth"
     # Public origin used for OAuth redirect URIs and CSRF origin checks.
     base_url: str | None = None
+    # Only trust X-Forwarded-Proto/X-Forwarded-Host when a known reverse proxy
+    # sets them. Without this, clients can spoof the origin used for CSRF
+    # checks and OAuth redirect URIs.
+    trust_forwarded_headers: bool = False
+    # Development-only passwordless login. Must be enabled explicitly and is
+    # always unavailable in production.
+    enable_mock_login: bool = False
 
     auth_google_id: str | None = None
     auth_google_secret: str | None = None
@@ -72,6 +77,8 @@ class Settings(BaseSettings):
     # for 30 days; a cursor older than the retained window must bootstrap.
     sync_operation_retention_days: int = 7
     sync_change_retention_days: int = 30
+    # Per-caller budget for the synchronization endpoints (single worker).
+    sync_rate_limit_per_minute: int = 120
 
     # --- Uploads and runtime feature flags ------------------------------
     # Local disk is the default blob backend; S3-compatible storage is used
@@ -120,6 +127,9 @@ class Settings(BaseSettings):
     max_receipt_item_quantity_milli: int = 1_000_000_000
     max_receipt_item_portions: int = 100
     receipt_extraction_stale_seconds: int = 5 * 60
+    # A failed extraction is retryable, but each retry is another paid model
+    # call. Once the cap is reached the image must be uploaded again.
+    receipt_max_attempts: int = 3
 
     @field_validator("api_prefix")
     @classmethod
@@ -190,6 +200,8 @@ class Settings(BaseSettings):
         "max_receipt_item_quantity_milli",
         "max_receipt_item_portions",
         "receipt_extraction_stale_seconds",
+        "receipt_max_attempts",
+        "sync_rate_limit_per_minute",
     )
     @classmethod
     def _positive_receipt_limit(cls, value: int) -> int:
@@ -258,6 +270,11 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET must be set to a unique value in production")
             if len(self.jwt_secret) < 32:
                 raise ValueError("JWT_SECRET must be at least 32 characters")
+            if not self.base_url:
+                raise ValueError("BASE_URL must be set in production")
+            parsed = urlsplit(self.base_url)
+            if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+                raise ValueError("BASE_URL must be an http(s) URL in production")
         return self
 
     @property
@@ -308,6 +325,21 @@ class Settings(BaseSettings):
     @property
     def ai_provider(self) -> str:
         return self.ai_base_url_resolved or "openai"
+
+    @property
+    def ai_provider_label(self) -> str:
+        """Stable public label for the configured AI provider.
+
+        ``ai_provider`` contains the internal base URL and must never be
+        exposed to clients. This collapses the configuration into a small,
+        non-sensitive enum used in receipt read models.
+        """
+        if not self.ai_api_key_resolved and not self.ai_base_url_resolved:
+            return "disabled"
+        base = (self.ai_base_url_resolved or "").lower()
+        if "google" in base or "generativelanguage" in base:
+            return "google"
+        return "openai-compatible"
 
     @property
     def receipt_extract_model(self) -> str:

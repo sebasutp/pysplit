@@ -24,23 +24,25 @@ export function AuthProvider({ children }) {
   const load = useCallback(
     /** @param {AbortSignal} [signal] */
     async (signal) => {
-    try {
-      await repository.auth.refresh()
-    } catch (error) {
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
-        return
+      try {
+        await repository.auth.refresh()
+      } catch (error) {
+        if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
+          return
+        }
       }
-    }
+      if (signal?.aborted) return
 
-    try {
-      const current = await repository.auth.me({ signal })
-      setUser(/** @type {User | null} */ (current))
-      setProviders(repository.auth.providers())
-    } catch (error) {
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
-        return
-      }
-        setUser(null)
+      try {
+        const current = await repository.auth.me({ signal })
+        if (signal?.aborted) return
+        setUser(/** @type {User | null} */ (current))
+        setProviders(repository.auth.providers())
+      } catch (error) {
+        if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
+          return
+        }
+        if (!signal?.aborted) setUser(null)
       }
     },
     [],
@@ -48,7 +50,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const controller = new AbortController()
-    load(controller.signal).finally(() => setLoading(false))
+    load(controller.signal).finally(() => {
+      if (!controller.signal.aborted) setLoading(false)
+    })
     return () => controller.abort()
   }, [load])
 
