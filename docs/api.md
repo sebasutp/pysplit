@@ -83,7 +83,9 @@ redirects to the provider. `return_to` must be a relative same-origin path.
 
 ### `GET /api/auth/oauth/{provider}/callback?code=…&state=…`
 Validates state, exchanges the code, links/creates the user, sets the refresh
-cookie, and redirects to `return_to` (default `/groups`). Errors redirect with
+cookie, and redirects to `return_to` (default `/groups`). Account linking
+requires a provider email that is verified by the provider: an unverified email
+is rejected with `403` and is never auto-linked. Other errors redirect with
 `?error=InvalidOAuthState|OAuthExchangeFailed|OAuthNotConfigured`.
 
 ### `POST /api/auth/refresh`
@@ -97,11 +99,14 @@ token and returns a new access token.
 Reuse of an already-rotated token returns `401` and revokes the family.
 
 ### `POST /api/auth/logout`
-Requires the same CSRF and origin checks. Revokes the refresh token, clears the
-session cookies, returns `204`.
+Requires the same CSRF and origin checks. Revokes the whole refresh-token
+rotation family, clears the session cookies, returns `204`.
 
 ### `POST /api/auth/mock-login` (development/test only)
-`404` in production. Used by the Playwright helpers.
+Disabled by default. Requires `ENABLE_MOCK_LOGIN=true` and is always unavailable
+(`404`) when the flag is off or `ENVIRONMENT=production`. It bypasses normal
+OAuth sign-in, so never enable it on a public deployment. Used by the Playwright
+helpers.
 ```json
 { "email": "test@example.com", "name": "Test", "tier": "group_creators" }
 ```
@@ -173,7 +178,8 @@ Merges locally known group IDs into the authenticated user's `UserGroup` rows.
 { "group_ids": ["g1", "g2"] }
 ```
 ```json
-{ "user_groups": [ { "group_id": "g1", "is_starred": false, "is_archived": false } ],
+{ "is_authenticated": true,
+  "user_groups": [ { "group_id": "g1", "is_starred": false, "is_archived": false } ],
   "groups": [ { "id": "g1", "name": "Trip" } ] }
 ```
 Idempotent: existing rows are not duplicated.
@@ -233,13 +239,21 @@ integer percentage or the API accepts `percentage`; for `BY_AMOUNT`, each
 participant's `amount` must sum exactly to `amount`. Validation returns `422`
 with field locations.
 
+Input bounds (create and update): `title` ≤ 200 characters, `paid_for` ≤ 100
+rows (create requires at least one), `documents` ≤ 20, `shares` ≤ 1,000,000, and
+`conversion_rate` at most 18 digits with at most 9 decimal places. Exceeding any
+bound returns `422`.
+
 ### `GET /api/groups/{group_id}/expenses/{expense_id}`
 Full expense or `404`.
 
 ### `PATCH /api/groups/{group_id}/expenses/{expense_id}`
-Partial update; changing split mode replaces `paid_for`. Recurring expenses
-cannot change their rule after materialization; the server returns `409`.
-Returns the updated expense.
+Partial update; changing split mode replaces `paid_for`. An optional
+`base_version` (also accepted as camelCase `baseVersion`) enables optimistic
+concurrency: when supplied it must equal the stored `version`, and a mismatch
+returns `409` without applying the update. When omitted, the update is
+last-writer-wins. Recurring expenses cannot change their rule after
+materialization; the server returns `409`. Returns the updated expense.
 
 ### `DELETE /api/groups/{group_id}/expenses/{expense_id}`
 `204`. Writes an activity row and a tombstone.
@@ -260,7 +274,8 @@ frames and receive future frames after synchronization.
   `204`.
 
 Uploads reject path traversal, executable content types and oversized files.
-Storage keys are server-generated.
+Storage keys are server-generated. When `ENABLE_EXPENSE_DOCUMENTS=false` (the
+default), upload, download and delete all return `403`.
 
 ## 7. Balances
 
@@ -322,8 +337,13 @@ Both return `{ "expenses": [ { "id", "title", "amount", "expense_date" } ] }`.
 
 Receipt GET/item/apply/link endpoints require `receipt_items` to be enabled.
 `extract-total` requires `receipt_extract` (which is implied by
-`receipt_items`). AI extraction is online-only. All limits and flags are
-enforced server-side, not only by the UI.
+`receipt_items`). AI extraction is online-only.
+
+**Authentication.** The three AI endpoints (`extract-total`, `extract-items`
+and `/api/ai/categories/infer`) require an authenticated user: send
+`Authorization: Bearer <access>` or receive `401`. They are rate limited per
+caller (`429`). All limits and flags are enforced server-side, not only by the
+UI.
 
 ### `POST /api/groups/{group_id}/receipts/upload`
 Multipart upload (`file`, optional `width`, `height`). Accepts the configured
@@ -332,18 +352,22 @@ image types, enforces `MAX_UPLOAD_BYTES`, and returns a server-generated URL:
 { "url": "/api/groups/g1/receipts/images/img_…", "width": 800, "height": 600 }
 ```
 When S3/R2 public storage is configured the URL points directly at storage.
-Uploads are rate-limited and keys are server-generated, so traversal is not
-possible.
+Uploads are rate-limited and keys are server-generated and group-scoped
+(`receipts/{group_id}/…`), so traversal is not possible. An image id referenced
+through a different group's route is rejected.
 
 ### `GET /api/groups/{group_id}/receipts/images/{image_id}`
-Returns the stored image bytes. Used for local-disk storage only.
+Returns the stored image bytes. Used for local-disk storage only. Only images
+stored under that group's prefix (or legacy images with a receipt row proving
+ownership) are served.
 
 ### `GET /api/groups/{group_id}/receipts/{receipt_id}`
 ### `GET /api/groups/{group_id}/expenses/{expense_id}/receipt`
 ```json
 {
   "receipt": { "id": "r1", "group_id": "g1", "image_url": "...",
-    "status": "EXTRACTED", "merchant": "Cafe", "receipt_date": "2026-09-03",
+    "status": "EXTRACTED", "attempts": 1, "provider": "openai-compatible",
+    "merchant": "Cafe", "receipt_date": "2026-09-03",
     "currency_code": "EUR", "total": 2400 },
   "items": [ { "id": "i1", "name": "Pasta", "quantity_milli": 1000,
     "unit_price": 1200, "amount": 1200, "is_shared": false,
@@ -360,7 +384,9 @@ Returns the stored image bytes. Used for local-disk storage only.
 }
 ```
 Provisional totals are always recomputed from stored items and live
-participants. Client-supplied totals are never trusted.
+participants. Client-supplied totals are never trusted. `ReceiptRead.attempts`
+counts paid extraction claims. `ReceiptRead.provider` is a stable public label —
+`openai-compatible`, `google` or `disabled` — never the internal AI base URL.
 
 ### `POST /api/groups/{group_id}/receipts/extract-total`
 ```json
@@ -388,6 +414,11 @@ Malformed output or a provider failure records `status: "FAILED"` on the
 receipt and returns `status: "FAILED"` with an empty split. Concurrent callers
 race on an atomic claim; a stale `EXTRACTING` claim is recoverable after
 `RECEIPT_EXTRACTION_STALE_SECONDS`. The loser receives `409`.
+
+Each paid extraction claim increments `attempts`. Retries are bounded by
+`RECEIPT_MAX_ATTEMPTS` (default 3); once the cap is reached, further extraction
+of that image returns `409` and the image must be uploaded again. Re-posting an
+already `EXTRACTED` image reuses the stored receipt without another paid call.
 
 ### `POST /api/groups/{group_id}/receipts/{receipt_id}/items`
 ### `PATCH /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}`
@@ -430,8 +461,9 @@ Returns `{ "receipt", "expense", "split" }`.
 { "category_id": 1 }
 ```
 The title is truncated to 40 characters before the model call. Unknown or
-malformed model output falls back to category `0` (General). Rate-limited and
-flag-gated.
+malformed model output falls back to category `0` (General). Requires bearer
+authentication (`401` without it), respects `ENABLE_CATEGORY_EXTRACT`, and is
+rate-limited (`429`).
 
 
 ## 11. Exports
@@ -468,7 +500,9 @@ receive `403`.
 
 ## 13. Synchronization
 
-See ADR 0002 for the full protocol.
+See ADR 0002 for the full protocol. All `/api/sync/*` endpoints are rate limited
+per caller (`SYNC_RATE_LIMIT_PER_MINUTE`, default 120 per minute); exceeding the
+budget returns `429` with `Retry-After`.
 
 ### `GET /api/sync/bootstrap?group_id=…`
 ```json
@@ -524,10 +558,10 @@ server feed) returns `409` with `{ "detail": "bootstrap_required" }`; call
 | 201 | create |
 | 204 | delete/logout/access |
 | 400 | malformed request |
-| 401 | missing/invalid access token |
-| 403 | tier or CSRF failure |
+| 401 | missing/invalid access token (including the AI endpoints) |
+| 403 | tier, CSRF, unverified OAuth email, or a disabled feature flag |
 | 404 | unknown entity (including cross-group access, to avoid leaks) |
-| 409 | stale version, duplicate link, immutable recurrence |
+| 409 | stale version, exhausted AI retries, duplicate link, immutable recurrence |
 | 422 | schema validation |
-| 429 | rate limited |
+| 429 | rate limited (auth, AI, uploads or `/api/sync/*`) |
 | 503 | readiness failure |

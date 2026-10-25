@@ -53,21 +53,64 @@ def test_memory_database_is_left_alone() -> None:
 
 def test_production_requires_a_unique_jwt_secret() -> None:
     with pytest.raises(ValidationError):
-        Settings(environment="production", _env_file=None)
+        Settings(
+            environment="production",
+            base_url="https://app.example.com",
+            _env_file=None,
+        )
     with pytest.raises(ValidationError):
         Settings(
             environment="production",
             jwt_secret="short",
+            base_url="https://app.example.com",
             _env_file=None,
         )
 
     settings = Settings(
         environment="production",
         jwt_secret="x" * 40,
+        base_url="https://app.example.com",
         _env_file=None,
     )
     assert settings.is_production
     assert settings.secure_cookies is True
+
+
+def test_production_requires_an_http_base_url() -> None:
+    with pytest.raises(ValidationError):
+        Settings(
+            environment="production",
+            jwt_secret="x" * 40,
+            _env_file=None,
+        )
+    with pytest.raises(ValidationError):
+        Settings(
+            environment="production",
+            jwt_secret="x" * 40,
+            base_url="ftp://app.example.com",
+            _env_file=None,
+        )
+    with pytest.raises(ValidationError):
+        Settings(
+            environment="production",
+            jwt_secret="x" * 40,
+            base_url="app.example.com",
+            _env_file=None,
+        )
+
+    settings = Settings(
+        environment="production",
+        jwt_secret="x" * 40,
+        base_url="https://app.example.com/",
+        _env_file=None,
+    )
+    assert settings.base_url == "https://app.example.com"
+
+
+def test_mock_login_and_forwarded_headers_default_to_disabled() -> None:
+    settings = Settings(_env_file=None)
+    assert settings.enable_mock_login is False
+    assert settings.trust_forwarded_headers is False
 
 
 def test_development_allows_the_default_secret() -> None:

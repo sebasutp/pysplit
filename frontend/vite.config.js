@@ -51,5 +51,19 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.js'],
     css: true,
     restoreMocks: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      include: ['src/**/*.{js,jsx,ts,tsx}'],
+      // Conservative floors measured from the current suite, set a few points
+      // below the actual totals so the gate catches regressions without
+      // failing on minor coverage shifts.
+      thresholds: {
+        statements: 29,
+        branches: 25,
+        functions: 22,
+        lines: 30,
+      },
+    },
   },
 })

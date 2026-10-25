@@ -49,14 +49,20 @@ def _normalise_origin(value: str) -> str | None:
 
 
 def request_origin(request: Request, settings: Settings) -> str:
-    """Return the canonical public origin for redirects and cookies."""
+    """Return the canonical public origin for redirects and cookies.
+
+    Forwarded headers are only honoured when the deployment explicitly opts
+    in; otherwise a client could spoof the origin used for CSRF checks and
+    OAuth redirect URIs.
+    """
     if settings.base_url:
         return settings.base_url
-    forwarded_proto = request.headers.get("x-forwarded-proto", "").split(",")[0].strip()
-    scheme = forwarded_proto or request.url.scheme
-    host = (
-        request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
-    )
+    scheme = request.url.scheme
+    host = request.headers.get("host") or request.url.netloc
+    if settings.trust_forwarded_headers:
+        forwarded_proto = request.headers.get("x-forwarded-proto", "").split(",")[0].strip()
+        scheme = forwarded_proto or scheme
+        host = request.headers.get("x-forwarded-host") or host
     return f"{scheme}://{host}".rstrip("/")
 
 
@@ -284,6 +290,7 @@ async def oauth_callback(
         return _oauth_error_redirect("OAuthExchangeFailed", settings)
 
     user = auth_service.upsert_oauth_user(session, profile)
+
     enforce_rate_limit(
         request,
         settings,
@@ -350,7 +357,7 @@ def logout(
     session: SessionDep,
     settings: SettingsDep,
 ) -> Response:
-    """Revoke the presented refresh token and clear session cookies."""
+    """Revoke the refresh-token family and clear session cookies."""
     enforce_rate_limit(request, settings, scope="logout")
     _require_same_origin(request, settings)
     _require_csrf(request, settings)
@@ -365,7 +372,7 @@ def logout(
             account_key=account_id,
         )
 
-    auth_service.revoke_refresh_token(session, raw_token)
+    auth_service.revoke_refresh_family(session, raw_token)
     _clear_session_cookies(response, settings)
     response.status_code = status.HTTP_204_NO_CONTENT
     return response
@@ -379,8 +386,8 @@ def mock_login(
     session: SessionDep,
     settings: SettingsDep,
 ) -> MockLoginResponse:
-    """Development/test login helper. Never available in production."""
-    if settings.is_production:
+    """Development/test login helper. Opt-in and never available in production."""
+    if not settings.enable_mock_login or settings.is_production:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
 
     enforce_rate_limit(request, settings, scope="mock_login")

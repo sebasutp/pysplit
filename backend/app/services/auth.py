@@ -7,7 +7,7 @@ always read from the database, never trusted from the access token.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from sqlalchemy import func, update
@@ -25,14 +25,15 @@ from app.core.security import (
 )
 from app.core.validation import normalize_email
 from app.models.account import Account
+from app.models.base import utc_now
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.schemas.auth import UserRead
-from app.services.errors import InvalidRefreshTokenError, RefreshTokenReuseError
-
-
-def utc_now() -> datetime:
-    return datetime.now(UTC)
+from app.services.errors import (
+    ForbiddenError,
+    InvalidRefreshTokenError,
+    RefreshTokenReuseError,
+)
 
 
 def user_to_read(user: User) -> UserRead:
@@ -222,21 +223,25 @@ def rotate_refresh_token(
     )
 
 
-def revoke_refresh_token(
+def revoke_refresh_family(
     session: Session,
     raw_token: str,
     *,
     now: datetime | None = None,
 ) -> None:
-    """Revoke the presented token (idempotent, no family revocation)."""
+    """Revoke the presented token and every descendant produced by rotation.
+
+    Logout must invalidate descendants too: otherwise the newest rotated token
+    in the family stays usable after the user signs out. Tokens belonging to
+    other families (including other users) are left untouched.
+    """
     if not raw_token:
         return
     statement = select(RefreshToken).where(RefreshToken.token_hash == hash_refresh_token(raw_token))
     token = session.exec(statement).first()
-    if token is None or token.revoked_at is not None:
+    if token is None:
         return
-    token.revoked_at = now or utc_now()
-    session.add(token)
+    _revoke_family(session, token, now or utc_now())
     session.commit()
 
 
@@ -265,6 +270,12 @@ def upsert_oauth_user(session: Session, profile: OAuthProfile) -> User:
             return user
 
     email = normalize_email(profile.email) if profile.email else None
+    if email and profile.email_verified is not True:
+        # An unverified address proves nothing about ownership. Refuse both
+        # account linking and auto-provisioning so a provider cannot be used to
+        # take over an existing account.
+        raise ForbiddenError("OAuth provider email is not verified.")
+
     existing_user = find_user_by_email(session, email) if email else None
 
     if existing_user is not None:

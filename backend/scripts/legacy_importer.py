@@ -511,19 +511,20 @@ def _build_rows(
             "type": row["type"],
             "provider": row["provider"],
             "provider_account_id": row["providerAccountId"],
-            "refresh_token": parse_str(row["refresh_token"]),
-            "access_token": parse_str(row["access_token"]),
+            # Provider credentials from the legacy NextAuth schema are never
+            # used by the new refresh-token flow, so they are not imported.
+            "refresh_token": None,
+            "access_token": None,
             "expires_at": parse_optional_int(row["expires_at"]),
             "token_type": parse_str(row["token_type"]),
             "scope": parse_str(row["scope"]),
-            "id_token": parse_str(row["id_token"]),
-            "session_state": parse_str(row["session_state"]),
+            "id_token": None,
+            "session_state": None,
         }
         for row in _rows(
             connection,
             "Account",
-            "id, userId, type, provider, providerAccountId, refresh_token, "
-            "access_token, expires_at, token_type, scope, id_token, session_state",
+            "id, userId, type, provider, providerAccountId, expires_at, token_type, scope",
         )
     ]
 

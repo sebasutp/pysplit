@@ -14,6 +14,12 @@ from app.schemas.categories import CategoryRead
 from app.schemas.common import UTCDateTime
 
 MAX_AMOUNT = 10_000_000_00
+MAX_TITLE_LENGTH = 200
+MAX_PAID_FOR_ENTRIES = 100
+MAX_DOCUMENTS = 20
+MAX_CONVERSION_RATE_DIGITS = 18
+MAX_CONVERSION_RATE_DECIMALS = 9
+MAX_SHARES = 1_000_000
 
 
 def _valid_url(value: str) -> str:
@@ -40,9 +46,9 @@ class DocumentInput(BaseModel):
 
 class ExpensePaidForInput(BaseModel):
     participant_id: str = Field(min_length=1, max_length=64)
-    shares: Decimal | None = None
-    amount: int | None = None
-    percentage: Decimal | None = None
+    shares: Decimal | None = Field(default=None, ge=0, le=MAX_SHARES)
+    amount: int | None = Field(default=None, ge=0, le=MAX_AMOUNT)
+    percentage: Decimal | None = Field(default=None, ge=0, le=100)
 
     @field_validator("shares", "percentage", mode="before")
     @classmethod
@@ -55,19 +61,23 @@ class ExpensePaidForInput(BaseModel):
 class ExpenseCreate(BaseModel):
     id: str | None = Field(default=None, min_length=1, max_length=64)
     expense_date: date
-    title: str = Field(min_length=2)
+    title: str = Field(min_length=2, max_length=MAX_TITLE_LENGTH)
     category_id: int = Field(default=0, ge=0)
     amount: int = Field(ge=-MAX_AMOUNT, le=MAX_AMOUNT)
     original_amount: int | None = Field(default=None, ge=-MAX_AMOUNT, le=MAX_AMOUNT)
     original_currency: str | None = Field(default=None, max_length=8)
-    conversion_rate: Decimal | None = None
+    conversion_rate: Decimal | None = Field(
+        default=None,
+        max_digits=MAX_CONVERSION_RATE_DIGITS,
+        decimal_places=MAX_CONVERSION_RATE_DECIMALS,
+    )
     paid_by_id: str = Field(min_length=1, max_length=64)
     is_reimbursement: bool = False
     split_mode: SplitMode = SplitMode.EVENLY
     notes: str | None = Field(default=None, max_length=20_000)
     recurrence_rule: RecurrenceRule = RecurrenceRule.NONE
-    paid_for: list[ExpensePaidForInput] = Field(min_length=1)
-    documents: list[DocumentInput] = Field(default_factory=list)
+    paid_for: list[ExpensePaidForInput] = Field(min_length=1, max_length=MAX_PAID_FOR_ENTRIES)
+    documents: list[DocumentInput] = Field(default_factory=list, max_length=MAX_DOCUMENTS)
     participant_id: str | None = Field(
         default=None,
         max_length=64,
@@ -117,23 +127,34 @@ class ExpenseCreate(BaseModel):
 
 class ExpenseUpdate(BaseModel):
     expense_date: date | None = None
-    title: str | None = Field(default=None, min_length=2)
+    title: str | None = Field(default=None, min_length=2, max_length=MAX_TITLE_LENGTH)
     category_id: int | None = Field(default=None, ge=0)
     amount: int | None = Field(default=None, ge=-MAX_AMOUNT, le=MAX_AMOUNT)
     original_amount: int | None = Field(default=None, ge=-MAX_AMOUNT, le=MAX_AMOUNT)
     original_currency: str | None = Field(default=None, max_length=8)
-    conversion_rate: Decimal | None = None
+    conversion_rate: Decimal | None = Field(
+        default=None,
+        max_digits=MAX_CONVERSION_RATE_DIGITS,
+        decimal_places=MAX_CONVERSION_RATE_DECIMALS,
+    )
     paid_by_id: str | None = Field(default=None, min_length=1, max_length=64)
     is_reimbursement: bool | None = None
     split_mode: SplitMode | None = None
     notes: str | None = Field(default=None, max_length=20_000)
     recurrence_rule: RecurrenceRule | None = None
-    paid_for: list[ExpensePaidForInput] | None = None
-    documents: list[DocumentInput] | None = None
+    paid_for: list[ExpensePaidForInput] | None = Field(
+        default=None, max_length=MAX_PAID_FOR_ENTRIES
+    )
+    documents: list[DocumentInput] | None = Field(default=None, max_length=MAX_DOCUMENTS)
     participant_id: str | None = Field(
         default=None,
         max_length=64,
         validation_alias=AliasChoices("participant_id", "participantId"),
+    )
+    base_version: int | None = Field(
+        default=None,
+        ge=0,
+        validation_alias=AliasChoices("base_version", "baseVersion"),
     )
 
     @field_validator("original_amount", mode="before")
@@ -228,8 +249,3 @@ class ExpenseDeleteOptions(BaseModel):
         max_length=64,
         validation_alias=AliasChoices("participant_id", "participantId"),
     )
-
-
-def dump_payload(payload: BaseModel) -> dict[str, Any]:
-    """Return explicitly-set fields without dropping explicit nulls."""
-    return payload.model_dump(exclude_unset=True)

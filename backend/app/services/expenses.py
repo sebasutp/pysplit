@@ -13,11 +13,11 @@ from sqlmodel import Session, select
 from app.core.enums import ActivityType, RecurrenceRule, SplitMode
 from app.core.ids import new_id
 from app.models.activity import Activity
+from app.models.base import utc_now
 from app.models.category import Category
 from app.models.expense import Expense
 from app.models.expense_document import ExpenseDocument
 from app.models.expense_paid_for import ExpensePaidFor
-from app.models.group import Group
 from app.models.participant import Participant
 from app.models.receipt import Receipt
 from app.models.recurring_expense_link import RecurringExpenseLink
@@ -35,33 +35,19 @@ from app.schemas.expenses import (
     ReceiptSummary,
 )
 from app.services.categories import ensure_default_categories
+from app.services.common import finish, require_group
 from app.services.errors import ConflictError, InvalidInputError, NotFoundError
 from app.utils.dates import date_to_datetime, datetime_to_date, end_of_day_exclusive, start_of_day
 from app.utils.recurrence import calculate_next_date
 
-
-def utc_now() -> datetime:
-    return datetime.now(UTC)
-
-
-def _finish(session: Session, commit: bool) -> None:
-    """Commit normally, or leave the transaction open for a sync operation."""
-    if commit:
-        session.commit()
-    else:
-        session.flush()
+# Write-on-read materialization is bounded so one request cannot loop over an
+# arbitrarily large backlog. Remaining due frames are picked up by the next call.
+MAX_RECURRENCE_FRAMES_PER_REQUEST = 100
 
 
 # ---------------------------------------------------------------------------
 # Validation and normalization
 # ---------------------------------------------------------------------------
-
-
-def _require_group(session: Session, group_id: str) -> Group:
-    group = session.get(Group, group_id)
-    if group is None or group.deleted_at is not None:
-        raise NotFoundError("group not found")
-    return group
 
 
 def _require_category(session: Session, category_id: int, *, commit: bool = True) -> Category:
@@ -217,18 +203,18 @@ def _document_rows(session: Session, expense_id: str) -> list[ExpenseDocument]:
     )
 
 
-def expense_to_read(session: Session, expense: Expense) -> ExpenseRead:
-    category = session.get(Category, expense.category_id)
-    paid_by = session.get(Participant, expense.paid_by_id)
-    paid_for_rows = session.exec(
-        select(ExpensePaidFor, Participant)
-        .join(Participant, Participant.id == ExpensePaidFor.participant_id)
-        .where(ExpensePaidFor.expense_id == expense.id)
-        .order_by(ExpensePaidFor.participant_id.asc())
-    ).all()
-    documents = _document_rows(session, expense.id)
-    receipt = session.exec(select(Receipt).where(Receipt.expense_id == expense.id)).first()
-
+def _expense_read(
+    expense: Expense,
+    *,
+    categories: dict[int, Category],
+    participants: dict[str, Participant],
+    paid_for_by_expense: dict[str, list[tuple[ExpensePaidFor, Participant]]],
+    documents_by_expense: dict[str, list[ExpenseDocument]],
+    receipts: dict[str, Receipt],
+) -> ExpenseRead:
+    category = categories.get(expense.category_id)
+    paid_by = participants.get(expense.paid_by_id)
+    receipt = receipts.get(expense.id)
     return ExpenseRead(
         id=expense.id,
         group_id=expense.group_id,
@@ -262,7 +248,7 @@ def expense_to_read(session: Session, expense: Expense) -> ExpenseRead:
                 shares=row.shares,
                 participant_name=participant.name if participant is not None else None,
             )
-            for row, participant in paid_for_rows
+            for row, participant in paid_for_by_expense.get(expense.id, [])
         ],
         documents=[
             ExpenseDocumentRead(
@@ -271,10 +257,80 @@ def expense_to_read(session: Session, expense: Expense) -> ExpenseRead:
                 width=document.width,
                 height=document.height,
             )
-            for document in documents
+            for document in documents_by_expense.get(expense.id, [])
         ],
         receipt=ReceiptSummary(id=receipt.id, status=receipt.status) if receipt else None,
     )
+
+
+def expenses_to_read(session: Session, expenses: list[Expense]) -> list[ExpenseRead]:
+    """Serialize many expenses with a constant number of batched queries."""
+    if not expenses:
+        return []
+
+    expense_ids = [expense.id for expense in expenses]
+
+    categories: dict[int, Category] = {}
+    category_ids = {expense.category_id for expense in expenses}
+    if category_ids:
+        categories = {
+            int(category.id or 0): category
+            for category in session.exec(
+                select(Category).where(Category.id.in_(category_ids))
+            ).all()
+        }
+
+    paid_for_rows = session.exec(
+        select(ExpensePaidFor, Participant)
+        .join(Participant, Participant.id == ExpensePaidFor.participant_id)
+        .where(ExpensePaidFor.expense_id.in_(expense_ids))
+        .order_by(ExpensePaidFor.expense_id.asc(), ExpensePaidFor.participant_id.asc())
+    ).all()
+    paid_for_by_expense: dict[str, list[tuple[ExpensePaidFor, Participant]]] = {}
+    participant_ids = {expense.paid_by_id for expense in expenses}
+    for row, participant in paid_for_rows:
+        paid_for_by_expense.setdefault(row.expense_id, []).append((row, participant))
+        participant_ids.add(row.participant_id)
+
+    participants: dict[str, Participant] = {}
+    if participant_ids:
+        participants = {
+            participant.id: participant
+            for participant in session.exec(
+                select(Participant).where(Participant.id.in_(participant_ids))
+            ).all()
+        }
+
+    documents_by_expense: dict[str, list[ExpenseDocument]] = {}
+    for document in session.exec(
+        select(ExpenseDocument)
+        .where(ExpenseDocument.expense_id.in_(expense_ids))
+        .order_by(ExpenseDocument.created_at.asc(), ExpenseDocument.id.asc())
+    ).all():
+        if document.expense_id is not None:
+            documents_by_expense.setdefault(document.expense_id, []).append(document)
+
+    receipts: dict[str, Receipt] = {}
+    for receipt in session.exec(select(Receipt).where(Receipt.expense_id.in_(expense_ids))).all():
+        if receipt.expense_id is not None:
+            receipts.setdefault(receipt.expense_id, receipt)
+
+    return [
+        _expense_read(
+            expense,
+            categories=categories,
+            participants=participants,
+            paid_for_by_expense=paid_for_by_expense,
+            documents_by_expense=documents_by_expense,
+            receipts=receipts,
+        )
+        for expense in expenses
+    ]
+
+
+def expense_to_read(session: Session, expense: Expense) -> ExpenseRead:
+    """Serialize a single expense; prefer ``expenses_to_read`` in loops."""
+    return expenses_to_read(session, [expense])[0]
 
 
 # ---------------------------------------------------------------------------
@@ -297,7 +353,7 @@ def list_expenses(
     date_to: date | None = None,
     query: str | None = None,
 ) -> ExpenseList:
-    _require_group(session, group_id)
+    require_group(session, group_id)
     materialize_due_recurring_expenses(session, group_id=group_id)
 
     conditions: list[Any] = [
@@ -322,7 +378,7 @@ def list_expenses(
         ).all()
     )
     return ExpenseList(
-        items=[expense_to_read(session, expense) for expense in expenses],
+        items=expenses_to_read(session, expenses),
         total=total,
         limit=limit,
         offset=offset,
@@ -330,7 +386,7 @@ def list_expenses(
 
 
 def get_expense(session: Session, group_id: str, expense_id: str) -> ExpenseRead:
-    _require_group(session, group_id)
+    require_group(session, group_id)
     materialize_due_recurring_expenses(session, group_id=group_id)
     expense = session.get(Expense, expense_id)
     if expense is None or expense.group_id != group_id or expense.deleted_at is not None:
@@ -484,7 +540,7 @@ def create_expense(
     commit: bool = True,
 ) -> ExpenseRead:
     moment = now or utc_now()
-    _require_group(session, group_id)
+    require_group(session, group_id)
 
     if payload.id:
         existing = session.get(Expense, payload.id)
@@ -546,7 +602,7 @@ def create_expense(
             data=payload.title,
         )
     )
-    _finish(session, commit)
+    finish(session, commit)
     if commit:
         session.refresh(expense)
     return expense_to_read(session, expense)
@@ -562,10 +618,13 @@ def update_expense(
     commit: bool = True,
 ) -> ExpenseRead:
     moment = now or utc_now()
-    _require_group(session, group_id)
+    require_group(session, group_id)
     expense = session.get(Expense, expense_id)
     if expense is None or expense.group_id != group_id or expense.deleted_at is not None:
         raise NotFoundError("expense not found")
+
+    if payload.base_version is not None and payload.base_version != expense.version:
+        raise ConflictError("expense version conflict")
 
     fields = payload.model_dump(exclude_unset=True)
     non_nullable = {
@@ -701,7 +760,7 @@ def update_expense(
             data=expense.title,
         )
     )
-    _finish(session, commit)
+    finish(session, commit)
     if commit:
         session.refresh(expense)
     return expense_to_read(session, expense)
@@ -717,7 +776,7 @@ def delete_expense(
     commit: bool = True,
 ) -> None:
     moment = now or utc_now()
-    _require_group(session, group_id)
+    require_group(session, group_id)
     expense = session.get(Expense, expense_id)
     if expense is None or expense.group_id != group_id or expense.deleted_at is not None:
         raise NotFoundError("expense not found")
@@ -754,7 +813,7 @@ def delete_expense(
             data=expense.title,
         )
     )
-    _finish(session, commit)
+    finish(session, commit)
 
 
 # ---------------------------------------------------------------------------
@@ -772,7 +831,9 @@ def materialize_due_recurring_expenses(
 
     Returns the number of frames created. The reference materializes at the
     start of expense reads; materialization copies the frame's fields,
-    participants and documents, closes the old link and opens a new one.
+    participants and documents, closes the old link and opens a new one. Each
+    call creates at most ``MAX_RECURRENCE_FRAMES_PER_REQUEST`` frames and
+    commits once; a larger backlog is finished by subsequent calls.
     """
     moment = now or utc_now()
     if moment.tzinfo is None:
@@ -799,8 +860,12 @@ def materialize_due_recurring_expenses(
 
     created = 0
     for initial_link in due_links:
+        if created >= MAX_RECURRENCE_FRAMES_PER_REQUEST:
+            break
         link_id = initial_link.id
-        for _ in range(1000):
+        for _ in range(MAX_RECURRENCE_FRAMES_PER_REQUEST):
+            if created >= MAX_RECURRENCE_FRAMES_PER_REQUEST:
+                break
             link = session.get(RecurringExpenseLink, link_id)
             if link is None or link.next_expense_created_at is not None:
                 break
@@ -906,15 +971,18 @@ def materialize_due_recurring_expenses(
                 )
             )
             if result.rowcount != 1:
+                # Another writer closed this link first; discard the whole
+                # batch so the next read retries from the current links.
                 session.rollback()
-                break
+                return 0
 
-            session.commit()
             created += 1
             link_id = new_link.id
             if new_link.next_expense_date >= cutoff:
                 break
 
+    if created:
+        session.commit()
     return created
 
 

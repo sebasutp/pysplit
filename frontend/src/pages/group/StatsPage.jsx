@@ -41,7 +41,7 @@ export function StatsPage() {
         ? { kind: /** @type {const} */ ('category'), categoryId: drilldown.categoryId }
         : drilldown?.kind === 'month'
           ? { kind: /** @type {const} */ ('month'), month: drilldown.month }
-          : { kind: /** @type {const} */ ('month'), month: '1970-01' },
+          : null,
     [drilldown],
   )
   const drill = useDrilldown(group.id, drilldownTarget, range)

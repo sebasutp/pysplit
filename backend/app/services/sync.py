@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from pydantic import BaseModel, ValidationError
@@ -27,6 +27,7 @@ from sqlmodel import Session, select
 from app.core.config import Settings, get_settings
 from app.core.enums import can_create_groups
 from app.models.activity import Activity
+from app.models.base import utc_now
 from app.models.expense import Expense
 from app.models.group import Group
 from app.models.participant import Participant
@@ -178,10 +179,6 @@ class _Outcome:
     duplicate: bool = False
 
 
-def utc_now() -> datetime:
-    return datetime.now(UTC)
-
-
 # ---------------------------------------------------------------------------
 # Serialization
 # ---------------------------------------------------------------------------
@@ -192,19 +189,17 @@ def _group_snapshot(
     group: Group,
     *,
     user_id: str | None = None,
-    include_membership: bool = False,
 ) -> dict[str, Any]:
     read = groups_service.group_to_read(session, group, user_id=user_id)
     data = read.model_dump(mode="json")
-    if not include_membership:
-        for key in (
-            "user_group",
-            "is_starred",
-            "is_archived",
-            "isStarred",
-            "isArchived",
-        ):
-            data.pop(key, None)
+    for key in (
+        "user_group",
+        "is_starred",
+        "is_archived",
+        "isStarred",
+        "isArchived",
+    ):
+        data.pop(key, None)
     return data
 
 
@@ -920,21 +915,6 @@ def compact_sync_state(
     return deleted
 
 
-def compact_change_log(
-    session: Session,
-    *,
-    now: datetime | None = None,
-    settings: Settings | None = None,
-    commit: bool = True,
-) -> int:
-    """Compact the change log and expired idempotency rows.
-
-    Alias kept explicit because the plan and ADR use the phrase "change-log
-    compaction"; the implementation also prunes expired operation results.
-    """
-    return compact_sync_state(session, now=now, settings=settings, commit=commit)
-
-
 def _remember_result(
     session: Session,
     operation: SyncOperationIn,
@@ -1269,7 +1249,7 @@ def bootstrap_group(
             ParticipantRead.model_validate(_participant_snapshot(participant))
             for participant in participants
         ],
-        expenses=[expenses_service.expense_to_read(session, expense) for expense in expense_rows],
+        expenses=expenses_service.expenses_to_read(session, expense_rows),
         activities=[
             ActivityRead(
                 id=activity.id,
@@ -1376,9 +1356,3 @@ def claim_groups(
     else:
         session.flush()
     return memberships
-
-
-# Short aliases for callers that describe the protocol by endpoint name.
-push = push_operations
-pull = pull_changes
-bootstrap = bootstrap_group

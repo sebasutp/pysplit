@@ -2,8 +2,9 @@ import { expect, Locator, Page } from '@playwright/test'
 
 /**
  * Generic UI primitives. These exist to absorb three recurring hazards in this
- * app: React hydration racing the first interaction, Radix rendering its
- * options/dialogs in a portal, and Intl emitting glyphs that vary by ICU build.
+ * app: React's first render and async data loads racing the first interaction,
+ * the custom Select rendering its options inline, and Intl emitting glyphs that
+ * vary by ICU build.
  */
 
 export function escapeRegExp(value: string): string {
@@ -12,8 +13,8 @@ export function escapeRegExp(value: string): string {
 
 /**
  * Formats an amount exactly as the app does -- see formatCurrency in
- * src/lib/utils.ts, which builds an Intl.NumberFormat with the group currency.
- * Never hardcode '$30.00' in a spec; call money(30).
+ * src/utils/currency.js, which builds an Intl.NumberFormat with the group
+ * currency. Never hardcode '$30.00' in a spec; call money(30).
  */
 export function money(
   amount: number,
@@ -28,18 +29,12 @@ export function money(
   }).format(amount)
 }
 
-/** Folds glyph variants (NBSP, narrow NBSP, U+2212 minus) to their ASCII form. */
-export function normalizeMoney(value: string): string {
-  return value.replace(/[  ]/g, ' ').replace(/−/g, '-').trim()
-}
-
 /**
- * Fills a react-hook-form input and proves the value stuck.
+ * Fills a controlled React input and proves the value stuck.
  *
- * Every form field here is controlled by RHF inside a client component that is
- * server-rendered with identical markup, so there is no visual signal for
- * "hydrated". A fill that lands too early is silently reverted to ''. Retrying
- * until the value survives is the only reliable approach.
+ * Form fields are plain useState-controlled inputs whose initial value can be
+ * replaced when the group/expense data finishes loading. A fill that lands too
+ * early is silently reverted, so retry until the value survives.
  */
 export async function fillStable(input: Locator, value: string): Promise<void> {
   await expect(async () => {
@@ -49,11 +44,12 @@ export async function fillStable(input: Locator, value: string): Promise<void> {
 }
 
 /**
- * Picks an option from a Radix Select.
+ * Picks an option from the custom Select (src/components/ui/Select.jsx).
  *
- * Options are portalled to document.body, and the trigger may not respond
- * before hydration. Re-opening on each attempt handles both. Pass a regex for
- * any label containing a non-ASCII glyph (the split modes use an en dash).
+ * The trigger is a role="combobox" button and the options render inline under
+ * role="option" only while the menu is open; the trigger may not respond until
+ * async data has loaded. Re-opening on each attempt handles both. Pass a regex
+ * for any label containing a non-ASCII glyph (the split modes use an en dash).
  */
 export async function selectRadixOption(
   page: Page,
@@ -69,9 +65,10 @@ export async function selectRadixOption(
 }
 
 /**
- * Sets a Radix Checkbox, which is a <button role="checkbox"> driven by
- * aria-checked rather than an <input>. Playwright's check() is more brittle
- * against it than simply reading state and clicking when it differs.
+ * Sets a participant checkbox: a native <input type="checkbox"> that also
+ * mirrors its state to aria-checked. Playwright's check() is more brittle
+ * against the React-controlled row than reading the attribute and clicking
+ * only when it differs.
  */
 export async function setChecked(
   checkbox: Locator,
@@ -96,10 +93,9 @@ export function cardByTitle(page: Page, title: string): Locator {
 }
 
 /**
- * The FormItem <div> wrapping the <label> with this exact text. Needed because
- * several Radix Select triggers in expense-form.tsx are not wrapped in
- * FormControl, so their FormLabel's htmlFor points at an element that does not
- * exist and getByLabel() cannot reach them.
+ * The field wrapper <div> around the <label> with this exact text, so a spec
+ * can scope a combobox (or another control) by its visible label regardless of
+ * the generated element ids.
  */
 export function fieldByLabel(page: Page, label: string): Locator {
   return page
@@ -108,7 +104,7 @@ export function fieldByLabel(page: Page, label: string): Locator {
     .locator('xpath=..')
 }
 
-/** Retries `action` until `settled` succeeds -- for clicks that precede hydration. */
+/** Retries `action` until `settled` succeeds -- for clicks that precede a route/render update. */
 export async function clickUntil(
   action: () => Promise<void>,
   settled: () => Promise<void>,

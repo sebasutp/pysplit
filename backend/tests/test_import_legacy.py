@@ -208,6 +208,19 @@ def test_import_preserves_legacy_ids_and_never_imports_sessions(imported):
         connection.close()
 
 
+def test_import_drops_legacy_provider_credentials(imported):
+    target, _ = imported
+    connection = sqlite3.connect(target)
+    try:
+        rows = connection.execute(
+            "SELECT refresh_token, access_token, id_token, session_state FROM accounts"
+        ).fetchall()
+    finally:
+        connection.close()
+    assert rows
+    assert all(row == (None, None, None, None) for row in rows)
+
+
 def test_import_preserves_timestamps_booleans_and_decimals(imported):
     target, _ = imported
     connection = sqlite3.connect(target)

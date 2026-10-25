@@ -12,7 +12,6 @@ from app.api.deps import (
     OptionalUser,
     SessionDep,
 )
-from app.api.errors import raise_service_error
 from app.schemas.groups import (
     GroupCreate,
     GroupDetails,
@@ -28,7 +27,6 @@ from app.schemas.groups import (
     UserGroupRead,
 )
 from app.services import groups as groups_service
-from app.services.errors import ServiceError
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -53,14 +51,11 @@ def sync_groups(
     user: OptionalUser,
     session: SessionDep,
 ) -> GroupSyncResponse:
-    try:
-        return groups_service.sync_groups(
-            session,
-            payload,
-            user_id=user.id if user else None,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.sync_groups(
+        session,
+        payload,
+        user_id=user.id if user else None,
+    )
 
 
 @router.get("", response_model=GroupList)
@@ -88,10 +83,7 @@ def create_group(
     user: GroupCreatorUser,
     session: SessionDep,
 ) -> GroupRead:
-    try:
-        return groups_service.create_group(session, payload, user_id=user.id)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.create_group(session, payload, user_id=user.id)
 
 
 @router.get("/{group_id}", response_model=GroupRead)
@@ -116,14 +108,11 @@ def get_group_details(
     user: OptionalUser,
     session: SessionDep,
 ) -> GroupDetails:
-    try:
-        return groups_service.get_group_details(
-            session,
-            group_id,
-            user_id=user.id if user else None,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.get_group_details(
+        session,
+        group_id,
+        user_id=user.id if user else None,
+    )
 
 
 @router.patch("/{group_id}", response_model=GroupRead)
@@ -132,10 +121,7 @@ def update_group(
     payload: GroupUpdate,
     session: SessionDep,
 ) -> GroupRead:
-    try:
-        return groups_service.update_group(session, group_id, payload)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.update_group(session, group_id, payload)
 
 
 @router.post("/{group_id}/access", status_code=status.HTTP_204_NO_CONTENT)
@@ -153,10 +139,7 @@ def list_participants(
     group_id: str,
     session: SessionDep,
 ) -> list[ParticipantRead]:
-    try:
-        return groups_service.list_participants(session, group_id)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.list_participants(session, group_id)
 
 
 @router.post(
@@ -169,10 +152,7 @@ def add_participant(
     payload: ParticipantCreate,
     session: SessionDep,
 ) -> ParticipantRead:
-    try:
-        return groups_service.add_participant(session, group_id, payload)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.add_participant(session, group_id, payload)
 
 
 @router.patch("/{group_id}/participants/{participant_id}", response_model=ParticipantRead)
@@ -182,10 +162,7 @@ def update_participant(
     payload: ParticipantUpdate,
     session: SessionDep,
 ) -> ParticipantRead:
-    try:
-        return groups_service.update_participant(session, group_id, participant_id, payload)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.update_participant(session, group_id, participant_id, payload)
 
 
 @router.delete(
@@ -197,10 +174,7 @@ def delete_participant(
     participant_id: str,
     session: SessionDep,
 ) -> Response:
-    try:
-        groups_service.delete_participant(session, group_id, participant_id)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    groups_service.delete_participant(session, group_id, participant_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -211,10 +185,7 @@ def update_membership(
     user: CurrentUser,
     session: SessionDep,
 ) -> UserGroupRead:
-    try:
-        return groups_service.set_membership(session, group_id, user.id, payload)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return groups_service.set_membership(session, group_id, user.id, payload)
 
 
 @router.delete("/{group_id}/membership", status_code=status.HTTP_204_NO_CONTENT)

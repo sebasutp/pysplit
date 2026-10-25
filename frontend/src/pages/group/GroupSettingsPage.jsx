@@ -1,22 +1,27 @@
 /** /groups/:groupId/edit */
 
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useGroupContext } from '../../components/groups/GroupLayout'
 import { GroupForm } from '../../components/groups/GroupForm'
-import { useGroup } from '../../hooks/useGroup'
 import { useToast } from '../../hooks/useToast'
 import { repository } from '../../services/repository'
 
 export function GroupSettingsPage() {
-  const { group: contextGroup, reloadGroup } = useGroupContext()
-  // Refresh details on mount: a participant may have joined an expense since
-  // the layout first loaded the group.
-  const { group: freshGroup, details, reload: reloadDetails } = useGroup(contextGroup.id)
-  const group = freshGroup || contextGroup
+  // The layout already loads the group and its details once per visit; reuse
+  // that data instead of issuing the same four requests again.
+  const { group, details, reloadGroup } = useGroupContext()
   const { t } = useTranslation()
   const { toast } = useToast()
   const locked = details?.participants_with_expenses || []
+
+  // Refresh once on mount: a participant may have joined an expense since the
+  // layout loaded, which changes the locked participant list. reloadGroup is a
+  // stable callback, so this cannot loop.
+  useEffect(() => {
+    void reloadGroup()
+  }, [reloadGroup])
 
   return (
     <section className="flex flex-col gap-4">
@@ -43,7 +48,8 @@ export function GroupSettingsPage() {
             description: t('Settings.savedDescription', 'Your changes have been saved.'),
           })
           void updated
-          await Promise.all([reloadGroup(), reloadDetails()])
+          // Refresh the shared group/details state after saving.
+          await reloadGroup()
         }}
       />
     </section>

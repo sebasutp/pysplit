@@ -2,7 +2,8 @@
 
 Self-hosted expense splitting app. The backend is FastAPI + SQLModel with
 SQLite; the frontend is React + Vite. This repository is a staged rewrite of
-the existing Spliit app; current routes are still placeholders.
+the existing Spliit app. The backend routes are implemented, and
+`docs/parity-matrix.yml` tracks their coverage against the reference app.
 
 ## Requirements
 
@@ -83,6 +84,9 @@ npm test -- --run
 
 # Frontend watch mode
 npm test
+
+# Frontend coverage with the enforced v8 thresholds
+npm run test:coverage
 ```
 
 Other useful commands:
@@ -92,10 +96,13 @@ make lint        # Ruff + oxlint, including format check
 make typecheck   # TypeScript checking for the JS frontend
 make build       # Production frontend build into frontend/dist
 make parity      # Check parity against the committed reference inventory
+make test-coverage  # Frontend coverage with enforced thresholds
 make clean       # Remove caches, coverage and build output
 ```
 
-These are the same checks CI runs (`.github/workflows/ci.yml`).
+CI (`.github/workflows/ci.yml`) runs these checks, the parity and architecture
+checks, and the Playwright end-to-end suite after starting the API and Vite dev
+server. Playwright is a separate CI job; `make test` does not run it.
 
 The parity check validates `docs/parity-matrix.yml` and uses the committed
 `docs/reference-manifest.txt` for the list of reference files. When the
@@ -115,9 +122,13 @@ Backend:
 
 ```bash
 cd backend
-cp .env.example .env          # optional; edit DATABASE_URL/CORS as needed
+cp ../.env.example .env       # canonical template; edit DATABASE_URL/CORS as needed
 PYTHONPATH=. .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
+
+The repository-root `.env.example` is the canonical template; `backend/.env.example`
+just points to it. For a backend-only run, copy it into `backend/.env` as shown
+above (the `VITE_*` keys are ignored by the API).
 
 Frontend:
 
@@ -139,9 +150,9 @@ backend/app/models/     SQLModel models
 backend/app/core/       settings and database setup
 backend/tests/          pytest suite
 frontend/src/           React app and the single HTTP client in services/api.js
-docs/                   API contract, decisions and stage reports
+docs/                   API contract, security model, decisions and stage reports
 dev                     development launcher for API + Vite
 ```
 
-Further reading: `docs/api.md`, `docs/repository-contract.md`, and the ADRs in
-`docs/adr/`.
+Further reading: `docs/api.md`, `docs/repository-contract.md`,
+`docs/security.md`, and the ADRs in `docs/adr/`.

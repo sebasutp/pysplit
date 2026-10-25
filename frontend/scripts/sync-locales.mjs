@@ -50,7 +50,7 @@ const base = JSON.parse(await readFile(join(source, 'en-US.json'), 'utf8'))
 await mkdir(target, { recursive: true })
 for (const file of files) {
   const messages = JSON.parse(await readFile(join(source, file), 'utf8'))
-  const merged = file === 'en-US.json' ? keepKnown(messages, base) : keepKnown(messages, base)
+  const merged = keepKnown(messages, base)
   await writeFile(join(target, file), `${JSON.stringify(merged, null, 2)}\n`)
 }
 

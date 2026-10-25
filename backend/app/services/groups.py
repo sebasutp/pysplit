@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-from typing import Any
-
 from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.core.enums import ActivityType
 from app.core.ids import new_id
 from app.models.activity import Activity
+from app.models.base import utc_now
 from app.models.expense import Expense
 from app.models.expense_paid_for import ExpensePaidFor
 from app.models.group import Group
@@ -31,24 +29,8 @@ from app.schemas.groups import (
     ParticipantUpdate,
     UserGroupRead,
 )
+from app.services.common import finish
 from app.services.errors import ConflictError, InvalidInputError, NotFoundError
-
-
-def utc_now() -> datetime:
-    return datetime.now(UTC)
-
-
-def _finish(session: Session, commit: bool) -> None:
-    """Commit normally, or flush when a caller owns the transaction.
-
-    The synchronization service applies each operation together with its
-    change-log row and idempotency record in one transaction, so it passes
-    ``commit=False``.
-    """
-    if commit:
-        session.commit()
-    else:
-        session.flush()
 
 
 def _participant_read(participant: Participant) -> ParticipantRead:
@@ -108,7 +90,6 @@ def group_to_read(
     *,
     user_id: str | None = None,
     membership: UserGroup | None = None,
-    participants_count: int | None = None,
 ) -> GroupRead:
     participants = get_participants(session, group.id)
     if membership is None and user_id is not None:
@@ -124,9 +105,7 @@ def group_to_read(
         version=group.version,
         deleted_at=group.deleted_at,
         participants=[_participant_read(participant) for participant in participants],
-        participants_count=participants_count
-        if participants_count is not None
-        else len(participants),
+        participants_count=len(participants),
         user_group=_membership_read(membership) if membership else None,
         is_starred=membership.is_starred if membership else False,
         is_archived=membership.is_archived if membership else False,
@@ -206,7 +185,7 @@ def create_group(
         if existing is not None and existing.deleted_at is None:
             if user_id is not None:
                 _ensure_membership(session, user_id, existing.id)
-                _finish(session, commit)
+                finish(session, commit)
             return group_to_read(session, existing, user_id=user_id)
         if existing is not None:
             raise ConflictError("group id is tombstoned")
@@ -245,7 +224,7 @@ def create_group(
     if user_id is not None:
         _ensure_membership(session, user_id, group.id)
 
-    _finish(session, commit)
+    finish(session, commit)
     if commit:
         session.refresh(group)
     return group_to_read(session, group, user_id=user_id)
@@ -349,12 +328,18 @@ def get_group_details(
         .where(Expense.group_id == group_id, Expense.deleted_at.is_(None))
         .order_by(Expense.expense_date.desc(), Expense.created_at.desc(), Expense.id.asc())
     ).all()
+    expense_ids = [expense.id for expense in expense_rows]
+    paid_for_by_expense: dict[str, list[str]] = {}
+    if expense_ids:
+        for expense_id, participant_id in session.exec(
+            select(ExpensePaidFor.expense_id, ExpensePaidFor.participant_id)
+            .where(ExpensePaidFor.expense_id.in_(expense_ids))
+            .order_by(ExpensePaidFor.participant_id.asc())
+        ).all():
+            paid_for_by_expense.setdefault(expense_id, []).append(participant_id)
     for expense in expense_rows:
         candidates = [expense.paid_by_id]
-        paid_for = session.exec(
-            select(ExpensePaidFor).where(ExpensePaidFor.expense_id == expense.id)
-        ).all()
-        candidates.extend(row.participant_id for row in paid_for)
+        candidates.extend(paid_for_by_expense.get(expense.id, []))
         for participant_id in candidates:
             if participant_id not in seen:
                 seen.add(participant_id)
@@ -439,7 +424,7 @@ def update_group(
             participant_id=payload.participant_id,
         )
     )
-    _finish(session, commit)
+    finish(session, commit)
     if commit:
         session.refresh(group)
     return group_to_read(session, group)
@@ -471,7 +456,7 @@ def add_participant(
     group.updated_at = now
     group.version += 1
     session.add(group)
-    _finish(session, commit)
+    finish(session, commit)
     if commit:
         session.refresh(participant)
     return _participant_read(participant)
@@ -506,7 +491,7 @@ def update_participant(
     group.version += 1
     session.add(participant)
     session.add(group)
-    _finish(session, commit)
+    finish(session, commit)
     if commit:
         session.refresh(participant)
     return _participant_read(participant)
@@ -528,11 +513,27 @@ def delete_participant(
     group.updated_at = now
     group.version += 1
     session.add(group)
-    _finish(session, commit)
+    finish(session, commit)
 
 
 def _sync_group_ids(payload: GroupSyncRequest) -> list[str]:
     return payload.group_ids or payload.local_group_ids
+
+
+def _sync_group_read(
+    session: Session,
+    group: Group,
+    *,
+    starred: bool,
+    archived: bool,
+) -> GroupRead:
+    item = group_to_read(session, group)
+    item.user_group = None
+    item.is_starred = starred
+    item.is_archived = archived
+    item.isStarred = starred
+    item.isArchived = archived
+    return item
 
 
 def sync_groups(
@@ -553,25 +554,14 @@ def sync_groups(
             else []
         )
         items = [
-            group_to_read(
+            _sync_group_read(
                 session,
                 group,
-                membership=UserGroup(
-                    user_id="",
-                    group_id=group.id,
-                    is_starred=group.id in payload.starred_group_ids,
-                    is_archived=group.id in payload.archived_group_ids,
-                    created_at=group.created_at,
-                ),
+                starred=group.id in payload.starred_group_ids,
+                archived=group.id in payload.archived_group_ids,
             )
             for group in groups
         ]
-        for item in items:
-            item.user_group = None
-            item.is_starred = item.id in payload.starred_group_ids
-            item.is_archived = item.id in payload.archived_group_ids
-            item.isStarred = item.is_starred
-            item.isArchived = item.is_archived
         return GroupSyncResponse(
             is_authenticated=False,
             groups=items,
@@ -658,8 +648,3 @@ def remove_membership(session: Session, group_id: str, user_id: str | None) -> N
     if membership is not None:
         session.delete(membership)
         session.commit()
-
-
-def group_payload_for_sync(group: GroupRead) -> dict[str, Any]:
-    """Small helper used by tests and future repository adapters."""
-    return group.model_dump(mode="json")

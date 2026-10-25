@@ -6,8 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, File, Form, Request, Response, UploadFile, status
 
-from app.api.deps import SessionDep, SettingsDep
-from app.api.errors import raise_service_error
+from app.api.deps import CurrentUser, SessionDep, SettingsDep
 from app.core.config import Settings
 from app.core.limits import enforce_ai_rate_limit, enforce_upload_rate_limit
 from app.schemas.receipts import (
@@ -30,8 +29,8 @@ from app.schemas.receipts import (
 from app.services import groups as groups_service
 from app.services import receipts as receipts_service
 from app.services import uploads as uploads_service
-from app.services.errors import ForbiddenError, ServiceError
-from app.storage import build_storage
+from app.services.errors import ForbiddenError
+from app.storage import get_storage
 
 router = APIRouter(prefix="/groups", tags=["receipts"])
 ai_router = APIRouter(prefix="/ai", tags=["ai"])
@@ -62,25 +61,19 @@ async def upload_receipt_image(
     height: Annotated[int, Form(ge=1)] = 1,
 ) -> ReceiptImageRead:
     enforce_upload_rate_limit(request, settings)
-    try:
-        _require_receipts(settings)
-        groups_service.get_active_group(session, group_id)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipts(settings)
+    groups_service.get_active_group(session, group_id)
 
     data = await file.read(settings.max_upload_bytes + 1)
-    try:
-        saved = uploads_service.save_receipt_image(
-            build_storage(settings),
-            settings,
-            group_id=group_id,
-            data=data,
-            content_type=file.content_type,
-            width=width,
-            height=height,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    saved = uploads_service.save_receipt_image(
+        get_storage(settings),
+        settings,
+        group_id=group_id,
+        data=data,
+        content_type=file.content_type,
+        width=width,
+        height=height,
+    )
     return ReceiptImageRead(
         url=str(saved["url"]),
         width=int(saved["width"]),
@@ -95,14 +88,13 @@ def get_receipt_image(
     session: SessionDep,
     settings: SettingsDep,
 ) -> Response:
-    try:
-        groups_service.get_active_group(session, group_id)
-        data, media_type, filename = uploads_service.find_receipt_image(
-            build_storage(settings),
-            image_id,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    groups_service.get_active_group(session, group_id)
+    data, media_type, filename = uploads_service.find_receipt_image(
+        get_storage(settings),
+        image_id,
+        group_id=group_id,
+        allow_legacy=uploads_service.receipt_image_owned_by_group(session, group_id, image_id),
+    )
     return Response(
         content=data,
         media_type=media_type,
@@ -120,17 +112,15 @@ def extract_total(
     request: Request,
     session: SessionDep,
     settings: SettingsDep,
+    _user: CurrentUser,
 ) -> ReceiptTotalExtraction:
     enforce_ai_rate_limit(request, settings)
-    try:
-        return receipts_service.extract_total(
-            session,
-            settings,
-            group_id=group_id,
-            image_url=payload.image_url,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return receipts_service.extract_total(
+        session,
+        settings,
+        group_id=group_id,
+        image_url=payload.image_url,
+    )
 
 
 @router.post(
@@ -143,19 +133,17 @@ def extract_items(
     request: Request,
     session: SessionDep,
     settings: SettingsDep,
+    _user: CurrentUser,
 ) -> ReceiptExtractionResult:
     enforce_ai_rate_limit(request, settings)
-    try:
-        return receipts_service.extract_items(
-            session,
-            settings,
-            group_id=group_id,
-            image_url=payload.image_url,
-            image_width=payload.image_width,
-            image_height=payload.image_height,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    return receipts_service.extract_items(
+        session,
+        settings,
+        group_id=group_id,
+        image_url=payload.image_url,
+        image_width=payload.image_width,
+        image_height=payload.image_height,
+    )
 
 
 @router.get("/{group_id}/receipts/{receipt_id}", response_model=ReceiptState)
@@ -165,15 +153,12 @@ def get_receipt(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.get_receipt_state(
-            session,
-            group_id,
-            receipt_id=receipt_id,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.get_receipt_state(
+        session,
+        group_id,
+        receipt_id=receipt_id,
+    )
 
 
 @router.get("/{group_id}/expenses/{expense_id}/receipt", response_model=ReceiptState)
@@ -183,15 +168,12 @@ def get_receipt_for_expense(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.get_receipt_state(
-            session,
-            group_id,
-            expense_id=expense_id,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.get_receipt_state(
+        session,
+        group_id,
+        expense_id=expense_id,
+    )
 
 
 @router.post(
@@ -206,11 +188,8 @@ def add_receipt_item(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.add_item(session, group_id, receipt_id, payload, settings=settings)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.add_item(session, group_id, receipt_id, payload, settings=settings)
 
 
 @router.patch(
@@ -225,18 +204,15 @@ def update_receipt_item(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.update_item(
-            session,
-            group_id,
-            receipt_id,
-            item_id,
-            payload,
-            settings=settings,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.update_item(
+        session,
+        group_id,
+        receipt_id,
+        item_id,
+        payload,
+        settings=settings,
+    )
 
 
 @router.delete(
@@ -250,11 +226,8 @@ def delete_receipt_item(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.delete_item(session, group_id, receipt_id, item_id)
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.delete_item(session, group_id, receipt_id, item_id)
 
 
 @router.put(
@@ -269,18 +242,15 @@ def set_receipt_item_portions(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.set_item_portions(
-            session,
-            group_id,
-            receipt_id,
-            item_id,
-            payload.portions,
-            settings=settings,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.set_item_portions(
+        session,
+        group_id,
+        receipt_id,
+        item_id,
+        payload.portions,
+        settings=settings,
+    )
 
 
 @router.put(
@@ -295,17 +265,14 @@ def set_receipt_opt_out(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptState:
-    try:
-        _require_receipt_items(settings)
-        return receipts_service.set_opt_out(
-            session,
-            group_id,
-            receipt_id,
-            participant_id,
-            payload.opted_out,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    return receipts_service.set_opt_out(
+        session,
+        group_id,
+        receipt_id,
+        participant_id,
+        payload.opted_out,
+    )
 
 
 @router.post(
@@ -319,17 +286,14 @@ def apply_receipt(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptApplyResult:
-    try:
-        _require_receipt_items(settings)
-        receipt, expense, _split = receipts_service.apply_receipt_to_expense(
-            session,
-            group_id,
-            receipt_id,
-            payload.expense_id,
-            participant_id=payload.participant_id,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    receipt, expense, _split = receipts_service.apply_receipt_to_expense(
+        session,
+        group_id,
+        receipt_id,
+        payload.expense_id,
+        participant_id=payload.participant_id,
+    )
     state = receipts_service.receipt_state(session, group_id, receipt)
     return ReceiptApplyResult(
         receipt=state.receipt,
@@ -349,17 +313,14 @@ def link_receipt(
     session: SessionDep,
     settings: SettingsDep,
 ) -> ReceiptRead:
-    try:
-        _require_receipt_items(settings)
-        receipt = receipts_service.link_receipt_to_expense(
-            session,
-            group_id,
-            receipt_id,
-            payload.expense_id,
-        )
-        return receipts_service.receipt_state(session, group_id, receipt).receipt
-    except ServiceError as exc:
-        raise_service_error(exc)
+    _require_receipt_items(settings)
+    receipt = receipts_service.link_receipt_to_expense(
+        session,
+        group_id,
+        receipt_id,
+        payload.expense_id,
+    )
+    return receipts_service.receipt_state(session, group_id, receipt).receipt
 
 
 @ai_router.post(
@@ -371,14 +332,12 @@ def infer_category(
     request: Request,
     session: SessionDep,
     settings: SettingsDep,
+    _user: CurrentUser,
 ) -> CategoryInferenceResponse:
     enforce_ai_rate_limit(request, settings)
-    try:
-        category_id = receipts_service.infer_category(
-            session,
-            settings,
-            title=payload.title,
-        )
-    except ServiceError as exc:
-        raise_service_error(exc)
+    category_id = receipts_service.infer_category(
+        session,
+        settings,
+        title=payload.title,
+    )
     return CategoryInferenceResponse(category_id=category_id)

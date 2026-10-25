@@ -15,10 +15,9 @@ from app.formats.exports import (
     json_filename,
 )
 from app.models.activity import Activity
-from app.models.group import Group
 from app.models.participant import Participant
 from app.schemas.common import iso_z
-from app.services.errors import NotFoundError
+from app.services.common import require_group
 from app.services.expenses import group_expense_snapshot
 from app.utils.dates import datetime_to_date
 from app.utils.totals import filter_expenses_by_date_range
@@ -30,13 +29,6 @@ class ExportFile:
     media_type: str
     filename: str
     disposition: str
-
-
-def _require_group(session: Session, group_id: str) -> Group:
-    group = session.get(Group, group_id)
-    if group is None or group.deleted_at is not None:
-        raise NotFoundError("group not found")
-    return group
 
 
 def _participants(session: Session, group_id: str) -> list[Participant]:
@@ -69,7 +61,7 @@ def csv_export(
     date_to: date | None = None,
     today: date | None = None,
 ) -> ExportFile:
-    group = _require_group(session, group_id)
+    group = require_group(session, group_id)
     participants = _participants(session, group_id)
     expenses = _filtered_expenses(session, group_id, date_from, date_to)
     payload = {
@@ -132,7 +124,7 @@ def json_export(
     date_to: date | None = None,
     today: date | None = None,
 ) -> ExportFile:
-    group = _require_group(session, group_id)
+    group = require_group(session, group_id)
     participants = _participants(session, group_id)
     expenses = _filtered_expenses(session, group_id, date_from, date_to)
     activities = session.exec(

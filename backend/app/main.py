@@ -6,8 +6,11 @@ only. Business logic lives in ``services`` and HTTP handlers live in ``api``.
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api import (
     activities,
@@ -23,7 +26,19 @@ from app.api import (
     stats,
     sync,
 )
+from app.api.errors import service_error
 from app.core.config import get_settings
+from app.services.errors import ServiceError
+from app.storage import close_storage
+
+
+@asynccontextmanager
+async def _lifespan(_app: FastAPI):
+    """Release the process-wide blob client on shutdown."""
+    try:
+        yield
+    finally:
+        close_storage()
 
 
 def create_app() -> FastAPI:
@@ -35,7 +50,13 @@ def create_app() -> FastAPI:
         debug=settings.debug,
         docs_url="/api/docs",
         openapi_url="/api/openapi.json",
+        lifespan=_lifespan,
     )
+
+    @app.exception_handler(ServiceError)
+    async def _service_error_handler(_request: Request, exc: ServiceError) -> JSONResponse:
+        http_exc = service_error(exc)
+        return JSONResponse(status_code=http_exc.status_code, content={"detail": http_exc.detail})
 
     app.add_middleware(
         CORSMiddleware,

@@ -1,12 +1,13 @@
 /** Create-group form, validated with zod at the UI boundary. */
 
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 
 import { repository } from '../../services/repository'
-import { saveRecentGroup, setPendingActiveUser } from '../../utils/recent-groups'
+import { CURRENCY_SYMBOLS } from '../../utils/currency'
+import { saveRecentGroup, setActiveUser } from '../../utils/recent-groups'
 import { ErrorState } from '../common/States'
 import { Button } from '../ui/Button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card'
@@ -42,19 +43,60 @@ export const groupFormSchema = z
 
 /** @typedef {z.infer<typeof groupFormSchema>} GroupFormValues */
 
-const CURRENCY_SYMBOLS = /** @type {Record<string, string>} */ ({
-  USD: '$',
-  EUR: '€',
-  GBP: '£',
-  JPY: '¥',
-  CNY: '¥',
-  INR: '₹',
-  BRL: 'R$',
-})
-
 /** @param {string} code @returns {string} */
 function symbolForCode(code) {
   return CURRENCY_SYMBOLS[code] || code
+}
+
+/**
+ * Values shown in the form for a (possibly freshly fetched) group.
+ *
+ * @param {any} initial
+ * @param {string} defaultCurrencyCode
+ * @param {(key: string, fallback: string) => string} t
+ * @returns {GroupFormValues}
+ */
+function valuesFromInitial(initial, defaultCurrencyCode, t) {
+  return {
+    name: initial?.name || '',
+    information: initial?.information || '',
+    currency: initial?.currency || symbolForCode(initial?.currency_code || initial?.currencyCode || defaultCurrencyCode),
+    currencyCode: initial?.currency_code || initial?.currencyCode || defaultCurrencyCode,
+    participants:
+      initial?.participants?.length
+        ? initial.participants.map((/** @type {any} */ participant) => ({
+            id: participant.id,
+            name: participant.name,
+          }))
+        : [
+            { name: t('GroupForm.Participants.John', 'John') },
+            { name: t('GroupForm.Participants.Jane', 'Jane') },
+            { name: t('GroupForm.Participants.Jack', 'Jack') },
+          ],
+  }
+}
+
+/**
+ * Stable signature of the fields the form initialises from. A parent may pass
+ * a fresh object on every render (GroupSettingsPage does); only an actual
+ * change in the underlying data should reset the form.
+ *
+ * @param {any} initial
+ * @returns {string}
+ */
+function initialFingerprint(initial) {
+  if (!initial) return ''
+  return JSON.stringify([
+    initial.id ?? '',
+    initial.name ?? '',
+    initial.information ?? '',
+    initial.currency ?? '',
+    initial.currency_code ?? initial.currencyCode ?? '',
+    (initial.participants || []).map((/** @type {any} */ participant) => [
+      participant.id ?? '',
+      participant.name ?? '',
+    ]),
+  ])
 }
 
 const ERROR_LABELS = /** @type {Record<string, string>} */ ({
@@ -84,26 +126,25 @@ export function GroupForm({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [values, setValues] = useState(/** @type {GroupFormValues} */ ({
-    name: initial?.name || '',
-    information: initial?.information || '',
-    currency: initial?.currency || symbolForCode(initial?.currency_code || initial?.currencyCode || defaultCurrencyCode),
-    currencyCode: initial?.currency_code || initial?.currencyCode || defaultCurrencyCode,
-    participants:
-      initial?.participants?.length
-        ? initial.participants.map((/** @type {any} */ participant) => ({
-            id: participant.id,
-            name: participant.name,
-          }))
-        : [
-            { name: t('GroupForm.Participants.John', 'John') },
-            { name: t('GroupForm.Participants.Jane', 'Jane') },
-            { name: t('GroupForm.Participants.Jack', 'Jack') },
-          ],
-  }))
+  const fingerprint = useMemo(() => initialFingerprint(initial), [initial])
+  const [values, setValues] = useState(
+    /** @type {GroupFormValues} */ (valuesFromInitial(initial, defaultCurrencyCode, t)),
+  )
+  const appliedFingerprint = useRef(fingerprint)
   const [errors, setErrors] = useState(/** @type {Record<string, string>} */ ({}))
   const [pending, setPending] = useState(false)
   const [submitError, setSubmitError] = useState('')
+
+  // GroupSettingsPage fetches fresher details after mount. Re-seed the form
+  // only when those details genuinely change, so in-progress edits survive
+  // unrelated parent renders.
+  useEffect(() => {
+    if (appliedFingerprint.current === fingerprint) return
+    appliedFingerprint.current = fingerprint
+    setValues(valuesFromInitial(initial, defaultCurrencyCode, t))
+    setErrors({})
+    setSubmitError('')
+  }, [fingerprint, initial, defaultCurrencyCode, t])
 
   /** @param {string} field @param {string} value */
   function update(field, value) {
@@ -344,7 +385,10 @@ export function CreateGroup({ defaultCurrencyCode = 'USD' }) {
           })),
         })
         saveRecentGroup({ id: group.id, name: group.name })
-        setPendingActiveUser(null)
+        // A freshly created group has no active participant yet. Record that
+        // answer explicitly so the "Who are you?" dialog does not open on the
+        // new group (the reference stores `None` after creation too).
+        setActiveUser(group.id, null)
         navigate(`/groups/${group.id}`)
       }}
     />

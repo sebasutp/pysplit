@@ -121,8 +121,7 @@ auth.me({ signal })                       // → User | null
 auth.refresh({ signal })                  // → { access_token, user } | null
 auth.logout({ signal })                   // → void
 auth.startOAuth(provider, returnTo)       // → void (browser redirect)
-auth.isAuthenticated()                    // → boolean, synchronous, memory only
-auth.onChange(listener)                   // → unsubscribe
+auth.providers()                          // → { google, github }, cached discovery
 ```
 
 `me` never throws `unauthorized`; it returns `null`. `refresh` returns `null`
@@ -141,7 +140,8 @@ groups.removeMembership(groupId, { signal }) // → void
 groups.recordAccess(groupId, { signal })  // → void (debounced by caller)
 groups.setStarred(groupId, value, { signal })   // → Membership
 groups.setArchived(groupId, value, { signal })  // → Membership
-groups.sync({ groupIds, signal })         // → { groups, user_groups }
+groups.sync({ groupIds, signal })         // → { groups, user_groups, is_authenticated }
+                                          //   sends only { group_ids: [...] }
 ```
 
 `status` is `'recent' | 'starred' | 'archived' | 'all'`; the local repository
@@ -293,18 +293,16 @@ exports.json(groupId, { from, to, signal })  // → { filename, content }
 Exports work offline from local data using the same formatting rules; the
 server returns byte-identical content for the same data.
 
-## 13. Synchronization
+## 13. Synchronization boundary
 
-```js
-sync.status()                          // → { online, syncing, pending, last_error }
-sync.now({ signal })                   // → { pushed, pulled, cursor }
-sync.onStatus(listener)                // → unsubscribe
-sync.conflicts.list({ group_id?, signal }) // → Conflict[]
-sync.conflicts.resolve(conflictId, resolution) // 'keep_mine'|'use_server'|'duplicate'
-```
+The repository exposes one synchronization entry point, `groups.sync` (see
+§3). It sends only `{ group_ids }` on the wire and returns
+`{ groups, user_groups, is_authenticated }`.
 
-These are repository services, not UI data reads. The online implementation
-returns an empty/online status and no conflicts.
+Runtime sync status, manual sync triggers and the conflict queue belong to the
+offline sync engine behind the local repository; they are not methods on the
+repository contract. Components observe pending work through the entity
+`pending` flag and offline behavior through `RepositoryError` codes.
 
 ## 14. Runtime features and administration
 

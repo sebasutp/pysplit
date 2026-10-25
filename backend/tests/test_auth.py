@@ -29,7 +29,11 @@ from app.models.account import Account
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 from app.services import auth as auth_service
-from app.services.errors import InvalidRefreshTokenError, RefreshTokenReuseError
+from app.services.errors import (
+    ForbiddenError,
+    InvalidRefreshTokenError,
+    RefreshTokenReuseError,
+)
 from tests.helpers import access_headers, csrf_headers, make_user, mock_login
 
 
@@ -268,6 +272,78 @@ def test_logout_revokes_refresh_token(client: TestClient) -> None:
     assert retry.status_code == 401
 
 
+def test_logout_revokes_rotated_token_family(client: TestClient, session) -> None:
+    user = _login(client, email="family@example.com")
+    original = client.cookies.get("pysplit_refresh")
+    assert original
+
+    assert client.post("/api/auth/refresh", headers=csrf_headers(client)).status_code == 200
+    assert client.post("/api/auth/refresh", headers=csrf_headers(client)).status_code == 200
+    csrf = client.cookies.get("pysplit_csrf")
+    assert csrf
+
+    other_user = make_user(session, email="other-family@example.com")
+    other_issued = auth_service.issue_session(
+        session,
+        other_user,
+        settings=Settings(_env_file=None),
+    )
+
+    client.cookies.clear()
+    response = client.post(
+        "/api/auth/logout",
+        headers={
+            "Origin": "http://testserver",
+            "X-CSRF-Token": csrf,
+            "Cookie": f"pysplit_refresh={original}; pysplit_csrf={csrf}",
+        },
+    )
+    assert response.status_code == 204
+
+    session.expire_all()
+    family = session.exec(select(RefreshToken).where(RefreshToken.user_id == user["id"])).all()
+    assert len(family) == 3
+    assert all(record.revoked_at is not None for record in family)
+
+    other_record = session.exec(
+        select(RefreshToken).where(
+            RefreshToken.token_hash == hash_refresh_token(other_issued.refresh_token)
+        )
+    ).one()
+    assert other_record.revoked_at is None
+
+
+def test_spoofed_forwarded_headers_do_not_widen_origin(client: TestClient) -> None:
+    _login(client)
+    csrf = client.cookies.get("pysplit_csrf")
+    response = client.post(
+        "/api/auth/logout",
+        headers={
+            "Origin": "http://evil.example",
+            "X-CSRF-Token": csrf,
+            "X-Forwarded-Host": "evil.example",
+            "X-Forwarded-Proto": "http",
+        },
+    )
+    assert response.status_code == 403
+
+
+def test_trusted_forwarded_headers_set_origin(make_client) -> None:
+    client = make_client(enable_mock_login=True, trust_forwarded_headers=True)
+    _login(client)
+    csrf = client.cookies.get("pysplit_csrf")
+    response = client.post(
+        "/api/auth/logout",
+        headers={
+            "Origin": "https://proxy.example",
+            "X-CSRF-Token": csrf,
+            "X-Forwarded-Host": "proxy.example",
+            "X-Forwarded-Proto": "https",
+        },
+    )
+    assert response.status_code == 204
+
+
 def test_refresh_cookie_is_scoped_and_httponly(client: TestClient) -> None:
     response = mock_login(client, email="cookie@example.com")
     cookies = response.headers.get_list("set-cookie")
@@ -424,6 +500,7 @@ def test_oauth_callback_creates_user_and_session(
             name="Grace Hopper",
             email="Grace@Example.com",
             image="https://example.com/grace.png",
+            email_verified=True,
         ),
     )
 
@@ -529,6 +606,7 @@ def test_oauth_callback_links_existing_email(
             name="Ada Lovelace",
             email="Ada@Example.com",
             image=None,
+            email_verified=True,
         ),
     )
 
@@ -545,6 +623,103 @@ def test_oauth_callback_links_existing_email(
     assert account.user_id == existing.id
 
 
+def test_oauth_callback_rejects_unverified_google_email(
+    make_client, session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    existing = make_user(session, email="victim@example.com")
+    client = _google_client(make_client)
+    client.get("/api/auth/oauth/google/start", follow_redirects=False)
+    state = client.cookies.get("pysplit_oauth_state")
+    _stub_exchange(
+        monkeypatch,
+        OAuthProfile(
+            provider="google",
+            provider_account_id="google-victim",
+            name="Mallory",
+            email="victim@example.com",
+            image=None,
+            email_verified=False,
+        ),
+    )
+
+    response = client.get(
+        f"/api/auth/oauth/google/callback?code=code&state={state}",
+        follow_redirects=False,
+    )
+    assert response.status_code == 403
+
+    session.expire_all()
+    assert session.exec(select(User)).all() == [existing]
+    assert session.exec(select(Account)).first() is None
+    assert client.cookies.get("pysplit_refresh") is None
+
+
+def test_upsert_oauth_rejects_unverified_google_email(session) -> None:
+    existing = make_user(session, email="google-victim@example.com")
+    profile = OAuthProfile(
+        provider="google",
+        provider_account_id="google-new",
+        name="Mallory",
+        email="google-victim@example.com",
+        image=None,
+        email_verified=False,
+    )
+    with pytest.raises(ForbiddenError):
+        auth_service.upsert_oauth_user(session, profile)
+
+    session.expire_all()
+    assert session.exec(select(User)).all() == [existing]
+    assert session.exec(select(Account)).first() is None
+
+
+def test_upsert_oauth_rejects_unverified_github_email(session) -> None:
+    existing = make_user(session, email="github-victim@example.com")
+    profile = OAuthProfile(
+        provider="github",
+        provider_account_id="github-new",
+        name="Mallory",
+        email="github-victim@example.com",
+        image=None,
+        email_verified=False,
+    )
+    with pytest.raises(ForbiddenError):
+        auth_service.upsert_oauth_user(session, profile)
+
+    session.expire_all()
+    assert session.exec(select(User)).all() == [existing]
+    assert session.exec(select(Account)).first() is None
+
+
+def test_upsert_oauth_existing_account_links_regardless_of_email_verification(session) -> None:
+    user = make_user(session, email="linked@example.com", name="Original")
+    session.add(
+        Account(
+            id="acc_linked",
+            user_id=user.id,
+            type="oauth",
+            provider="google",
+            provider_account_id="google-linked",
+        )
+    )
+    session.commit()
+
+    profile = OAuthProfile(
+        provider="google",
+        provider_account_id="google-linked",
+        name="Updated",
+        email="attacker@example.com",
+        image=None,
+        email_verified=False,
+    )
+    resolved = auth_service.upsert_oauth_user(session, profile)
+
+    assert resolved.id == user.id
+    session.expire_all()
+    assert session.exec(select(User)).all()[0].name == "Updated"
+    account = session.exec(select(Account)).one()
+    assert account.user_id == user.id
+
+
 def test_oauth_exchange_google_with_mock_transport() -> None:
     settings = Settings(auth_google_id="id", auth_google_secret="secret", _env_file=None)
 
@@ -558,6 +733,7 @@ def test_oauth_exchange_google_with_mock_transport() -> None:
                     "sub": "123",
                     "name": "Ada",
                     "email": "ada@example.com",
+                    "email_verified": True,
                     "picture": "https://example.com/a.png",
                 },
             )
@@ -580,6 +756,7 @@ def test_oauth_exchange_google_with_mock_transport() -> None:
         name="Ada",
         email="ada@example.com",
         image="https://example.com/a.png",
+        email_verified=True,
     )
 
 
@@ -604,8 +781,8 @@ def test_oauth_exchange_github_falls_back_to_primary_email() -> None:
             return httpx.Response(
                 200,
                 json=[
-                    {"email": "secondary@example.com", "primary": False},
-                    {"email": "primary@example.com", "primary": True},
+                    {"email": "secondary@example.com", "primary": False, "verified": True},
+                    {"email": "primary@example.com", "primary": True, "verified": True},
                 ],
             )
         return httpx.Response(404)
@@ -625,6 +802,53 @@ def test_oauth_exchange_github_falls_back_to_primary_email() -> None:
     assert profile.provider_account_id == "42"
     assert profile.name == "octocat"
     assert profile.email == "primary@example.com"
+    assert profile.email_verified is True
+
+
+def test_oauth_exchange_github_ignores_unverified_emails() -> None:
+    settings = Settings(auth_github_id="id", auth_github_secret="secret", _env_file=None)
+    requested: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requested.append(str(request.url))
+        if str(request.url) == oauth.GITHUB_TOKEN_URL:
+            return httpx.Response(200, json={"access_token": "access"})
+        if str(request.url) == oauth.GITHUB_USER_URL:
+            return httpx.Response(
+                200,
+                json={
+                    "id": 43,
+                    "login": "octocat",
+                    "name": "Octo",
+                    "email": "public@example.com",
+                    "avatar_url": None,
+                },
+            )
+        if str(request.url) == oauth.GITHUB_EMAILS_URL:
+            return httpx.Response(
+                200,
+                json=[
+                    {"email": "primary@example.com", "primary": True, "verified": False},
+                    {"email": "secondary@example.com", "primary": False, "verified": True},
+                ],
+            )
+        return httpx.Response(404)
+
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await oauth.exchange_oauth_code(
+                "github",
+                code="code",
+                redirect_uri="http://testserver/api/auth/oauth/github/callback",
+                settings=settings,
+                client=client,
+            )
+
+    profile = asyncio.run(run())
+    assert profile is not None
+    assert profile.email is None
+    assert profile.email_verified is None
+    assert oauth.GITHUB_EMAILS_URL in requested
 
 
 # ---------------------------------------------------------------------------
@@ -632,10 +856,25 @@ def test_oauth_exchange_github_falls_back_to_primary_email() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_mock_login_dev_only(make_client) -> None:
+def test_mock_login_disabled_by_default(make_client) -> None:
+    client = make_client(enable_mock_login=False)
+    response = mock_login(client, email="disabled@example.com")
+    assert response.status_code == 404
+
+
+def test_mock_login_enabled(make_client) -> None:
+    client = make_client(enable_mock_login=True)
+    response = mock_login(client, email="enabled@example.com")
+    assert response.status_code == 200
+    assert response.json()["user"]["email"] == "enabled@example.com"
+
+
+def test_mock_login_disabled_in_production(make_client) -> None:
     production = make_client(
         environment="production",
         jwt_secret="a" * 40,
+        base_url="https://app.example.com",
+        enable_mock_login=True,
     )
     response = mock_login(production, email="prod@example.com")
     assert response.status_code == 404
@@ -660,6 +899,7 @@ def test_auth_account_rate_limit(make_client) -> None:
         auth_rate_limit_per_minute=100,
         auth_account_rate_limit_per_minute=2,
         auth_rate_limit_window_seconds=60,
+        enable_mock_login=True,
     )
     assert mock_login(client, email="limited@example.com").status_code == 200
     for _ in range(2):

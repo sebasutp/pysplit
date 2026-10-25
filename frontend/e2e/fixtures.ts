@@ -14,8 +14,9 @@ import { test as base, expect } from '@playwright/test'
  *    tests depend on hidden state.
  *
  * 2. The locale. Assertions are English literals and amounts are formatted by
- *    Intl, so both the app locale (NEXT_LOCALE cookie, which outranks
- *    Accept-Language in src/lib/locale.ts) and the browser locale are pinned.
+ *    Intl, so both the app locale (localStorage `pysplit-locale`, then the
+ *    NEXT_LOCALE cookie, then the browser language -- see
+ *    src/services/i18n.js) and the browser locale are pinned.
  */
 type Options = {
   /**

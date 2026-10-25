@@ -145,10 +145,6 @@ class GroupDetails(BaseModel):
     participantsWithExpenses: list[str] = Field(default_factory=list)
 
 
-class GroupAccessResponse(BaseModel):
-    success: bool = True
-
-
 class MembershipUpdate(BaseModel):
     is_starred: bool | None = Field(
         default=None,

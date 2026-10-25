@@ -45,14 +45,18 @@ export function useGlobalBalance(groups) {
     setLoading(true)
     repository.balances
       .forUser(entries, { signal: controller.signal })
-      .then((items) => setBalances(items))
+      .then((items) => {
+        if (!controller.signal.aborted) setBalances(items)
+      })
       .catch((error) => {
         if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
           return
         }
-        setBalances([])
+        if (!controller.signal.aborted) setBalances([])
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
     return () => controller.abort()
   }, [entries])
 

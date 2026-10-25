@@ -45,17 +45,33 @@ export function useStats(groupId, options = {}) {
 
 /**
  * @param {string} groupId
- * @param {{kind: 'category', categoryId: number}|{kind: 'month', month: string}} target
+ * @param {{kind: 'category', categoryId: number}|{kind: 'month', month: string}|null} target
  * @param {{from?: string|null, to?: string|null}} [range]
  */
 export function useDrilldown(groupId, target, range = {}) {
   const [expenses, setExpenses] = useState(/** @type {any[]} */ ([]))
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(/** @type {any} */ (null))
+  const targetKind = target?.kind ?? null
+  const targetKey =
+    target?.kind === 'category'
+      ? target.categoryId
+      : target?.kind === 'month'
+        ? target.month
+        : null
 
   useEffect(() => {
+    if (!groupId || !target) {
+      setExpenses([])
+      setLoading(false)
+      setError(null)
+      return undefined
+    }
     const controller = new AbortController()
+    // Clear the previous selection before the new request resolves.
+    setExpenses([])
     setLoading(true)
+    setError(null)
     const request =
       target.kind === 'category'
         ? repository.stats.categoryExpenses(
@@ -71,23 +87,19 @@ export function useDrilldown(groupId, target, range = {}) {
             { signal: controller.signal },
           )
     request
-      .then((payload) => setExpenses(payload?.expenses || []))
+      .then((payload) => {
+        if (!controller.signal.aborted) setExpenses(payload?.expenses || [])
+      })
       .catch((caught) => {
         if (caught && typeof caught === 'object' && caught.code === 'aborted') return
-        setError(caught)
+        if (!controller.signal.aborted) setError(caught)
       })
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false)
       })
     return () => controller.abort()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    groupId,
-    target.kind,
-    target.kind === 'category' ? target.categoryId : target.month,
-    range.from,
-    range.to,
-  ])
+  }, [groupId, targetKind, targetKey, range.from, range.to])
 
   return { expenses, loading, error }
 }

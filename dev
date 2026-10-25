@@ -81,6 +81,9 @@ export VITE_API_PROXY_TARGET="${VITE_API_PROXY_TARGET:-http://$API_BIND_HOST:$AP
 # The browser talks to Vite, so OAuth redirect URIs and CSRF origin checks must
 # use the public web origin rather than the internal API address.
 export BASE_URL="${BASE_URL:-http://$WEB_HOST:$WEB_PORT}"
+# Passwordless login is used by local development and the Playwright suite. It
+# is opt-in in the application and always disabled in production.
+export ENABLE_MOCK_LOGIN="${ENABLE_MOCK_LOGIN:-true}"
 # Local development defaults to the Stage 8D online features. Production keeps
 # the opt-in defaults from .env.example.
 export ENABLE_RECEIPT_EXTRACT="${ENABLE_RECEIPT_EXTRACT:-true}"

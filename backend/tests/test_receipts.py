@@ -10,8 +10,10 @@ from sqlmodel import Session, select
 from app.core.config import Settings
 from app.models.receipt import Receipt
 from app.models.receipt_item import ReceiptItem
+from app.schemas.receipts import ReceiptItemCreate
 from app.services import receipts as receipts_service
 from app.services import uploads as uploads_service
+from app.services.errors import ConflictError, InvalidInputError
 from app.storage import LocalBlobStorage, S3BlobStorage, build_storage
 from app.utils.receipt_split import (
     compute_receipt_split,
@@ -310,6 +312,62 @@ def test_claim_receipt_once(session: Session):
     assert results == [True, False, False, False]
 
 
+def test_claim_attempts_are_capped(session: Session):
+    group, _people = make_group(session)
+    settings = _settings(receipt_max_attempts=2)
+    receipt = receipts_service.create_pending_receipt(
+        session,
+        group_id=group.id,
+        image_url="https://uploads.example.com/attempts.png",
+    )
+
+    assert receipts_service.claim_receipt_for_extraction(session, receipt.id, settings=settings)
+    session.refresh(receipt)
+    assert receipt.attempts == 1
+
+    receipts_service.fail_receipt(
+        session,
+        receipt.id,
+        raw_extraction=None,
+        provider=None,
+        model=None,
+    )
+    # A failed receipt may be retried while the budget remains.
+    assert receipts_service.claim_receipt_for_extraction(session, receipt.id, settings=settings)
+    session.refresh(receipt)
+    assert receipt.attempts == 2
+
+    receipts_service.fail_receipt(
+        session,
+        receipt.id,
+        raw_extraction=None,
+        provider=None,
+        model=None,
+    )
+    with pytest.raises(ConflictError, match="exhausted"):
+        receipts_service.claim_receipt_for_extraction(session, receipt.id, settings=settings)
+    session.refresh(receipt)
+    assert receipt.attempts == 2
+
+
+def test_manual_item_add_respects_configured_cap(session: Session):
+    group, _people = make_group(session)
+    receipt = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Existing", "quantity_milli": 1000, "amount": 100}],
+    )
+
+    with pytest.raises(InvalidInputError, match="too many items"):
+        receipts_service.add_item(
+            session,
+            group.id,
+            receipt.id,
+            ReceiptItemCreate(name="Extra", quantity_milli=1000, amount=100),
+            settings=_settings(max_receipt_items=1),
+        )
+
+
 def test_concurrent_claim_calls_only_one_model(tmp_path):
     import threading
 
@@ -359,6 +417,22 @@ def test_concurrent_claim_calls_only_one_model(tmp_path):
         assert stored is not None
         assert stored.status == "EXTRACTING"
     engine.dispose()
+
+
+def test_receipt_read_never_exposes_provider_url(make_client, session: Session):
+    client = make_client(enable_receipt_items=True)
+    group, _people = make_group(session)
+    receipt = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Pizza", "quantity_milli": 1000, "amount": 100}],
+    )
+    receipt.provider = "https://internal-ai.example.com/v1"
+    session.add(receipt)
+    session.commit()
+
+    body = client.get(f"/api/groups/{group.id}/receipts/{receipt.id}").json()
+    assert body["receipt"]["provider"] == "openai-compatible"
 
 
 def test_get_receipt_split(make_client, session: Session):
@@ -627,7 +701,7 @@ def test_upload_receipt_image(make_client, session, tmp_path):
     assert body["width"] == 800
     assert body["height"] == 600
     assert body["url"].startswith(f"/api/groups/{group.id}/receipts/images/")
-    assert list((tmp_path / "receipts").glob("*.png"))
+    assert list((tmp_path / "receipts").rglob("*.png"))
 
     image = client.get(body["url"])
     assert image.status_code == 200
@@ -660,7 +734,7 @@ def test_upload_receipt_image(make_client, session, tmp_path):
 
 
 def test_document_upload(make_client, session, tmp_path):
-    client = make_client(upload_dir=str(tmp_path))
+    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
     group, people = make_group(session)
     expense = make_expense(
         session,
@@ -681,6 +755,120 @@ def test_document_upload(make_client, session, tmp_path):
     )
     assert download.status_code == 200
     assert download.content.startswith(b"\x89PNG")
+
+
+def test_receipt_image_reads_are_scoped_to_group(make_client, session, tmp_path):
+    client = make_client(enable_receipt_extract=True, upload_dir=str(tmp_path))
+    group, _people = make_group(session)
+    other, _other_people = make_group(session, name="Other")
+
+    upload = client.post(
+        f"/api/groups/{group.id}/receipts/upload",
+        files={"file": ("receipt.png", b"\x89PNG\r\n\x1a\nexample", "image/png")},
+    )
+    assert upload.status_code == 201, upload.text
+    image_id = upload.json()["url"].rsplit("/", 1)[-1]
+
+    # The owning group can read it.
+    same = client.get(f"/api/groups/{group.id}/receipts/images/{image_id}")
+    assert same.status_code == 200, same.text
+
+    # Knowing the id is not enough to read it through another group.
+    cross = client.get(f"/api/groups/{other.id}/receipts/images/{image_id}")
+    assert cross.status_code == 422, cross.text
+
+
+def test_legacy_receipt_image_is_readable_only_for_owning_group(make_client, session, tmp_path):
+    client = make_client(enable_receipt_extract=True, upload_dir=str(tmp_path))
+    group, _people = make_group(session)
+    other, _other_people = make_group(session, name="Other")
+    # Simulate an image stored before group-scoped keys were introduced.
+    LocalBlobStorage(tmp_path).save("receipts/img_legacy.png", b"\x89PNG legacy")
+    make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Legacy", "quantity_milli": 1000, "amount": 100}],
+        image_url=f"/api/groups/{group.id}/receipts/images/img_legacy",
+    )
+
+    same = client.get(f"/api/groups/{group.id}/receipts/images/img_legacy")
+    assert same.status_code == 200, same.text
+    assert same.content == b"\x89PNG legacy"
+
+    cross = client.get(f"/api/groups/{other.id}/receipts/images/img_legacy")
+    assert cross.status_code == 422, cross.text
+
+
+def test_document_downloads_and_ai_reads_are_scoped(make_client, session, tmp_path):
+    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
+    group, people = make_group(session)
+    other, other_people = make_group(session, name="Other")
+    expense = make_expense(
+        session,
+        group=group,
+        paid_by=people["Alice"],
+        paid_for=[(people["Alice"], 1)],
+        amount=1000,
+    )
+    other_expense = make_expense(
+        session,
+        group=other,
+        paid_by=other_people["Alice"],
+        paid_for=[(other_people["Alice"], 1)],
+        amount=1000,
+    )
+    upload = client.post(
+        f"/api/groups/{group.id}/expenses/{expense.id}/documents",
+        files={"file": ("receipt.png", b"\x89PNG\r\n\x1a\nexample", "image/png")},
+    )
+    assert upload.status_code == 201, upload.text
+    document_id = upload.json()["id"]
+
+    same = client.get(f"/api/groups/{group.id}/expenses/{expense.id}/documents/{document_id}")
+    assert same.status_code == 200, same.text
+
+    cross = client.get(
+        f"/api/groups/{other.id}/expenses/{other_expense.id}/documents/{document_id}"
+    )
+    assert cross.status_code == 404, cross.text
+
+    settings = _settings(upload_dir=str(tmp_path))
+    storage = LocalBlobStorage(tmp_path)
+    with pytest.raises(InvalidInputError):
+        uploads_service.resolve_image_for_ai(
+            session,
+            storage,
+            settings,
+            group_id=other.id,
+            image_url=(
+                f"/api/groups/{other.id}/expenses/{other_expense.id}/documents/{document_id}"
+            ),
+        )
+    inline = uploads_service.resolve_image_for_ai(
+        session,
+        storage,
+        settings,
+        group_id=group.id,
+        image_url=f"/api/groups/{group.id}/expenses/{expense.id}/documents/{document_id}",
+    )
+    assert inline.startswith("data:image/png;base64,")
+
+
+def test_document_routes_require_feature_flag(make_client, session, tmp_path):
+    client = make_client(upload_dir=str(tmp_path))
+    group, people = make_group(session)
+    expense = make_expense(
+        session,
+        group=group,
+        paid_by=people["Alice"],
+        paid_for=[(people["Alice"], 1)],
+        amount=1000,
+    )
+    response = client.post(
+        f"/api/groups/{group.id}/expenses/{expense.id}/documents",
+        files={"file": ("receipt.png", b"\x89PNG", "image/png")},
+    )
+    assert response.status_code == 403, response.text
 
 
 def test_public_upload_url():

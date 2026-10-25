@@ -188,13 +188,9 @@ ROW_SPECS: list[RowSpec] = [
             ("type", "type", "str"),
             ("provider", "provider", "str"),
             ("providerAccountId", "provider_account_id", "str"),
-            ("refresh_token", "refresh_token", "str"),
-            ("access_token", "access_token", "str"),
             ("expires_at", "expires_at", "int"),
             ("token_type", "token_type", "str"),
             ("scope", "scope", "str"),
-            ("id_token", "id_token", "str"),
-            ("session_state", "session_state", "str"),
         ],
     ),
     (
@@ -369,6 +365,16 @@ def compare_rows(old: sqlite3.Connection, new: sqlite3.Connection) -> list[str]:
                     "categories: missing default ids "
                     + ", ".join(str(item) for item in sorted(missing_defaults))
                 )
+        if source_table == "Account":
+            # Legacy NextAuth provider credentials are deliberately not
+            # imported; make sure none leaked into the new accounts table.
+            leaked = new.execute(
+                "SELECT COUNT(*) FROM accounts WHERE refresh_token IS NOT NULL "
+                "OR access_token IS NOT NULL OR id_token IS NOT NULL "
+                "OR session_state IS NOT NULL"
+            ).fetchone()[0]
+            if leaked:
+                problems.append(f"accounts: {leaked} row(s) contain legacy provider credentials")
     return problems
 
 

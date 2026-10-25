@@ -14,7 +14,7 @@ from app.utils.receipt_extraction import (
     normalize_receipt,
     parse_receipt_items_response,
 )
-from tests.helpers import make_group
+from tests.helpers import access_headers, make_group, make_user
 
 
 class FakeAiClient:
@@ -48,6 +48,11 @@ def _upload(client, group_id: str, data: bytes = b"\x89PNG\r\n\x1a\nexample"):
     )
 
 
+def _auth(session) -> dict[str, str]:
+    """Authenticated headers for paid-AI endpoints."""
+    return access_headers(make_user(session))
+
+
 # ---------------------------------------------------------------------------
 # Configuration and prompts
 # ---------------------------------------------------------------------------
@@ -71,20 +76,25 @@ def test_ai_config_precedence():
         ai_service.get_ai_base_url(settings)
         == "https://generativelanguage.googleapis.com/v1beta/openai"
     )
-    assert (
-        ai_service.get_ai_provider(settings)
-        == "https://generativelanguage.googleapis.com/v1beta/openai"
-    )
-    assert ai_service.get_receipt_extract_model(settings) == "gemini-2.5-flash"
-    assert ai_service.get_category_extract_model(settings) == "gemini-2.5-flash-lite"
-    assert ai_service.get_receipt_items_model(settings) == "gemini-2.5-flash"
+    assert settings.ai_provider == "https://generativelanguage.googleapis.com/v1beta/openai"
+    assert settings.receipt_extract_model == "gemini-2.5-flash"
+    assert settings.category_extract_model == "gemini-2.5-flash-lite"
+    assert settings.receipt_items_model == "gemini-2.5-flash"
 
     fallback = Settings(_env_file=None)
     assert ai_service.get_ai_api_key(fallback) is None
     assert ai_service.get_ai_base_url(fallback) is None
-    assert ai_service.get_ai_provider(fallback) == "openai"
-    assert ai_service.get_receipt_extract_model(fallback) == "gpt-5-nano"
-    assert ai_service.get_category_extract_model(fallback) == "gpt-5-nano"
+    assert fallback.ai_provider == "openai"
+    assert fallback.receipt_extract_model == "gpt-5-nano"
+    assert fallback.category_extract_model == "gpt-5-nano"
+
+    # Public receipt labels never contain the internal base URL.
+    assert settings.ai_provider_label == "google"
+    assert fallback.ai_provider_label == "disabled"
+    assert (
+        Settings(_env_file=None, openai_api_key="sk-openai").ai_provider_label
+        == "openai-compatible"
+    )
 
 
 def test_prompt_contract():
@@ -235,14 +245,23 @@ def test_receipt_extraction_caps_items_and_uses_currency_decimals():
 
 def test_receipt_endpoints_require_feature_flags(client, session):
     group, _people = make_group(session)
+    headers = _auth(session)
     payload = {"image_url": "https://uploads.example.com/receipt.jpg"}
 
     assert (
-        client.post(f"/api/groups/{group.id}/receipts/extract-total", json=payload).status_code
+        client.post(
+            f"/api/groups/{group.id}/receipts/extract-total",
+            json=payload,
+            headers=headers,
+        ).status_code
         == 403
     )
     assert (
-        client.post(f"/api/groups/{group.id}/receipts/extract-items", json=payload).status_code
+        client.post(
+            f"/api/groups/{group.id}/receipts/extract-items",
+            json=payload,
+            headers=headers,
+        ).status_code
         == 403
     )
     assert (
@@ -252,7 +271,29 @@ def test_receipt_endpoints_require_feature_flags(client, session):
         ).status_code
         == 403
     )
-    assert client.post("/api/ai/categories/infer", json={"title": "Dinner"}).status_code == 403
+    assert (
+        client.post(
+            "/api/ai/categories/infer",
+            json={"title": "Dinner"},
+            headers=headers,
+        ).status_code
+        == 403
+    )
+
+
+def test_ai_endpoints_require_authentication(client, session):
+    group, _people = make_group(session)
+    payload = {"image_url": "https://uploads.example.com/receipt.jpg"}
+
+    assert (
+        client.post(f"/api/groups/{group.id}/receipts/extract-total", json=payload).status_code
+        == 401
+    )
+    assert (
+        client.post(f"/api/groups/{group.id}/receipts/extract-items", json=payload).status_code
+        == 401
+    )
+    assert client.post("/api/ai/categories/infer", json={"title": "Dinner"}).status_code == 401
 
 
 def test_feature_flags(make_client):
@@ -270,12 +311,14 @@ def test_extract_total_endpoint(make_client, session, tmp_path, monkeypatch):
     _patch_ai(monkeypatch, fake)
     client = make_client(enable_receipt_extract=True, upload_dir=str(tmp_path))
     group, _people = make_group(session)
+    headers = _auth(session)
     upload = _upload(client, group.id)
     assert upload.status_code == 201, upload.text
 
     response = client.post(
         f"/api/groups/{group.id}/receipts/extract-total",
         json={"image_url": upload.json()["url"]},
+        headers=headers,
     )
     assert response.status_code == 200, response.text
     assert response.json() == {
@@ -311,12 +354,14 @@ def test_extract_items_endpoint(make_client, session, tmp_path, monkeypatch):
     _patch_ai(monkeypatch, fake)
     client = make_client(enable_receipt_items=True, upload_dir=str(tmp_path))
     group, _people = make_group(session)
+    headers = _auth(session)
     upload = _upload(client, group.id)
     assert upload.status_code == 201, upload.text
 
     response = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": upload.json()["url"], "image_width": 800, "image_height": 600},
+        headers=headers,
     )
     assert response.status_code == 200, response.text
     body = response.json()
@@ -326,11 +371,15 @@ def test_extract_items_endpoint(make_client, session, tmp_path, monkeypatch):
     assert len(body["items"]) == 4
     assert body["items"][-1]["name"] == "Adjustment"
     assert body["items"][-1]["is_adjustment"] is True
+    # The internal AI base URL must never leak into the read model.
+    assert body["receipt"]["provider"] in {"openai-compatible", "google", "disabled"}
+    assert "://" not in (body["receipt"]["provider"] or "")
 
     # Re-uploading the same image reuses the successful parse (one paid call).
     again = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": upload.json()["url"]},
+        headers=headers,
     )
     assert again.status_code == 200, again.text
     assert again.json()["receipt"]["id"] == body["receipt"]["id"]
@@ -357,15 +406,78 @@ def test_configured_item_cap(make_client, session, tmp_path, monkeypatch):
         max_receipt_items=1,
     )
     group, _people = make_group(session)
+    headers = _auth(session)
     upload = _upload(client, group.id)
 
     response = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": upload.json()["url"]},
+        headers=headers,
     )
     assert response.status_code == 200, response.text
     assert [item["name"] for item in response.json()["items"]] == ["One"]
     assert response.json()["split"]["items_total"] == 100
+
+
+def test_configured_charge_cap(make_client, session, tmp_path, monkeypatch):
+    fake = FakeAiClient(
+        json.dumps(
+            {
+                "total": None,
+                "items": [],
+                "charges": [{"name": f"Charge {index}", "amount": 1} for index in range(5)],
+            }
+        )
+    )
+    _patch_ai(monkeypatch, fake)
+    client = make_client(
+        enable_receipt_items=True,
+        upload_dir=str(tmp_path),
+        max_receipt_items=2,
+    )
+    group, _people = make_group(session)
+    headers = _auth(session)
+    upload = _upload(client, group.id)
+
+    response = client.post(
+        f"/api/groups/{group.id}/receipts/extract-items",
+        json={"image_url": upload.json()["url"]},
+        headers=headers,
+    )
+    assert response.status_code == 200, response.text
+    assert [item["name"] for item in response.json()["items"]] == ["Charge 0", "Charge 1"]
+
+
+def test_normalized_ai_items_respect_configured_limits(make_client, session, tmp_path, monkeypatch):
+    fake = FakeAiClient(
+        json.dumps(
+            {
+                "total": 1000,
+                "items": [{"name": "Too expensive", "quantity": 1, "amount": 1000}],
+                "charges": [],
+            }
+        )
+    )
+    _patch_ai(monkeypatch, fake)
+    client = make_client(
+        enable_receipt_items=True,
+        upload_dir=str(tmp_path),
+        max_receipt_item_amount=100,
+    )
+    group, _people = make_group(session)
+    headers = _auth(session)
+    upload = _upload(client, group.id)
+
+    response = client.post(
+        f"/api/groups/{group.id}/receipts/extract-items",
+        json={"image_url": upload.json()["url"]},
+        headers=headers,
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "FAILED"
+    assert body["items"] == []
+    assert len(fake.calls) == 1
 
 
 def test_malformed_ai_output_fails_receipt(make_client, session, tmp_path, monkeypatch):
@@ -373,17 +485,20 @@ def test_malformed_ai_output_fails_receipt(make_client, session, tmp_path, monke
     _patch_ai(monkeypatch, fake)
     client = make_client(enable_receipt_items=True, upload_dir=str(tmp_path))
     group, _people = make_group(session)
+    headers = _auth(session)
     upload = _upload(client, group.id)
     assert upload.status_code == 201, upload.text
 
     response = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": upload.json()["url"]},
+        headers=headers,
     )
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["status"] == "FAILED"
     assert body["receipt"]["status"] == "FAILED"
+    assert body["receipt"]["attempts"] == 1
     assert body["split"]["items_total"] == 0
     assert body["items"] == []
 
@@ -392,10 +507,42 @@ def test_malformed_ai_output_fails_receipt(make_client, session, tmp_path, monke
     retried = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": upload.json()["url"]},
+        headers=headers,
     )
     assert retried.status_code == 200, retried.text
     assert retried.json()["status"] == "EXTRACTED"
+    assert retried.json()["receipt"]["attempts"] == 2
     assert len(fake.calls) == 2
+
+
+def test_retry_attempt_cap_returns_conflict(make_client, session, tmp_path, monkeypatch):
+    fake = FakeAiClient("not json")
+    _patch_ai(monkeypatch, fake)
+    client = make_client(
+        enable_receipt_items=True,
+        upload_dir=str(tmp_path),
+        receipt_max_attempts=1,
+    )
+    group, _people = make_group(session)
+    headers = _auth(session)
+    upload = _upload(client, group.id)
+
+    first = client.post(
+        f"/api/groups/{group.id}/receipts/extract-items",
+        json={"image_url": upload.json()["url"]},
+        headers=headers,
+    )
+    assert first.status_code == 200, first.text
+    assert first.json()["status"] == "FAILED"
+
+    blocked = client.post(
+        f"/api/groups/{group.id}/receipts/extract-items",
+        json={"image_url": upload.json()["url"]},
+        headers=headers,
+    )
+    assert blocked.status_code == 409, blocked.text
+    assert "exhausted" in blocked.json()["detail"].lower()
+    assert len(fake.calls) == 1
 
 
 def test_ai_provider_failure_becomes_failed_receipt(make_client, session, tmp_path, monkeypatch):
@@ -403,11 +550,13 @@ def test_ai_provider_failure_becomes_failed_receipt(make_client, session, tmp_pa
     _patch_ai(monkeypatch, fake)
     client = make_client(enable_receipt_items=True, upload_dir=str(tmp_path))
     group, _people = make_group(session)
+    headers = _auth(session)
     upload = _upload(client, group.id)
 
     response = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": upload.json()["url"]},
+        headers=headers,
     )
     assert response.status_code == 200, response.text
     assert response.json()["status"] == "FAILED"
@@ -418,29 +567,37 @@ def test_category_inference_endpoint(make_client, session, monkeypatch):
     fake = FakeAiClient(json.dumps({"categoryId": 7}))
     _patch_ai(monkeypatch, fake)
     client = make_client(enable_category_extract=True)
+    headers = _auth(session)
 
-    response = client.post("/api/ai/categories/infer", json={"title": "Team dinner"})
+    response = client.post(
+        "/api/ai/categories/infer", json={"title": "Team dinner"}, headers=headers
+    )
     assert response.status_code == 200, response.text
     assert response.json() == {"category_id": 7}
     assert fake.calls[0]["messages"][1]["content"] == "Team dinner"
 
     fake.content = "garbage"
-    fallback = client.post("/api/ai/categories/infer", json={"title": "Team dinner"})
+    fallback = client.post(
+        "/api/ai/categories/infer", json={"title": "Team dinner"}, headers=headers
+    )
     assert fallback.json() == {"category_id": 0}
 
     # An unknown category id also falls back to General (0).
     fake.content = json.dumps({"categoryId": 9999})
-    unknown = client.post("/api/ai/categories/infer", json={"title": "Team dinner"})
+    unknown = client.post(
+        "/api/ai/categories/infer", json={"title": "Team dinner"}, headers=headers
+    )
     assert unknown.json() == {"category_id": 0}
 
 
-def test_category_inference_truncates_title(make_client, monkeypatch):
+def test_category_inference_truncates_title(make_client, session, monkeypatch):
     fake = FakeAiClient(json.dumps({"categoryId": 1}))
     _patch_ai(monkeypatch, fake)
     client = make_client(enable_category_extract=True)
+    headers = _auth(session)
 
     title = "x" * 100
-    response = client.post("/api/ai/categories/infer", json={"title": title})
+    response = client.post("/api/ai/categories/infer", json={"title": title}, headers=headers)
     assert response.status_code == 200, response.text
     assert fake.calls[0]["messages"][1]["content"] == "x" * 40
 
@@ -455,6 +612,7 @@ def test_extraction_rejects_untrusted_image_urls(make_client, session, monkeypat
     response = client.post(
         f"/api/groups/{group.id}/receipts/extract-items",
         json={"image_url": bad_url},
+        headers=_auth(session),
     )
     assert response.status_code == 422, response.text
     assert fake.calls == []

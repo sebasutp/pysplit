@@ -51,3 +51,7 @@ class Receipt(SyncColumns, table=True):
         sa_type=UTCDateTime,
         nullable=False,
     )
+    # Number of paid extraction claims. Failed receipts are retryable, so this
+    # bounds the total model spend per uploaded image. Appended last so the
+    # migration and ``SQLModel.metadata.create_all`` produce the same order.
+    attempts: int = Field(default=0, nullable=False)

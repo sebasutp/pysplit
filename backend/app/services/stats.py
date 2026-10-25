@@ -6,7 +6,6 @@ from datetime import date
 
 from sqlmodel import Session
 
-from app.models.group import Group
 from app.schemas.stats import (
     CategorySpending,
     DrilldownExpense,
@@ -19,7 +18,7 @@ from app.schemas.stats import (
     StatsOverview,
     StatsRange,
 )
-from app.services.errors import NotFoundError
+from app.services.common import require_group
 from app.services.expenses import (
     active_recurring_expenses,
     group_expense_snapshot,
@@ -28,7 +27,6 @@ from app.services.expenses import (
 from app.services.groups import get_participants
 from app.utils.dates import datetime_to_date
 from app.utils.totals import (
-    calculate_share,
     filter_expenses_by_date_range,
     get_expenses_by_category,
     get_expenses_by_month,
@@ -41,13 +39,6 @@ from app.utils.totals import (
     get_total_active_user_share,
     get_total_group_spending,
 )
-
-
-def _require_group(session: Session, group_id: str) -> Group:
-    group = session.get(Group, group_id)
-    if group is None or group.deleted_at is not None:
-        raise NotFoundError("group not found")
-    return group
 
 
 def _summary(raw: dict) -> SpendingSummary:
@@ -132,7 +123,7 @@ def stats_overview(
     date_from: date | None = None,
     date_to: date | None = None,
 ) -> StatsOverview:
-    _require_group(session, group_id)
+    require_group(session, group_id)
     materialize_due_recurring_expenses(session, group_id=group_id)
     all_expenses = group_expense_snapshot(session, group_id)
     date_from_text = date_from.isoformat() if date_from else None
@@ -226,7 +217,7 @@ def category_expenses(
     date_from: date | None = None,
     date_to: date | None = None,
 ) -> ExpenseDrilldown:
-    _require_group(session, group_id)
+    require_group(session, group_id)
     materialize_due_recurring_expenses(session, group_id=group_id)
     expenses = group_expense_snapshot(session, group_id)
     filtered = filter_expenses_by_date_range(
@@ -245,7 +236,7 @@ def month_expenses(
     date_from: date | None = None,
     date_to: date | None = None,
 ) -> ExpenseDrilldown:
-    _require_group(session, group_id)
+    require_group(session, group_id)
     materialize_due_recurring_expenses(session, group_id=group_id)
     expenses = group_expense_snapshot(session, group_id)
     filtered = filter_expenses_by_date_range(
@@ -254,14 +245,3 @@ def month_expenses(
         date_to.isoformat() if date_to else None,
     )
     return _drilldown(get_expenses_by_month(filtered, month))
-
-
-def active_participant_share(
-    session: Session,
-    group_id: str,
-    participant_id: str,
-) -> int:
-    """Convenience helper used by tests and the future local-first mirror."""
-    _require_group(session, group_id)
-    expenses = group_expense_snapshot(session, group_id)
-    return sum(calculate_share(participant_id, expense) for expense in expenses)

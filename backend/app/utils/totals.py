@@ -316,16 +316,3 @@ def get_recurring_spending(expenses: Sequence[Mapping[str, Any]]) -> dict[str, A
         "estimatedMonthly": estimate("perMonth"),
         "estimatedYearly": estimate("perYear"),
     }
-
-
-def as_stat_expense(expense: Mapping[str, Any]) -> dict[str, Any]:
-    """Return the flat expense shape used by the stats helpers."""
-    return {
-        **_share_input(expense),
-        "title": str(expense.get("title", "")),
-        "is_reimbursement": bool(expense.get("is_reimbursement", False)),
-        "category": dict(_category(expense)),
-        "category_id": int(expense.get("category_id", _category(expense).get("id", 0)) or 0),
-        "paid_by_id": _paid_by_id(expense),
-        "recurrence_rule": expense.get("recurrence_rule", expense.get("recurrenceRule", "NONE")),
-    }
