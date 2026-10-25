@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
@@ -20,6 +21,7 @@ from app.models.group import Group
 from app.models.participant import Participant
 from app.models.receipt import Receipt
 from app.models.recurring_expense_link import RecurringExpenseLink
+from app.models.sync_change import SyncChange
 from app.schemas.categories import CategoryRead
 from app.schemas.expenses import (
     DocumentInput,
@@ -42,6 +44,14 @@ def utc_now() -> datetime:
     return datetime.now(UTC)
 
 
+def _finish(session: Session, commit: bool) -> None:
+    """Commit normally, or leave the transaction open for a sync operation."""
+    if commit:
+        session.commit()
+    else:
+        session.flush()
+
+
 # ---------------------------------------------------------------------------
 # Validation and normalization
 # ---------------------------------------------------------------------------
@@ -54,10 +64,10 @@ def _require_group(session: Session, group_id: str) -> Group:
     return group
 
 
-def _require_category(session: Session, category_id: int) -> Category:
+def _require_category(session: Session, category_id: int, *, commit: bool = True) -> Category:
     category = session.get(Category, category_id)
     if category is None:
-        ensure_default_categories(session)
+        ensure_default_categories(session, commit=commit)
         category = session.get(Category, category_id)
     if category is None:
         raise InvalidInputError(f"Unknown category id: {category_id}", field="category_id")
@@ -68,7 +78,10 @@ def _group_participant_ids(session: Session, group_id: str) -> set[str]:
     return {
         participant_id
         for participant_id in session.exec(
-            select(Participant.id).where(Participant.group_id == group_id)
+            select(Participant.id).where(
+                Participant.group_id == group_id,
+                Participant.deleted_at.is_(None),
+            )
         ).all()
     }
 
@@ -468,6 +481,7 @@ def create_expense(
     payload: ExpenseCreate,
     *,
     now: datetime | None = None,
+    commit: bool = True,
 ) -> ExpenseRead:
     moment = now or utc_now()
     _require_group(session, group_id)
@@ -479,7 +493,7 @@ def create_expense(
                 raise ConflictError("expense id already exists")
             return expense_to_read(session, existing)
 
-    _require_category(session, payload.category_id)
+    _require_category(session, payload.category_id, commit=commit)
     _validate_participants(session, group_id, payload.paid_by_id, payload.paid_for)
     normalized = normalize_paid_for(payload.paid_for, payload.split_mode, payload.amount)
 
@@ -532,8 +546,9 @@ def create_expense(
             data=payload.title,
         )
     )
-    session.commit()
-    session.refresh(expense)
+    _finish(session, commit)
+    if commit:
+        session.refresh(expense)
     return expense_to_read(session, expense)
 
 
@@ -544,6 +559,7 @@ def update_expense(
     payload: ExpenseUpdate,
     *,
     now: datetime | None = None,
+    commit: bool = True,
 ) -> ExpenseRead:
     moment = now or utc_now()
     _require_group(session, group_id)
@@ -611,7 +627,7 @@ def update_expense(
             payload.paid_for or [],
         )
     if "category_id" in fields:
-        _require_category(session, int(fields["category_id"]))
+        _require_category(session, int(fields["category_id"]), commit=commit)
 
     if "expense_date" in fields:
         expense.expense_date = date_to_datetime(payload.expense_date)  # type: ignore[arg-type]
@@ -685,8 +701,9 @@ def update_expense(
             data=expense.title,
         )
     )
-    session.commit()
-    session.refresh(expense)
+    _finish(session, commit)
+    if commit:
+        session.refresh(expense)
     return expense_to_read(session, expense)
 
 
@@ -697,6 +714,7 @@ def delete_expense(
     *,
     participant_id: str | None = None,
     now: datetime | None = None,
+    commit: bool = True,
 ) -> None:
     moment = now or utc_now()
     _require_group(session, group_id)
@@ -736,7 +754,7 @@ def delete_expense(
             data=expense.title,
         )
     )
-    session.commit()
+    _finish(session, commit)
 
 
 # ---------------------------------------------------------------------------
@@ -856,6 +874,22 @@ def materialize_due_recurring_expenses(
                     expense_id=new_expense.id,
                     updated_at=moment,
                     version=ExpenseDocument.version + 1,
+                )
+            )
+
+            # Recurrence is materialized server-side, so the new frame must
+            # also be visible to clients that only consume the change feed.
+            session.flush()
+            snapshot = expense_to_read(session, new_expense).model_dump(mode="json")
+            session.add(
+                SyncChange(
+                    group_id=new_expense.group_id,
+                    entity_type="expense",
+                    entity_id=new_expense.id,
+                    op_type="create",
+                    payload_json=json.dumps(snapshot, sort_keys=True, separators=(",", ":")),
+                    user_id=None,
+                    changed_at=moment,
                 )
             )
 

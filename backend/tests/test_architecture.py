@@ -14,6 +14,7 @@ ROUTERS = (
     "categories.py",
     "features.py",
     "health.py",
+    "sync.py",
 )
 UTILS = (
     "shares.py",
@@ -61,3 +62,14 @@ def test_stage_five_specs_exist():
         "test_openapi.py",
     ):
         assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
+
+
+def test_stage_six_sync_specs_exist():
+    for name in ("test_sync.py", "test_sync_conflicts.py"):
+        assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
+
+
+def test_stage_six_sync_router_does_not_import_models_or_sql():
+    source = (BACKEND / "app" / "api" / "sync.py").read_text()
+    for forbidden in ("app.models", "sqlmodel", "sqlalchemy", "app.core.database"):
+        assert forbidden not in source, f"sync.py imports {forbidden}"

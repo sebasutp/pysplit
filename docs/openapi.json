@@ -2479,6 +2479,130 @@
           }
         }
       }
+    },
+    "/api/sync/bootstrap": {
+      "get": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "Bootstrap",
+        "operationId": "bootstrap_api_sync_bootstrap_get",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Group Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncBootstrapResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sync/pull": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "Pull",
+        "operationId": "pull_api_sync_pull_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncPullRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncPullResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sync/push": {
+      "post": {
+        "tags": [
+          "sync"
+        ],
+        "summary": "Push",
+        "operationId": "push_api_sync_push_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncPushRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncPushResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5171,6 +5295,421 @@
         },
         "type": "object",
         "title": "StatsRange"
+      },
+      "SyncBootstrapResponse": {
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "title": "Cursor"
+          },
+          "group": {
+            "$ref": "#/components/schemas/GroupRead"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantRead"
+            },
+            "type": "array",
+            "title": "Participants"
+          },
+          "expenses": {
+            "items": {
+              "$ref": "#/components/schemas/ExpenseRead"
+            },
+            "type": "array",
+            "title": "Expenses"
+          },
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityRead"
+            },
+            "type": "array",
+            "title": "Activities"
+          },
+          "receipts": {
+            "items": {
+              "$ref": "#/components/schemas/SyncReceiptSnapshot"
+            },
+            "type": "array",
+            "title": "Receipts"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryRead"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "user_group": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Group"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cursor",
+          "group"
+        ],
+        "title": "SyncBootstrapResponse"
+      },
+      "SyncChangeRead": {
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "title": "Seq"
+          },
+          "entity_type": {
+            "type": "string",
+            "title": "Entity Type"
+          },
+          "entity_id": {
+            "type": "string",
+            "title": "Entity Id"
+          },
+          "op_type": {
+            "type": "string",
+            "title": "Op Type"
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seq",
+          "entity_type",
+          "entity_id",
+          "op_type"
+        ],
+        "title": "SyncChangeRead"
+      },
+      "SyncOperationIn": {
+        "properties": {
+          "op_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Op Id"
+          },
+          "group_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Group Id"
+          },
+          "entity_type": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Entity Type"
+          },
+          "entity_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Entity Id"
+          },
+          "op_type": {
+            "type": "string",
+            "enum": [
+              "create",
+              "update",
+              "delete"
+            ],
+            "title": "Op Type"
+          },
+          "base_version": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Version"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          },
+          "client_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Time"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op_id",
+          "group_id",
+          "entity_type",
+          "entity_id",
+          "op_type"
+        ],
+        "title": "SyncOperationIn",
+        "description": "One offline mutation in the push envelope."
+      },
+      "SyncPullRequest": {
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Cursor",
+            "default": 0
+          },
+          "group_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Group Ids"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 500
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SyncPullRequest"
+      },
+      "SyncPullResponse": {
+        "properties": {
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/SyncChangeRead"
+            },
+            "type": "array",
+            "title": "Changes"
+          },
+          "cursor": {
+            "type": "integer",
+            "title": "Cursor"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "changes",
+          "cursor",
+          "has_more"
+        ],
+        "title": "SyncPullResponse"
+      },
+      "SyncPushRequest": {
+        "properties": {
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/SyncOperationIn"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Operations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "operations"
+        ],
+        "title": "SyncPushRequest"
+      },
+      "SyncPushResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SyncPushResult"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "cursor": {
+            "type": "integer",
+            "title": "Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results",
+          "cursor"
+        ],
+        "title": "SyncPushResponse"
+      },
+      "SyncPushResult": {
+        "properties": {
+          "op_id": {
+            "type": "string",
+            "title": "Op Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "applied",
+              "conflict",
+              "error"
+            ],
+            "title": "Status"
+          },
+          "entity": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "seq": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seq"
+          },
+          "server_entity": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Server Entity"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "duplicate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duplicate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "op_id",
+          "status"
+        ],
+        "title": "SyncPushResult"
+      },
+      "SyncReceiptSnapshot": {
+        "properties": {
+          "receipt": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Receipt"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "portions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Portions"
+          },
+          "opt_outs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Opt Outs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receipt"
+        ],
+        "title": "SyncReceiptSnapshot"
       },
       "TierCounts": {
         "properties": {

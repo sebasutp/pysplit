@@ -238,6 +238,67 @@
   tests:
   - backend/tests/test_group_sync.py::test_remove_membership
   offline: queued
+- id: SYNC-PUSH
+  category: custom
+  reference: docs/adr/0002-offline-sync.md::Push
+  api: POST /api/sync/push
+  ui: n/a
+  stage: '6'
+  tests:
+  - backend/tests/test_sync.py::test_replayed_operation_applies_once
+  - backend/tests/test_sync.py::test_duplicate_create_with_new_operation_is_idempotent
+  - backend/tests/test_sync_conflicts.py::test_concurrent_creates_do_not_duplicate_recurrence_frames
+  - backend/tests/test_sync_conflicts.py::test_two_clients_converge_and_replay_delete_once
+  offline: queued
+- id: SYNC-PULL
+  category: custom
+  reference: docs/adr/0002-offline-sync.md::Pull and bootstrap
+  api: POST /api/sync/pull
+  ui: n/a
+  stage: '6'
+  tests:
+  - backend/tests/test_sync.py::test_pagination_and_has_more
+  - backend/tests/test_sync.py::test_participant_crud_tombstone_and_last_writer_wins
+  offline: read-only
+- id: SYNC-BOOTSTRAP
+  category: custom
+  reference: docs/adr/0002-offline-sync.md::Pull and bootstrap
+  api: GET /api/sync/bootstrap
+  ui: n/a
+  stage: '6'
+  tests:
+  - backend/tests/test_sync.py::test_push_create_pull_and_bootstrap
+  - backend/tests/test_sync.py::test_bootstrap_includes_receipts_and_user_membership
+  offline: read-only
+- id: SYNC-CONFLICT
+  category: custom
+  reference: docs/adr/0002-offline-sync.md::Conflict rules
+  api: POST /api/sync/push
+  ui: n/a
+  stage: '6'
+  tests:
+  - backend/tests/test_sync_conflicts.py::test_stale_update_returns_conflict_then_next_edit_applies
+  - backend/tests/test_sync_conflicts.py::test_delete_tombstone_wins_over_updates
+  offline: queued
+- id: SYNC-CLAIM
+  category: custom
+  reference: docs/adr/0002-offline-sync.md::Entity versioning
+  api: POST /api/sync/push
+  ui: /groups
+  stage: '6'
+  tests:
+  - backend/tests/test_sync.py::test_claim_groups_merges_without_duplication
+  - backend/tests/test_sync.py::test_user_group_is_lww_and_scoped_to_its_user
+  offline: queued
+- id: SYNC-COMPACTION
+  category: custom
+  reference: docs/adr/0002-offline-sync.md::Idempotency and ordering
+  api: POST /api/sync/pull
+  ui: n/a
+  stage: '6'
+  tests:
+  - backend/tests/test_sync.py::test_expired_and_future_cursors_require_bootstrap
+  offline: read-only
 - id: EXP-LIST
   category: standard
   reference: spliit/src/trpc/routers/groups/expenses/list.procedure.ts::listGroupExpensesProcedure

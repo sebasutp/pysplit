@@ -38,6 +38,19 @@ def utc_now() -> datetime:
     return datetime.now(UTC)
 
 
+def _finish(session: Session, commit: bool) -> None:
+    """Commit normally, or flush when a caller owns the transaction.
+
+    The synchronization service applies each operation together with its
+    change-log row and idempotency record in one transaction, so it passes
+    ``commit=False``.
+    """
+    if commit:
+        session.commit()
+    else:
+        session.flush()
+
+
 def _participant_read(participant: Participant) -> ParticipantRead:
     return ParticipantRead(
         id=participant.id,
@@ -69,7 +82,15 @@ def get_active_group(session: Session, group_id: str) -> Group:
 
 
 def get_participants(session: Session, group_id: str) -> list[Participant]:
-    return list(session.exec(select(Participant).where(Participant.group_id == group_id)).all())
+    """Return live participants; synchronization tombstones stay hidden."""
+    return list(
+        session.exec(
+            select(Participant).where(
+                Participant.group_id == group_id,
+                Participant.deleted_at.is_(None),
+            )
+        ).all()
+    )
 
 
 def list_participants(session: Session, group_id: str) -> list[ParticipantRead]:
@@ -177,6 +198,7 @@ def create_group(
     payload: GroupCreate,
     *,
     user_id: str | None = None,
+    commit: bool = True,
 ) -> GroupRead:
     now = utc_now()
     if payload.id:
@@ -184,7 +206,7 @@ def create_group(
         if existing is not None and existing.deleted_at is None:
             if user_id is not None:
                 _ensure_membership(session, user_id, existing.id)
-                session.commit()
+                _finish(session, commit)
             return group_to_read(session, existing, user_id=user_id)
         if existing is not None:
             raise ConflictError("group id is tombstoned")
@@ -223,8 +245,9 @@ def create_group(
     if user_id is not None:
         _ensure_membership(session, user_id, group.id)
 
-    session.commit()
-    session.refresh(group)
+    _finish(session, commit)
+    if commit:
+        session.refresh(group)
     return group_to_read(session, group, user_id=user_id)
 
 
@@ -351,7 +374,13 @@ def get_group_details(
     )
 
 
-def update_group(session: Session, group_id: str, payload: GroupUpdate) -> GroupRead:
+def update_group(
+    session: Session,
+    group_id: str,
+    payload: GroupUpdate,
+    *,
+    commit: bool = True,
+) -> GroupRead:
     group = get_active_group(session, group_id)
     now = utc_now()
     fields = payload.model_dump(exclude_unset=True)
@@ -410,8 +439,9 @@ def update_group(session: Session, group_id: str, payload: GroupUpdate) -> Group
             participant_id=payload.participant_id,
         )
     )
-    session.commit()
-    session.refresh(group)
+    _finish(session, commit)
+    if commit:
+        session.refresh(group)
     return group_to_read(session, group)
 
 
@@ -419,6 +449,8 @@ def add_participant(
     session: Session,
     group_id: str,
     payload: ParticipantCreate,
+    *,
+    commit: bool = True,
 ) -> ParticipantRead:
     group = get_active_group(session, group_id)
     participants = get_participants(session, group_id)
@@ -439,8 +471,9 @@ def add_participant(
     group.updated_at = now
     group.version += 1
     session.add(group)
-    session.commit()
-    session.refresh(participant)
+    _finish(session, commit)
+    if commit:
+        session.refresh(participant)
     return _participant_read(participant)
 
 
@@ -449,6 +482,8 @@ def update_participant(
     group_id: str,
     participant_id: str,
     payload: ParticipantUpdate,
+    *,
+    commit: bool = True,
 ) -> ParticipantRead:
     group = get_active_group(session, group_id)
     participant = session.get(Participant, participant_id)
@@ -471,12 +506,19 @@ def update_participant(
     group.version += 1
     session.add(participant)
     session.add(group)
-    session.commit()
-    session.refresh(participant)
+    _finish(session, commit)
+    if commit:
+        session.refresh(participant)
     return _participant_read(participant)
 
 
-def delete_participant(session: Session, group_id: str, participant_id: str) -> None:
+def delete_participant(
+    session: Session,
+    group_id: str,
+    participant_id: str,
+    *,
+    commit: bool = True,
+) -> None:
     group = get_active_group(session, group_id)
     participant = session.get(Participant, participant_id)
     if participant is None or participant.group_id != group_id:
@@ -486,7 +528,7 @@ def delete_participant(session: Session, group_id: str, participant_id: str) -> 
     group.updated_at = now
     group.version += 1
     session.add(group)
-    session.commit()
+    _finish(session, commit)
 
 
 def _sync_group_ids(payload: GroupSyncRequest) -> list[str]:

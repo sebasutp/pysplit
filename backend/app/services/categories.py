@@ -9,7 +9,7 @@ from app.models.category import Category
 from app.schemas.categories import CategoryList, CategoryRead
 
 
-def ensure_default_categories(session: Session) -> int:
+def ensure_default_categories(session: Session, *, commit: bool = True) -> int:
     """Insert any missing default category rows.
 
     The reference seeds only when the table is empty; the migration plan is
@@ -28,7 +28,10 @@ def ensure_default_categories(session: Session) -> int:
         session.add(Category(id=category_id, grouping=grouping, name=name))
         added += 1
     if added:
-        session.commit()
+        if commit:
+            session.commit()
+        else:
+            session.flush()
     return added
 
 

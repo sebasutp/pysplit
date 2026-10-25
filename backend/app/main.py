@@ -20,6 +20,7 @@ from app.api import (
     groups,
     health,
     stats,
+    sync,
 )
 from app.core.config import get_settings
 
@@ -54,6 +55,7 @@ def create_app() -> FastAPI:
     app.include_router(stats.router, prefix=settings.api_prefix)
     app.include_router(activities.router, prefix=settings.api_prefix)
     app.include_router(expenses.router, prefix=settings.api_prefix)
+    app.include_router(sync.router, prefix=settings.api_prefix)
 
     return app
 
