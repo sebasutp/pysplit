@@ -1067,6 +1067,7 @@ def extract_items(
     image_url: str,
     image_width: int | None = None,
     image_height: int | None = None,
+    expense_id: str | None = None,
     ai_client: Any = None,
     storage: BlobStorage | None = None,
 ) -> ReceiptExtractionResult:
@@ -1083,6 +1084,11 @@ def extract_items(
     )
 
     existing = get_receipt_by_image(session, group_id, image_url)
+    if existing is not None and expense_id is not None:
+        # Offline line-item scans arrive with the expense id. Persist the link
+        # before returning so the sync bootstrap cannot replace the local
+        # receipt with an unlinked server copy.
+        existing = link_receipt_to_expense(session, group_id, existing.id, expense_id)
     if existing is not None and existing.status == ReceiptStatus.EXTRACTED.value:
         return _extraction_result(
             session,
@@ -1098,6 +1104,8 @@ def extract_items(
         image_width=image_width,
         image_height=image_height,
     )
+    if expense_id is not None and receipt.expense_id != expense_id:
+        receipt = link_receipt_to_expense(session, group_id, receipt.id, expense_id)
 
     if not claim_receipt_for_extraction(session, receipt.id, settings=settings):
         raise ConflictError("Receipt extraction is already in progress.")

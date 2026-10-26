@@ -17,6 +17,7 @@ import { ExpenseCurrencyCard } from './ExpenseCurrencyCard'
 import { ExpenseDocumentsCard } from './ExpenseDocumentsCard'
 import { ExpenseFormActions } from './ExpenseFormActions'
 import { ExpenseDeleteDialog } from './ExpenseDeleteDialog'
+import { Button } from '../ui/Button'
 
 /**
  * @param {{
@@ -56,6 +57,33 @@ export function ExpenseForm({ group, categories, expense = null, activeUserId = 
         <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
           {form.error}
         </p>
+      ) : null}
+
+      {form.pendingReceiptTotal ? (
+        <div
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-sm"
+        >
+          <span>
+            {t(
+              'ExpenseForm.pendingReceiptTotal',
+              'A receipt scanned while offline is ready.',
+            )}
+          </span>
+          <span className="flex gap-2">
+            <Button type="button" size="sm" onClick={form.applyPendingReceiptTotal}>
+              {t('ExpenseForm.pendingReceiptTotalApply', 'Use scanned total')}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={form.dismissPendingReceiptTotal}
+            >
+              {t('ExpenseForm.pendingReceiptTotalDismiss', 'Dismiss')}
+            </Button>
+          </span>
+        </div>
       ) : null}
 
       <ExpenseBasicsCard

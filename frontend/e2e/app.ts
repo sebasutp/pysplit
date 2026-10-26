@@ -210,6 +210,7 @@ export async function addExpense(
     /** Visible label: 'None' | 'Daily' | 'Weekly' | 'Monthly'. Defaults to None. */
     recurrence?: Recurrence
   },
+  options: { waitForActiveUser?: boolean } = {},
 ): Promise<void> {
   await page.goto(`/groups/${groupId}/expenses/create`)
 
@@ -222,6 +223,7 @@ export async function addExpense(
   // Amount before split mode: BY_AMOUNT re-distributes shares whenever the
   // amount changes, which would wipe values set beforehand.
   await fillStable(page.locator('input[name="amount"]'), expense.amount)
+  await dismissActiveUserDialog(page, options.waitForActiveUser ? 10_000 : 1_000)
   await selectRadixOption(page, page.getByTestId('paid-by'), expense.paidBy)
 
   if (expense.date) {
@@ -284,6 +286,7 @@ export async function addExpense(
     }
   }
 
+  await dismissActiveUserDialog(page)
   await submit.click()
   await page.waitForURL(EXPENSES_URL, { timeout: 30_000 })
 }
@@ -294,6 +297,19 @@ export async function openTab(page: Page, tab: GroupTab): Promise<void> {
     () => page.getByRole('tab', { name: tab, exact: true }).click(),
     () => page.waitForURL(path, { timeout: 5_000 }),
   )
+}
+
+/** Dismiss the optional active-user prompt if it appeared after a reload. */
+async function dismissActiveUserDialog(page: Page, timeout = 1_000): Promise<void> {
+  const dialog = page.getByRole('dialog').filter({ hasText: 'Who are you?' })
+  const appeared = await dialog
+    .waitFor({ state: 'visible', timeout })
+    .then(() => true)
+    .catch(() => false)
+  if (!appeared) return
+  await dialog.getByRole('button', { name: 'I don’t want to select anyone' }).click()
+  await dialog.getByRole('button', { name: 'Save changes' }).click()
+  await dialog.waitFor({ state: 'hidden', timeout: 5_000 }).catch(() => {})
 }
 
 /** Opens an expense for editing. The card is a div with onClick, not a link. */
@@ -343,9 +359,22 @@ export async function setActiveUser(
   if (!participant) throw new Error(`Unknown participant ${name}`)
 
   await page.goto(`/groups/${groupId}/expenses`)
+  const key = `${groupId}-activeUser`
   await page.evaluate(
-    ([key, value]) => window.localStorage.setItem(key, value),
-    [`${groupId}-activeUser`, participant.id] as const,
+    ([storageKey, value]) => window.localStorage.setItem(storageKey, value),
+    [key, participant.id] as const,
+  )
+  // Keep the choice across later full-page navigations that may boot auth
+  // before the app reads localStorage.
+  await page.addInitScript(
+    ({ storageKey, value }) => {
+      try {
+        window.localStorage.setItem(storageKey, value)
+      } catch {
+        // about:blank has no storage.
+      }
+    },
+    { storageKey: key, value: participant.id },
   )
 }
 

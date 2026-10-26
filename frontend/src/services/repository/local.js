@@ -656,12 +656,19 @@ let refreshInFlight = null
 /** @type {{at: number, payload: any}|null} */
 let lastRefresh = null
 
+const ONLINE_ACK_TIMEOUT_MS = 4_000
+
 /**
  * Debounced push after a local mutation. Recurring creates request an
  * immediate push because the server owns frame materialization.
  *
+ * An online create waits for the acknowledgement so a fast navigation or
+ * reload cannot leave it in the outbox without the in-memory access token.
+ * The wait is bounded: a captive portal must not hang the form. After the
+ * timeout the durable outbox row remains and the normal sync triggers retry.
+ *
  * @param {string} groupId
- * @param {{immediate?: boolean}} [options]
+ * @param {{immediate?: boolean, timeoutMs?: number}} [options]
  */
 async function flushGroup(groupId, options = {}) {
   if (!isOnline()) {
@@ -672,10 +679,29 @@ async function flushGroup(groupId, options = {}) {
     scheduleSync()
     return
   }
+  const timeoutMs = Number(options.timeoutMs ?? ONLINE_ACK_TIMEOUT_MS)
+  const push = pushPending({ groupId })
+  if (!timeoutMs) {
+    try {
+      await push
+    } catch {
+      scheduleSync()
+    }
+    return
+  }
+  /** @type {ReturnType<typeof setTimeout>|null} */
+  let timer = null
   try {
-    await pushPending({ groupId })
+    await Promise.race([
+      push,
+      new Promise((resolve) => {
+        timer = setTimeout(resolve, timeoutMs)
+      }),
+    ])
   } catch {
     scheduleSync()
+  } finally {
+    if (timer) clearTimeout(timer)
   }
 }
 
@@ -901,7 +927,10 @@ const groups = {
           await rememberRecent(record)
         },
       )
-      await flushGroup(groupId)
+      // Await the server acknowledgement while online so a fast navigation or
+      // reload cannot leave a freshly-created group in the outbox without the
+      // access token that only lives in memory.
+      await flushGroup(groupId, { immediate: true })
       const stored = await readGroup(groupId)
       return composeCachedGroup(stored)
     })
@@ -1445,7 +1474,10 @@ const expenses = {
         })
       })
       await flushGroup(groupId, {
-        immediate: isOnline() && record.recurrence_rule !== 'NONE',
+        // Online creates are acknowledged before the form navigates. This
+        // keeps a server-side read immediately after create consistent and
+        // still lets offline creates queue durably.
+        immediate: isOnline(),
       })
       if (isOnline() && record.recurrence_rule !== 'NONE') {
         // The server owns recurrence materialization; refresh the cached frames
@@ -1844,6 +1876,75 @@ const activities = {
   },
 }
 
+/**
+ * Find the queued upload behind a local receipt URL.
+ *
+ * @param {string} groupId
+ * @param {string} imageUrl
+ */
+async function queuedReceiptUpload(groupId, imageUrl) {
+  if (!String(imageUrl).startsWith('local-receipt://')) return null
+  const id = String(imageUrl).slice('local-receipt://'.length)
+  const row = await db.outbox.where('entity_id').equals(id).first()
+  if (!row || row.entity_type !== 'receipt_upload' || row.group_id !== groupId) return null
+  return row
+}
+
+/**
+ * Persist the extraction mode on the queued upload so the sync engine knows
+ * whether to run total or line-item extraction after reconnect.
+ *
+ * @param {any} row
+ * @param {'total'|'items'} mode
+ * @param {Record<string, unknown>} [patch]
+ */
+async function markReceiptUploadMode(row, mode, patch = {}) {
+  const current = await db.outbox.get(row.seq)
+  if (!current || current.status === 'failed') return
+  await db.outbox.put({
+    ...current,
+    payload: { ...current.payload, ...patch, mode },
+    updated_at: nowIso(),
+  })
+  scheduleSync()
+}
+
+/**
+ * Create the local placeholder receipt shown while its image waits offline.
+ *
+ * @param {string} groupId
+ * @param {any} operation
+ * @param {any} input
+ */
+async function ensurePendingReceipt(groupId, operation, input) {
+  const receiptId = operation.entity_id
+  const existing = await db.receipts.get(receiptId)
+  if (existing) return existing
+  const timestamp = nowIso()
+  const receipt = {
+    id: receiptId,
+    group_id: groupId,
+    image_url: `local-receipt://${receiptId}`,
+    image_width: Number(input.image_width || operation.payload?.width || 1),
+    image_height: Number(input.image_height || operation.payload?.height || 1),
+    status: 'PENDING',
+    attempts: 0,
+    merchant: null,
+    receipt_date: null,
+    currency_code: null,
+    total: null,
+    expense_id: input.expense_id || operation.payload?.expense_id || null,
+    created_at: timestamp,
+    updated_at: timestamp,
+    version: 1,
+    deleted_at: null,
+    pending: true,
+    pending_scan: true,
+  }
+  await db.receipts.put(receipt)
+  return receipt
+}
+
 const receipts = {
   async get(groupId, options = {}, _read = {}) {
     return run(async () => {
@@ -1859,19 +1960,85 @@ const receipts = {
       return receiptState(receipt, group.participants)
     })
   },
+  /**
+   * @returns {Promise<any>}
+   */
   async upload(groupId, file, options = {}) {
     return run(async () => {
-      if (!isOnline()) {
-        throw new RepositoryError('Receipt uploads are queued for later', {
-          code: 'offline_unsupported',
-        })
+      checkAbort(options)
+      await requireGroup(groupId)
+      if (isOnline()) {
+        try {
+          return await onlineRepository.receipts.upload(groupId, file, options)
+        } catch (error) {
+          if (!retryableUploadError(error)) throw error
+          // A lost upload response is safe to retry because uploads are keyed
+          // by the generated receipt id on the client.
+        }
       }
-      const result = await onlineRepository.receipts.upload(groupId, file, options)
-      return result
+      const receiptId = newId('receipt')
+      const width = Number(options.width || 1)
+      const height = Number(options.height || 1)
+      const url = `local-receipt://${receiptId}`
+      // Read the file before opening the Dexie transaction; an external await
+      // inside it would commit it early in a real browser.
+      const data = await fileBytes(file)
+      await db.transaction('rw', [db.blobs, db.outbox], async () => {
+        await queueBlob({
+          groupId,
+          kind: 'receipt',
+          entityId: receiptId,
+          expenseId: options.expense_id || null,
+          file,
+          data,
+          width,
+          height,
+          payload: { mode: null },
+        })
+      })
+      scheduleSync()
+      return { url, width, height, pending: true, upload_id: receiptId, receipt_id: receiptId }
+    })
+  },
+  /**
+   * A total-only receipt scanned while offline is extracted after reconnect,
+   * when its original form may be gone. The result is kept here until the user
+   * chooses to apply it to a new expense.
+   *
+   * @param {string} groupId
+   * @returns {Promise<any|null>}
+   */
+  async pendingTotal(groupId) {
+    return run(async () => {
+      const value = await getMetadata(`pending_receipt_total:${groupId}`, null)
+      return value && typeof value === 'object' ? value : null
+    })
+  },
+  /**
+   * Consume the pending total so the same scan is not offered twice.
+   *
+   * @param {string} groupId
+   * @returns {Promise<void>}
+   */
+  async clearPendingTotal(groupId) {
+    await run(async () => {
+      await db.metadata.delete(`pending_receipt_total:${groupId}`)
     })
   },
   async extractTotal(groupId, input, options = {}) {
     return run(async () => {
+      checkAbort(options)
+      const queued = await queuedReceiptUpload(groupId, input.image_url)
+      if (queued) {
+        await markReceiptUploadMode(queued, 'total')
+        return {
+          amount: null,
+          category_id: null,
+          date: null,
+          title: null,
+          pending: true,
+        }
+      }
       if (!isOnline()) {
         throw new RepositoryError('Receipt extraction is available when online', {
           code: 'offline_unsupported',
@@ -1884,6 +2051,18 @@ const receipts = {
   },
   async extractItems(groupId, input, options = {}) {
     return run(async () => {
+      checkAbort(options)
+      const queued = await queuedReceiptUpload(groupId, input.image_url)
+      if (queued) {
+        const group = await requireGroup(groupId)
+        const receipt = await ensurePendingReceipt(groupId, queued, input)
+        await markReceiptUploadMode(
+          queued,
+          'items',
+          input.expense_id ? { expense_id: input.expense_id } : {},
+        )
+        return receiptState(receipt, group.participants)
+      }
       if (!isOnline()) {
         throw new RepositoryError('Receipt extraction is available when online', {
           code: 'offline_unsupported',
@@ -2113,32 +2292,194 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
   })
 }
 
+/**
+ * File/Blob to ArrayBuffer without relying on FileReader, which is not
+ * available in every service-worker-like environment.
+ *
+ * @param {File|Blob} file
+ * @returns {Promise<ArrayBuffer>}
+ */
+async function fileBytes(file) {
+  if (typeof file.arrayBuffer === 'function') return file.arrayBuffer()
+  return new Response(file).arrayBuffer()
+}
+
+/** @param {any} error @returns {boolean} */
+function retryableUploadError(error) {
+  const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : 'network'
+  return ['network', 'server', 'rate_limited'].includes(code)
+}
+
+/**
+ * Put a queued blob and its outbox row inside the caller's transaction.
+ *
+ * The bytes must already be read: awaiting `File.arrayBuffer()` inside a
+ * Dexie transaction lets the transaction expire in real browsers
+ * (`PrematureCommitError`). Callers read the data before opening the
+ * transaction and pass it here as `data`.
+ *
+ * @param {{
+ *   groupId: string,
+ *   kind: 'document'|'receipt',
+ *   entityId: string,
+ *   expenseId?: string|null,
+ *   file: File|Blob,
+ *   data: Blob|ArrayBuffer,
+ *   width?: number,
+ *   height?: number,
+ *   payload?: Record<string, unknown>,
+ * }} input
+ */
+async function queueBlob(input) {
+  const blobId = newId('blob')
+  const opId = newId('op')
+  const data = input.data
+  await db.blobs.put({
+    id: blobId,
+    group_id: input.groupId,
+    kind: input.kind,
+    entity_id: input.entityId,
+    expense_id: input.expenseId || null,
+    filename: input.file.name || `${input.kind}.bin`,
+    content_type: input.file.type || 'application/octet-stream',
+    width: Number(input.width || 1),
+    height: Number(input.height || 1),
+    data,
+    created_at: nowIso(),
+  })
+  await enqueue({
+    op_id: opId,
+    group_id: input.groupId,
+    entity_type: input.kind === 'document' ? 'document_upload' : 'receipt_upload',
+    entity_id: input.entityId,
+    op_type: 'create',
+    payload: {
+      expense_id: input.expenseId || null,
+      width: Number(input.width || 1),
+      height: Number(input.height || 1),
+      filename: input.file.name || null,
+      content_type: input.file.type || null,
+      ...input.payload,
+    },
+    transport: 'blob',
+    meta: { blob_id: blobId, expense_id: input.expenseId || null },
+  })
+  return { blobId, opId }
+}
+
+/** @param {string} entityType @param {string} entityId */
+async function queuedOperation(entityType, entityId) {
+  return db.outbox
+    .where('entity_id')
+    .equals(entityId)
+    .filter((row) => row.entity_type === entityType)
+    .first()
+}
+
 const documents = {
   async upload(groupId, expenseId, file, options = {}) {
     return run(async () => {
-      if (!isOnline()) {
-        throw new RepositoryError('Document uploads are available when online', {
-          code: 'offline_unsupported',
-        })
+      checkAbort(options)
+      await requireGroup(groupId)
+      const width = Number(options.width || 1)
+      const height = Number(options.height || 1)
+      if (isOnline()) {
+        try {
+          const document = await onlineRepository.documents.upload(groupId, expenseId, file, {
+            ...options,
+            width,
+            height,
+          })
+          await db.documents.put({
+            ...document,
+            expense_id: expenseId,
+            created_at: nowIso(),
+            pending: false,
+          })
+          return document
+        } catch (error) {
+          if (!retryableUploadError(error)) throw error
+          // A transport failure falls through to the durable queue.
+        }
       }
-      const document = await onlineRepository.documents.upload(groupId, expenseId, file, options)
-      await db.documents.put({
-        ...document,
+
+      const documentId = newId('doc')
+      const timestamp = nowIso()
+      const document = {
+        id: documentId,
+        url: `/local-uploads/${documentId}`,
+        width,
+        height,
         expense_id: expenseId,
-        created_at: nowIso(),
+        created_at: timestamp,
+        updated_at: timestamp,
+        version: 1,
+        deleted_at: null,
+        pending: true,
+        pending_upload: true,
+      }
+      // Read the file before opening the Dexie transaction; an external await
+      // inside it would commit it early in a real browser.
+      const data = await fileBytes(file)
+      await db.transaction('rw', [db.documents, db.blobs, db.outbox], async () => {
+        await db.documents.put(document)
+        await queueBlob({
+          groupId,
+          kind: 'document',
+          entityId: documentId,
+          expenseId,
+          file,
+          data,
+          width,
+          height,
+        })
       })
+      scheduleSync()
       return document
     })
   },
   async remove(groupId, expenseId, documentId, options = {}) {
     await run(async () => {
-      if (!isOnline()) {
-        throw new RepositoryError('Document removal is available when online', {
-          code: 'offline_unsupported',
+      checkAbort(options)
+      await requireGroup(groupId)
+      const upload = await queuedOperation('document_upload', documentId)
+      if (upload) {
+        // The bytes never reached the server, so drop the placeholder and its
+        // blob instead of queueing a delete for a document that does not exist.
+        await db.transaction('rw', [db.documents, db.blobs, db.outbox], async () => {
+          await db.documents.delete(documentId)
+          await db.outbox.delete(upload.seq)
+          const blobId = upload.meta?.blob_id
+          if (blobId) await db.blobs.delete(blobId)
         })
+        return
       }
-      await onlineRepository.documents.remove(groupId, expenseId, documentId, options)
-      await db.documents.delete(documentId)
+
+      if (isOnline()) {
+        try {
+          await onlineRepository.documents.remove(groupId, expenseId, documentId, options)
+          await db.documents.delete(documentId)
+          return
+        } catch (error) {
+          if (!retryableUploadError(error)) throw error
+        }
+      }
+
+      if (await queuedOperation('document_remove', documentId)) return
+      await db.transaction('rw', [db.documents, db.outbox], async () => {
+        await db.documents.delete(documentId)
+        await enqueue({
+          op_id: newId('op'),
+          group_id: groupId,
+          entity_type: 'document_remove',
+          entity_id: documentId,
+          op_type: 'delete',
+          payload: { expense_id: expenseId },
+          transport: 'blob',
+          meta: { expense_id: expenseId },
+        })
+      })
+      scheduleSync()
     })
   },
 }

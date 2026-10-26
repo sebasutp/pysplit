@@ -285,7 +285,9 @@
       "title": "문서 업로드 중 오류가 발생했어요",
       "description": "문서 업로드 중 오류가 발생했습니다. 나중에 다시 시도하거나 다른 파일을 선택해 주세요.",
       "retry": "Retry"
-    }
+    },
+    "queued": "Pending upload",
+    "open": "Open"
   },
   "CreateFromReceipt": {
     "Dialog": {
@@ -310,7 +312,9 @@
       "title": "문서 업로드 중 오류가 발생했어요",
       "description": "문서 업로드 중 오류가 발생했습니다. 나중에 다시 시도하거나 다른 파일을 선택해 주세요.",
       "retry": "Retry"
-    }
+    },
+    "queued": "Queued. The receipt will be scanned after you reconnect.",
+    "offline": "Scanning resumes when you are online."
   },
   "ReceiptItems": {
     "title": "Receipt items",
@@ -398,7 +402,10 @@
       "total": "total {current} → {new}",
       "cancel": "Cancel",
       "confirm": "Apply"
-    }
+    },
+    "scanPending": "Scan queued",
+    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
+    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
   },
   "Balances": {
     "title": "잔액",
@@ -622,8 +629,13 @@
   },
   "Pwa": {
     "updateTitle": "Update available",
-    "updateDescription": "A new version of Spliit is available.",
-    "reload": "Reload"
+    "updateDescription": "A new version of pysplit is available.",
+    "reload": "Reload",
+    "updating": "Updating…",
+    "offlineReady": "Ready to work offline",
+    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
+    "dismiss": "Dismiss",
+    "install": "Install app"
   },
   "Auth": {
     "signIn": "Sign in",
@@ -640,5 +652,21 @@
     "totalExpenses": "Total Expenses",
     "registeredUsers": "Registered Users",
     "userManagement": "User Management & Permission Tiers"
+  },
+  "Storage": {
+    "title": "Offline storage",
+    "loading": "Checking this device…",
+    "unsupported": "This browser cannot report storage status.",
+    "usage": "{{used}} of {{quota}} used",
+    "unknown": "unknown",
+    "persisted": "Storage is persistent on this device.",
+    "notPersisted": "The browser may evict offline data if the device runs low on space.",
+    "keep": "Keep data on this device",
+    "refresh": "Refresh",
+    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
+    "warning": "Storage is getting full. A backup is recommended."
+  },
+  "Pending": {
+    "participant": "Pending sync"
   }
 }

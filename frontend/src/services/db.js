@@ -9,6 +9,23 @@
 
 import Dexie from 'dexie'
 
+import {
+  DATABASE_SCHEMA_VERSION,
+  REQUIRED_INDEXES,
+  REQUIRED_TABLES,
+  STORES_V2,
+  STORES_V3,
+} from './db-schema'
+
+export {
+  DATABASE_BUILD_CONTRACT,
+  DATABASE_SCHEMA_VERSION,
+  REQUIRED_INDEXES,
+  REQUIRED_TABLES,
+  STORES_V2,
+  STORES_V3,
+} from './db-schema'
+
 /**
  * @typedef {import('dexie').Table<any, string>} EntityTable
  * @typedef {Dexie & {
@@ -34,28 +51,111 @@ import Dexie from 'dexie'
 
 const database = new Dexie('pysplit')
 
-database.version(2).stores({
-  groups: 'id, updated_at, version, deleted_at',
-  participants: 'id, group_id, updated_at, version, deleted_at, position',
-  expenses: 'id, group_id, expense_date, updated_at, version, deleted_at',
-  paidFor: '[expense_id+participant_id], expense_id, participant_id',
-  documents: 'id, expense_id, created_at',
-  activities: 'id, group_id, time',
-  receipts: 'id, group_id, expense_id, updated_at, version, deleted_at',
-  receiptItems: 'id, receipt_id, position, updated_at, version, deleted_at',
-  receiptPortions: 'id, item_id, updated_at, version, deleted_at',
-  receiptOptOuts: 'id, receipt_id, participant_id, updated_at, version, deleted_at',
-  categories: 'id',
-  userGroups: 'id, user_id, group_id, [user_id+group_id], updated_at, version, deleted_at',
-  outbox: '++seq, op_id, group_id, status, next_attempt_at',
-  syncState: 'scope',
-  conflicts: '++id, group_id, entity_type, entity_id, created_at',
-  blobs: 'id, group_id',
-  metadata: 'key',
-})
+database.version(2).stores(STORES_V2)
+database.version(DATABASE_SCHEMA_VERSION).stores(STORES_V3)
 
 /** @type {PysplitDb} */
 export const db = /** @type {any} */ (database)
+
+/** @param {any} table */
+function indexNames(table) {
+  return new Set(
+    (table?.schema?.indexes || []).map((/** @type {any} */ index) => String(index.name)),
+  )
+}
+
+/**
+ * Open the database and make sure every table (and the indexes the repository
+ * queries) the UI needs survived the schema upgrade. This only proves that the
+ * code already running can open the current database; it is not a simulation
+ * of an incoming build's migration. `verifyIncomingBuildCompatibility()` adds
+ * the incoming build's declared contract before an update is activated.
+ *
+ * @returns {Promise<{version: number, tables: string[]}>}
+ */
+export async function verifyDatabaseCompatibility() {
+  await db.open()
+  const byName = new Map(db.tables.map((table) => [table.name, table]))
+  const missing = REQUIRED_TABLES.filter((name) => !byName.has(name))
+  if (missing.length) {
+    throw new Error(`missing Dexie tables: ${missing.join(', ')}`)
+  }
+  const missingIndexes = []
+  for (const [tableName, indexes] of Object.entries(REQUIRED_INDEXES)) {
+    const table = byName.get(tableName)
+    if (!table) continue
+    const actual = indexNames(table)
+    for (const index of indexes) {
+      if (!actual.has(index)) missingIndexes.push(`${tableName}.${index}`)
+    }
+  }
+  if (missingIndexes.length) {
+    throw new Error(`missing Dexie indexes: ${missingIndexes.join(', ')}`)
+  }
+  return { version: Number(db.verno), tables: [...byName.keys()].sort() }
+}
+
+/**
+ * Fetch the waiting build's Dexie contract. This file is emitted at build time
+ * and is deliberately not precached, so `no-store` reads the newly deployed
+ * copy rather than the cache belonging to the running build.
+ *
+ * @returns {Promise<{schemaVersion: number, requiredTables: string[], requiredIndexes: Record<string, string[]>}>}
+ */
+export async function fetchIncomingBuildContract() {
+  if (typeof fetch !== 'function') throw new Error('Build contract is unavailable')
+  const response = await fetch('/pwa-build.json', {
+    cache: 'no-store',
+    headers: { Accept: 'application/json' },
+  })
+  if (!response.ok) throw new Error(`Build contract is unavailable (${response.status})`)
+  const contract = await response.json()
+  if (!contract || typeof contract !== 'object') {
+    throw new Error('Build contract is invalid')
+  }
+  return contract
+}
+
+/**
+ * Compare the waiting build's declared Dexie contract with the open database.
+ *
+ * This catches a build that would downgrade the schema or drop a table/index
+ * the current data depends on. It cannot execute the incoming build's
+ * migration; that can only be validated with a staged migration or an update
+ * e2e using a deliberately newer schema. See docs/offline-capabilities.md §7.
+ *
+ * @param {{schemaVersion?: number, requiredTables?: string[], requiredIndexes?: Record<string, string[]>}} contract
+ * @returns {Promise<{version: number, incomingVersion: number}>}
+ */
+export async function verifyIncomingBuildCompatibility(contract) {
+  await verifyDatabaseCompatibility()
+  const currentVersion = Number(db.verno)
+  const incomingVersion = Number(contract?.schemaVersion || 0)
+  if (!incomingVersion) throw new Error('Incoming build does not declare a Dexie schema version')
+  if (incomingVersion < currentVersion) {
+    throw new Error(
+      `Incoming build schema v${incomingVersion} is older than local v${currentVersion}`,
+    )
+  }
+  const currentTables = new Set(db.tables.map((table) => table.name))
+  const incomingTables = new Set(contract?.requiredTables || [])
+  const missingTables = [...currentTables].filter((name) => !incomingTables.has(name))
+  if (missingTables.length) {
+    throw new Error(`Incoming build drops Dexie tables: ${missingTables.join(', ')}`)
+  }
+  const incomingIndexes = contract?.requiredIndexes || {}
+  const missingIndexes = []
+  for (const [tableName, indexes] of Object.entries(REQUIRED_INDEXES)) {
+    const declared = new Set(incomingIndexes[tableName] || [])
+    for (const index of indexes) {
+      if (!declared.has(index)) missingIndexes.push(`${tableName}.${index}`)
+    }
+  }
+  if (missingIndexes.length) {
+    throw new Error(`Incoming build drops Dexie indexes: ${missingIndexes.join(', ')}`)
+  }
+  return { version: currentVersion, incomingVersion }
+}
 
 /**
  * @param {string} prefix

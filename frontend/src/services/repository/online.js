@@ -573,6 +573,17 @@ const receipts = {
     )
   },
   /**
+   * A queued total-only extraction is local state; the online repository has
+   * no equivalent to read or clear.
+   *
+   * @returns {Promise<null>}
+   */
+  async pendingTotal() {
+    return null
+  },
+  /** @returns {Promise<void>} */
+  async clearPendingTotal() {},
+  /**
    * @param {string} groupId
    * @param {string} receiptId
    * @param {any} input

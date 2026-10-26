@@ -15,7 +15,8 @@
     "lint": "oxlint src",
     "typecheck": "tsc -p jsconfig.json",
     "e2e": "playwright test",
-    "locales:sync": "node scripts/sync-locales.mjs"
+    "locales:sync": "node scripts/sync-locales.mjs",
+    "icons": "python3 scripts/generate-pwa-icons.py"
   },
   "dependencies": {
     "dexie": "4.2.1",
@@ -43,6 +44,7 @@
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
     "vite": "8.3.5",
+    "vite-plugin-pwa": "2.0.0",
     "vitest": "5.0.5"
   }
 }

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 
 import App from './App'
 import { startSync } from './services/repository'
+import { startPwa } from './services/pwa'
 import './styles/index.css'
 
 const container = document.getElementById('root')
@@ -12,6 +13,7 @@ if (!container) {
 }
 
 startSync()
+startPwa()
 
 createRoot(container).render(
   <StrictMode>

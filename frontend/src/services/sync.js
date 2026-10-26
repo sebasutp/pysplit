@@ -19,6 +19,7 @@ import {
   nowIso,
   readCursor,
   replaceGroupSnapshot,
+  setMetadata,
   writeCursor,
 } from './db'
 import {
@@ -234,6 +235,190 @@ async function pushRestOperation(operation) {
 }
 
 /**
+ * Turn a queued blob row back into a File-like body for multipart upload.
+ *
+ * @param {any} blobRow
+ */
+function queuedFile(blobRow) {
+  const type = blobRow.content_type || 'application/octet-stream'
+  const name = blobRow.filename || `${blobRow.kind || 'upload'}.bin`
+  return new File([blobRow.data], name, { type })
+}
+
+/**
+ * Persist a receipt extraction result over the local placeholder receipt.
+ *
+ * @param {any} operation
+ * @param {any} result
+ * @param {string} imageUrl
+ */
+async function applyQueuedReceiptExtraction(operation, result, imageUrl) {
+  const receipt = result?.receipt
+  if (!receipt?.id) return
+  const expenseId =
+    operation.payload?.expense_id || receipt.expense_id || null
+  await db.transaction(
+    'rw',
+    [db.receipts, db.receiptItems, db.receiptPortions, db.receiptOptOuts],
+    async () => {
+      if (operation.entity_id !== receipt.id) {
+        await db.receipts.delete(operation.entity_id)
+      }
+      await db.receipts.put({
+        ...receipt,
+        image_url: receipt.image_url || imageUrl,
+        expense_id: expenseId,
+        pending: false,
+        pending_scan: false,
+      })
+      await db.receiptItems.where('receipt_id').equals(operation.entity_id).delete()
+      if (receipt.id !== operation.entity_id) {
+        await db.receiptItems.where('receipt_id').equals(receipt.id).delete()
+      }
+      for (const item of result.items || []) {
+        const { portions, ...row } = item
+        await db.receiptItems.put({ ...row, pending: false })
+        await db.receiptPortions.where('item_id').equals(item.id).delete()
+        if (portions?.length) {
+          await db.receiptPortions.bulkPut(
+            portions.map((portion) => ({ ...portion, pending: false })),
+          )
+        }
+      }
+      await db.receiptOptOuts.where('receipt_id').equals(receipt.id).delete()
+      for (const participantId of result.opt_outs || []) {
+        await db.receiptOptOuts.put({
+          id: `${receipt.id}:${participantId}`,
+          receipt_id: receipt.id,
+          participant_id: participantId,
+          created_at: nowIso(),
+          updated_at: nowIso(),
+          version: 1,
+          deleted_at: null,
+        })
+      }
+    },
+  )
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('pysplit:refresh'))
+  }
+}
+
+/**
+ * Process one queued document or receipt upload.
+ *
+ * The uploaded image URL is remembered on the outbox row before extraction so
+ * a retry after a lost extraction response does not upload another copy.
+ *
+ * @param {any} operation
+ */
+async function pushBlobOperation(operation) {
+  const groupPath = `/groups/${encodeURIComponent(operation.group_id)}`
+  const blobRow = operation.meta?.blob_id
+    ? await db.blobs.get(operation.meta.blob_id)
+    : null
+
+  if (operation.entity_type === 'document_remove') {
+    const expenseId = operation.payload?.expense_id || operation.meta?.expense_id
+    try {
+      await api.delete(
+        `${groupPath}/expenses/${encodeURIComponent(expenseId)}/documents/${encodeURIComponent(operation.entity_id)}`,
+      )
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? error.code : 'network'
+      if (code !== 'not_found') throw error
+    }
+    await db.documents.delete(operation.entity_id)
+    return null
+  }
+
+  if (!blobRow) {
+    throw Object.assign(new Error('Queued upload payload is missing'), {
+      code: 'validation',
+    })
+  }
+
+  if (operation.entity_type === 'document_upload') {
+    const expenseId = operation.payload?.expense_id || blobRow.expense_id
+    const form = new FormData()
+    form.append('file', queuedFile(blobRow))
+    form.append('width', String(operation.payload?.width || blobRow.width || 1))
+    form.append('height', String(operation.payload?.height || blobRow.height || 1))
+    const document = await api.post(
+      `${groupPath}/expenses/${encodeURIComponent(expenseId)}/documents`,
+      { body: form },
+    )
+    await db.transaction('rw', [db.documents, db.blobs], async () => {
+      await db.documents.delete(operation.entity_id)
+      await db.documents.put({
+        ...document,
+        expense_id: expenseId,
+        created_at: nowIso(),
+        pending: false,
+      })
+      await db.blobs.delete(blobRow.id)
+    })
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('pysplit:refresh'))
+    }
+    return document
+  }
+
+  if (operation.entity_type === 'receipt_upload') {
+    let imageUrl = operation.payload?.image_url
+    if (!imageUrl) {
+      const form = new FormData()
+      form.append('file', queuedFile(blobRow))
+      form.append('width', String(operation.payload?.width || blobRow.width || 1))
+      form.append('height', String(operation.payload?.height || blobRow.height || 1))
+      const image = await api.post(`${groupPath}/receipts/upload`, { body: form })
+      imageUrl = image.url
+      const current = await db.outbox.get(operation.seq)
+      if (current) {
+        await db.outbox.put({
+          ...current,
+          payload: { ...current.payload, image_url: imageUrl },
+          updated_at: nowIso(),
+        })
+      }
+    }
+
+    const mode = operation.payload?.mode
+    if (mode === 'items') {
+      const result = await api.post(`${groupPath}/receipts/extract-items`, {
+        body: {
+          image_url: imageUrl,
+          image_width: operation.payload?.width || blobRow.width || 1,
+          image_height: operation.payload?.height || blobRow.height || 1,
+          ...(operation.payload?.expense_id
+            ? { expense_id: operation.payload.expense_id }
+            : {}),
+        },
+      })
+      await applyQueuedReceiptExtraction(operation, result, imageUrl)
+    } else if (mode === 'total') {
+      const result = await api.post(`${groupPath}/receipts/extract-total`, {
+        body: { image_url: imageUrl },
+      })
+      await setMetadata(`pending_receipt_total:${operation.group_id}`, {
+        ...result,
+        image_url: imageUrl,
+        created_at: nowIso(),
+      })
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('pysplit:refresh'))
+      }
+    }
+    await db.blobs.delete(blobRow.id)
+    return imageUrl
+  }
+
+  throw Object.assign(new Error(`Unsupported queued upload ${operation.entity_type}`), {
+    code: 'validation',
+  })
+}
+
+/**
  * Push pending operations in FIFO batches.
  *
  * @param {{groupId?: string|null, ignoreBackoff?: boolean}} [options]
@@ -306,13 +491,16 @@ export async function pushPending(options = {}) {
         /** @type {any[]} */
         let syncBatch = []
         for (const operation of batch) {
-          if (operation.transport === 'rest') {
+          if (operation.transport === 'rest' || operation.transport === 'blob') {
             await flushSync(syncBatch)
             syncBatch = []
             try {
-              await pushRestOperation(operation)
+              if (operation.transport === 'blob') await pushBlobOperation(operation)
+              else await pushRestOperation(operation)
               await markApplied(operation.op_id)
-              receiptGroups.add(groupId)
+              if (operation.transport === 'rest' || operation.entity_type === 'receipt_upload') {
+                receiptGroups.add(groupId)
+              }
               totals.applied += 1
             } catch (error) {
               const code =
@@ -326,7 +514,7 @@ export async function pushPending(options = {}) {
               )
               if (['network', 'server', 'rate_limited'].includes(code)) throw error
               totals.errors += 1
-              // Stop this group at its first non-retryable REST failure.
+              // Stop this group at its first non-retryable queued failure.
               break
             }
           } else {
@@ -881,6 +1069,14 @@ export async function discardFailed() {
     } else if (row.entity_type === 'receipt_opt_out') {
       const id = `${row.meta?.receipt_id}:${row.entity_id}`
       await db.receiptOptOuts.delete(id)
+    } else if (row.entity_type === 'document_upload') {
+      await db.documents.delete(row.entity_id)
+      if (row.meta?.blob_id) await db.blobs.delete(row.meta.blob_id)
+    } else if (row.entity_type === 'receipt_upload') {
+      await db.receipts.delete(row.entity_id)
+      await db.receiptItems.where('receipt_id').equals(row.entity_id).delete()
+      await db.receiptOptOuts.where('receipt_id').equals(row.entity_id).delete()
+      if (row.meta?.blob_id) await db.blobs.delete(row.meta.blob_id)
     }
   }
   await discardFailedOperations()

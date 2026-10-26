@@ -155,6 +155,43 @@ describe('JSON backup', () => {
     put.mockRestore()
   })
 
+  it('round-trips queued ArrayBuffer blobs written by the upload queue', async () => {
+    const bytes = new Uint8Array([1, 2, 3, 4]).buffer
+    const toArray = vi.spyOn(db.blobs, 'toArray').mockResolvedValue([
+      {
+        id: 'blob-2',
+        group_id: 'g1',
+        kind: 'document',
+        data: bytes,
+      },
+    ])
+
+    const backup = await exportBackup()
+    expect(backup.blobs[0]).toMatchObject({
+      id: 'blob-2',
+      data: null,
+      data_base64: btoa(String.fromCharCode(1, 2, 3, 4)),
+    })
+    toArray.mockRestore()
+
+    await clearMetadata()
+    const put = /** @type {any} */ (vi.spyOn(db.blobs, 'put')).mockResolvedValue(undefined)
+    await importBackup(backup)
+
+    const restored = /** @type {any} */ (put.mock.calls[0][0])
+    expect(restored.data).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await restored.data.arrayBuffer())).toEqual(
+      new Uint8Array([1, 2, 3, 4]),
+    )
+    put.mockRestore()
+  })
+
+  it('rejects a backup whose queued blob lost its data', async () => {
+    const backup = await exportBackup()
+    backup.blobs = [{ id: 'blob-empty', group_id: 'g1', data: null }]
+    await expect(importBackup(backup)).rejects.toThrow('has no data')
+  })
+
   it('keeps a logged-in session usable after restore and reload', async () => {
     await db.metadata.put({
       key: 'session_user',

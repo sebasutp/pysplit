@@ -143,6 +143,7 @@ def extract_items(
         image_url=payload.image_url,
         image_width=payload.image_width,
         image_height=payload.image_height,
+        expense_id=payload.expense_id,
     )
 
 

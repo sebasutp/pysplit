@@ -171,6 +171,26 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [documents, setDocuments] = useState(/** @type {any[]} */ (expense?.documents || []))
   const [pendingFiles, setPendingFiles] = useState(/** @type {File[]} */ ([]))
+  const [pendingReceiptTotal, setPendingReceiptTotal] = useState(
+    /** @type {any|null} */ (null),
+  )
+
+  // A total-only scan queued offline is extracted after reconnect, when its
+  // original form is gone. Offer the result on the next new expense instead of
+  // leaving it in metadata that nothing reads.
+  useEffect(() => {
+    if (editing || !group.id) return undefined
+    let cancelled = false
+    repository.receipts
+      .pendingTotal(group.id)
+      .then((value) => {
+        if (!cancelled) setPendingReceiptTotal(value)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [editing, group.id])
 
   const foreign = Boolean(selectedCurrency && selectedCurrency !== group.currency_code)
   const income = isIncome(parseAmount(amountInput))
@@ -329,6 +349,21 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
     if (result.amount) setAmountInput(majorUnits(Math.round(result.amount * 100)))
     if (result.date) setExpenseDate(result.date)
     if (result.category_id) setCategoryId(String(result.category_id))
+  }
+
+  function consumePendingReceiptTotal() {
+    setPendingReceiptTotal(null)
+    void repository.receipts.clearPendingTotal(group.id).catch(() => {})
+  }
+
+  function applyPendingReceiptTotal() {
+    if (!pendingReceiptTotal) return
+    applyExtracted(pendingReceiptTotal)
+    consumePendingReceiptTotal()
+  }
+
+  function dismissPendingReceiptTotal() {
+    consumePendingReceiptTotal()
   }
 
   /** @returns {string[]} */
@@ -618,5 +653,8 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
     handleDocuments,
     removeDocument,
     applyExtracted,
+    pendingReceiptTotal,
+    applyPendingReceiptTotal,
+    dismissPendingReceiptTotal,
   }
 }

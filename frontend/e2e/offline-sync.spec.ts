@@ -16,11 +16,40 @@ async function blockApi(page) {
 
 async function unblockApi(page) {
   await page.unroute('**/api/**')
+  // A failed cycle may have scheduled a backoff retry. Wait until a plain
+  // health request reaches the server, then force a sync so the test does not
+  // depend on the retry timer.
+  await page.waitForFunction(
+    async () => {
+      try {
+        return (await fetch('/api/health')).ok
+      } catch {
+        return false
+      }
+    },
+    null,
+    { timeout: 10_000 },
+  )
   await page.evaluate(() => window.dispatchEvent(new Event('online')))
-  const syncNow = page
-    .getByTestId('sync-status')
-    .getByRole('button', { name: 'Sync now' })
-  if (await syncNow.isVisible().catch(() => false)) await syncNow.click()
+  await page.evaluate(async () => {
+    const mod = await import('/src/services/repository/index.js')
+    await mod.syncNow({ reason: 'e2e-unblock', force: true })
+  })
+}
+
+/** Force sync until the card loses its pending marker, then assert once. */
+async function waitForSynced(page, title) {
+  const deadline = Date.now() + 30_000
+  while (Date.now() < deadline) {
+    await syncFromBanner(page)
+    const text = await expenseCard(page, title).innerText().catch(() => '')
+    if (text && !text.includes('Pending sync')) {
+      await expect(expenseCard(page, title)).not.toContainText('Pending sync')
+      return
+    }
+    await page.waitForTimeout(500)
+  }
+  await expect(expenseCard(page, title)).not.toContainText('Pending sync')
 }
 
 /** Force a synchronization cycle, preferring the visible status action. */
@@ -29,8 +58,15 @@ async function syncFromBanner(page) {
     .getByTestId('sync-status')
     .getByRole('button', { name: 'Sync now' })
   if (await button.isVisible().catch(() => false)) {
-    await button.click()
-    return
+    // The banner re-renders on every status change, so a normal click can be
+    // detached mid-action. Use a short forced click, then fall back to the
+    // repository entry point.
+    try {
+      await button.click({ force: true, timeout: 2_000 })
+      return
+    } catch {
+      // Fall through to the deterministic programmatic trigger.
+    }
   }
   await page.evaluate(async () => {
     const mod = await import('/src/services/repository/index.js')
@@ -87,6 +123,7 @@ test('creates and edits an expense offline, survives reload and syncs exactly on
   await expect(expenseCard(page, 'Offline lunch edited')).toContainText('Pending sync')
 
   await unblockApi(page)
+  await syncFromBanner(page)
 
   await expect(expenseCard(page, 'Offline lunch edited')).not.toContainText(
     'Pending sync',
@@ -200,18 +237,109 @@ test('queues divergent offline edits and resolves the expense conflict explicitl
   await dialog.getByRole('button', { name: 'Keep mine' }).click()
   await expect(dialog.getByTestId('conflict-row')).toHaveCount(0)
 
+  const deadline = Date.now() + 30_000
+  let title = 'First device edit'
+  while (Date.now() < deadline) {
+    await syncFromBanner(second)
+    const response = await second.request.get(`/api/groups/${groupId}/expenses`)
+    const body = await response.json()
+    title = body.items[0]?.title
+    if (title === 'Second device edit') break
+    await second.waitForTimeout(500)
+  }
+  expect(title).toBe('Second device edit')
+
+  await secondContext.close()
+})
+
+test('queues an offline document in a real browser and uploads it exactly once', async ({
+  page,
+}) => {
+  const groupId = await createGroup(page, {
+    name: `E2E Offline Upload ${uniqueSuffix()}`,
+    participants: ['Alice', 'Bob'],
+  })
+  await addExpense(page, groupId, {
+    title: 'Document expense',
+    amount: '10',
+    paidBy: 'Alice',
+  })
+  const expenseResponse = await page.request.get(`/api/groups/${groupId}/expenses`)
+  const expenseId = (await expenseResponse.json()).items[0].id
+
+  // The live API is unreachable, but the Vite app shell still loads. This is
+  // the case that used to throw PrematureCommitError inside a Dexie
+  // transaction after leaving partial rows behind.
+  await blockApi(page)
+  const document = await page.evaluate(
+    async ({ groupId, expenseId }) => {
+      const { localRepository } = await import('/src/services/repository/local.js')
+      const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3, 4])
+      const file = new File([bytes], 'offline-proof.png', { type: 'image/png' })
+      return localRepository.documents.upload(groupId, expenseId, file, {
+        width: 10,
+        height: 20,
+      })
+    },
+    { groupId, expenseId },
+  )
+  expect(document.pending).toBe(true)
+
+  const queued = await page.evaluate(async () => {
+    const { db } = await import('/src/services/db.js')
+    const outbox = await db.outbox.toArray()
+    return {
+      blobs: await db.blobs.count(),
+      documents: await db.documents.count(),
+      uploads: outbox.filter((row) => row.entity_type === 'document_upload').length,
+    }
+  })
+  expect(queued).toEqual({ blobs: 1, documents: 1, uploads: 1 })
+
+  // The blob row, placeholder and outbox row all survive a reload.
+  await page.reload()
+  const afterReload = await page.evaluate(async () => {
+    const { db } = await import('/src/services/db.js')
+    return {
+      blobs: await db.blobs.count(),
+      uploads: (await db.outbox.toArray()).filter(
+        (row) => row.entity_type === 'document_upload',
+      ).length,
+    }
+  })
+  expect(afterReload).toEqual({ blobs: 1, uploads: 1 })
+
+  await unblockApi(page)
+  await syncFromBanner(page)
   await expect
     .poll(
       async () => {
-        const response = await second.request.get(`/api/groups/${groupId}/expenses`)
+        const response = await page.request.get(
+          `/api/groups/${groupId}/expenses/${expenseId}`,
+        )
+        if (!response.ok()) return -1
         const body = await response.json()
-        return body.items[0]?.title
+        return (body.documents || []).length
       },
       { timeout: 30_000 },
     )
-    .toBe('Second device edit')
+    .toBe(1)
 
-  await secondContext.close()
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(async () => {
+          const { db } = await import('/src/services/db.js')
+          return {
+            blobs: await db.blobs.count(),
+            uploads: (await db.outbox.toArray()).filter(
+              (row) => row.entity_type === 'document_upload',
+            ).length,
+          }
+        }),
+      { timeout: 30_000 },
+    )
+    .toEqual({ blobs: 0, uploads: 0 })
 })
 
 test('retries a lost push response without duplicating the expense', async ({ page }) => {
@@ -223,7 +351,10 @@ test('retries a lost push response without duplicating the expense', async ({ pa
 
   let dropped = false
   await page.route('**/api/sync/push', async (route) => {
-    if (dropped) {
+    const body = route.request().postData() || ''
+    // Only drop the response for the expense under test; group-creation and
+    // other background pushes must still complete normally.
+    if (dropped || !body.includes('Exactly once')) {
       await route.continue()
       return
     }
@@ -236,19 +367,21 @@ test('retries a lost push response without duplicating the expense', async ({ pa
     })
   })
 
-  await addExpense(page, groupId, {
-    title: 'Exactly once',
-    amount: '25',
-    paidBy: 'Bob',
-  })
+  await addExpense(
+    page,
+    groupId,
+    {
+      title: 'Exactly once',
+      amount: '25',
+      paidBy: 'Bob',
+    },
+    { waitForActiveUser: true },
+  )
   await expect(expenseCard(page, 'Exactly once')).toContainText('Pending sync')
 
   await page.unroute('**/api/sync/push')
   await page.evaluate(() => window.dispatchEvent(new Event('online')))
-  await syncFromBanner(page)
-  await expect(expenseCard(page, 'Exactly once')).not.toContainText('Pending sync', {
-    timeout: 30_000,
-  })
+  await waitForSynced(page, 'Exactly once')
 
   const response = await page.request.get(`/api/groups/${groupId}/expenses`)
   const body = await response.json()

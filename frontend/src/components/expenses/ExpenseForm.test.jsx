@@ -7,9 +7,11 @@ import { today } from '../../hooks/useExpenseForm'
 import { ToastProvider } from '../../hooks/useToast'
 import { ExpenseForm } from './ExpenseForm'
 
-const { create, update } = vi.hoisted(() => ({
+const { create, update, pendingTotal, clearPendingTotal } = vi.hoisted(() => ({
   create: vi.fn(),
   update: vi.fn(),
+  pendingTotal: vi.fn(),
+  clearPendingTotal: vi.fn(),
 }))
 
 vi.mock('../../services/repository', () => ({
@@ -20,7 +22,12 @@ vi.mock('../../services/repository', () => ({
       remove: vi.fn(),
     },
     documents: { upload: vi.fn(), remove: vi.fn() },
-    receipts: { upload: vi.fn(), extractTotal: vi.fn() },
+    receipts: {
+      upload: vi.fn(),
+      extractTotal: vi.fn(),
+      pendingTotal,
+      clearPendingTotal,
+    },
   },
 }))
 
@@ -66,6 +73,8 @@ beforeEach(() => {
   localStorage.clear()
   create.mockReset().mockResolvedValue({ id: 'expense-1' })
   update.mockReset()
+  pendingTotal.mockReset().mockResolvedValue(null)
+  clearPendingTotal.mockReset().mockResolvedValue(undefined)
 })
 
 afterEach(() => {
@@ -225,6 +234,35 @@ describe('ExpenseForm', () => {
     expect(screen.queryByText('left form')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Expense title')).toHaveValue('Hotel')
     expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+  })
+
+  it('surfaces and consumes a queued total-only receipt scan', async () => {
+    pendingTotal.mockResolvedValue({
+      amount: 42.5,
+      title: 'Lunch',
+      date: '2026-10-01',
+      category_id: '9',
+    })
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/groups/group-1/expenses/create']}>
+        <ToastProvider>
+          <ExpenseForm group={group} categories={categories} />
+        </ToastProvider>
+      </MemoryRouter>,
+    )
+
+    expect(
+      await screen.findByText('A receipt scanned while offline is ready.'),
+    ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Use scanned total' }))
+
+    expect(screen.getByLabelText('Expense title')).toHaveValue('Lunch')
+    expect(screen.getByLabelText('Amount')).toHaveValue('42.50')
+    expect(clearPendingTotal).toHaveBeenCalledWith('group-1')
+    expect(
+      screen.queryByText('A receipt scanned while offline is ready.'),
+    ).not.toBeInTheDocument()
   })
 
   it('uses the local calendar date for the default expense date', () => {

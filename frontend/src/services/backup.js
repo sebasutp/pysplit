@@ -50,6 +50,25 @@ function blobToBase64(blob) {
 }
 
 /**
+ * @param {ArrayBuffer|ArrayBufferView} value
+ * @returns {string}
+ */
+function bytesToBase64(value) {
+  const bytes =
+    value instanceof Uint8Array
+      ? value
+      : ArrayBuffer.isView(value)
+        ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength)
+        : new Uint8Array(value)
+  let binary = ''
+  const chunk = 0x8000
+  for (let index = 0; index < bytes.length; index += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunk))
+  }
+  return btoa(binary)
+}
+
+/**
  * @param {string} base64
  * @param {string} type
  * @returns {Blob}
@@ -59,6 +78,43 @@ function base64ToBlob(base64, type) {
   const bytes = new Uint8Array(binary.length)
   for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index)
   return new Blob([bytes], { type })
+}
+
+/**
+ * Encode the two shapes Stage 9/10 store in `blobs.data`: a Blob (tests and
+ * older rows) or an ArrayBuffer (queued uploads written before the backup
+ * fix). Returning `null` means the backup cannot preserve those bytes, and the
+ * import below rejects it rather than restoring a corrupt upload.
+ *
+ * @param {any} value
+ * @returns {Promise<{base64: string, type: string}|null>}
+ */
+async function encodeBlobData(value) {
+  if (typeof Blob !== 'undefined' && value instanceof Blob) {
+    if (typeof FileReader !== 'undefined') {
+      return { base64: await blobToBase64(value), type: value.type || 'application/octet-stream' }
+    }
+    if (typeof value.arrayBuffer === 'function') {
+      return {
+        base64: bytesToBase64(await value.arrayBuffer()),
+        type: value.type || 'application/octet-stream',
+      }
+    }
+    return null
+  }
+  if (value instanceof ArrayBuffer) {
+    return { base64: bytesToBase64(value), type: 'application/octet-stream' }
+  }
+  if (ArrayBuffer.isView(value)) {
+    return { base64: bytesToBase64(value), type: 'application/octet-stream' }
+  }
+  if (value && typeof value.arrayBuffer === 'function') {
+    return {
+      base64: bytesToBase64(await value.arrayBuffer()),
+      type: value.type || 'application/octet-stream',
+    }
+  }
+  return null
 }
 
 /**
@@ -72,20 +128,17 @@ export async function exportBackup() {
   }
   const blobs = []
   for (const row of await db.blobs.toArray()) {
-    const value = row.data
-    const isBlob =
-      (typeof Blob !== 'undefined' && value instanceof Blob) ||
-      (value && typeof value === 'object' && typeof value.arrayBuffer === 'function')
-    if (isBlob && typeof FileReader !== 'undefined') {
-      blobs.push({
-        ...row,
-        data: null,
-        data_base64: await blobToBase64(value),
-        data_type: value.type || 'application/octet-stream',
-      })
-    } else {
-      blobs.push({ ...row, data: null })
-    }
+    const encoded = await encodeBlobData(row.data)
+    blobs.push(
+      encoded
+        ? {
+            ...row,
+            data: null,
+            data_base64: encoded.base64,
+            data_type: encoded.type,
+          }
+        : { ...row, data: null },
+    )
   }
   const user = await getMetadata('session_user', null)
   return {
@@ -139,6 +192,11 @@ export async function importBackup(backup) {
       const data = row.data_base64
         ? base64ToBlob(String(row.data_base64), String(row.data_type || 'application/octet-stream'))
         : row.data
+      if (data == null) {
+        // Never restore a queued upload with `data: null`; the sync engine
+        // would upload an empty/corrupt file.
+        throw new Error(`Backup blob ${row.id || 'unknown'} has no data`)
+      }
       await db.blobs.put({ ...row, data, data_base64: undefined })
     }
   })

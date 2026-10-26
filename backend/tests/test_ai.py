@@ -14,7 +14,7 @@ from app.utils.receipt_extraction import (
     normalize_receipt,
     parse_receipt_items_response,
 )
-from tests.helpers import access_headers, make_group, make_user
+from tests.helpers import access_headers, make_expense, make_group, make_user
 
 
 class FakeAiClient:
@@ -384,6 +384,50 @@ def test_extract_items_endpoint(make_client, session, tmp_path, monkeypatch):
     assert again.status_code == 200, again.text
     assert again.json()["receipt"]["id"] == body["receipt"]["id"]
     assert len(fake.calls) == 1
+
+
+def test_extract_items_links_queued_receipt_to_expense(make_client, session, tmp_path, monkeypatch):
+    fake = FakeAiClient(
+        json.dumps(
+            {
+                "merchant": "Cafe",
+                "date": "2026-04-01",
+                "currencyCode": "USD",
+                "total": 10,
+                "items": [{"name": "Coffee", "quantity": 1, "amount": 10}],
+            }
+        )
+    )
+    _patch_ai(monkeypatch, fake)
+    client = make_client(enable_receipt_items=True, upload_dir=str(tmp_path))
+    group, people = make_group(session)
+    expense = make_expense(
+        session,
+        group=group,
+        paid_by=people["Alice"],
+        paid_for=[(people["Alice"], 1), (people["Bob"], 1)],
+        amount=1000,
+    )
+    headers = _auth(session)
+    upload = _upload(client, group.id)
+    assert upload.status_code == 201, upload.text
+
+    response = client.post(
+        f"/api/groups/{group.id}/receipts/extract-items",
+        json={"image_url": upload.json()["url"], "expense_id": expense.id},
+        headers=headers,
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["receipt"]["expense_id"] == expense.id
+
+    # The post-sync bootstrap reads the link from the server, so it survives.
+    linked = client.get(
+        f"/api/groups/{group.id}/expenses/{expense.id}/receipt",
+        headers=headers,
+    )
+    assert linked.status_code == 200, linked.text
+    assert linked.json()["receipt"]["id"] == body["receipt"]["id"]
 
 
 def test_configured_item_cap(make_client, session, tmp_path, monkeypatch):

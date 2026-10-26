@@ -261,9 +261,11 @@ activities.list(groupId, { cursor, limit, signal })
 ```js
 receipts.get(groupId, { receipt_id?, expense_id?, signal })
   // → { receipt, items, opt_outs, split } | null
-receipts.upload(groupId, file, { width, height, signal })   // → { url, width, height }
+receipts.upload(groupId, file, { width, height, expense_id?, signal }) // → { url, width, height }
 receipts.extractTotal(groupId, { image_url }, { signal })   // → Receipt
-receipts.extractItems(groupId, { image_url, image_width, image_height }, { signal }) // → Receipt
+receipts.extractItems(groupId, { image_url, image_width, image_height, expense_id? }, { signal }) // → Receipt
+receipts.pendingTotal(groupId)                              // → queued total result | null
+receipts.clearPendingTotal(groupId)                         // → void
 receipts.addItem(groupId, receiptId, input, { signal })     // → ReceiptState
 receipts.updateItem(groupId, receiptId, itemId, input, { signal }) // → ReceiptState
 receipts.deleteItem(groupId, receiptId, itemId, { signal }) // → ReceiptState
@@ -276,9 +278,18 @@ categories.infer(title, { signal })                         // → { category_id
 
 `ReceiptState` is `{ receipt, items, opt_outs, split }`, where `split` is the
 server-recomputed provisional split. Clients never send their own totals.
-AI methods are **online-only**: offline they reject with
-`offline_unsupported` (or queue an upload in the upload-specific flow).
-`receipts.apply`/`receipts.link` are also online-only in Stage 9.
+Offline `receipts.upload` reads the file bytes before opening its Dexie
+transaction, stores the blob and returns a local placeholder
+`{ url: 'local-receipt://…', pending: true }`; a following `extractTotal` or
+`extractItems` records the requested mode and returns either a pending marker or
+a placeholder `ReceiptState` with `status: 'PENDING'`. The sync engine uploads
+and extracts after reconnect, then replaces the placeholder. Line-item
+extraction sends the known `expense_id` so the link survives the post-sync
+server bootstrap. A total-only result has no expense to link; it is stored
+locally and exposed through `pendingTotal`/`clearPendingTotal` until the user
+applies or dismisses it on a new expense form. Live extraction methods remain
+**online-only** when no queued upload matches. `receipts.apply`/`receipts.link`
+are online-only.
 
 ## 11. Documents
 
@@ -287,9 +298,12 @@ documents.upload(groupId, expenseId, file, { signal }) // → Document
 documents.remove(groupId, expenseId, documentId, { signal }) // → void
 ```
 
-Document upload and removal are **online-only** until Stage 10B. Offline they
-reject with `offline_unsupported`; the local repository never deletes a cached
-document while offline.
+Offline upload returns a local placeholder Document with `pending: true` and
+queues its blob. The bytes are read before the Dexie transaction so a real
+browser cannot expire it mid-write; the placeholder, blob and outbox row commit
+together. Offline removal drops a never-uploaded placeholder immediately or
+queues the server delete and removes the local row. The sync engine uploads or
+deletes after reconnect.
 
 ## 12. Exports
 
@@ -344,8 +358,8 @@ the next request because the server reloads the user row.
 | Star/archive/access | yes (queued, LWW); access recording is best-effort and skipped offline |
 | Receipt item/portion/opt-out edits on cached receipts | yes (queued) |
 | Receipt apply/link | no (online-only) |
-| Receipt total/item extraction, category inference | no (online-only) |
-| Documents upload/remove | no (online-only until Stage 10B) |
+| Receipt total/item extraction, category inference | extraction no (queued upload runs after reconnect); category inference no |
+| Documents upload/remove | yes (queued); pending placeholders are shown |
 | Admin | no (online-only) |
 | Auth refresh | deferred, retried on reconnect |
 | Exports | yes, from local data, byte-identical to the server |

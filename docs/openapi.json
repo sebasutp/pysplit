@@ -5774,6 +5774,19 @@
               }
             ],
             "title": "Image Height"
+          },
+          "expense_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expense Id"
           }
         },
         "additionalProperties": false,

@@ -126,6 +126,10 @@ class ReceiptExtractRequest(BaseModel):
     image_url: str = Field(min_length=1, max_length=2000)
     image_width: int | None = Field(default=None, ge=1)
     image_height: int | None = Field(default=None, ge=1)
+    # Optional link for offline line-item scans: the client already knows which
+    # expense the queued receipt belongs to, and a later sync bootstrap would
+    # otherwise overwrite the local link with the unlinked server row.
+    expense_id: str | None = Field(default=None, min_length=1, max_length=64)
 
 
 class ReceiptItemCreate(BaseModel):

@@ -58,6 +58,8 @@ REQUIRED_E2E = (
     "receipts.spec.ts",
     "admin.spec.ts",
     "offline-sync.spec.ts",
+    "pwa.spec.ts",
+    "pwa-offline.spec.ts",
 )
 FORBIDDEN_FRONTEND = re.compile(
     r"from\s+['\"][^'\"]*services/(?:api|db|outbox|sync)(?:\.js)?['\"]"

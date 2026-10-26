@@ -1,6 +1,13 @@
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
+
+import { includeAssets, manifest, workbox } from './pwa.config.js'
+import { DATABASE_BUILD_CONTRACT } from './src/services/db-schema.js'
 
 // The SPA calls /api by default and Vite proxies it to the API. When
 // VITE_API_BASE_URL is an absolute URL the browser calls that origin directly
@@ -37,7 +44,44 @@ const proxy = {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      // Registration is manual so the update prompt controls when a waiting
+      // worker activates. `registerType: 'prompt'` never calls skipWaiting on
+      // its own.
+      registerType: 'prompt',
+      injectRegister: false,
+      includeAssets,
+      manifest,
+      manifestFilename: 'manifest.webmanifest',
+      workbox,
+      devOptions: { enabled: false },
+    }),
+    {
+      // Emit the waiting build's Dexie contract next to the app shell. It is
+      // intentionally not precached: `fetchIncomingBuildContract()` fetches it
+      // with `cache: 'no-store'` so an update can be checked before activation.
+      name: 'pwa-build-contract',
+      apply: 'build',
+      closeBundle() {
+        const output = fileURLToPath(new URL('./dist', import.meta.url))
+        mkdirSync(output, { recursive: true })
+        writeFileSync(
+          fileURLToPath(new URL('./dist/pwa-build.json', import.meta.url)),
+          JSON.stringify(
+            {
+              ...DATABASE_BUILD_CONTRACT,
+              buildId: process.env.PWA_BUILD_ID || process.env.npm_package_version || 'dev',
+            },
+            null,
+            2,
+          ),
+        )
+      },
+    },
+  ],
   server: {
     host: listenHost,
     port: webPort,

@@ -17,6 +17,7 @@ import { Input, Textarea } from '../ui/Input'
 const participantSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(2, 'min2').max(50, 'max50'),
+  pending: z.boolean().optional(),
 })
 
 export const groupFormSchema = z
@@ -67,6 +68,7 @@ function valuesFromInitial(initial, defaultCurrencyCode, t) {
         ? initial.participants.map((/** @type {any} */ participant) => ({
             id: participant.id,
             name: participant.name,
+            pending: Boolean(participant.pending),
           }))
         : [
             { name: t('GroupForm.Participants.John', 'John') },
@@ -330,6 +332,14 @@ export function GroupForm({
                 {errors[`participants.${index}.name`] ? (
                   <p role="alert" className="mt-1 text-xs text-destructive">
                     {errors[`participants.${index}.name`]}
+                  </p>
+                ) : null}
+                {participant.pending ? (
+                  <p
+                    data-testid="participant-pending"
+                    className="mt-1 text-xs text-muted-foreground"
+                  >
+                    {t('Pending.participant', 'Pending sync')}
                   </p>
                 ) : null}
               </li>

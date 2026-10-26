@@ -8,6 +8,7 @@ import { useGroupContext } from '../../components/groups/GroupLayout'
 import { ErrorState, LoadingState } from '../../components/common/States'
 import { ReceiptFooter } from '../../components/receipts/ReceiptFooter'
 import { useFeatures } from '../../hooks/useFeatures'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { useToast } from '../../hooks/useToast'
 import { repository } from '../../services/repository'
 import { compressImage, imageDimensions } from '../../utils/compress-image'
@@ -46,6 +47,7 @@ export function ReceiptItemsPage() {
   const { t, i18n } = useTranslation()
   const { toast } = useToast()
   const { features, loading: featuresLoading } = useFeatures()
+  const online = useOnlineStatus()
   const locale = i18n.resolvedLanguage || 'en-US'
   const currency = getCurrencyFromGroup(group)
   const participants = group.participants || []
@@ -134,16 +136,27 @@ export function ReceiptItemsPage() {
     try {
       const compressed = await compressImage(file)
       const size = await imageDimensions(compressed)
-      const image = await repository.receipts.upload(group.id, compressed, size)
+      const image = await repository.receipts.upload(group.id, compressed, {
+        ...size,
+        expense_id: expenseId,
+      })
       const result = await repository.receipts.extractItems(group.id, {
         image_url: image.url,
         image_width: size.width,
         image_height: size.height,
+        expense_id: expenseId,
       })
       setState(result)
       toast({
-        title: t('ReceiptItems.extracted', 'Receipt scanned'),
-        description: t('ReceiptItems.extractedDescription', 'Review the extracted items below.'),
+        title: image.pending
+          ? t('ReceiptItems.scanPending', 'Scan queued')
+          : t('ReceiptItems.extracted', 'Receipt scanned'),
+        description: image.pending
+          ? t(
+              'ReceiptItems.scanPendingDescription',
+              'The image is saved on this device and will be scanned when you are back online.',
+            )
+          : t('ReceiptItems.extractedDescription', 'Review the extracted items below.'),
       })
     } catch (caught) {
       toast({
@@ -330,6 +343,14 @@ export function ReceiptItemsPage() {
           <p className="text-sm text-muted-foreground">
             {t('ReceiptItems.noReceipt', 'No receipt is linked to this expense yet.')}
           </p>
+          {!online ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              {t(
+                'ReceiptItems.offlineQueue',
+                'You are offline. Attach the photo now and it will be scanned after you reconnect.',
+              )}
+            </p>
+          ) : null}
           <input
             type="file"
             accept="image/*"
@@ -358,6 +379,14 @@ export function ReceiptItemsPage() {
           <p className="text-sm text-muted-foreground">
             {receipt.merchant || t('ReceiptItems.merchant', 'Merchant')} · {receipt.status}
           </p>
+          {receipt.pending_scan || receipt.pending ? (
+            <p
+              data-testid="receipt-scan-pending"
+              className="mt-1 text-xs font-medium text-amber-600 dark:text-amber-400"
+            >
+              {t('ReceiptItems.scanPending', 'Scan queued')}
+            </p>
+          ) : null}
         </div>
         <div className="flex gap-2">
           <Button

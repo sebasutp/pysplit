@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { compressImage, imageDimensions } from '../../utils/compress-image'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { repository } from '../../services/repository'
 import { Button } from '../ui/Button'
 import { Alert, AlertDescription } from '../ui/Feedback'
@@ -17,9 +18,11 @@ import { Alert, AlertDescription } from '../ui/Feedback'
  */
 export function ReceiptScanButton({ groupId, features, onExtracted }) {
   const { t } = useTranslation()
+  const online = useOnlineStatus()
   const input = useRef(/** @type {HTMLInputElement|null} */ (null))
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
 
   if (!features?.receipt_extract) return null
 
@@ -29,6 +32,7 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
     if (!file) return
     setPending(true)
     setError('')
+    setNotice('')
     try {
       const compressed = await compressImage(file)
       const size = await imageDimensions(compressed)
@@ -36,7 +40,16 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
       const result = await repository.receipts.extractTotal(groupId, {
         image_url: image.url,
       })
-      onExtracted(result)
+      if (result.pending) {
+        setNotice(
+          t(
+            'CreateFromReceipt.queued',
+            'Queued. The receipt will be scanned after you reconnect.',
+          ),
+        )
+      } else {
+        onExtracted(result)
+      }
     } catch (caught) {
       setError(
         caught && typeof caught === 'object' && 'detail' in caught
@@ -62,6 +75,16 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
           ? t('CreateFromReceipt.scanning', 'Scanning…')
           : t('CreateFromReceipt.Dialog.triggerTitle', 'Create expense from receipt')}
       </Button>
+      {notice ? (
+        <p role="status" className="text-xs text-muted-foreground">
+          {notice}
+        </p>
+      ) : null}
+      {!online && !notice ? (
+        <p className="text-xs text-muted-foreground">
+          {t('CreateFromReceipt.offline', 'Scanning resumes when you are online.')}
+        </p>
+      ) : null}
       {error ? (
         <Alert variant="destructive" className="py-2">
           <AlertDescription>{error}</AlertDescription>

@@ -70,9 +70,21 @@ export function ExpenseDocumentsCard({
             <ul className="mt-2 flex flex-col gap-1 text-sm">
               {documents.map((document) => (
                 <li key={document.id} className="flex items-center justify-between gap-2">
-                  <a href={document.url} target="_blank" rel="noreferrer" className="underline">
-                    {document.id}
-                  </a>
+                  <span className="flex items-center gap-2">
+                    <span className="underline">{document.id}</span>
+                    {document.pending || document.pending_upload ? (
+                      <span
+                        data-testid="document-pending"
+                        className="text-xs text-muted-foreground"
+                      >
+                        {t('ExpenseDocumentsInput.queued', 'Pending upload')}
+                      </span>
+                    ) : (
+                      <a href={document.url} target="_blank" rel="noreferrer" className="underline">
+                        {t('ExpenseDocumentsInput.open', 'Open')}
+                      </a>
+                    )}
+                  </span>
                   <Button variant="ghost" size="sm" onClick={() => void removeDocument(document.id)}>
                     {t('ExpenseForm.DeletePopup.label', 'Delete')}
                   </Button>

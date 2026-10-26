@@ -69,6 +69,8 @@ export const REPOSITORY_METHODS = [
   'receipts.upload',
   'receipts.extractTotal',
   'receipts.extractItems',
+  'receipts.pendingTotal',
+  'receipts.clearPendingTotal',
   'receipts.addItem',
   'receipts.updateItem',
   'receipts.deleteItem',
