@@ -211,6 +211,7 @@ def _expense_read(
     paid_for_by_expense: dict[str, list[tuple[ExpensePaidFor, Participant]]],
     documents_by_expense: dict[str, list[ExpenseDocument]],
     receipts: dict[str, Receipt],
+    recurring_heads: set[str] | None = None,
 ) -> ExpenseRead:
     category = categories.get(expense.category_id)
     paid_by = participants.get(expense.paid_by_id)
@@ -238,6 +239,7 @@ def _expense_read(
         split_mode=SplitMode(expense.split_mode),
         notes=expense.notes,
         recurrence_rule=RecurrenceRule(expense.recurrence_rule or "NONE"),
+        is_recurring_head=expense.id in (recurring_heads or set()),
         created_at=expense.created_at,
         updated_at=expense.updated_at,
         version=expense.version,
@@ -315,6 +317,16 @@ def expenses_to_read(session: Session, expenses: list[Expense]) -> list[ExpenseR
         if receipt.expense_id is not None:
             receipts.setdefault(receipt.expense_id, receipt)
 
+    recurring_heads = {
+        link.current_frame_expense_id
+        for link in session.exec(
+            select(RecurringExpenseLink).where(
+                RecurringExpenseLink.current_frame_expense_id.in_(expense_ids),
+                RecurringExpenseLink.next_expense_created_at.is_(None),
+            )
+        ).all()
+    }
+
     return [
         _expense_read(
             expense,
@@ -323,6 +335,7 @@ def expenses_to_read(session: Session, expenses: list[Expense]) -> list[ExpenseR
             paid_for_by_expense=paid_for_by_expense,
             documents_by_expense=documents_by_expense,
             receipts=receipts,
+            recurring_heads=recurring_heads,
         )
         for expense in expenses
     ]

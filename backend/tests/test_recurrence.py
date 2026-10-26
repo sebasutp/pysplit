@@ -204,6 +204,9 @@ def test_materialization_is_capped_per_call_and_makes_progress(session: Session)
     assert len(listed.items) == total_due + 1
     assert all(len(item.paid_for) == 2 for item in listed.items)
     assert sum(item.amount for item in listed.items) == (total_due + 1) * 10000
+    heads = [item for item in listed.items if item.is_recurring_head]
+    assert len(heads) == 1
+    assert heads[0].expense_date == max(item.expense_date for item in listed.items)
 
 
 def test_update_recurrence_rule_creates_updates_and_deletes_link(client, session: Session):

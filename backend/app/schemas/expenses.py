@@ -227,6 +227,7 @@ class ExpenseRead(BaseModel):
     split_mode: SplitMode
     notes: str | None = None
     recurrence_rule: RecurrenceRule
+    is_recurring_head: bool = False
     created_at: UTCDateTime
     updated_at: UTCDateTime
     version: int = 1

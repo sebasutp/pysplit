@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { repository } from '../services/repository'
+import { useSyncRefresh } from './useSyncRefresh'
 
 /** @param {string|undefined} groupId */
 export function useActivities(groupId) {
@@ -12,9 +13,12 @@ export function useActivities(groupId) {
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(/** @type {any} */ (null))
+  const [nonce, setNonce] = useState(0)
   const loadingMoreRef = useRef(false)
   const generationRef = useRef(0)
   const loadMoreControllerRef = useRef(/** @type {AbortController|null} */ (null))
+
+  useSyncRefresh(setNonce)
 
   useEffect(() => {
     if (!groupId) return undefined
@@ -53,7 +57,7 @@ export function useActivities(groupId) {
       loadMoreControllerRef.current?.abort()
       generationRef.current += 1
     }
-  }, [groupId])
+  }, [groupId, nonce])
 
   const loadMore = useCallback(async () => {
     if (!groupId || !nextCursor || !hasMore || loadingMoreRef.current) return

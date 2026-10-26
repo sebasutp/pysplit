@@ -601,6 +601,14 @@ def add_item(
     settings: Settings | None = None,
 ) -> ReceiptState:
     receipt = _require_receipt(session, group_id, receipt_id)
+    item_id = payload.id or new_id("ritem")
+    if payload.id is not None:
+        existing_item = session.get(ReceiptItem, item_id)
+        if existing_item is not None:
+            if existing_item.receipt_id == receipt.id and existing_item.deleted_at is None:
+                # Idempotent replay of a create whose response was lost.
+                return receipt_state(session, group_id, receipt)
+            raise InvalidInputError("Receipt item id already exists", field="id")
     _check_item_values(
         settings,
         name=payload.name,
@@ -623,7 +631,7 @@ def add_item(
     position = (int(maximum) if maximum is not None else -1) + 1
     session.add(
         ReceiptItem(
-            id=new_id("ritem"),
+            id=item_id,
             receipt_id=receipt.id,
             name=payload.name,
             quantity_milli=payload.quantity_milli,
@@ -689,7 +697,13 @@ def delete_item(
     now: datetime | None = None,
 ) -> ReceiptState:
     receipt = _require_receipt(session, group_id, receipt_id)
-    item = _require_item(session, receipt, item_id)
+    item = session.get(ReceiptItem, item_id)
+    if item is not None and item.receipt_id != receipt.id:
+        raise NotFoundError("Item not found")
+    if item is None or item.deleted_at is not None:
+        # Retries after a lost response must be idempotent: the first delete
+        # already removed the row, so return the current receipt state.
+        return receipt_state(session, group_id, receipt)
     session.execute(delete(ReceiptItemPortion).where(ReceiptItemPortion.item_id == item.id))
     session.delete(item)
     moment = now or utc_now()

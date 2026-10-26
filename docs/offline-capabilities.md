@@ -7,10 +7,17 @@ This is the user-visible classification every screen and the final README must
 use. "Offline" means after a group has been synchronized at least once and the
 application shell boots from the service worker.
 
-> **Implementation status.** The current frontend ships the online repository;
-> the offline repository, outbox and PWA behavior below are the Stage 9 target.
-> On the server, only `/api/sync/push` and server-side recurrence
-> materialization append sync change rows. REST mutations do not. See §2.1.
+> **Implementation status.** Stage 9 ships the Dexie-backed local repository,
+> durable outbox, push/pull engine, conflict queue, local domain calculations,
+> localStorage migration and JSON backup. Stage 10 adds the Workbox service
+> worker and installable PWA; until then an offline reload requires the app
+> shell to be served by the dev server or an already-installed cache. On the
+> server, `/api/sync/push` and recurrence materialization append sync change
+> rows. REST mutations still do not; the outbox therefore uses `/sync/push`
+> for all synchronizable writes. Receipt item edits use a REST transport in the
+> outbox and are refreshed by bootstrap rather than appearing in another
+> device's change feed. Receipt apply/link and document upload/removal are
+> online-only in Stage 9. See §2.1 and §3.
 
 ## 1. Capability matrix
 
@@ -23,15 +30,15 @@ application shell boots from the service worker.
 | Statistics and drill-downs | Yes | Yes, computed locally | — |
 | CSV/JSON export | Yes | Yes, from local data | — |
 | Star/archive and active-user preferences | Yes | Yes | Yes |
-| Group access recording | Yes | Yes | Yes, debounced |
+| Group access recording | Yes | Best effort | No; skipped offline |
 | Receipt item/portion/opt-out edits on cached receipts | Yes | Yes | Yes |
-| Receipt total/item extraction (AI) | Yes | No | Upload queued; extraction after reconnect |
+| Receipt total/item extraction (AI) | Yes | No | No; online-only until Stage 10B |
 | Category inference (AI) | Yes | No | No |
-| Expense document upload | Yes | Yes, blob queued | Yes |
+| Expense document upload/removal | Yes | No | No; online-only until Stage 10B |
 | Admin operations | Yes | No | No |
 | Live currency-rate lookup | Yes | Last cached rate or manual override | — |
 | Authentication refresh | Yes | Deferred | Retried on reconnect |
-| Login/merge local groups | Yes | Yes, merge queued | Yes |
+| Login/merge local groups | Yes | Not implemented | Stage 11 |
 
 ## 2. What each class means
 
@@ -66,8 +73,8 @@ transaction. The UI updates immediately and marks the record `pending`.
 Pending edits survive reload and are pushed FIFO per group when online. Queued
 writes are sent through `POST /api/sync/push`, not the REST mutation endpoints.
 
-- Guest capability URLs continue to work: the offline cache is scoped to the
-  groups this browser has opened, not to a user account.
+- Guest capability URLs continue to work while browsing as a guest. The cache
+  is not scoped per account; logout or an account switch clears it (see §5).
 - Expense updates that conflict are never auto-resolved. The conflict dialog
   offers **keep mine**, **use server**, and **duplicate as new**.
 - Group metadata, participant names and star/archive use last-writer-wins.
@@ -84,26 +91,25 @@ cached receipt remain available.
 
 ## 3. AI and uploads offline
 
-1. The user selects a receipt image offline. The compressed blob is stored in
-   Dexie and a queued upload is created.
-2. The receipt shows a **scan pending** state. No provisional totals are
-   invented.
-3. On reconnect the blob uploads, then AI extraction runs. A failure becomes a
-   visible `FAILED` receipt with a retry action, never a crash. Retries are
-   capped by `RECEIPT_MAX_ATTEMPTS` (default 3); once exhausted the image must
-   be uploaded again.
+AI extraction and document uploads are **online-only** in Stage 9. Offline the
+repository rejects them with `offline_unsupported`; the UI must disable the
+controls with an explanation. The queued-blob flow (scan pending, retry caps,
+`RECEIPT_MAX_ATTEMPTS`, local placeholder documents) belongs to Stage 10B and is
+not implemented.
 
 AI flags come from `/api/features`; a cached flag may keep a control visible
 offline, but the action is disabled with "available when online".
 
 ## 4. Storage and durability
 
-- `navigator.storage.persist()` is requested on first sync; quota is shown in
-  settings.
-- A low-quota warning appears before writes fail.
-- Outbox, unsynced blobs and conflict rows are never evicted by app code.
+- `navigator.storage.persist()` and the quota UI are **not implemented** in
+  Stage 9; they are Stage 10B work.
+- Outbox, conflict rows and any blobs already stored by the app are never
+  evicted by app code.
 - A versioned JSON backup/restore covers groups, expenses, preferences,
-  conflict records and, where feasible, pending blobs.
+  conflict records and pending blobs where the browser can read them. Restores
+  preserve the live session, reject a backup from another account and reset the
+  sync cursor.
 - Workbox caches never contain `/api` responses; data freshness is Dexie's
   responsibility, not the service worker's.
 
@@ -113,8 +119,11 @@ offline, but the action is disabled with "available when online".
   depend on it.
 - Refresh is attempted on start and when the network returns. If it fails, the
   user remains locally active and the outbox drains after a successful refresh.
-- Logout clears the local user scope; guest data remains unless the user
-  explicitly removes it.
+- Logout and account switches stop synchronization, wait for the in-flight
+  cycle, then clear all Dexie tables and the legacy selection keys. Unsynced
+  local writes for the signed-out account are discarded. This prevents one
+  account's cached groups from being claimed by the next account on the same
+  browser.
 
 ## 6. Synchronization UX
 
@@ -123,11 +132,13 @@ A single global banner reports:
 - **offline** (with pending count);
 - **syncing** (with progress);
 - **pending N changes**;
+- **failed N changes** (with retry and discard);
 - **error** (with retry and last error);
 - **conflict** (opens the conflict dialog).
 
-Per-entity pending badges appear on expenses, participants, receipts and
-uploads. The user can trigger a manual sync at any time.
+Per-entity pending badges are currently shown on expenses only. Participant,
+receipt and upload badges are Stage 10B work. The user can trigger a manual sync
+at any time.
 
 ## 7. Update behavior
 

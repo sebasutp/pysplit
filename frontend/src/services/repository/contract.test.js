@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { api } from '../api'
 import { onlineRepository } from './online'
+import { localRepository } from './local'
 import { REPOSITORY_METHODS } from './contract'
 
 /**
@@ -31,15 +32,17 @@ afterEach(() => {
 })
 
 describe('repository contract', () => {
-  it('exposes every documented method', () => {
-    for (const path of REPOSITORY_METHODS) {
-      const parts = path.split('.')
-      let current = /** @type {Record<string, any>} */ (onlineRepository)
-      for (const part of parts) {
-        expect(current, `${path} is missing ${part}`).toBeTruthy()
-        current = current[part]
+  it('exposes every documented method on both implementations', () => {
+    for (const repository of [onlineRepository, localRepository]) {
+      for (const path of REPOSITORY_METHODS) {
+        const parts = path.split('.')
+        let current = /** @type {Record<string, any>} */ (repository)
+        for (const part of parts) {
+          expect(current, `${path} is missing ${part}`).toBeTruthy()
+          current = current[part]
+        }
+        expect(typeof current, `${path} must be a function`).toBe('function')
       }
-      expect(typeof current, `${path} must be a function`).toBe('function')
     }
   })
 

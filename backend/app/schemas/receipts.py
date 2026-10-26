@@ -131,6 +131,9 @@ class ReceiptExtractRequest(BaseModel):
 class ReceiptItemCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    # Optional client-generated id. Offline clients supply it so a retried
+    # create is idempotent and dependent portion edits can address the item.
+    id: str | None = Field(default=None, min_length=1, max_length=64)
     name: str = Field(min_length=1, max_length=MAX_RECEIPT_ITEM_NAME_LENGTH)
     quantity_milli: int = Field(ge=1, le=MAX_RECEIPT_ITEM_QUANTITY_MILLI)
     amount: int = Field(ge=1, le=MAX_RECEIPT_ITEM_AMOUNT)

@@ -4520,6 +4520,11 @@
           "recurrence_rule": {
             "$ref": "#/components/schemas/RecurrenceRule"
           },
+          "is_recurring_head": {
+            "type": "boolean",
+            "title": "Is Recurring Head",
+            "default": false
+          },
           "created_at": {
             "type": "string",
             "title": "Created At"
@@ -5907,6 +5912,19 @@
       },
       "ReceiptItemCreate": {
         "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
           "name": {
             "type": "string",
             "maxLength": 200,

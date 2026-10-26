@@ -161,6 +161,7 @@ export ENABLE_EXPENSE_DOCUMENTS="${ENABLE_EXPENSE_DOCUMENTS:-true}"
 # The Playwright suite signs in per test context; keep the local limiter from
 # throttling a full run. Production keeps the conservative defaults.
 export AUTH_RATE_LIMIT_PER_MINUTE="${AUTH_RATE_LIMIT_PER_MINUTE:-1000}"
+export SYNC_RATE_LIMIT_PER_MINUTE="${SYNC_RATE_LIMIT_PER_MINUTE:-1000}"
 export AUTH_ACCOUNT_RATE_LIMIT_PER_MINUTE="${AUTH_ACCOUNT_RATE_LIMIT_PER_MINUTE:-1000}"
 
 # Keep the local database in step with the checked-in migrations before the API

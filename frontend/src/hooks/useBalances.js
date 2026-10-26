@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { repository } from '../services/repository'
+import { useSyncRefresh } from './useSyncRefresh'
 
 /** @param {string|undefined} groupId */
 export function useBalances(groupId) {
@@ -12,6 +13,8 @@ export function useBalances(groupId) {
   const [error, setError] = useState(/** @type {any} */ (null))
   const [nonce, setNonce] = useState(0)
   const reload = useCallback(() => setNonce((value) => value + 1), [])
+
+  useSyncRefresh(setNonce)
 
   useEffect(() => {
     if (!groupId) return undefined

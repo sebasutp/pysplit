@@ -75,6 +75,11 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
                 🧾
               </span>
             ) : null}
+            {expense.pending ? (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-900">
+                Pending sync
+              </span>
+            ) : null}
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {income

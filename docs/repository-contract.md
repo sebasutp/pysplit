@@ -131,7 +131,8 @@ and the session stays in its cached state.
 ## 3. Groups and membership
 
 ```js
-groups.list({ ids?, status?, signal })    // → list of Group
+groups.list({ ids?, status?, limit?, offset?, signal })
+  // → { items: Group[], total, limit, offset }
 groups.get(groupId, { signal })           // → Group | null
 groups.details(groupId, { signal })       // → { group, participants_with_expenses }
 groups.create(input, { signal })          // → Group
@@ -140,12 +141,16 @@ groups.removeMembership(groupId, { signal }) // → void
 groups.recordAccess(groupId, { signal })  // → void (debounced by caller)
 groups.setStarred(groupId, value, { signal })   // → Membership
 groups.setArchived(groupId, value, { signal })  // → Membership
-groups.sync({ groupIds, signal })         // → { groups, user_groups, is_authenticated }
-                                          //   sends only { group_ids: [...] }
+groups.sync({ groupIds, starredGroupIds?, archivedGroupIds?, signal })
+  // → { groups, user_groups, is_authenticated }
+  //   sends { group_ids, starred_group_ids, archived_group_ids }
 ```
 
 `status` is `'recent' | 'starred' | 'archived' | 'all'`; the local repository
 resolves recent/starred/archived from Dexie metadata and the membership table.
+The default and `'all'` both include archived groups, matching the server.
+`ids` filters the result to exactly those groups. Guests keep star/archive in
+Dexie metadata; authenticated users keep it in the membership table.
 `groups.create` requires an authenticated tier on the server; offline creation
 is allowed only when a cached permitted tier exists and is revalidated on push.
 
@@ -206,6 +211,7 @@ rows, documents and the receipt summary needed by the row UI.
   conversion_rate: string | null,
   paid_by_id, is_reimbursement, split_mode: 'EVENLY'|'BY_SHARES'|'BY_PERCENTAGE'|'BY_AMOUNT',
   notes, recurrence_rule: 'NONE'|'DAILY'|'WEEKLY'|'MONTHLY',
+  is_recurring_head: boolean,
   created_at, updated_at, version, deleted_at,
   paid_for: [{ participant_id, shares }],
   documents: [{ id, url, width, height }],
@@ -272,6 +278,7 @@ categories.infer(title, { signal })                         // → { category_id
 server-recomputed provisional split. Clients never send their own totals.
 AI methods are **online-only**: offline they reject with
 `offline_unsupported` (or queue an upload in the upload-specific flow).
+`receipts.apply`/`receipts.link` are also online-only in Stage 9.
 
 ## 11. Documents
 
@@ -280,8 +287,9 @@ documents.upload(groupId, expenseId, file, { signal }) // → Document
 documents.remove(groupId, expenseId, documentId, { signal }) // → void
 ```
 
-Offline uploads are queued as blobs and retried after reconnect. The repository
-may return a local placeholder document with `pending: true`.
+Document upload and removal are **online-only** until Stage 10B. Offline they
+reject with `offline_unsupported`; the local repository never deletes a cached
+document while offline.
 
 ## 12. Exports
 
@@ -296,13 +304,17 @@ server returns byte-identical content for the same data.
 ## 13. Synchronization boundary
 
 The repository exposes one synchronization entry point, `groups.sync` (see
-§3). It sends only `{ group_ids }` on the wire and returns
-`{ groups, user_groups, is_authenticated }`.
+§3). It sends `{ group_ids, starred_group_ids, archived_group_ids }` and
+returns `{ groups, user_groups, is_authenticated }`.
 
 Runtime sync status, manual sync triggers and the conflict queue belong to the
 offline sync engine behind the local repository; they are not methods on the
 repository contract. Components observe pending work through the entity
-`pending` flag and offline behavior through `RepositoryError` codes.
+`pending` flag and offline behavior through `RepositoryError` codes. The
+`services/repository/index.js` module exposes a small `sync` facade
+(`sync.conflicts`, `sync.resolveConflict`, `sync.backup`, `sync.restore`) plus
+`subscribeSyncStatus` for the status UI; hooks import it from the repository
+entry point, never from `services/sync.js`.
 
 ## 14. Runtime features and administration
 
@@ -329,13 +341,14 @@ the next request because the server reloads the user row.
 | Groups create/update/remove membership | yes (queued) |
 | Expenses read/write | yes (queued) |
 | Balances/statistics/activities/categories | yes, from local data |
-| Star/archive/access | yes (queued, LWW) |
-| Receipt item/portion/opt-out/apply/link | yes on cached receipts (queued) |
-| Receipt total/item extraction, category inference | no (online-only, queued upload after reconnect) |
-| Documents upload | queued blob |
+| Star/archive/access | yes (queued, LWW); access recording is best-effort and skipped offline |
+| Receipt item/portion/opt-out edits on cached receipts | yes (queued) |
+| Receipt apply/link | no (online-only) |
+| Receipt total/item extraction, category inference | no (online-only) |
+| Documents upload/remove | no (online-only until Stage 10B) |
 | Admin | no (online-only) |
 | Auth refresh | deferred, retried on reconnect |
-| Exports | yes, from local data |
+| Exports | yes, from local data, byte-identical to the server |
 
 ## 16. Contract tests
 

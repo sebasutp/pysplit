@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { repository } from '../services/repository'
+import { useSyncRefresh } from './useSyncRefresh'
 
 /**
  * @param {string|undefined} groupId
@@ -31,6 +32,8 @@ export function useExpenses(groupId, options = {}) {
   const loadingMoreRef = useRef(false)
 
   const reload = useCallback(() => setNonce((value) => value + 1), [])
+
+  useSyncRefresh(setNonce)
 
   useEffect(() => {
     if (!groupId) return undefined

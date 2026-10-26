@@ -368,6 +368,28 @@ def test_manual_item_add_respects_configured_cap(session: Session):
         )
 
 
+def test_add_item_with_client_id_is_idempotent(session: Session):
+    group, _people = make_group(session)
+    receipt = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Pizza", "quantity_milli": 1000, "amount": 1000}],
+    )
+    payload = ReceiptItemCreate(
+        id="ri_offline",
+        name="Extra",
+        quantity_milli=1000,
+        amount=100,
+    )
+
+    first = receipts_service.add_item(session, group.id, receipt.id, payload)
+    second = receipts_service.add_item(session, group.id, receipt.id, payload)
+
+    assert [item.id for item in first.items].count("ri_offline") == 1
+    assert [item.id for item in second.items].count("ri_offline") == 1
+    assert len(second.items) == 2
+
+
 def test_concurrent_claim_calls_only_one_model(tmp_path):
     import threading
 
@@ -526,6 +548,13 @@ def test_add_update_delete_item(make_client, session: Session):
     assert deleted.status_code == 200, deleted.text
     assert all(item["id"] != new_item["id"] for item in deleted.json()["items"])
     assert deleted.json()["split"]["items_total"] == 1000
+
+    retried = client.delete(
+        f"/api/groups/{group.id}/receipts/{receipt.id}/items/{new_item['id']}"
+    )
+    assert retried.status_code == 200, retried.text
+    assert all(item["id"] != new_item["id"] for item in retried.json()["items"])
+    assert retried.json()["split"]["items_total"] == 1000
 
 
 def test_set_portions(make_client, session: Session):

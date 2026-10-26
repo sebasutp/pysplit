@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 /** @param {string} directory @returns {string[]} */
-/** @param {string} directory @returns {string[]} */
 function files(directory) {
   return readdirSync(directory).flatMap((name) => {
     const path = join(directory, name)
@@ -63,6 +62,7 @@ describe('frontend architecture', () => {
       'active-user.spec.ts',
       'receipts.spec.ts',
       'admin.spec.ts',
+      'offline-sync.spec.ts',
     ]) {
       expect(specs).toContain(name)
     }

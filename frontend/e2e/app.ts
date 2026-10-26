@@ -61,6 +61,12 @@ export async function signInAsTier(
   name: string,
 ): Promise<void> {
   if (!page.url().startsWith('http')) await page.goto('/groups')
+  // Let the unauthenticated boot finish before creating a session. Otherwise
+  // its in-flight refresh can rotate the cookie after mock-login and make the
+  // reload look like refresh-token reuse.
+  await expect(
+    page.getByRole('button', { name: /^(Sign in|User menu)$/ }),
+  ).toBeVisible({ timeout: 20_000 })
   const origin = process.env.BASE_URL ?? process.env.E2E_BASE_URL ?? 'http://127.0.0.1:5173'
   const response = await page.request.post('/api/auth/mock-login', {
     headers: { Origin: origin },
