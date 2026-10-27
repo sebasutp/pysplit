@@ -126,8 +126,15 @@ def write_manifest(discovered: dict[str, list[Path]]) -> None:
     MANIFEST.write_text("\n".join(lines) + "\n")
 
 
+def reference_present() -> bool:
+    # An empty directory can exist in a sandbox or a partial checkout even
+    # though the reference source itself was not mounted. Treat that like a
+    # missing tree so the committed inventory remains authoritative.
+    return REFERENCE.is_dir() and any(REFERENCE.iterdir())
+
+
 def discover() -> dict[str, list[str]]:
-    if REFERENCE.exists():
+    if reference_present():
         tree = discover_from_tree()
         discovered = {kind: [relative(path) for path in tree[kind]] for kind in KINDS}
         manifest = read_manifest()
@@ -264,8 +271,11 @@ def main() -> int:
     rows = load_matrix()
 
     if "--write-reference-manifest" in sys.argv[1:]:
-        if not REFERENCE.exists():
-            fail(f"cannot write manifest without reference source: {REFERENCE.relative_to(ROOT)}")
+        if not reference_present():
+            fail(
+                "cannot write manifest without reference source: "
+                f"{REFERENCE.relative_to(ROOT)}"
+            )
             return 1
         write_manifest(discover_from_tree())
         print(f"wrote {MANIFEST.relative_to(ROOT)}")

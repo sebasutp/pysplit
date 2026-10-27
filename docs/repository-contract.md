@@ -141,7 +141,7 @@ groups.removeMembership(groupId, { signal }) // → void
 groups.recordAccess(groupId, { signal })  // → void (debounced by caller)
 groups.setStarred(groupId, value, { signal })   // → Membership
 groups.setArchived(groupId, value, { signal })  // → Membership
-groups.sync({ groupIds, starredGroupIds?, archivedGroupIds?, signal })
+groups.sync({ groupIds, starredGroupIds?, archivedGroupIds?, claimGroupIds?, signal })
   // → { groups, user_groups, is_authenticated }
   //   sends { group_ids, starred_group_ids, archived_group_ids }
 ```
@@ -153,6 +153,28 @@ The default and `'all'` both include archived groups, matching the server.
 Dexie metadata; authenticated users keep it in the membership table.
 `groups.create` requires an authenticated tier on the server; offline creation
 is allowed only when a cached permitted tier exists and is revalidated on push.
+
+An authenticated list read does not send cached recent IDs as claims. A stale
+recent entry on another device must not re-create a membership that was removed
+elsewhere; capability URLs grant access through `recordAccess` instead.
+`groupIds` is sent for guest reads, and for an authenticated caller only when
+`claimGroupIds` is explicitly set.
+
+On the guest-to-account transition, `groups.sync` is also the merge boundary.
+Every locally known group ID and the guest star/archive sets are persisted as
+`user_group` outbox operations plus a `pending_group_merge` marker before the
+account becomes current. The marker is reconciled after a push cycle reports no
+errors: the server returns the complete membership scope, and the local
+repository updates the existing group rows in place (no duplicate cache or
+membership rows), prefetches the returned groups, and clears the marker. If the
+request fails, the marker survives and the next successful sync cycle retries
+it. While the marker is pending, its group IDs and any group with queued outbox
+work are protected from list-scope pruning, so a stale response cannot delete a
+guest group, its offline expenses, or its claim. Guest preferences are sent as
+positive signals only; the server keeps star and archive mutually exclusive,
+with archive winning. Membership uses arrival-order last-writer-wins per user:
+a stale `base_version` still applies and replaces the stored flags, and a
+removal only drops the membership, not the group's server-side financial data.
 
 ### Group shape
 
@@ -319,7 +341,9 @@ server returns byte-identical content for the same data.
 
 The repository exposes one synchronization entry point, `groups.sync` (see
 §3). It sends `{ group_ids, starred_group_ids, archived_group_ids }` and
-returns `{ groups, user_groups, is_authenticated }`.
+returns `{ groups, user_groups, is_authenticated }`. Authenticated list reads
+send an empty `group_ids`; only guest reads and explicit `claimGroupIds`
+callers ask the server to include locally known groups.
 
 Runtime sync status, manual sync triggers and the conflict queue belong to the
 offline sync engine behind the local repository; they are not methods on the

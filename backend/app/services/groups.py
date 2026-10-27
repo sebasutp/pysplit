@@ -124,6 +124,12 @@ def _ensure_membership(
 ) -> UserGroup:
     membership = find_membership(session, user_id, group_id)
     now = utc_now()
+    # Star and archive are mutually exclusive; archive wins when a caller sends
+    # both. Without this a guest archive plus a stale star could leave both set.
+    if is_archived is True:
+        is_starred = False
+    elif is_starred is True:
+        is_archived = False
     if membership is None:
         membership = UserGroup(
             user_id=user_id,
@@ -569,9 +575,13 @@ def sync_groups(
             isAuthenticated=False,
         )
 
-    if local_ids:
+    # Only the explicit legacy claim field creates memberships. `group_ids`
+    # is a read filter (guest capability reads, and authenticated list reads
+    # that must not resurrect a membership removed on another device).
+    claim_ids = payload.local_group_ids
+    if claim_ids:
         existing_groups = session.exec(
-            select(Group).where(Group.id.in_(local_ids), Group.deleted_at.is_(None))
+            select(Group).where(Group.id.in_(claim_ids), Group.deleted_at.is_(None))
         ).all()
         for group in existing_groups:
             existing = find_membership(session, user_id, group.id)

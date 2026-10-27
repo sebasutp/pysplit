@@ -340,6 +340,23 @@ describe('local repository', () => {
     )
   })
 
+  it('does not send cached ids as claims for an authenticated list read', async () => {
+    await cacheUser({ id: 'user-a', tier: 'group_creators' })
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
+    const spy = vi.spyOn(onlineRepository.groups, 'sync').mockResolvedValue({
+      is_authenticated: true,
+      groups: [{ id: 'g1', name: 'Trip', participants: [] }],
+      user_groups: [],
+    })
+
+    await localRepository.groups.sync({ groupIds: ['g1'] })
+
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ groupIds: [] }),
+      expect.anything(),
+    )
+  })
+
   it('returns the documented GroupList envelope and honours ids/status', async () => {
     await db.groups.put({
       id: 'g2',
@@ -376,11 +393,22 @@ describe('local repository', () => {
     expect(archived.items.map((/** @type {any} */ group) => group.id)).toEqual(['g2'])
   })
 
-  it('removes local group data when membership is removed', async () => {
+  it('removes local group data and selection keys when membership is removed', async () => {
+    window.localStorage.setItem(
+      'recentGroups',
+      JSON.stringify([{ id: 'g1', name: 'Trip' }]),
+    )
+    window.localStorage.setItem('starredGroups', JSON.stringify(['g1']))
+    window.localStorage.setItem('archivedGroups', JSON.stringify(['g1']))
+
     await localRepository.groups.removeMembership('g1')
+
     expect(await db.groups.get('g1')).toBeUndefined()
     expect(await db.expenses.count()).toBe(0)
     expect(await db.participants.count()).toBe(0)
+    expect(window.localStorage.getItem('recentGroups')).toBe('[]')
+    expect(window.localStorage.getItem('starredGroups')).toBe('[]')
+    expect(window.localStorage.getItem('archivedGroups')).toBe('[]')
   })
 
   it('does not mark unchanged participants pending during a group update', async () => {
@@ -569,7 +597,9 @@ describe('local repository', () => {
     vi.spyOn(onlineRepository.auth, 'refresh').mockResolvedValue(null)
 
     await expect(localRepository.auth.me()).resolves.toBeNull()
-    expect(await db.groups.count()).toBe(1)
+    // The login claimed the pre-existing guest group instead of dropping it;
+    // group-a was added after the account became current.
+    expect(await db.groups.count()).toBe(2)
     expect((await cachedUser()).id).toBe('user-a')
 
     await expect(localRepository.auth.refresh()).resolves.toBeNull()

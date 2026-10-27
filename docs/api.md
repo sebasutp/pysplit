@@ -176,7 +176,9 @@ Removes the group from the user's synchronized list without deleting data.
 `204`.
 
 ### `POST /api/groups/sync`
-Merges locally known group IDs into the authenticated user's `UserGroup` rows.
+Returns the authenticated user's complete synchronized group scope. Locally
+known IDs in `local_group_ids` are merged into `UserGroup` rows; `group_ids`
+alone is a read filter for guests and does not claim a membership.
 ```json
 { "group_ids": ["g1", "g2"] }
 ```
@@ -185,7 +187,8 @@ Merges locally known group IDs into the authenticated user's `UserGroup` rows.
   "user_groups": [ { "group_id": "g1", "is_starred": false, "is_archived": false } ],
   "groups": [ { "id": "g1", "name": "Trip" } ] }
 ```
-Idempotent: existing rows are not duplicated.
+Idempotent: existing rows are not duplicated. Star and archive are mutually
+exclusive; archive wins when both are supplied.
 
 ## 5. Categories
 

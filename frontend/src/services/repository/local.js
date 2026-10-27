@@ -50,9 +50,15 @@ import {
   clearLegacySelectionKeys,
   migrateLocalStorage,
 } from '../local-storage-migration'
+import {
+  deleteRecentGroup,
+  unarchiveGroup,
+  unstarGroup,
+} from '../../utils/recent-groups'
 import { enqueue } from '../outbox'
 import {
   scheduleSync,
+  setGroupScopeReconciler,
   startSync,
   stopSync,
   pushPending,
@@ -93,13 +99,24 @@ export function ready() {
 export async function cacheUser(user) {
   const next = user || null
   const previous = await getMetadata('session_user', null)
-  if ((previous?.id || null) !== (next?.id || null)) {
-    // Never let one account's cache, outbox, conflicts or selection keys leak
-    // into another account on the same browser.
+  const previousId = previous?.id || null
+  const nextId = next?.id || null
+  const changed = previousId !== nextId
+  // A guest cache is the user's own local data and must be claimed by the
+  // account instead of being wiped. Switching between two accounts still
+  // clears everything so one account cannot see the other's cache.
+  const guestToAccount = previousId === null && Boolean(nextId)
+  /** @type {{group_ids: string[], starred_group_ids: string[], archived_group_ids: string[]}|null} */
+  let mergeState = null
+  if (changed) {
     await stopSync()
-    await clearAllData()
-    await db.categories.bulkPut(DEFAULT_CATEGORIES)
-    clearLegacySelectionKeys()
+    if (guestToAccount) {
+      mergeState = await captureGuestMergeState()
+    } else {
+      await clearAllData()
+      await db.categories.bulkPut(DEFAULT_CATEGORIES)
+      clearLegacySelectionKeys()
+    }
     groupsSyncPromise = null
     groupLoading.clear()
     accessRecordedAt.clear()
@@ -111,8 +128,181 @@ export async function cacheUser(user) {
   } else {
     await setMetadata('session_user', null)
   }
-  if ((previous?.id || null) !== (next?.id || null)) startSync()
+  if (guestToAccount && mergeState) {
+    await prepareGuestMerge(next, mergeState)
+  }
+  if (changed) startSync()
 }
+
+const PENDING_GROUP_MERGE = 'pending_group_merge'
+
+/**
+ * Collect every group the guest knows about before a login changes the cache
+ * owner. The union covers cached rows and the local recent/star/archive lists.
+ *
+ * @returns {Promise<{group_ids: string[], starred_group_ids: string[], archived_group_ids: string[]}>}
+ */
+async function captureGuestMergeState() {
+  const [rows, recent, starred, archived] = await Promise.all([
+    db.groups.toArray(),
+    getMetadata('recentGroups', []),
+    getMetadata('starredGroups', []),
+    getMetadata('archivedGroups', []),
+  ])
+  const groupIds = new Set(
+    rows.filter((row) => !row.deleted_at).map((row) => String(row.id)),
+  )
+  for (const group of recent || []) {
+    if (group?.id) groupIds.add(String(group.id))
+  }
+  const starredIds = new Set((starred || []).map(String))
+  const archivedIds = new Set((archived || []).map(String))
+  for (const groupId of [...starredIds, ...archivedIds]) groupIds.add(groupId)
+  return {
+    group_ids: [...groupIds],
+    starred_group_ids: [...starredIds],
+    archived_group_ids: [...archivedIds],
+  }
+}
+
+/**
+ * Turn the guest cache into account memberships without clearing the cached
+ * group rows. Membership operations are durable: when the API is unavailable
+ * they are pushed by the next sync cycle, before the scope is reconciled.
+ *
+ * @param {any} user
+ * @param {{group_ids: string[], starred_group_ids: string[], archived_group_ids: string[]}} state
+ */
+async function prepareGuestMerge(user, state) {
+  await setMetadata(PENDING_GROUP_MERGE, {
+    user_id: user.id,
+    group_ids: state.group_ids,
+    starred_group_ids: state.starred_group_ids,
+    archived_group_ids: state.archived_group_ids,
+    created_at: nowIso(),
+  })
+  if (!state.group_ids.length) return
+  const starred = new Set(state.starred_group_ids)
+  const archived = new Set(state.archived_group_ids)
+  const timestamp = nowIso()
+  await db.transaction('rw', [db.userGroups, db.outbox], async () => {
+    await db.userGroups.where('user_id').equals('guest').delete()
+    for (const groupId of state.group_ids) {
+      const id = `${user.id}:${groupId}`
+      const existing = await db.userGroups.get(id)
+      const baseVersion = existing ? Number(existing.version || 0) : null
+      const guestStarred = starred.has(groupId)
+      const guestArchived = archived.has(groupId)
+      // The guest UI keeps the two flags exclusive; tolerate stale data that
+      // has both by preferring archive, the same rule the server applies.
+      const isStarred = existing?.is_starred ?? (guestStarred && !guestArchived)
+      const isArchived = existing?.is_archived ?? guestArchived
+      await db.userGroups.put({
+        id,
+        user_id: user.id,
+        group_id: groupId,
+        is_starred: isStarred,
+        is_archived: isArchived,
+        created_at: existing?.created_at || timestamp,
+        updated_at: timestamp,
+        version: existing ? baseVersion + 1 : 1,
+        deleted_at: null,
+      })
+      const pending = await db.outbox
+        .where('group_id')
+        .equals(groupId)
+        .filter(
+          (row) =>
+            row.entity_type === 'user_group' &&
+            row.op_type !== 'delete' &&
+            row.status !== 'failed',
+        )
+        .first()
+      if (pending) continue
+      // A guest preference is only a positive signal. Sending an explicit
+      // `false` here would clobber a star/archive choice made on another
+      // device for an existing membership. New memberships already default to
+      // false on the server, and the server enforces star/archive exclusion.
+      const preference = existing
+        ? { is_starred: isStarred, is_archived: isArchived }
+        : isStarred
+          ? { is_starred: true }
+          : isArchived
+            ? { is_archived: true }
+            : {}
+      await enqueue({
+        op_id: newId('op'),
+        group_id: groupId,
+        entity_type: 'user_group',
+        entity_id: groupId,
+        op_type: baseVersion ? 'update' : 'create',
+        ...(baseVersion ? { base_version: baseVersion } : {}),
+        payload: preference,
+      })
+    }
+  })
+}
+
+/** @type {Promise<any>|null} */
+let groupMergeInFlight = null
+
+/**
+ * Claim local group IDs for the current account and refresh the complete
+ * synchronized group scope. Safe to call on every sync cycle: it is a no-op
+ * once the pending marker is gone.
+ *
+ * @returns {Promise<any|null>}
+ */
+export async function reconcilePendingGroupMerge() {
+  await ready()
+  const marker = await getMetadata(PENDING_GROUP_MERGE, null)
+  if (!marker?.user_id) return null
+  const user = await cachedUser()
+  if (!user || user.id !== marker.user_id) {
+    // A stale marker belongs to a previous session; never merge it into the
+    // current account.
+    if (user) await setMetadata(PENDING_GROUP_MERGE, null)
+    return null
+  }
+  if (!isOnline()) return null
+  if (groupMergeInFlight) return groupMergeInFlight
+  groupMergeInFlight = (async () => {
+    try {
+      const result = await onlineRepository.groups.sync({
+        groupIds: marker.group_ids || [],
+        claimGroupIds: true,
+        starredGroupIds: marker.starred_group_ids || [],
+        archivedGroupIds: marker.archived_group_ids || [],
+      })
+      if (!(result?.is_authenticated ?? result?.isAuthenticated)) return null
+      await cacheSyncResult(result)
+      await setMetadata(PENDING_GROUP_MERGE, null)
+      const returned = (Array.isArray(result?.groups) ? result.groups : []).map(
+        (group) => group.id,
+      )
+      // Every membership should become fully readable offline, not just the
+      // groups that happened to be in the guest cache.
+      void prefetchGroups(returned)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('pysplit:refresh'))
+      }
+      return result
+    } catch (error) {
+      const code =
+        error && typeof error === 'object' && 'code' in error ? String(error.code) : 'network'
+      if (!['network', 'server', 'rate_limited', 'aborted', 'unauthorized'].includes(code)) {
+        throw error
+      }
+      // Keep the marker so the next online cycle retries the merge.
+      return null
+    } finally {
+      groupMergeInFlight = null
+    }
+  })()
+  return groupMergeInFlight
+}
+
+setGroupScopeReconciler(reconcilePendingGroupMerge)
 
 /** @returns {Promise<any|null>} */
 export async function cachedUser() {
@@ -176,11 +366,25 @@ async function cacheSyncResult(result) {
       .filter((operation) => operation.entity_type === 'user_group' && operation.op_type === 'delete')
       .map((operation) => operation.group_id),
   )
+  // Any queued operation means the local group still owns unsynced work (an
+  // expense, a participant edit, or a guest merge claim). A list response that
+  // has not caught up must not delete that group or its outbox rows.
+  const pendingOutboxGroups = new Set(outbox.map((operation) => operation.group_id))
+  const merge = await getMetadata(PENDING_GROUP_MERGE, null)
+  const pendingMergeGroups = new Set(
+    Array.isArray(merge?.group_ids) ? merge.group_ids.map(String) : [],
+  )
   const returnedIds = new Set(groups.map((group) => group.id))
   const pruned = authenticated
     ? (await db.groups.toCollection().primaryKeys())
         .map(String)
-        .filter((id) => !returnedIds.has(id) && !pendingGroupCreates.has(id))
+        .filter(
+          (id) =>
+            !returnedIds.has(id) &&
+            !pendingGroupCreates.has(id) &&
+            !pendingOutboxGroups.has(id) &&
+            !pendingMergeGroups.has(id),
+        )
     : []
   await db.transaction(
     'rw',
@@ -787,8 +991,9 @@ const groups = {
       let groupsList = await cachedGroups(options.ids || [])
       if (isOnline()) {
         try {
-          // `groups.sync` also claims requested capability groups for the
-          // current account and returns the complete membership list.
+          // Refresh the synchronized scope. Group reads are not claims: a
+          // capability URL grants membership through `recordAccess`, while a
+          // stale recent-list ID must not resurrect a removed membership.
           await groups.sync({ groupIds: options.ids || [] }, read)
           groupsList = await cachedGroups(options.ids || [])
         } catch (error) {
@@ -1078,6 +1283,12 @@ const groups = {
       // Leaving a group (or dismissing a capability URL) must remove the local
       // cache too; otherwise the group stays readable by direct URL.
       await deleteLocalGroup(groupId)
+      // The selection lists still live in localStorage for the shell. Clear
+      // them here so every caller, not only `useGroups.remove`, leaves no
+      // stale recent/star/archive entry that could be sent as a claim.
+      deleteRecentGroup(groupId)
+      unstarGroup(groupId)
+      unarchiveGroup(groupId)
       if (membership) {
         await db.transaction('rw', [db.outbox], async () => {
           await enqueue({
@@ -1130,23 +1341,36 @@ const groups = {
       groupsSyncPromise = (async () => {
         const requested = [...(input.groupIds || [])]
         if (!isOnline()) {
-          const localGroups = await cachedGroups(requested)
+          const [localGroups, user] = await Promise.all([
+            cachedGroups(requested),
+            cachedUser(),
+          ])
+          // An authenticated cache is the synchronized list even before the
+          // group-list request succeeds; a guest only sees the capabilities
+          // the caller explicitly asked for.
           return {
-            is_authenticated: Boolean(await cachedUser()),
-            isAuthenticated: Boolean(await cachedUser()),
-            groups: requested.length
-              ? localGroups.filter((group) => requested.includes(group.id))
-              : [],
+            is_authenticated: Boolean(user),
+            isAuthenticated: Boolean(user),
+            groups: user
+              ? localGroups
+              : requested.length
+                ? localGroups.filter((group) => requested.includes(group.id))
+                : [],
             user_groups: await db.userGroups.toArray(),
           }
         }
         try {
+          const user = await cachedUser()
+          const requestedIds = input.claimGroupIds ? requested : user ? [] : requested
           const result = await onlineRepository.groups.sync(
             {
-              // Only ids the caller actually asked for. Enumerating every cached
-              // group here would grant the next account membership in the
-              // previous user's groups.
-              groupIds: requested,
+              // An authenticated list read must not claim every cached recent
+              // ID: another device may have removed the membership, and a list
+              // read would silently re-create it. Explicit merge/claim callers
+              // opt in with `claimGroupIds`; guests still send the capability
+              // IDs they want to read.
+              groupIds: requestedIds,
+              claimGroupIds: Boolean(input.claimGroupIds),
               starredGroupIds: input.starredGroupIds || (await getMetadata('starredGroups', [])),
               archivedGroupIds:
                 input.archivedGroupIds || (await getMetadata('archivedGroups', [])),
@@ -1166,13 +1390,18 @@ const groups = {
           if (error && typeof error === 'object' && 'code' in error && error.code === 'aborted') {
             throw error
           }
-          const localGroups = await cachedGroups(requested)
+          const [localGroups, user] = await Promise.all([
+            cachedGroups(requested),
+            cachedUser(),
+          ])
           return {
-            is_authenticated: Boolean(await cachedUser()),
-            isAuthenticated: Boolean(await cachedUser()),
-            groups: requested.length
-              ? localGroups.filter((group) => requested.includes(group.id))
-              : [],
+            is_authenticated: Boolean(user),
+            isAuthenticated: Boolean(user),
+            groups: user
+              ? localGroups
+              : requested.length
+                ? localGroups.filter((group) => requested.includes(group.id))
+                : [],
             user_groups: await db.userGroups.toArray(),
           }
         }

@@ -17,7 +17,10 @@ application shell boots from the service worker.
 > transport in the outbox and are refreshed by bootstrap rather than appearing
 > in another device's change feed. Receipt image/document uploads are stored as
 > blobs in Dexie and uploaded after reconnect; receipt extraction runs then.
-> Receipt apply/link and category inference remain online-only. See §2.1 and §3.
+> Receipt apply/link and category inference remain online-only. Stage 11 adds
+> authenticated group claiming: a guest cache is converted into account
+> memberships in place, and the claim is durably queued if synchronization is
+> unavailable. See §2.1, §3 and §5.
 
 ## 1. Capability matrix
 
@@ -38,7 +41,7 @@ application shell boots from the service worker.
 | Admin operations | Yes | No | No |
 | Live currency-rate lookup | Yes | Last cached rate or manual override | — |
 | Authentication refresh | Yes | Deferred | Retried on reconnect |
-| Login/merge local groups | Yes | Not implemented | Stage 11 |
+| Login/merge local groups | Yes | Yes; claim is queued | Yes; claimed on reconnect |
 
 ## 2. What each class means
 
@@ -143,6 +146,22 @@ stay available.
   local writes for the signed-out account are discarded. This prevents one
   account's cached groups from being claimed by the next account on the same
   browser.
+- The one exception is a guest (no cached account) signing in: the guest cache
+  belongs to the person at the keyboard, so it is claimed in place instead of
+  cleared. Local group IDs and star/archive preferences are converted into
+  account memberships, a durable `pending_group_merge` marker plus
+  `user_group` outbox rows are written, and the complete account scope is
+  fetched and bootstrapped. If the API is unavailable, the local groups remain
+  readable and the claim is retried on reconnect. A scope refresh only runs
+  after a push cycle reports no errors, and the marker plus queued outbox work
+  protect those groups from pruning. On the next successful cycle the claim is
+  pushed before the scope is reconciled. A guest group ID is updated, never
+  duplicated, when the server returns it.
+- Guest star/archive preferences are applied as positive signals only. The
+  server keeps the two flags mutually exclusive (archive wins), so a guest
+  archive clears an older star instead of leaving both set. Membership is
+  arrival-order last-writer-wins per user: a stale `base_version` still applies
+  to that user's row and does not affect another user.
 
 ## 6. Synchronization UX
 

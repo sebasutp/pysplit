@@ -83,6 +83,11 @@ def test_stage_seven_specs_exist():
         assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
 
 
+def test_stage_eleven_sync_specs_exist():
+    for name in ("test_group_sync.py", "test_groups_sync.py", "test_admin.py"):
+        assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
+
+
 def test_stage_seven_receipt_router_is_http_only():
     source = (BACKEND / "app" / "api" / "receipts.py").read_text()
     for forbidden in ("app.models", "sqlmodel", "sqlalchemy", "app.core.database"):

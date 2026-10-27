@@ -213,7 +213,7 @@ const groups = {
     )
   },
   /**
-   * @param {{groupIds?: string[], starredGroupIds?: string[], archivedGroupIds?: string[]}} [input]
+   * @param {{groupIds?: string[], starredGroupIds?: string[], archivedGroupIds?: string[], claimGroupIds?: boolean}} [input]
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
@@ -222,6 +222,7 @@ const groups = {
       api.post('/groups/sync', {
         body: {
           group_ids: input.groupIds || [],
+          local_group_ids: input.claimGroupIds ? input.groupIds || [] : [],
           starred_group_ids: input.starredGroupIds || [],
           archived_group_ids: input.archivedGroupIds || [],
         },

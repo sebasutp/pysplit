@@ -208,6 +208,25 @@ def test_update_tier(client: TestClient, session) -> None:
     assert invalid.status_code == 422
 
 
+def test_tier_change_takes_effect_on_the_next_request(client: TestClient, session) -> None:
+    admin_headers = _admin_headers(session)
+    user = make_user(session, email="promote@example.com", tier=UserTier.SYNC_USERS)
+    user_headers = access_headers(user)
+
+    assert client.get("/api/admin/metrics", headers=user_headers).status_code == 403
+
+    promoted = client.patch(
+        f"/api/admin/users/{user.id}/tier",
+        headers=admin_headers,
+        json={"tier": "admin"},
+    )
+    assert promoted.status_code == 200
+
+    # The access token has not changed, but the tier is loaded from the
+    # database for every request, so the promotion applies immediately.
+    assert client.get("/api/admin/metrics", headers=user_headers).status_code == 200
+
+
 def test_delete_user(client: TestClient, session) -> None:
     headers = _admin_headers(session)
     user = make_user(session, email="delete@example.com")

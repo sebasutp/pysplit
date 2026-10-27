@@ -45,6 +45,29 @@ let intervalTimer = null
 /** @type {BroadcastChannel|null} */
 let channel = null
 let started = false
+/** @type {(() => Promise<any>) | null} */
+let groupScopeReconciler = null
+
+/**
+ * Register the repository callback that claims locally known guest groups and
+ * refreshes the authenticated group scope after a login (or a queued offline
+ * login once the network returns).
+ *
+ * @param {() => Promise<any>} reconciler
+ */
+export function setGroupScopeReconciler(reconciler) {
+  groupScopeReconciler = reconciler
+}
+
+/** @returns {Promise<void>} */
+async function reconcileGroupScope() {
+  if (!groupScopeReconciler) return
+  try {
+    await groupScopeReconciler()
+  } catch {
+    // The marker stays in Dexie, so the next sync cycle retries the merge.
+  }
+}
 
 /**
  * @param {string|null} userId
@@ -723,6 +746,11 @@ export async function runSync(options = {}) {
   try {
     const pushed = await pushPending({ ignoreBackoff: Boolean(options.force) })
     const pulled = await pullChanges()
+    // A login may have queued group claims while the API was unreachable.
+    // Reconcile only after every queued operation was accepted; a failed push
+    // must not let a scope refresh prune the group whose claim is still in the
+    // outbox.
+    if (pushed.errors === 0) await reconcileGroupScope()
     const { count, conflicts } = await refreshCounters()
     setSyncStatus({
       phase: conflicts ? 'conflict' : 'idle',

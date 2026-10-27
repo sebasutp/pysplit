@@ -698,24 +698,34 @@ def _apply_user_group(
     except ValidationError as exc:
         raise SyncError("validation_error", _validation_detail(exc)) from exc
 
+    # A group is either starred or archived, never both. Archive wins when a
+    # stale client sends both positive flags; setting either one clears the
+    # other. This keeps a guest archive from leaving another device's star set.
+    is_starred = payload.is_starred
+    is_archived = payload.is_archived
+    if is_archived is True:
+        is_starred = False
+    elif is_starred is True:
+        is_archived = False
+
     changed = False
     if membership is None:
         membership = UserGroup(
             user_id=user_id,
             group_id=group.id,
-            is_starred=bool(payload.is_starred),
-            is_archived=bool(payload.is_archived),
+            is_starred=bool(is_starred),
+            is_archived=bool(is_archived),
             created_at=now,
             updated_at=now,
             version=1,
         )
         changed = True
     else:
-        if payload.is_starred is not None and membership.is_starred != payload.is_starred:
-            membership.is_starred = payload.is_starred
+        if is_starred is not None and membership.is_starred != is_starred:
+            membership.is_starred = is_starred
             changed = True
-        if payload.is_archived is not None and membership.is_archived != payload.is_archived:
-            membership.is_archived = payload.is_archived
+        if is_archived is not None and membership.is_archived != is_archived:
+            membership.is_archived = is_archived
             changed = True
         if changed:
             membership.updated_at = now
@@ -1299,6 +1309,8 @@ def claim_groups(
     moment = now or utc_now()
     starred = set(starred_group_ids)
     archived = set(archived_group_ids)
+    # Archive wins when a stale guest cache lists a group in both sets.
+    starred -= archived
     memberships: list[UserGroup] = []
     seen: set[str] = set()
     for group_id in group_ids:

@@ -66,6 +66,18 @@ export function useGroups() {
       const details = Array.isArray(result?.groups) ? result.groups : []
 
       if (authenticated) {
+        const returnedIds = new Set(details.map((/** @type {any} */ group) => group.id))
+        // The authenticated scope is authoritative: drop localStorage entries
+        // for memberships another device removed before writing the new list.
+        for (const group of localGroups) {
+          if (!returnedIds.has(group.id)) deleteRecentGroup(group.id)
+        }
+        for (const groupId of localStarred) {
+          if (!returnedIds.has(groupId)) unstarGroup(groupId)
+        }
+        for (const groupId of localArchived) {
+          if (!returnedIds.has(groupId)) unarchiveGroup(groupId)
+        }
         for (const group of /** @type {any[]} */ (details)) {
           saveRecentGroup({ id: group.id, name: group.name })
           if (group.is_starred ?? group.isStarred) starGroup(group.id)
@@ -114,6 +126,18 @@ export function useGroups() {
     const controller = new AbortController()
     void load(controller.signal)
     return () => controller.abort()
+  }, [load])
+
+  // Authentication refreshes and background syncs can finish after the first
+  // group-list read (especially on a fresh device with no local cache). Reload
+  // the synchronized scope when the sync engine announces new server state.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+    const handler = () => {
+      void load()
+    }
+    window.addEventListener('pysplit:refresh', handler)
+    return () => window.removeEventListener('pysplit:refresh', handler)
   }, [load])
 
   const setStarred = useCallback(
@@ -175,6 +199,8 @@ export function useGroups() {
     /** @param {string} groupId */
     async (groupId) => {
     deleteRecentGroup(groupId)
+    unstarGroup(groupId)
+    unarchiveGroup(groupId)
     setState((previous) => ({
       ...previous,
       groups: previous.groups.filter((group) => group.id !== groupId),

@@ -58,6 +58,7 @@ REQUIRED_E2E = (
     "receipts.spec.ts",
     "admin.spec.ts",
     "offline-sync.spec.ts",
+    "group-sync.spec.ts",
     "pwa.spec.ts",
     "pwa-offline.spec.ts",
 )
