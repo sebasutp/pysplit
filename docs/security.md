@@ -95,9 +95,11 @@ The UI and documentation must not imply that shared links are private. See
   interchangeable yet; the unified write path is a Stage 9/C follow-up and is
   not implemented. See `offline-capabilities.md` §2.1.
 - **SQLite is single-writer.** Production assumes one Uvicorn worker and a
-  local SQLite database in WAL mode with `busy_timeout` and short
-  transactions. Multiple writers, a network filesystem, or multiple processes
-  can produce lock contention and must not be assumed safe.
+  local SQLite database in WAL mode with `busy_timeout` (`SQLITE_BUSY_TIMEOUT_MS`,
+  default 5000 ms), foreign keys enabled, and short transactions. Multiple
+  writers, a network filesystem, or multiple processes can produce lock
+  contention and must not be assumed safe. The production entrypoint forces one
+  worker.
 - **Capability URLs cannot be revoked per user.** Rotating or deleting a group
   is the only way to invalidate the link. There are no private groups.
 
@@ -113,9 +115,15 @@ The UI and documentation must not imply that shared links are private. See
 - [ ] Feature flags (`ENABLE_RECEIPT_EXTRACT`, `ENABLE_RECEIPT_ITEMS`,
       `ENABLE_CATEGORY_EXTRACT`, `ENABLE_EXPENSE_DOCUMENTS`) are off unless
       intended, and AI credentials are scoped to the provider.
-- [ ] Backups use the SQLite online backup API (`.backup`) or a checkpointed
-      copy — never a raw copy of a live WAL file. Store backups off-host, record
-      checksums, and test a restore. See `runbook-cutover.md` §3.
+- [ ] Backups use `scripts/backup.py` (SQLite online backup API) — never a
+      raw copy of a live WAL file. Store backups off-host, record checksums, and
+      test a restore with `scripts/restore.py --dry-run` and one real restore.
+      See `runbook-cutover.md` §3.
+- [ ] `compose.yaml` publishes only the web tier; the API stays on the internal
+      network. nginx sets `Cache-Control: no-store` for `/api` and never caches
+      the service worker or build contract.
+- [ ] Logs are structured (`LOG_FORMAT=json`) and contain request ids but never
+      access tokens, refresh cookies, AI keys or full request bodies.
 - [ ] Monitor auth refresh/OAuth failures, `429`/`5xx` rates, SQLite `busy`
       errors, upload failures and AI `FAILED` receipts.
 - [ ] Rotate secrets and provider credentials after exposure, and review the

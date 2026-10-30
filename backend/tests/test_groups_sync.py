@@ -66,9 +66,7 @@ def test_a_group_created_on_one_device_appears_on_the_second(client, session: Se
         headers=headers,
     )
     assert pulled.status_code == 200, pulled.text
-    assert "user_group" in {
-        change["entity_type"] for change in pulled.json()["changes"]
-    }
+    assert "user_group" in {change["entity_type"] for change in pulled.json()["changes"]}
 
     second = client.post("/api/groups/sync", json={}, headers=headers)
     assert second.status_code == 200, second.text
@@ -142,9 +140,7 @@ def test_star_and_archive_are_last_writer_wins_per_user(client, session: Session
     assert other_view["is_archived"] is False
 
 
-def test_star_and_archive_stay_mutually_exclusive_for_a_guest_claim(
-    client, session: Session
-):
+def test_star_and_archive_stay_mutually_exclusive_for_a_guest_claim(client, session: Session):
     user = make_user(session, email="exclusive@example.com")
     group, _ = make_group(session)
 
@@ -194,9 +190,7 @@ def test_star_and_archive_stay_mutually_exclusive_for_a_guest_claim(
     assert (membership.is_starred, membership.is_archived) == (True, False)
 
 
-def test_group_list_read_does_not_claim_a_removed_membership(
-    client, session: Session
-):
+def test_group_list_read_does_not_claim_a_removed_membership(client, session: Session):
     user = make_user(session, email="list-read@example.com")
     group, _ = make_group(session)
 
@@ -206,9 +200,12 @@ def test_group_list_read_does_not_claim_a_removed_membership(
         headers=access_headers(user),
     )
     assert claim.status_code == 200
-    assert client.delete(
-        f"/api/groups/{group.id}/membership", headers=access_headers(user)
-    ).status_code == 204
+    assert (
+        client.delete(
+            f"/api/groups/{group.id}/membership", headers=access_headers(user)
+        ).status_code
+        == 204
+    )
 
     # Another device still has the ID in its recent list; a plain read filter
     # must not turn that stale ID back into a membership.
@@ -223,9 +220,7 @@ def test_group_list_read_does_not_claim_a_removed_membership(
     assert session.get(UserGroup, (user.id, group.id)) is None
 
 
-def test_removing_membership_removes_the_list_entry_but_keeps_group_data(
-    client, session: Session
-):
+def test_removing_membership_removes_the_list_entry_but_keeps_group_data(client, session: Session):
     user = make_user(session, email="leave@example.com")
     group, people = make_group(session, name="Keep my data")
     expense = make_expense(
@@ -250,9 +245,7 @@ def test_removing_membership_removes_the_list_entry_but_keeps_group_data(
     listed = client.post("/api/groups/sync", json={}, headers=headers)
     assert listed.status_code == 200
     assert listed.json()["groups"] == []
-    assert (
-        session.exec(select(UserGroup).where(UserGroup.user_id == user.id)).all() == []
-    )
+    assert session.exec(select(UserGroup).where(UserGroup.user_id == user.id)).all() == []
 
     # ...but the capability URL and its financial data are still intact.
     detail = client.get(f"/api/groups/{group.id}")

@@ -1,4 +1,4 @@
-.PHONY: install dev test test-coverage lint typecheck e2e build parity architecture clean
+.PHONY: install dev test test-coverage lint typecheck e2e build parity architecture performance backup restore clean
 
 PYTHON ?= python3
 PYTEST = PYTHONPATH=. .venv/bin/pytest
@@ -36,6 +36,24 @@ e2e:
 
 build:
 	cd frontend && npm run build
+
+# Stage 12 operational checks. Use BACKUP_DATABASE/BACKUP_UPLOADS/BACKUP_OUTPUT
+# or pass the scripts' flags directly for production paths.
+performance:
+	cd backend && PYTHONPATH=. .venv/bin/python scripts/performance_check.py
+	cd frontend && npm run build && npm run check:bundle
+
+backup:
+	cd backend && PYTHONPATH=. .venv/bin/python scripts/backup.py \
+		--database "$${BACKUP_DATABASE:-../data/dev/pysplit.db}" \
+		--uploads "$${BACKUP_UPLOADS:-../data/dev/uploads}" \
+		--output "$${BACKUP_OUTPUT:-../data/backups}"
+
+restore:
+	cd backend && PYTHONPATH=. .venv/bin/python scripts/restore.py \
+		--backup "$${BACKUP_PATH:?set BACKUP_PATH to a backup directory}" \
+		--database "$${BACKUP_DATABASE:-../data/dev/pysplit.db}" \
+		--uploads "$${BACKUP_UPLOADS:-../data/dev/uploads}"
 
 parity:
 	$(PARITY_PYTHON) scripts/check_parity_matrix.py

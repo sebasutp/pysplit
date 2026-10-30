@@ -195,7 +195,8 @@ def main() -> None:
     ]
     (OUTPUT / "balances.json").write_text(json.dumps(balance_cases, indent=2) + "\n")
 
-    totals_expenses = balance_expenses + [
+    totals_expenses = [
+        *balance_expenses,
         expense(
             "t1",
             2500,
@@ -256,12 +257,8 @@ def main() -> None:
                 row["id"]
                 for row in filter_expenses_by_date_range(decorated, "2026-02-01", "2026-02-28")
             ],
-            "category_9": [
-                row["id"] for row in get_expenses_by_category(decorated, 9)
-            ],
-            "month_2026_01": [
-                row["id"] for row in get_expenses_by_month(decorated, "2026-01")
-            ],
+            "category_9": [row["id"] for row in get_expenses_by_category(decorated, 9)],
+            "month_2026_01": [row["id"] for row in get_expenses_by_month(decorated, "2026-01")],
         },
     }
     (OUTPUT / "totals.json").write_text(json.dumps(totals_cases, indent=2) + "\n")
@@ -295,27 +292,33 @@ def main() -> None:
                     "portions": [],
                 },
             ],
-            "expected": asdict(compute_receipt_split(
-                ["a", "b", "c"],
-                [],
-                [
-                    {
-                        "amount": 1000,
-                        "quantity_milli": 1000,
-                        "portions": [
-                            {"target": "PARTICIPANT", "participant_id": "a", "quantity_milli": 1000}
-                        ],
-                    },
-                    {
-                        "amount": 999,
-                        "quantity_milli": 1000,
-                        "portions": [
-                            {"target": "SHARED", "participant_id": None, "quantity_milli": 1000}
-                        ],
-                    },
-                    {"amount": 100, "quantity_milli": 1000, "portions": []},
-                ],
-            )),
+            "expected": asdict(
+                compute_receipt_split(
+                    ["a", "b", "c"],
+                    [],
+                    [
+                        {
+                            "amount": 1000,
+                            "quantity_milli": 1000,
+                            "portions": [
+                                {
+                                    "target": "PARTICIPANT",
+                                    "participant_id": "a",
+                                    "quantity_milli": 1000,
+                                }
+                            ],
+                        },
+                        {
+                            "amount": 999,
+                            "quantity_milli": 1000,
+                            "portions": [
+                                {"target": "SHARED", "participant_id": None, "quantity_milli": 1000}
+                            ],
+                        },
+                        {"amount": 100, "quantity_milli": 1000, "portions": []},
+                    ],
+                )
+            ),
         },
         {
             "name": "fractional-and-opt-out",
@@ -340,27 +343,37 @@ def main() -> None:
                     ],
                 },
             ],
-            "expected": asdict(compute_receipt_split(
-                ["a", "b", "c"],
-                ["c"],
-                [
-                    {
-                        "amount": 1001,
-                        "quantity_milli": 1000,
-                        "portions": [
-                            {"target": "SHARED", "participant_id": None, "quantity_milli": 1000}
-                        ],
-                    },
-                    {
-                        "amount": 501,
-                        "quantity_milli": 2000,
-                        "portions": [
-                            {"target": "PARTICIPANT", "participant_id": "a", "quantity_milli": 1000},
-                            {"target": "PARTICIPANT", "participant_id": "b", "quantity_milli": 500},
-                        ],
-                    },
-                ],
-            )),
+            "expected": asdict(
+                compute_receipt_split(
+                    ["a", "b", "c"],
+                    ["c"],
+                    [
+                        {
+                            "amount": 1001,
+                            "quantity_milli": 1000,
+                            "portions": [
+                                {"target": "SHARED", "participant_id": None, "quantity_milli": 1000}
+                            ],
+                        },
+                        {
+                            "amount": 501,
+                            "quantity_milli": 2000,
+                            "portions": [
+                                {
+                                    "target": "PARTICIPANT",
+                                    "participant_id": "a",
+                                    "quantity_milli": 1000,
+                                },
+                                {
+                                    "target": "PARTICIPANT",
+                                    "participant_id": "b",
+                                    "quantity_milli": 500,
+                                },
+                            ],
+                        },
+                    ],
+                )
+            ),
         },
         {
             "name": "all-opted-out",
@@ -369,9 +382,11 @@ def main() -> None:
             "items": [
                 {"amount": 250, "quantity_milli": 1000, "portions": []},
             ],
-            "expected": asdict(compute_receipt_split(
-                ["a"], ["a"], [{"amount": 250, "quantity_milli": 1000, "portions": []}]
-            )),
+            "expected": asdict(
+                compute_receipt_split(
+                    ["a"], ["a"], [{"amount": 250, "quantity_milli": 1000, "portions": []}]
+                )
+            ),
         },
     ]
     (OUTPUT / "receipt-split.json").write_text(json.dumps(receipt_cases, indent=2) + "\n")

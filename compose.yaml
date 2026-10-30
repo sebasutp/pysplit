@@ -1,0 +1,116 @@
+# Production-shaped deployment: nginx serves the SPA and proxies /api to one
+# Uvicorn worker with a persistent SQLite volume.
+#
+#   cp .env.example .env      # set BASE_URL and JWT_SECRET
+#   docker compose build
+#   docker compose up -d
+#   curl -f http://localhost:8080/api/health/readiness
+#
+# The optional backup service runs on a profile:
+#   docker compose --profile backup up -d backup
+#
+# See docs/runbook-cutover.md for the full cutover and rollback procedure.
+name: pysplit
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: pysplit-api:local
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/pysplit.db}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+      LOG_FORMAT: ${LOG_FORMAT:-json}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # nginx overwrites these headers, so the API may trust them.
+      TRUST_FORWARDED_HEADERS: ${TRUST_FORWARDED_HEADERS:-true}
+      ENABLE_MOCK_LOGIN: "false"
+    volumes:
+      - pysplit_data:/data
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/readiness', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+    image: pysplit-web:local
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    security_opt:
+      - no-new-privileges:true
+
+  # Optional scheduled backup sidecar. It shares the data volume read-only and
+  # writes timestamped, checksummed backups to a separate volume.
+  backup:
+    profiles: ["backup"]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: pysplit-api:local
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/pysplit.db}
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-86400}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        mkdir -p /backups
+        while true; do
+          python /app/scripts/backup.py \
+            --database /data/pysplit.db \
+            --uploads /data/uploads \
+            --output /backups
+          python - <<'PY'
+        import os
+        import shutil
+        import time
+        from pathlib import Path
+
+        retention = int(os.environ.get("BACKUP_RETENTION_DAYS", "14"))
+        cutoff = time.time() - retention * 86400
+        for path in sorted(Path("/backups").glob("pysplit-backup-*")):
+            if path.is_dir() and path.stat().st_mtime < cutoff:
+                shutil.rmtree(path, ignore_errors=True)
+        PY
+          sleep "${BACKUP_INTERVAL_SECONDS:-86400}"
+        done
+    volumes:
+      - pysplit_data:/data:ro
+      - pysplit_backups:/backups
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  pysplit_data:
+  pysplit_backups:

@@ -44,9 +44,27 @@ class Settings(BaseSettings):
     debug: bool = False
     api_prefix: str = "/api"
 
+    # --- Logging and observability ---------------------------------------
+    # ``json`` emits one structured object per line for container log
+    # collectors; ``text`` is friendlier for local development. The request id
+    # header is echoed on every response and included in request logs.
+    log_level: str = "INFO"
+    log_format: Literal["json", "text"] = "text"
+    request_id_header: str = "X-Request-ID"
+    # Optional Sentry integration. The SDK is not a hard dependency: when the
+    # value is set but ``sentry-sdk`` is not installed, startup logs a warning
+    # and continues. No DSN means no network calls.
+    sentry_dsn: str | None = None
+    sentry_traces_sample_rate: float = 0.0
+
     # SQLite by default. The dev launcher and Docker override this with an
     # absolute path so no database is written next to the source tree.
     database_url: str = "sqlite:///./data/dev/pysplit.db"
+    # Wait this long for a writer lock before SQLite returns ``database is
+    # locked``. Production runs a single Uvicorn worker with short
+    # transactions; the timeout prevents transient 500s during a backup or
+    # checkpoint.
+    sqlite_busy_timeout_ms: int = 5000
 
     # Comma-separated list; parsed into a list by `cors_origins_list`.
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
@@ -199,6 +217,29 @@ class Settings(BaseSettings):
             raise ValueError("frontend_url must be an http(s) URL")
         return value
 
+    @field_validator("log_level")
+    @classmethod
+    def _normalise_log_level(cls, value: str) -> str:
+        cleaned = value.strip().upper()
+        if cleaned not in {"CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"}:
+            raise ValueError("log_level must be a standard Python logging level")
+        return cleaned
+
+    @field_validator("request_id_header")
+    @classmethod
+    def _valid_request_id_header(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned or not re.fullmatch(r"[A-Za-z0-9-]+", cleaned):
+            raise ValueError("request_id_header must be a valid HTTP header name")
+        return cleaned
+
+    @field_validator("sentry_traces_sample_rate")
+    @classmethod
+    def _valid_sentry_rate(cls, value: float) -> float:
+        if not 0.0 <= value <= 1.0:
+            raise ValueError("sentry_traces_sample_rate must be between 0 and 1")
+        return value
+
     @field_validator("cors_origin_regex")
     @classmethod
     def _valid_cors_regex(cls, value: str | None) -> str | None:
@@ -271,6 +312,7 @@ class Settings(BaseSettings):
         "receipt_extraction_stale_seconds",
         "receipt_max_attempts",
         "sync_rate_limit_per_minute",
+        "sqlite_busy_timeout_ms",
     )
     @classmethod
     def _positive_receipt_limit(cls, value: int) -> int:
@@ -302,6 +344,7 @@ class Settings(BaseSettings):
         "openai_model_receipt_items_extract",
         "ai_model_category_extract",
         "openai_model_category_extract",
+        "sentry_dsn",
         mode="before",
     )
     @classmethod

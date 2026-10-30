@@ -44,7 +44,7 @@ def _enforce_sqlite_pragmas(dbapi_connection, _connection_record) -> None:
     cursor = dbapi_connection.cursor()
     try:
         cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.execute("PRAGMA busy_timeout=5000")
+        cursor.execute(f"PRAGMA busy_timeout={int(settings.sqlite_busy_timeout_ms)}")
         cursor.execute("PRAGMA database_list")
         row = cursor.fetchone()
         # (seq, name, file); ``file`` is empty for an in-memory database.

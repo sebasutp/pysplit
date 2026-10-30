@@ -16,7 +16,8 @@
     "typecheck": "tsc -p jsconfig.json",
     "e2e": "playwright test",
     "locales:sync": "node scripts/sync-locales.mjs",
-    "icons": "python3 scripts/generate-pwa-icons.py"
+    "icons": "python3 scripts/generate-pwa-icons.py",
+    "check:bundle": "node scripts/check-bundle-size.mjs"
   },
   "dependencies": {
     "dexie": "4.2.1",

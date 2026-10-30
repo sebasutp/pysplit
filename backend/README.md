@@ -148,3 +148,22 @@ cannot read the API host's CSRF cookie.
 ```bash
 .venv/bin/python -m pytest
 ```
+
+
+## Production
+
+The deployable stack is the repository-root `compose.yaml` with
+`Dockerfile.api` and `Dockerfile.web`. The API runs Alembic before Uvicorn and
+uses one worker against SQLite in `/data`. See `docs/runbook-cutover.md` for the
+cutover and rollback procedure, and `docs/performance.md` for the measured
+budgets.
+
+Operational scripts:
+
+```bash
+python scripts/backup.py --database /data/pysplit.db \
+  --uploads /data/uploads --output /backups
+python scripts/restore.py --backup /backups/pysplit-backup-... \
+  --database /data/pysplit.db --uploads /data/uploads
+python scripts/performance_check.py
+```

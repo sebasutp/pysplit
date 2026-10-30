@@ -28,6 +28,8 @@ from app.api import (
 )
 from app.api.errors import service_error
 from app.core.config import Settings, get_settings
+from app.core.logging import RequestContextMiddleware, configure_logging
+from app.core.observability import init_sentry
 from app.services.errors import ServiceError
 from app.storage import close_storage
 
@@ -43,6 +45,8 @@ async def _lifespan(_app: FastAPI):
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
+    configure_logging(settings)
+    init_sentry(settings)
 
     api_prefix = settings.api_prefix.rstrip("/")
     app = FastAPI(
@@ -60,6 +64,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def _service_error_handler(_request: Request, exc: ServiceError) -> JSONResponse:
         http_exc = service_error(exc)
         return JSONResponse(status_code=http_exc.status_code, content={"detail": http_exc.detail})
+
+    # Added before CORS so the request id is available to every later layer
+    # and is echoed even on a CORS preflight response.
+    app.add_middleware(RequestContextMiddleware, settings=settings)
 
     app.add_middleware(
         CORSMiddleware,

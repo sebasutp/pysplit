@@ -549,9 +549,7 @@ def test_add_update_delete_item(make_client, session: Session):
     assert all(item["id"] != new_item["id"] for item in deleted.json()["items"])
     assert deleted.json()["split"]["items_total"] == 1000
 
-    retried = client.delete(
-        f"/api/groups/{group.id}/receipts/{receipt.id}/items/{new_item['id']}"
-    )
+    retried = client.delete(f"/api/groups/{group.id}/receipts/{receipt.id}/items/{new_item['id']}")
     assert retried.status_code == 200, retried.text
     assert all(item["id"] != new_item["id"] for item in retried.json()["items"])
     assert retried.json()["split"]["items_total"] == 1000
