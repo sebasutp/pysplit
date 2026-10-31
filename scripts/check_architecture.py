@@ -20,7 +20,7 @@ FRONTEND = ROOT / "frontend"
 ROUTERS = (
     "groups.py",
     "expenses.py",
-    "receipts.py",
+    "attachments.py",
     "balances.py",
     "stats.py",
     "activities.py",
@@ -57,6 +57,10 @@ REQUIRED_E2E = (
     "active-user.spec.ts",
     "receipts.spec.ts",
     "admin.spec.ts",
+    "offline-sync.spec.ts",
+    "group-sync.spec.ts",
+    "pwa.spec.ts",
+    "pwa-offline.spec.ts",
 )
 FORBIDDEN_FRONTEND = re.compile(
     r"from\s+['\"][^'\"]*services/(?:api|db|outbox|sync)(?:\.js)?['\"]"
@@ -117,7 +121,14 @@ class Checker:
                 self.fail(f"{path.relative_to(ROOT)} uses dangerouslySetInnerHTML")
 
     def check_repository(self) -> None:
-        for name in ("contract.js", "online.js", "index.js", "contract.test.js"):
+        for name in (
+            "contract.js",
+            "online.js",
+            "local.js",
+            "index.js",
+            "contract.test.js",
+            "local.test.js",
+        ):
             path = FRONTEND / "src" / "services" / "repository" / name
             if not path.is_file():
                 self.fail(f"missing repository file {path.relative_to(ROOT)}")

@@ -59,6 +59,8 @@ jobs:
         run: npm run typecheck
       - name: Build
         run: npm run build
+      - name: Check initial bundle budget
+        run: npm run check:bundle
       - name: Dependency audit
         run: npm audit --audit-level=high
 

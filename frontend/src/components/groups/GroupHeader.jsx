@@ -18,6 +18,13 @@ const TABS = [
   { key: 'Settings', path: 'edit' },
 ]
 
+/** @param {any} group */
+function visibleTabs(group) {
+  const hasInformation =
+    typeof group?.information === 'string' && group.information.trim().length > 0
+  return TABS.filter((tab) => tab.key !== 'Information' || hasInformation)
+}
+
 /**
  * @param {{group: any}} props
  */
@@ -25,6 +32,7 @@ export function GroupHeader({ group }) {
   const { t } = useTranslation()
   const [shareOpen, setShareOpen] = useState(false)
   const url = typeof window === 'undefined' ? '' : `${window.location.origin}/groups/${group.id}`
+  const tabs = visibleTabs(group)
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,7 +48,7 @@ export function GroupHeader({ group }) {
         aria-label={t('GroupTabs.label', 'Group sections')}
         className="flex flex-wrap gap-1 border-b border-border pb-1"
       >
-        {TABS.map((tab) => (
+        {tabs.map((tab) => (
           <NavLink
             key={tab.key}
             role="tab"

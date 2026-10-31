@@ -27,14 +27,14 @@ from sqlmodel import Session, select
 from app.core.config import Settings, get_settings
 from app.core.enums import can_create_groups
 from app.models.activity import Activity
+from app.models.attachment import Attachment
+from app.models.attachment_item import AttachmentItem
+from app.models.attachment_item_portion import AttachmentItemPortion
+from app.models.attachment_opt_out import AttachmentOptOut
 from app.models.base import utc_now
 from app.models.expense import Expense
 from app.models.group import Group
 from app.models.participant import Participant
-from app.models.receipt import Receipt
-from app.models.receipt_item import ReceiptItem
-from app.models.receipt_item_portion import ReceiptItemPortion
-from app.models.receipt_opt_out import ReceiptOptOut
 from app.models.sync_change import SyncChange
 from app.models.sync_operation import SyncOperation
 from app.models.user import User
@@ -52,6 +52,7 @@ from app.schemas.groups import (
     ParticipantUpdate,
 )
 from app.schemas.sync import (
+    SyncAttachmentSnapshot,
     SyncBootstrapResponse,
     SyncChangeRead,
     SyncOperationIn,
@@ -59,7 +60,6 @@ from app.schemas.sync import (
     SyncPullResponse,
     SyncPushResponse,
     SyncPushResult,
-    SyncReceiptSnapshot,
 )
 from app.services import categories as categories_service
 from app.services import expenses as expenses_service
@@ -98,7 +98,6 @@ ENTITY_FIELDS: dict[str, dict[str, frozenset[str]]] = {
                 "notes",
                 "recurrence_rule",
                 "paid_for",
-                "documents",
                 "participant_id",
             }
         ),
@@ -117,7 +116,6 @@ ENTITY_FIELDS: dict[str, dict[str, frozenset[str]]] = {
                 "notes",
                 "recurrence_rule",
                 "paid_for",
-                "documents",
                 "participant_id",
             }
         ),
@@ -133,7 +131,6 @@ ENTITY_FIELDS: dict[str, dict[str, frozenset[str]]] = {
 NESTED_FIELDS: dict[str, frozenset[str]] = {
     "participants": frozenset({"id", "name"}),
     "paid_for": frozenset({"participant_id", "shares", "amount", "percentage"}),
-    "documents": frozenset({"id", "url", "width", "height"}),
 }
 
 
@@ -231,49 +228,61 @@ def _membership_snapshot(membership: UserGroup) -> dict[str, Any]:
     }
 
 
-def _receipt_snapshot(session: Session, receipt: Receipt) -> SyncReceiptSnapshot:
+def _attachment_snapshot(session: Session, attachment: Attachment) -> SyncAttachmentSnapshot:
     items = list(
         session.exec(
-            select(ReceiptItem)
-            .where(ReceiptItem.receipt_id == receipt.id)
-            .order_by(ReceiptItem.position.asc(), ReceiptItem.id.asc())
+            select(AttachmentItem)
+            .where(AttachmentItem.attachment_id == attachment.id)
+            .order_by(AttachmentItem.position.asc(), AttachmentItem.id.asc())
         ).all()
     )
     item_ids = [item.id for item in items]
-    portions: list[ReceiptItemPortion] = []
+    portions: list[AttachmentItemPortion] = []
     if item_ids:
         portions = list(
             session.exec(
-                select(ReceiptItemPortion)
-                .where(ReceiptItemPortion.item_id.in_(item_ids))
-                .order_by(ReceiptItemPortion.created_at.asc(), ReceiptItemPortion.id.asc())
+                select(AttachmentItemPortion)
+                .where(AttachmentItemPortion.item_id.in_(item_ids))
+                .order_by(
+                    AttachmentItemPortion.created_at.asc(),
+                    AttachmentItemPortion.id.asc(),
+                )
             ).all()
         )
     opt_outs = list(
-        session.exec(select(ReceiptOptOut).where(ReceiptOptOut.receipt_id == receipt.id)).all()
+        session.exec(
+            select(AttachmentOptOut).where(AttachmentOptOut.attachment_id == attachment.id)
+        ).all()
     )
-    return SyncReceiptSnapshot(
-        receipt={
-            "id": receipt.id,
-            "group_id": receipt.group_id,
-            "image_url": receipt.image_url,
-            "image_width": receipt.image_width,
-            "image_height": receipt.image_height,
-            "status": receipt.status,
-            "merchant": receipt.merchant,
-            "receipt_date": iso_z(receipt.receipt_date) if receipt.receipt_date else None,
-            "currency_code": receipt.currency_code,
-            "total": receipt.total,
-            "expense_id": receipt.expense_id,
-            "created_at": iso_z(receipt.created_at),
-            "updated_at": iso_z(receipt.updated_at),
-            "version": receipt.version,
-            "deleted_at": iso_z(receipt.deleted_at) if receipt.deleted_at else None,
+    return SyncAttachmentSnapshot(
+        attachment={
+            "id": attachment.id,
+            "group_id": attachment.group_id,
+            "expense_id": attachment.expense_id,
+            "url": attachment.url,
+            "thumbnail_url": attachment.thumbnail_url,
+            "filename": attachment.filename,
+            "content_type": attachment.content_type,
+            "byte_size": attachment.byte_size,
+            "width": attachment.width,
+            "height": attachment.height,
+            "receipt_status": attachment.receipt_status,
+            "attempts": attachment.attempts,
+            "merchant": attachment.merchant,
+            "receipt_date": (iso_z(attachment.receipt_date) if attachment.receipt_date else None),
+            "currency_code": attachment.currency_code,
+            "total": attachment.total,
+            "provider": attachment.provider,
+            "model": attachment.model,
+            "created_at": iso_z(attachment.created_at),
+            "updated_at": iso_z(attachment.updated_at),
+            "version": attachment.version,
+            "deleted_at": iso_z(attachment.deleted_at) if attachment.deleted_at else None,
         },
         items=[
             {
                 "id": item.id,
-                "receipt_id": item.receipt_id,
+                "attachment_id": item.attachment_id,
                 "name": item.name,
                 "quantity_milli": item.quantity_milli,
                 "unit_price": item.unit_price,
@@ -305,7 +314,7 @@ def _receipt_snapshot(session: Session, receipt: Receipt) -> SyncReceiptSnapshot
         opt_outs=[
             {
                 "id": opt_out.id,
-                "receipt_id": opt_out.receipt_id,
+                "attachment_id": opt_out.attachment_id,
                 "participant_id": opt_out.participant_id,
                 "created_at": iso_z(opt_out.created_at),
                 "updated_at": iso_z(opt_out.updated_at),
@@ -698,24 +707,34 @@ def _apply_user_group(
     except ValidationError as exc:
         raise SyncError("validation_error", _validation_detail(exc)) from exc
 
+    # A group is either starred or archived, never both. Archive wins when a
+    # stale client sends both positive flags; setting either one clears the
+    # other. This keeps a guest archive from leaving another device's star set.
+    is_starred = payload.is_starred
+    is_archived = payload.is_archived
+    if is_archived is True:
+        is_starred = False
+    elif is_starred is True:
+        is_archived = False
+
     changed = False
     if membership is None:
         membership = UserGroup(
             user_id=user_id,
             group_id=group.id,
-            is_starred=bool(payload.is_starred),
-            is_archived=bool(payload.is_archived),
+            is_starred=bool(is_starred),
+            is_archived=bool(is_archived),
             created_at=now,
             updated_at=now,
             version=1,
         )
         changed = True
     else:
-        if payload.is_starred is not None and membership.is_starred != payload.is_starred:
-            membership.is_starred = payload.is_starred
+        if is_starred is not None and membership.is_starred != is_starred:
+            membership.is_starred = is_starred
             changed = True
-        if payload.is_archived is not None and membership.is_archived != payload.is_archived:
-            membership.is_archived = payload.is_archived
+        if is_archived is not None and membership.is_archived != is_archived:
+            membership.is_archived = is_archived
             changed = True
         if changed:
             membership.updated_at = now
@@ -1238,7 +1257,14 @@ def bootstrap_group(
             .order_by(Activity.time.desc(), Activity.id.desc())
         ).all()
     )
-    receipts = list(session.exec(select(Receipt).where(Receipt.group_id == group_id)).all())
+    attachments = list(
+        session.exec(
+            select(Attachment).where(
+                Attachment.group_id == group_id,
+                Attachment.deleted_at.is_(None),
+            )
+        ).all()
+    )
     categories = categories_service.list_categories(session, limit=200)
 
     membership = session.get(UserGroup, (user_id, group_id)) if user_id is not None else None
@@ -1262,7 +1288,7 @@ def bootstrap_group(
             )
             for activity in activity_rows
         ],
-        receipts=[_receipt_snapshot(session, receipt) for receipt in receipts],
+        attachments=[_attachment_snapshot(session, attachment) for attachment in attachments],
         categories=[
             CategoryRead(id=int(category.id or 0), grouping=category.grouping, name=category.name)
             for category in categories.items
@@ -1299,6 +1325,8 @@ def claim_groups(
     moment = now or utc_now()
     starred = set(starred_group_ids)
     archived = set(archived_group_ids)
+    # Archive wins when a stale guest cache lists a group in both sets.
+    starred -= archived
     memberships: list[UserGroup] = []
     seen: set[str] = set()
     for group_id in group_ids:

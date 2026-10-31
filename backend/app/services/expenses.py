@@ -1,4 +1,4 @@
-"""Expense, recurrence, document and activity business logic."""
+"""Expense, recurrence and activity business logic."""
 
 from __future__ import annotations
 
@@ -16,24 +16,21 @@ from app.models.activity import Activity
 from app.models.base import utc_now
 from app.models.category import Category
 from app.models.expense import Expense
-from app.models.expense_document import ExpenseDocument
 from app.models.expense_paid_for import ExpensePaidFor
 from app.models.participant import Participant
-from app.models.receipt import Receipt
 from app.models.recurring_expense_link import RecurringExpenseLink
 from app.models.sync_change import SyncChange
+from app.schemas.attachments import AttachmentRead
 from app.schemas.categories import CategoryRead
 from app.schemas.expenses import (
-    DocumentInput,
     ExpenseCreate,
-    ExpenseDocumentRead,
     ExpenseList,
     ExpensePaidForInput,
     ExpensePaidForRead,
     ExpenseRead,
     ExpenseUpdate,
-    ReceiptSummary,
 )
+from app.services.attachments import attachment_reads_for_expenses
 from app.services.categories import ensure_default_categories
 from app.services.common import finish, require_group
 from app.services.errors import ConflictError, InvalidInputError, NotFoundError
@@ -193,28 +190,17 @@ def normalize_paid_for(
 # ---------------------------------------------------------------------------
 
 
-def _document_rows(session: Session, expense_id: str) -> list[ExpenseDocument]:
-    return list(
-        session.exec(
-            select(ExpenseDocument)
-            .where(ExpenseDocument.expense_id == expense_id)
-            .order_by(ExpenseDocument.created_at.asc(), ExpenseDocument.id.asc())
-        ).all()
-    )
-
-
 def _expense_read(
     expense: Expense,
     *,
     categories: dict[int, Category],
     participants: dict[str, Participant],
     paid_for_by_expense: dict[str, list[tuple[ExpensePaidFor, Participant]]],
-    documents_by_expense: dict[str, list[ExpenseDocument]],
-    receipts: dict[str, Receipt],
+    attachments_by_expense: dict[str, list[AttachmentRead]],
+    recurring_heads: set[str] | None = None,
 ) -> ExpenseRead:
     category = categories.get(expense.category_id)
     paid_by = participants.get(expense.paid_by_id)
-    receipt = receipts.get(expense.id)
     return ExpenseRead(
         id=expense.id,
         group_id=expense.group_id,
@@ -238,6 +224,7 @@ def _expense_read(
         split_mode=SplitMode(expense.split_mode),
         notes=expense.notes,
         recurrence_rule=RecurrenceRule(expense.recurrence_rule or "NONE"),
+        is_recurring_head=expense.id in (recurring_heads or set()),
         created_at=expense.created_at,
         updated_at=expense.updated_at,
         version=expense.version,
@@ -250,16 +237,7 @@ def _expense_read(
             )
             for row, participant in paid_for_by_expense.get(expense.id, [])
         ],
-        documents=[
-            ExpenseDocumentRead(
-                id=document.id,
-                url=document.url,
-                width=document.width,
-                height=document.height,
-            )
-            for document in documents_by_expense.get(expense.id, [])
-        ],
-        receipt=ReceiptSummary(id=receipt.id, status=receipt.status) if receipt else None,
+        attachments=attachments_by_expense.get(expense.id, []),
     )
 
 
@@ -301,19 +279,17 @@ def expenses_to_read(session: Session, expenses: list[Expense]) -> list[ExpenseR
             ).all()
         }
 
-    documents_by_expense: dict[str, list[ExpenseDocument]] = {}
-    for document in session.exec(
-        select(ExpenseDocument)
-        .where(ExpenseDocument.expense_id.in_(expense_ids))
-        .order_by(ExpenseDocument.created_at.asc(), ExpenseDocument.id.asc())
-    ).all():
-        if document.expense_id is not None:
-            documents_by_expense.setdefault(document.expense_id, []).append(document)
+    attachments_by_expense = attachment_reads_for_expenses(session, expense_ids)
 
-    receipts: dict[str, Receipt] = {}
-    for receipt in session.exec(select(Receipt).where(Receipt.expense_id.in_(expense_ids))).all():
-        if receipt.expense_id is not None:
-            receipts.setdefault(receipt.expense_id, receipt)
+    recurring_heads = {
+        link.current_frame_expense_id
+        for link in session.exec(
+            select(RecurringExpenseLink).where(
+                RecurringExpenseLink.current_frame_expense_id.in_(expense_ids),
+                RecurringExpenseLink.next_expense_created_at.is_(None),
+            )
+        ).all()
+    }
 
     return [
         _expense_read(
@@ -321,8 +297,8 @@ def expenses_to_read(session: Session, expenses: list[Expense]) -> list[ExpenseR
             categories=categories,
             participants=participants,
             paid_for_by_expense=paid_for_by_expense,
-            documents_by_expense=documents_by_expense,
-            receipts=receipts,
+            attachments_by_expense=attachments_by_expense,
+            recurring_heads=recurring_heads,
         )
         for expense in expenses
     ]
@@ -460,55 +436,6 @@ def group_expense_snapshot(session: Session, group_id: str) -> list[dict[str, An
 # ---------------------------------------------------------------------------
 
 
-def _attach_documents(
-    session: Session,
-    expense_id: str,
-    documents: list[DocumentInput],
-    *,
-    replace: bool,
-    now: datetime,
-) -> None:
-    existing = {document.id: document for document in _document_rows(session, expense_id)}
-    desired: list[tuple[str, DocumentInput]] = []
-    seen: set[str] = set()
-    for document in documents:
-        document_id = document.id or new_id("doc")
-        if document_id in seen:
-            raise InvalidInputError(f"Duplicate document id: {document_id}", field="documents")
-        seen.add(document_id)
-        desired.append((document_id, document))
-
-    if replace:
-        for document_id, document in existing.items():
-            if document_id not in seen:
-                session.delete(document)
-
-    for document_id, document in desired:
-        current = existing.get(document_id) or session.get(ExpenseDocument, document_id)
-        if current is None:
-            current = ExpenseDocument(
-                id=document_id,
-                url=document.url,
-                width=document.width,
-                height=document.height,
-                expense_id=expense_id,
-                created_at=now,
-                updated_at=now,
-                version=1,
-            )
-            session.add(current)
-            continue
-        if current.expense_id not in (None, expense_id):
-            raise ConflictError(f"Document {document_id} belongs to another expense")
-        current.expense_id = expense_id
-        current.url = document.url
-        current.width = document.width
-        current.height = document.height
-        current.updated_at = now
-        current.version += 1
-        session.add(current)
-
-
 def _create_recurring_link(
     session: Session,
     expense: Expense,
@@ -586,8 +513,6 @@ def create_expense(
             )
         )
 
-    _attach_documents(session, expense.id, payload.documents, replace=False, now=moment)
-
     if payload.recurrence_rule != RecurrenceRule.NONE:
         _create_recurring_link(session, expense, payload.recurrence_rule, now=moment)
 
@@ -637,7 +562,6 @@ def update_expense(
         "split_mode",
         "recurrence_rule",
         "paid_for",
-        "documents",
     }
     for field in non_nullable:
         if field in fields and fields[field] is None:
@@ -719,9 +643,6 @@ def update_expense(
                 )
             )
 
-    if payload.documents is not None:
-        _attach_documents(session, expense.id, payload.documents, replace=True, now=moment)
-
     if "recurrence_rule" in fields:
         new_rule = str(fields["recurrence_rule"])
         existing_rule = expense.recurrence_rule or RecurrenceRule.NONE.value
@@ -787,15 +708,17 @@ def delete_expense(
     expense.recurring_expense_link_id = None
     session.add(expense)
 
+    from app.models.attachment import Attachment
+
     session.execute(
-        update(ExpenseDocument)
-        .where(ExpenseDocument.expense_id == expense.id)
-        .values(expense_id=None, updated_at=moment, version=ExpenseDocument.version + 1)
-    )
-    session.execute(
-        update(Receipt)
-        .where(Receipt.expense_id == expense.id)
-        .values(expense_id=None, updated_at=moment, version=Receipt.version + 1)
+        update(Attachment)
+        .where(Attachment.expense_id == expense.id)
+        .values(
+            expense_id=None,
+            deleted_at=moment,
+            updated_at=moment,
+            version=Attachment.version + 1,
+        )
     )
     session.execute(
         delete(RecurringExpenseLink).where(
@@ -932,13 +855,15 @@ def materialize_due_recurring_expenses(
                     )
                 )
 
+            from app.models.attachment import Attachment
+
             session.execute(
-                update(ExpenseDocument)
-                .where(ExpenseDocument.expense_id == current.id)
+                update(Attachment)
+                .where(Attachment.expense_id == current.id)
                 .values(
                     expense_id=new_expense.id,
                     updated_at=moment,
-                    version=ExpenseDocument.version + 1,
+                    version=Attachment.version + 1,
                 )
             )
 

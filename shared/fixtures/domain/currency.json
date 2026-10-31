@@ -1,0 +1,38 @@
+[
+  {
+    "amount": 1234,
+    "currency_code": "USD",
+    "decimal": "12.34",
+    "csv": "12.34"
+  },
+  {
+    "amount": -5,
+    "currency_code": "USD",
+    "decimal": "-0.05",
+    "csv": "-0.05"
+  },
+  {
+    "amount": 1000,
+    "currency_code": "JPY",
+    "decimal": "1000",
+    "csv": "1000"
+  },
+  {
+    "amount": 0,
+    "currency_code": "EUR",
+    "decimal": "0.00",
+    "csv": "0"
+  },
+  {
+    "amount": -1234,
+    "currency_code": "JPY",
+    "decimal": "-1234",
+    "csv": "-1234"
+  },
+  {
+    "amount": 999,
+    "currency_code": null,
+    "decimal": "9.99",
+    "csv": "9.99"
+  }
+]

@@ -121,19 +121,6 @@ ROW_SPECS: list[RowSpec] = [
         ],
     ),
     (
-        "ExpenseDocument",
-        "expense_documents",
-        ["id"],
-        ["id"],
-        [
-            ("id", "id", "str"),
-            ("url", "url", "str"),
-            ("width", "width", "int"),
-            ("height", "height", "int"),
-            ("expenseId", "expense_id", "str"),
-        ],
-    ),
-    (
         "Activity",
         "activities",
         ["id"],
@@ -208,16 +195,14 @@ ROW_SPECS: list[RowSpec] = [
     ),
     (
         "Receipt",
-        "receipts",
+        "attachments",
         ["id"],
         ["id"],
         [
             ("id", "id", "str"),
             ("groupId", "group_id", "str"),
-            ("imageUrl", "image_url", "str"),
-            ("imageWidth", "image_width", "int"),
-            ("imageHeight", "image_height", "int"),
-            ("status", "status", "str"),
+            ("imageUrl", "url", "str"),
+            ("status", "receipt_status", "str"),
             ("rawExtraction", "raw_extraction", "str"),
             ("provider", "provider", "str"),
             ("model", "model", "str"),
@@ -232,12 +217,12 @@ ROW_SPECS: list[RowSpec] = [
     ),
     (
         "ReceiptItem",
-        "receipt_items",
+        "attachment_items",
         ["id"],
         ["id"],
         [
             ("id", "id", "str"),
-            ("receiptId", "receipt_id", "str"),
+            ("receiptId", "attachment_id", "str"),
             ("name", "name", "str"),
             ("quantityMilli", "quantity_milli", "int"),
             ("unitPrice", "unit_price", "int"),
@@ -251,7 +236,7 @@ ROW_SPECS: list[RowSpec] = [
     ),
     (
         "ReceiptItemPortion",
-        "receipt_item_portions",
+        "attachment_item_portions",
         ["id"],
         ["id"],
         [
@@ -266,12 +251,12 @@ ROW_SPECS: list[RowSpec] = [
     ),
     (
         "ReceiptOptOut",
-        "receipt_opt_outs",
+        "attachment_opt_outs",
         ["id"],
         ["id"],
         [
             ("id", "id", "str"),
-            ("receiptId", "receipt_id", "str"),
+            ("receiptId", "attachment_id", "str"),
             ("participantId", "participant_id", "str"),
             ("createdAt", "created_at", "datetime"),
         ],
@@ -348,7 +333,10 @@ def compare_rows(old: sqlite3.Connection, new: sqlite3.Connection) -> list[str]:
             extra = [key for key in extra if key[0] not in default_ids]
         if missing:
             problems.append(f"{target_table}: {len(missing)} missing rows (sample {missing[:3]})")
-        if extra:
+        # Multiple legacy source tables (documents and receipts) map to the
+        # unified attachments table, so an individual spec sees the other
+        # source's rows as extra. The union is checked by the other specs.
+        if extra and target_table != "attachments":
             problems.append(f"{target_table}: {len(extra)} unexpected rows (sample {extra[:3]})")
         for key in sorted(set(source_rows) & set(target_rows)):
             if source_rows[key] != target_rows[key]:

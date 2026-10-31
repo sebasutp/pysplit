@@ -1,16 +1,19 @@
 /** /groups/:groupId/expenses/:expenseId/items — smart split editor. */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { useGroupContext } from '../../components/groups/GroupLayout'
 import { ErrorState, LoadingState } from '../../components/common/States'
+import { AttachmentList } from '../../components/attachments/AttachmentList'
+import { AttachmentPreviewDialog } from '../../components/attachments/AttachmentPreviewDialog'
 import { ReceiptFooter } from '../../components/receipts/ReceiptFooter'
 import { useFeatures } from '../../hooks/useFeatures'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { useToast } from '../../hooks/useToast'
 import { repository } from '../../services/repository'
-import { compressImage, imageDimensions } from '../../utils/compress-image'
+import { prepareUpload } from '../../utils/attachments'
 import { formatCurrency, getCurrencyFromGroup, majorUnits, parseAmount } from '../../utils/currency'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
@@ -45,7 +48,10 @@ export function ReceiptItemsPage() {
   const { expenseId } = useParams()
   const { t, i18n } = useTranslation()
   const { toast } = useToast()
+  const navigate = useNavigate()
+  const location = useLocation()
   const { features, loading: featuresLoading } = useFeatures()
+  const online = useOnlineStatus()
   const locale = i18n.resolvedLanguage || 'en-US'
   const currency = getCurrencyFromGroup(group)
   const participants = group.participants || []
@@ -55,6 +61,7 @@ export function ReceiptItemsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(/** @type {any} */ (null))
   const [uploading, setUploading] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [applying, setApplying] = useState(false)
   const [applyConfirm, setApplyConfirm] = useState(false)
 
@@ -81,12 +88,20 @@ export function ReceiptItemsPage() {
     setError(null)
     setLoading(true)
     try {
-      const [expensePayload, receiptPayload] = await Promise.all([
-        repository.expenses.get(group.id, expenseId, { signal: controller.signal }),
-        features.receipt_items
-          ? repository.receipts.get(group.id, { expense_id: expenseId }, { signal: controller.signal })
-          : Promise.resolve(null),
-      ])
+      const expensePayload = await repository.expenses.get(group.id, expenseId, {
+        signal: controller.signal,
+      })
+      const receiptAttachment = expensePayload?.attachments?.find(
+        (/** @type {any} */ attachment) => attachment.receipt_status,
+      )
+      const receiptPayload =
+        features.receipt_ai && receiptAttachment
+          ? await repository.attachments.get(
+              group.id,
+              { attachment_id: receiptAttachment.id },
+              { signal: controller.signal },
+            )
+          : null
       if (controller.signal.aborted) return
       setExpense(expensePayload)
       setState(receiptPayload)
@@ -100,7 +115,7 @@ export function ReceiptItemsPage() {
     } finally {
       if (!controller.signal.aborted) setLoading(false)
     }
-  }, [group.id, expenseId, features.receipt_items])
+  }, [group.id, expenseId, features.receipt_ai])
 
   useEffect(() => {
     if (!featuresLoading) void reload()
@@ -132,18 +147,26 @@ export function ReceiptItemsPage() {
     if (!file) return
     setUploading(true)
     try {
-      const compressed = await compressImage(file)
-      const size = await imageDimensions(compressed)
-      const image = await repository.receipts.upload(group.id, compressed, size)
-      const result = await repository.receipts.extractItems(group.id, {
-        image_url: image.url,
-        image_width: size.width,
-        image_height: size.height,
+      const prepared = await prepareUpload(file)
+      const attachment = await repository.attachments.upload(group.id, prepared.file, {
+        width: prepared.width,
+        height: prepared.height,
+        expense_id: expenseId,
+      })
+      const result = await repository.attachments.extractItems(group.id, attachment.id, {
+        expense_id: expenseId,
       })
       setState(result)
       toast({
-        title: t('ReceiptItems.extracted', 'Receipt scanned'),
-        description: t('ReceiptItems.extractedDescription', 'Review the extracted items below.'),
+        title: attachment.pending
+          ? t('ReceiptItems.scanPending', 'Scan queued')
+          : t('ReceiptItems.extracted', 'Receipt scanned'),
+        description: attachment.pending
+          ? t(
+              'ReceiptItems.scanPendingDescription',
+              'The image is saved on this device and will be scanned when you are back online.',
+            )
+          : t('ReceiptItems.extractedDescription', 'Assign the extracted items below.'),
       })
     } catch (caught) {
       toast({
@@ -159,8 +182,34 @@ export function ReceiptItemsPage() {
     }
   }
 
+
+  /** @param {any} attachment */
+  async function scanExistingAttachment(attachment) {
+    setUploading(true)
+    try {
+      const result = await repository.attachments.extractItems(group.id, attachment.id, {
+        expense_id: expenseId,
+      })
+      setState(result)
+      toast({
+        title: t('ReceiptItems.extracted', 'Receipt scanned'),
+        description: t('ReceiptItems.extractedDescription', 'Assign the extracted items below.'),
+      })
+    } catch (caught) {
+      toast({
+        title: t('ReceiptItems.saveError.title', 'Couldn’t save your change'),
+        description:
+          caught && typeof caught === 'object' && 'detail' in caught
+            ? String(caught.detail)
+            : t('ReceiptItems.scanError', 'The receipt could not be scanned.'),
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
   async function saveItem() {
-    if (!itemDialog || !state?.receipt) return
+    if (!itemDialog || !state?.attachment) return
     const payload = {
       name: itemDialog.name.trim(),
       quantity_milli: Math.max(1, Math.round(Number(itemDialog.quantity || 1) * 1000)),
@@ -170,13 +219,13 @@ export function ReceiptItemsPage() {
     try {
       const next =
         itemDialog.mode === 'edit' && itemDialog.item
-          ? await repository.receipts.updateItem(
+          ? await repository.attachments.updateItem(
               group.id,
-              state.receipt.id,
+              state.attachment.id,
               itemDialog.item.id,
               payload,
             )
-          : await repository.receipts.addItem(group.id, state.receipt.id, payload)
+          : await repository.attachments.addItem(group.id, state.attachment.id, payload)
       setState(next)
       setItemDialog(null)
     } catch (caught) {
@@ -188,7 +237,7 @@ export function ReceiptItemsPage() {
   }
 
   async function assignItem() {
-    if (!assignDialog || !state?.receipt) return
+    if (!assignDialog || !state?.attachment) return
     const { item, selected } = assignDialog
     try {
       let portions
@@ -211,9 +260,9 @@ export function ReceiptItemsPage() {
           quantity_milli: base + (index === 0 ? remainder : 0),
         }))
       }
-      const next = await repository.receipts.setPortions(
+      const next = await repository.attachments.setPortions(
         group.id,
-        state.receipt.id,
+        state.attachment.id,
         item.id,
         portions,
       )
@@ -228,11 +277,11 @@ export function ReceiptItemsPage() {
   }
 
   async function removeItem() {
-    if (!deleteItem || !state?.receipt) return
+    if (!deleteItem || !state?.attachment) return
     try {
-      const next = await repository.receipts.deleteItem(
+      const next = await repository.attachments.deleteItem(
         group.id,
-        state.receipt.id,
+        state.attachment.id,
         deleteItem.id,
       )
       setState(next)
@@ -247,11 +296,11 @@ export function ReceiptItemsPage() {
 
   /** @param {string} participantId @param {boolean} value */
   async function toggleOptOut(participantId, value) {
-    if (!state?.receipt) return
+    if (!state?.attachment) return
     try {
-      const next = await repository.receipts.setOptOut(
+      const next = await repository.attachments.setOptOut(
         group.id,
-        state.receipt.id,
+        state.attachment.id,
         participantId,
         value,
       )
@@ -265,18 +314,18 @@ export function ReceiptItemsPage() {
   }
 
   async function applyReceipt() {
-    if (!state?.receipt || !expenseId) return
+    if (!state?.attachment || !expenseId) return
     setApplying(true)
     try {
-      const result = await repository.receipts.apply(group.id, state.receipt.id, {
+      const result = await repository.attachments.apply(group.id, state.attachment.id, {
         expense_id: expenseId,
       })
       setState((/** @type {any} */ previous) => ({
         ...previous,
-        receipt: result.receipt,
+        attachment: result.attachment,
         split: result.split,
       }))
-      setExpense(result.expense)
+      setExpense(await repository.expenses.get(group.id, expenseId))
       setApplyConfirm(false)
       toast({
         title: t('ReceiptItems.applySuccess.title', 'Expense updated'),
@@ -285,6 +334,13 @@ export function ReceiptItemsPage() {
           'The receipt items were applied to the expense.',
         ),
       })
+      // Return to the screen the user came from (usually the expense form).
+      // A direct link has no useful history entry, so fall back to the editor.
+      if (location.key && location.key !== 'default') {
+        navigate(-1)
+      } else {
+        navigate(`/groups/${group.id}/expenses/${expenseId}/edit`, { replace: true })
+      }
     } catch (caught) {
       toast({
         title: t('ReceiptItems.applyError.title', 'Couldn’t apply the receipt'),
@@ -299,7 +355,7 @@ export function ReceiptItemsPage() {
   if (error) return <ErrorState detail={error.detail || error.message} onRetry={() => void reload()} />
   if (!expense) return <ErrorState title="Expense not found" />
 
-  if (!features.receipt_items) {
+  if (!features.receipt_ai) {
     return (
       <Card>
         <CardHeader>
@@ -330,9 +386,25 @@ export function ReceiptItemsPage() {
           <p className="text-sm text-muted-foreground">
             {t('ReceiptItems.noReceipt', 'No receipt is linked to this expense yet.')}
           </p>
+          {expense.attachments?.length ? (
+            <AttachmentList
+              attachments={expense.attachments}
+              canScan={Boolean(features.receipt_ai)}
+              scanningId={uploading ? 'scanning' : null}
+              onScan={scanExistingAttachment}
+            />
+          ) : null}
+          {!online ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              {t(
+                'ReceiptItems.offlineQueue',
+                'You are offline. Attach the photo now and it will be scanned after you reconnect.',
+              )}
+            </p>
+          ) : null}
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,application/pdf"
             disabled={uploading}
             onChange={handleUpload}
             aria-label={t('ReceiptItems.upload', 'Upload a receipt photo')}
@@ -348,16 +420,41 @@ export function ReceiptItemsPage() {
 
   const split = state.split
   const diverged = expense.amount !== (split?.items_total ?? expense.amount)
-  const receipt = state.receipt
+  const receipt = state.attachment
 
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="text-xl font-semibold">{t('ReceiptItems.title', 'Receipt items')}</h2>
-          <p className="text-sm text-muted-foreground">
-            {receipt.merchant || t('ReceiptItems.merchant', 'Merchant')} · {receipt.status}
-          </p>
+        <div className="flex items-center gap-3">
+          {receipt.content_type?.startsWith('image/') && !String(receipt.url).startsWith('local-') ? (
+            <button
+              type="button"
+              className="h-20 w-20 overflow-hidden rounded border border-border"
+              onClick={() => setPreviewOpen(true)}
+              aria-label={t('Attachments.preview', 'Preview')}
+            >
+              <img
+                src={receipt.thumbnail_url || receipt.url}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </button>
+          ) : null}
+          <div>
+            <h2 className="text-xl font-semibold">{t('ReceiptItems.title', 'Receipt items')}</h2>
+            <p className="text-sm text-muted-foreground">
+              {receipt.merchant || t('ReceiptItems.merchant', 'Merchant')} ·{' '}
+              {receipt.receipt_status}
+            </p>
+          </div>
+          {receipt.pending_scan || receipt.pending ? (
+            <p
+              data-testid="receipt-scan-pending"
+              className="mt-1 text-xs font-medium text-amber-600 dark:text-amber-400"
+            >
+              {t('ReceiptItems.scanPending', 'Scan queued')}
+            </p>
+          ) : null}
         </div>
         <div className="flex gap-2">
           <Button
@@ -662,6 +759,11 @@ export function ReceiptItemsPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <AttachmentPreviewDialog
+        attachment={receipt}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+      />
     </section>
   )
 }

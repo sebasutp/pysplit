@@ -51,10 +51,8 @@ Runs `SELECT 1`. `200` when ready, `503` when the database is unavailable.
 Returns server-enforced flags so the SPA never enables a disabled feature.
 ```json
 {
-  "receipt_extract": false,
-  "receipt_items": false,
-  "category_extract": false,
-  "expense_documents": false
+  "receipt_ai": false,
+  "category_ai": false
 }
 ```
 
@@ -176,7 +174,9 @@ Removes the group from the user's synchronized list without deleting data.
 `204`.
 
 ### `POST /api/groups/sync`
-Merges locally known group IDs into the authenticated user's `UserGroup` rows.
+Returns the authenticated user's complete synchronized group scope. Locally
+known IDs in `local_group_ids` are merged into `UserGroup` rows; `group_ids`
+alone is a read filter for guests and does not claim a membership.
 ```json
 { "group_ids": ["g1", "g2"] }
 ```
@@ -185,7 +185,8 @@ Merges locally known group IDs into the authenticated user's `UserGroup` rows.
   "user_groups": [ { "group_id": "g1", "is_starred": false, "is_archived": false } ],
   "groups": [ { "id": "g1", "name": "Trip" } ] }
 ```
-Idempotent: existing rows are not duplicated.
+Idempotent: existing rows are not duplicated. Star and archive are mutually
+exclusive; archive wins when both are supplied.
 
 ## 5. Categories
 
@@ -211,8 +212,7 @@ Ordered by `expense_date DESC, created_at DESC, id ASC`.
     "created_at": "2026-09-03T11:23:49Z", "updated_at": "2026-09-03T11:23:49Z",
     "version": 1, "deleted_at": null,
     "paid_for": [ { "participant_id": "p1", "shares": 1 } ],
-    "documents": [],
-    "receipt": null
+    "attachments": []
   }],
   "total": 1, "limit": 50, "offset": 0
 }
@@ -243,9 +243,10 @@ participant's `amount` must sum exactly to `amount`. Validation returns `422`
 with field locations.
 
 Input bounds (create and update): `title` ≤ 200 characters, `paid_for` ≤ 100
-rows (create requires at least one), `documents` ≤ 20, `shares` ≤ 1,000,000, and
+rows (create requires at least one), `shares` ≤ 1,000,000, and
 `conversion_rate` at most 18 digits with at most 9 decimal places. Exceeding any
-bound returns `422`.
+bound returns `422`. Files are attached through the attachment endpoints, not
+through the expense payload.
 
 ### `GET /api/groups/{group_id}/expenses/{expense_id}`
 Full expense or `404`.
@@ -267,18 +268,21 @@ reference. `next_expense_created_at` prevents duplicates. Clients never create
 recurrence frames themselves; offline clients display already-materialized
 frames and receive future frames after synchronization.
 
-### Documents
-- `POST /api/groups/{group_id}/expenses/{expense_id}/documents` — multipart
-  upload (`file`, optional `width`/`height`). Limits: 10 MB,
-  `image/jpeg|png|webp`, local disk (S3 in Stage 7).
-- `GET /api/groups/{group_id}/expenses/{expense_id}/documents/{document_id}` —
-  returns the blob inline with `Content-Disposition`.
-- `DELETE /api/groups/{group_id}/expenses/{expense_id}/documents/{document_id}` —
-  `204`.
+### Attachments
+- `POST /api/groups/{group_id}/attachments` — multipart upload (`file`,
+  optional `expense_id`, `width`, `height`). Accepts images and PDFs, enforces
+  `MAX_UPLOAD_BYTES` and the configured `UPLOAD_ALLOWED_TYPES`, and validates
+  the file signature. Returns `AttachmentRead`.
+- `GET /api/groups/{group_id}/attachments/{attachment_id}` — metadata.
+- `GET /api/groups/{group_id}/attachments/{attachment_id}/file` — blob inline.
+- `GET /api/groups/{group_id}/attachments/{attachment_id}/thumbnail` — image
+  bytes (PDFs have no generated thumbnail).
+- `PATCH /api/groups/{group_id}/attachments/{attachment_id}` — `{ "expense_id":
+  "e1" }` links an attachment to an expense; `null` unlinks it.
+- `DELETE /api/groups/{group_id}/attachments/{attachment_id}` — `204`.
 
-Uploads reject path traversal, executable content types and oversized files.
-Storage keys are server-generated. When `ENABLE_EXPENSE_DOCUMENTS=false` (the
-default), upload, download and delete all return `403`.
+Attachments are group-scoped so a receipt can be uploaded before its expense
+exists. Deleting an expense deletes its attachments.
 
 ## 7. Balances
 
@@ -336,11 +340,11 @@ Both return `{ "expenses": [ { "id", "title", "amount", "expense_date" } ] }`.
 ```
 `Activity` has no foreign key to `Expense`; orphan activities are returned.
 
-## 10. Receipts and AI
+## 10. Attachments and receipt AI
 
-Receipt GET/item/apply/link endpoints require `receipt_items` to be enabled.
-`extract-total` requires `receipt_extract` (which is implied by
-`receipt_items`). AI extraction is online-only.
+Attachments are always available. Receipt extraction (`extract-total`,
+`extract-items` and the receipt-state/item routes) requires
+`ENABLE_RECEIPT_AI=true`. Category inference requires `ENABLE_CATEGORY_EXTRACT`.
 
 **Authentication.** The three AI endpoints (`extract-total`, `extract-items`
 and `/api/ai/categories/infer`) require an authenticated user: send
@@ -348,36 +352,39 @@ and `/api/ai/categories/infer`) require an authenticated user: send
 caller (`429`). All limits and flags are enforced server-side, not only by the
 UI.
 
-### `POST /api/groups/{group_id}/receipts/upload`
-Multipart upload (`file`, optional `width`, `height`). Accepts the configured
-image types, enforces `MAX_UPLOAD_BYTES`, and returns a server-generated URL:
-```json
-{ "url": "/api/groups/g1/receipts/images/img_…", "width": 800, "height": 600 }
-```
-When S3/R2 public storage is configured the URL points directly at storage.
-Uploads are rate-limited and keys are server-generated and group-scoped
-(`receipts/{group_id}/…`), so traversal is not possible. An image id referenced
-through a different group's route is rejected.
-
-### `GET /api/groups/{group_id}/receipts/images/{image_id}`
-Returns the stored image bytes. Used for local-disk storage only. Only images
-stored under that group's prefix (or legacy images with a receipt row proving
-ownership) are served.
-
-### `GET /api/groups/{group_id}/receipts/{receipt_id}`
-### `GET /api/groups/{group_id}/expenses/{expense_id}/receipt`
+### `POST /api/groups/{group_id}/attachments`
+The only upload route. Accepts images and PDFs, returns:
 ```json
 {
-  "receipt": { "id": "r1", "group_id": "g1", "image_url": "...",
-    "status": "EXTRACTED", "attempts": 1, "provider": "openai-compatible",
-    "merchant": "Cafe", "receipt_date": "2026-09-03",
-    "currency_code": "EUR", "total": 2400 },
-  "items": [ { "id": "i1", "name": "Pasta", "quantity_milli": 1000,
-    "unit_price": 1200, "amount": 1200, "is_shared": false,
-    "is_adjustment": false, "position": 0,
-    "portions": [ { "id": "rp1", "target": "PARTICIPANT",
+  "id": "att_…",
+  "group_id": "g1",
+  "expense_id": null,
+  "url": "/api/groups/g1/attachments/att_…/file",
+  "thumbnail_url": "/api/groups/g1/attachments/att_…/file",
+  "filename": "receipt.png",
+  "content_type": "image/png",
+  "byte_size": 12345,
+  "width": 800,
+  "height": 600,
+  "receipt_status": null
+}
+```
+`thumbnail_url` is null for PDFs. The browser compresses images before upload;
+PDFs are stored unchanged and opened through their normal link.
+
+### `GET /api/groups/{group_id}/attachments/{attachment_id}/receipt`
+Returns the receipt state:
+```json
+{
+  "attachment": { "id": "att_…", "receipt_status": "EXTRACTED",
+    "attempts": 1, "provider": "openai-compatible", "merchant": "Cafe",
+    "receipt_date": "2026-09-03", "currency_code": "EUR", "total": 2400 },
+  "items": [ { "id": "ai_…", "attachment_id": "att_…", "name": "Pasta",
+    "quantity_milli": 1000, "unit_price": 1200, "amount": 1200,
+    "is_shared": false, "is_adjustment": false, "position": 0,
+    "portions": [ { "id": "ap_…", "target": "PARTICIPANT",
       "participant_id": "p1", "quantity_milli": 1000 } ] } ],
-  "opt_outs": [ "p2" ],
+  "opt_outs": ["p2"],
   "split": { "participant_totals": [ { "participant_id": "p1", "amount": 1200 } ],
     "participants": [ { "participant_id": "p1", "direct": 1200, "shared": 0,
       "unassigned": 0, "total": 1200 } ],
@@ -387,51 +394,46 @@ ownership) are served.
 }
 ```
 Provisional totals are always recomputed from stored items and live
-participants. Client-supplied totals are never trusted. `ReceiptRead.attempts`
-counts paid extraction claims. `ReceiptRead.provider` is a stable public label —
-`openai-compatible`, `google` or `disabled` — never the internal AI base URL.
+participants. Client-supplied totals are never trusted. `attempts` counts paid
+extraction claims; `provider` is a stable public label (`openai-compatible`,
+`google` or `disabled`), never the internal base URL.
 
-### `POST /api/groups/{group_id}/receipts/extract-total`
-```json
-{ "image_url": "/api/groups/g1/receipts/images/img_…" }
-```
+### `POST /api/groups/{group_id}/attachments/{attachment_id}/extract-total`
+No request body.
 ```json
 { "amount": 42.5, "category_id": "7", "date": "2026-04-01", "title": "Lunch" }
 ```
-The reference-shaped result is returned without persisting a receipt, so the
-follow-up line-item extraction still performs the single paid call. Malformed
-model output or a provider failure returns all-null fields, never a 500.
+The result is not persisted, so a later line-item extraction still performs the
+single paid item call. Malformed output or provider failure returns all-null
+fields, never a 500. PDFs return `422`.
 
-### `POST /api/groups/{group_id}/receipts/extract-items`
-Same input plus optional `image_width`/`image_height`. The first successful
-call per `(group_id, image_url)` persists an `EXTRACTED` receipt; re-posting the
-same image reuses it without another paid call. Returns:
+### `POST /api/groups/{group_id}/attachments/{attachment_id}/extract-items`
+Optional body `{ "expense_id": "e1" }`. The first successful call persists an
+`EXTRACTED` receipt on that attachment; re-posting reuses it without another
+paid call. Returns:
 ```json
-{ "status": "EXTRACTED", "receipt_id": "r1", "total": 2400,
+{ "status": "EXTRACTED", "attachment_id": "att_…", "total": 2400,
   "items_total": 2400, "merchant": "Cafe", "date": "2026-04-01",
   "currency_code": "EUR", "category_id": "7",
-  "receipt": { "…": "ReceiptRead" }, "items": [], "opt_outs": [],
-  "split": { "…": "ReceiptSplitRead" } }
+  "attachment": { "…": "AttachmentRead" }, "items": [], "opt_outs": [],
+  "split": { "…": "AttachmentSplitRead" } }
 ```
-Malformed output or a provider failure records `status: "FAILED"` on the
-receipt and returns `status: "FAILED"` with an empty split. Concurrent callers
-race on an atomic claim; a stale `EXTRACTING` claim is recoverable after
-`RECEIPT_EXTRACTION_STALE_SECONDS`. The loser receives `409`.
+Malformed output or provider failure records `FAILED` on the attachment and
+returns `status: "FAILED"` with an empty split. Concurrent callers race on an
+atomic claim; a stale `EXTRACTING` claim is recoverable after
+`RECEIPT_EXTRACTION_STALE_SECONDS`. The loser receives `409`. Attempts are
+bounded by `RECEIPT_MAX_ATTEMPTS`; once exhausted, further extraction returns
+`409` and the file must be uploaded again.
 
-Each paid extraction claim increments `attempts`. Retries are bounded by
-`RECEIPT_MAX_ATTEMPTS` (default 3); once the cap is reached, further extraction
-of that image returns `409` and the image must be uploaded again. Re-posting an
-already `EXTRACTED` image reuses the stored receipt without another paid call.
-
-### `POST /api/groups/{group_id}/receipts/{receipt_id}/items`
-### `PATCH /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}`
-### `DELETE /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}`
+### `POST /api/groups/{group_id}/attachments/{attachment_id}/items`
+### `PATCH /api/groups/{group_id}/attachments/{attachment_id}/items/{item_id}`
+### `DELETE /api/groups/{group_id}/attachments/{attachment_id}/items/{item_id}`
 Create fields: `name`, `quantity_milli`, `amount`, `is_shared`.
 Update fields: any of `name`, `quantity_milli`, `amount`, `is_shared`.
 Limits: name ≤ 200 characters, amount ≤ 1,000,000,000 minor units,
-quantity ≤ 1,000,000,000 thousandths. Every mutation returns `ReceiptState`.
+quantity ≤ 1,000,000,000 thousandths. Every mutation returns `AttachmentState`.
 
-### `PUT /api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}/portions`
+### `PUT /api/groups/{group_id}/attachments/{attachment_id}/items/{item_id}/portions`
 Replace-set:
 ```json
 { "portions": [ { "target": "PARTICIPANT", "participant_id": "p1", "quantity_milli": 500 },
@@ -441,20 +443,17 @@ At most 100 portions. Participant portions must name a live group participant,
 and the summed quantities may not exceed the item quantity. An empty list
 returns the item to the unassigned pool and clears `is_shared`.
 
-### `PUT /api/groups/{group_id}/receipts/{receipt_id}/opt-outs/{participant_id}`
-`{ "opted_out": true }`; returns `ReceiptState`.
+### `PUT /api/groups/{group_id}/attachments/{attachment_id}/opt-outs/{participant_id}`
+`{ "opted_out": true }`; returns `AttachmentState`.
 
-### `POST /api/groups/{group_id}/receipts/{receipt_id}/apply`
+### `POST /api/groups/{group_id}/attachments/{attachment_id}/apply`
 ```json
 { "expense_id": "e1", "participant_id": "p1" }
 ```
 Updates the expense to a `BY_AMOUNT` split using the server-recomputed split,
-preserves its notes/documents/paid-by/recurrence, and links the receipt.
+preserves its notes/paid-by/recurrence, and links the attachment.
 All-opted-out, empty and negative-share receipts are rejected with `422`.
-Returns `{ "receipt", "expense", "split" }`.
-
-### `POST /api/groups/{group_id}/receipts/{receipt_id}/link`
-`{ "expense_id": "e1" }`; `404` if either side belongs to another group.
+Returns `{ "attachment", "split" }`.
 
 ### `POST /api/ai/categories/infer`
 ```json
@@ -467,7 +466,6 @@ The title is truncated to 40 characters before the model call. Unknown or
 malformed model output falls back to category `0` (General). Requires bearer
 authentication (`401` without it), respects `ENABLE_CATEGORY_EXTRACT`, and is
 rate-limited (`429`).
-
 
 ## 11. Exports
 

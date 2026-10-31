@@ -1,0 +1,60 @@
+{
+  "receipt_response": {
+    "amount": 48.5,
+    "categoryId": "0",
+    "date": "{{today}}",
+    "title": "Mock Trattoria receipt"
+  },
+  "receipt_items_response": {
+    "merchant": "Mock Trattoria",
+    "date": "{{today}}",
+    "currencyCode": "USD",
+    "total": 48.5,
+    "categoryId": "0",
+    "items": [
+      {
+        "name": "Margherita Pizza",
+        "quantity": 1,
+        "unitPrice": 14.0,
+        "amount": 14.0
+      },
+      {
+        "name": "Caesar Salad",
+        "quantity": 1,
+        "unitPrice": 9.5,
+        "amount": 9.5
+      },
+      {
+        "name": "Sparkling Water",
+        "quantity": 2,
+        "unitPrice": 3.0,
+        "amount": 6.0
+      },
+      {
+        "name": "Tiramisu",
+        "quantity": 1,
+        "unitPrice": 8.0,
+        "amount": 8.0
+      },
+      {
+        "name": "Espresso",
+        "quantity": 2,
+        "unitPrice": 2.5,
+        "amount": 5.0
+      }
+    ],
+    "charges": [
+      {
+        "name": "Tax",
+        "amount": 4.0
+      },
+      {
+        "name": "Service charge",
+        "amount": 2.0
+      }
+    ]
+  },
+  "category_response": {
+    "categoryId": 0
+  }
+}

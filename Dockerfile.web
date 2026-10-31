@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1
+#
+# Production SPA image. Build from the repository root:
+#   docker build -f Dockerfile.web -t pysplit-web .
+FROM node:24-alpine AS build
+
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ ./
+# Same-origin /api is the production default. Override only for a split origin
+# (the backend CORS allowlist must include that origin).
+ARG VITE_API_BASE_URL=/api
+ARG VITE_IMAGE_MAX_DIMENSION=1600
+ARG VITE_IMAGE_QUALITY=0.82
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL} \
+    VITE_IMAGE_MAX_DIMENSION=${VITE_IMAGE_MAX_DIMENSION} \
+    VITE_IMAGE_QUALITY=${VITE_IMAGE_QUALITY}
+RUN npm run build
+
+FROM nginx:1.29-alpine AS runtime
+
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx-security-headers.conf /etc/nginx/snippets/pysplit-security-headers.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://127.0.0.1/healthz >/dev/null || exit 1

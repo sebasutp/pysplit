@@ -1,0 +1,174 @@
+[
+  {
+    "name": "direct-and-shared",
+    "participants": [
+      "a",
+      "b",
+      "c"
+    ],
+    "opt_outs": [],
+    "items": [
+      {
+        "name": "Pizza",
+        "amount": 1000,
+        "quantity_milli": 1000,
+        "portions": [
+          {
+            "target": "PARTICIPANT",
+            "participant_id": "a",
+            "quantity_milli": 1000
+          }
+        ]
+      },
+      {
+        "name": "Service",
+        "amount": 999,
+        "quantity_milli": 1000,
+        "portions": [
+          {
+            "target": "SHARED",
+            "participant_id": null,
+            "quantity_milli": 1000
+          }
+        ]
+      },
+      {
+        "name": "Unassigned",
+        "amount": 100,
+        "quantity_milli": 1000,
+        "portions": []
+      }
+    ],
+    "expected": {
+      "participants": [
+        {
+          "participant_id": "a",
+          "direct": 1000,
+          "shared": 333,
+          "unassigned": 34,
+          "total": 1367
+        },
+        {
+          "participant_id": "b",
+          "direct": 0,
+          "shared": 333,
+          "unassigned": 33,
+          "total": 366
+        },
+        {
+          "participant_id": "c",
+          "direct": 0,
+          "shared": 333,
+          "unassigned": 33,
+          "total": 366
+        }
+      ],
+      "items_total": 2099,
+      "shared_pool": 999,
+      "unassigned_pool": 100,
+      "all_opted_out": false
+    }
+  },
+  {
+    "name": "fractional-and-opt-out",
+    "participants": [
+      "a",
+      "b",
+      "c"
+    ],
+    "opt_outs": [
+      "c"
+    ],
+    "items": [
+      {
+        "name": "Shared starter",
+        "amount": 1001,
+        "quantity_milli": 1000,
+        "portions": [
+          {
+            "target": "SHARED",
+            "participant_id": null,
+            "quantity_milli": 1000
+          }
+        ]
+      },
+      {
+        "name": "Repeated",
+        "amount": 501,
+        "quantity_milli": 2000,
+        "portions": [
+          {
+            "target": "PARTICIPANT",
+            "participant_id": "a",
+            "quantity_milli": 1000
+          },
+          {
+            "target": "PARTICIPANT",
+            "participant_id": "b",
+            "quantity_milli": 500
+          }
+        ]
+      }
+    ],
+    "expected": {
+      "participants": [
+        {
+          "participant_id": "a",
+          "direct": 251,
+          "shared": 334,
+          "unassigned": 63,
+          "total": 648
+        },
+        {
+          "participant_id": "b",
+          "direct": 125,
+          "shared": 334,
+          "unassigned": 62,
+          "total": 521
+        },
+        {
+          "participant_id": "c",
+          "direct": 0,
+          "shared": 333,
+          "unassigned": 0,
+          "total": 333
+        }
+      ],
+      "items_total": 1502,
+      "shared_pool": 1001,
+      "unassigned_pool": 125,
+      "all_opted_out": false
+    }
+  },
+  {
+    "name": "all-opted-out",
+    "participants": [
+      "a"
+    ],
+    "opt_outs": [
+      "a"
+    ],
+    "items": [
+      {
+        "amount": 250,
+        "quantity_milli": 1000,
+        "portions": []
+      }
+    ],
+    "expected": {
+      "participants": [
+        {
+          "participant_id": "a",
+          "direct": 0,
+          "shared": 0,
+          "unassigned": 0,
+          "total": 0
+        }
+      ],
+      "items_total": 250,
+      "shared_pool": 0,
+      "unassigned_pool": 250,
+      "all_opted_out": true
+    }
+  }
+]

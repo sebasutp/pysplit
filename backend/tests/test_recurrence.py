@@ -6,8 +6,8 @@ from datetime import UTC, date, datetime, timedelta
 
 from sqlmodel import Session, select
 
+from app.models.attachment import Attachment
 from app.models.expense import Expense
-from app.models.expense_document import ExpenseDocument
 from app.models.expense_paid_for import ExpensePaidFor
 from app.models.recurring_expense_link import RecurringExpenseLink
 from app.services.expenses import (
@@ -88,12 +88,17 @@ def test_materializes_due_frames_once_and_copies_relations(session: Session):
     )
     session.add(link)
     session.add(
-        ExpenseDocument(
-            id="doc-recurring",
+        Attachment(
+            id="attachment-recurring",
+            group_id=group.id,
+            expense_id=expense.id,
+            storage_key="attachments/recurring.jpg",
             url="https://example.com/receipt.jpg",
+            filename="receipt.jpg",
+            content_type="image/jpeg",
+            byte_size=1,
             width=10,
             height=20,
-            expense_id=expense.id,
         )
     )
     expense.recurring_expense_link_id = link.id
@@ -129,9 +134,9 @@ def test_materializes_due_frames_once_and_copies_relations(session: Session):
             == 2
         )
 
-    # Documents move to the newest frame, matching the reference connect.
-    document = session.get(ExpenseDocument, "doc-recurring")
-    assert document is not None and document.expense_id == frames[-1].id
+    # Attachments move to the newest frame with the expense.
+    attachment = session.get(Attachment, "attachment-recurring")
+    assert attachment is not None and attachment.expense_id == frames[-1].id
 
     links = session.exec(
         select(RecurringExpenseLink).order_by(RecurringExpenseLink.next_expense_date.asc())
@@ -204,6 +209,9 @@ def test_materialization_is_capped_per_call_and_makes_progress(session: Session)
     assert len(listed.items) == total_due + 1
     assert all(len(item.paid_for) == 2 for item in listed.items)
     assert sum(item.amount for item in listed.items) == (total_due + 1) * 10000
+    heads = [item for item in listed.items if item.is_recurring_head]
+    assert len(heads) == 1
+    assert heads[0].expense_date == max(item.expense_date for item in listed.items)
 
 
 def test_update_recurrence_rule_creates_updates_and_deletes_link(client, session: Session):

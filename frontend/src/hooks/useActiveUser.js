@@ -1,9 +1,10 @@
 /**
  * Active participant per group.
  *
- * The storage key is the reference `<groupId>-activeUser`; Stage 9C migrates it
- * into Dexie. Components subscribe to a window event so every mounted card
- * reacts immediately to the dialog.
+ * The storage key is the reference `<groupId>-activeUser`; Stage 9C mirrors it
+ * into Dexie for backup/migration, while this hook still reads the legacy key.
+ * Components subscribe to a window event so every mounted card reacts
+ * immediately to the dialog.
  */
 
 import { useCallback, useEffect, useState } from 'react'

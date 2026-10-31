@@ -52,10 +52,8 @@ test('shows online-only copy when smart split is disabled', async ({ page }) => 
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        receipt_extract: false,
-        receipt_items: false,
-        category_extract: false,
-        expense_documents: false,
+        receipt_ai: false,
+        category_ai: false,
       }),
     }),
   )

@@ -7,10 +7,20 @@ This is the user-visible classification every screen and the final README must
 use. "Offline" means after a group has been synchronized at least once and the
 application shell boots from the service worker.
 
-> **Implementation status.** The current frontend ships the online repository;
-> the offline repository, outbox and PWA behavior below are the Stage 9 target.
-> On the server, only `/api/sync/push` and server-side recurrence
-> materialization append sync change rows. REST mutations do not. See §2.1.
+> **Implementation status.** Stage 10 ships the Workbox service worker,
+> installable manifest, explicit update prompt, storage/quota panel and durable
+> queued uploads on top of the Stage 9 Dexie repository. An offline reload boots
+> the complete application shell from the precache; `/api` is NetworkOnly.
+> On the server, `/api/sync/push` and recurrence materialization append sync
+> change rows. REST mutations still do not; the outbox therefore uses
+> `/sync/push` for all synchronizable writes. Receipt item edits use a REST
+> transport in the outbox and are refreshed by bootstrap rather than appearing
+> in another device's change feed. Attachment uploads are stored as blobs in
+> Dexie and uploaded after reconnect; receipt extraction runs then. Attachment
+> apply/link and category inference remain online-only. Stage 11 adds
+> authenticated group claiming: a guest cache is converted into account
+> memberships in place, and the claim is durably queued if synchronization is
+> unavailable. See §2.1, §3 and §5.
 
 ## 1. Capability matrix
 
@@ -23,15 +33,15 @@ application shell boots from the service worker.
 | Statistics and drill-downs | Yes | Yes, computed locally | — |
 | CSV/JSON export | Yes | Yes, from local data | — |
 | Star/archive and active-user preferences | Yes | Yes | Yes |
-| Group access recording | Yes | Yes | Yes, debounced |
-| Receipt item/portion/opt-out edits on cached receipts | Yes | Yes | Yes |
-| Receipt total/item extraction (AI) | Yes | No | Upload queued; extraction after reconnect |
+| Group access recording | Yes | Best effort | No; skipped offline |
+| Attachment item/portion/opt-out edits on cached receipts | Yes | Yes | Yes |
+| Receipt total/item extraction (AI) | Yes | No | Yes; image upload queues, extraction runs after reconnect |
 | Category inference (AI) | Yes | No | No |
-| Expense document upload | Yes | Yes, blob queued | Yes |
+| Attachment upload/removal (images and PDFs) | Yes | Yes, placeholder shown | Yes; blobs upload after reconnect |
 | Admin operations | Yes | No | No |
 | Live currency-rate lookup | Yes | Last cached rate or manual override | — |
 | Authentication refresh | Yes | Deferred | Retried on reconnect |
-| Login/merge local groups | Yes | Yes, merge queued | Yes |
+| Login/merge local groups | Yes | Yes; claim is queued | Yes; claimed on reconnect |
 
 ## 2. What each class means
 
@@ -66,8 +76,8 @@ transaction. The UI updates immediately and marks the record `pending`.
 Pending edits survive reload and are pushed FIFO per group when online. Queued
 writes are sent through `POST /api/sync/push`, not the REST mutation endpoints.
 
-- Guest capability URLs continue to work: the offline cache is scoped to the
-  groups this browser has opened, not to a user account.
+- Guest capability URLs continue to work while browsing as a guest. The cache
+  is not scoped per account; logout or an account switch clears it (see §5).
 - Expense updates that conflict are never auto-resolved. The conflict dialog
   offers **keep mine**, **use server**, and **duplicate as new**.
 - Group metadata, participant names and star/archive use last-writer-wins.
@@ -78,32 +88,50 @@ writes are sent through `POST /api/sync/push`, not the REST mutation endpoints.
 
 ### 2.4 Online-only
 
-Admin endpoints and AI extraction require the network. Controls are disabled
-offline with an explanation; manual expense entry and manual item editing on a
-cached receipt remain available.
+Admin endpoints, live AI extraction and category inference require the network.
+Offline the receipt upload path stores the image and shows a **scan queued**
+state; extraction itself starts after reconnect. Manual expense entry and manual
+item editing on a cached receipt remain available, and the UI explains why a
+scan is waiting.
 
 ## 3. AI and uploads offline
 
-1. The user selects a receipt image offline. The compressed blob is stored in
-   Dexie and a queued upload is created.
-2. The receipt shows a **scan pending** state. No provisional totals are
-   invented.
-3. On reconnect the blob uploads, then AI extraction runs. A failure becomes a
-   visible `FAILED` receipt with a retry action, never a crash. Retries are
-   capped by `RECEIPT_MAX_ATTEMPTS` (default 3); once exhausted the image must
-   be uploaded again.
+Attachments are durable offline writes. `attachments.upload` reads the file
+bytes **before** opening the Dexie transaction,
+then store the blob and append the queued operation inside it. Reading a
+`File` inside the transaction would let it expire in a real browser
+(`PrematureCommitError`) and leave partial rows behind, so the transaction only
+contains Dexie work. The UI immediately shows a local attachment
+placeholder with a pending marker. When the browser reconnects the sync engine
+uploads the blob, runs the requested total or line-item extraction, replaces
+the placeholder with the canonical server rows and removes the local blob.
+Retries keep the uploaded image URL so a lost extraction response does not
+upload a second copy.
 
-AI flags come from `/api/features`; a cached flag may keep a control visible
-offline, but the action is disabled with "available when online".
+Line-item scans send the known `expense_id` with `extract-items`, so the server
+stores the link before the post-sync bootstrap replaces the local attachment.
+Total-only scans have no expense to link; their result is kept as pending
+metadata and offered on the next new expense form ("Use scanned total"), where
+applying or dismissing it consumes the entry.
+
+The AI request itself is never attempted offline. Receipt-only uploads without
+an extraction request are also flushed. AI flags still come from `/api/features`;
+the UI states that scanning resumes online while manual entry and item editing
+stay available.
 
 ## 4. Storage and durability
 
-- `navigator.storage.persist()` is requested on first sync; quota is shown in
-  settings.
-- A low-quota warning appears before writes fail.
-- Outbox, unsynced blobs and conflict rows are never evicted by app code.
+- The group list shows a storage panel with usage/quota, a low-space warning at
+  75% and a critical warning at 90%. A user action calls
+  `navigator.storage.persist()` and reports whether storage is persistent.
+- Outbox, conflict rows and any blobs already stored by the app are never
+  evicted by app code.
 - A versioned JSON backup/restore covers groups, expenses, preferences,
-  conflict records and, where feasible, pending blobs.
+  conflict records and pending blobs. Both storage shapes are encoded: `Blob`
+  rows and the `ArrayBuffer` rows written by the upload queue. A backup whose
+  blob bytes are missing is rejected rather than restored as a corrupt upload.
+  Restores preserve the live session, reject a backup from another account and
+  reset the sync cursor.
 - Workbox caches never contain `/api` responses; data freshness is Dexie's
   responsibility, not the service worker's.
 
@@ -113,8 +141,27 @@ offline, but the action is disabled with "available when online".
   depend on it.
 - Refresh is attempted on start and when the network returns. If it fails, the
   user remains locally active and the outbox drains after a successful refresh.
-- Logout clears the local user scope; guest data remains unless the user
-  explicitly removes it.
+- Logout and account switches stop synchronization, wait for the in-flight
+  cycle, then clear all Dexie tables and the legacy selection keys. Unsynced
+  local writes for the signed-out account are discarded. This prevents one
+  account's cached groups from being claimed by the next account on the same
+  browser.
+- The one exception is a guest (no cached account) signing in: the guest cache
+  belongs to the person at the keyboard, so it is claimed in place instead of
+  cleared. Local group IDs and star/archive preferences are converted into
+  account memberships, a durable `pending_group_merge` marker plus
+  `user_group` outbox rows are written, and the complete account scope is
+  fetched and bootstrapped. If the API is unavailable, the local groups remain
+  readable and the claim is retried on reconnect. A scope refresh only runs
+  after a push cycle reports no errors, and the marker plus queued outbox work
+  protect those groups from pruning. On the next successful cycle the claim is
+  pushed before the scope is reconciled. A guest group ID is updated, never
+  duplicated, when the server returns it.
+- Guest star/archive preferences are applied as positive signals only. The
+  server keeps the two flags mutually exclusive (archive wins), so a guest
+  archive clears an older star instead of leaving both set. Membership is
+  arrival-order last-writer-wins per user: a stale `base_version` still applies
+  to that user's row and does not affect another user.
 
 ## 6. Synchronization UX
 
@@ -123,17 +170,38 @@ A single global banner reports:
 - **offline** (with pending count);
 - **syncing** (with progress);
 - **pending N changes**;
+- **failed N changes** (with retry and discard);
 - **error** (with retry and last error);
 - **conflict** (opens the conflict dialog).
 
-Per-entity pending badges appear on expenses, participants, receipts and
-uploads. The user can trigger a manual sync at any time.
+Pending markers appear on expenses, changed participants, pending receipt
+scans and queued attachment uploads. The storage panel includes the same backup
+controls as before, so a low-quota warning is actionable. The user can trigger a
+manual sync at any time; startup, `online`, visibility, mutation and manual
+retry are the reliable triggers. Background Sync is not required and is not
+relied upon.
 
 ## 7. Update behavior
 
 A new service worker waits; the UI prompts to reload. Pending outbox rows and
-blobs survive the update. The app never calls `skipWaiting()` automatically,
-and a Dexie schema upgrade is tested before an update is activated.
+blobs survive the update. The app never calls `skipWaiting()` automatically.
+Before activation the running app:
+
+1. opens the current Dexie database and checks every required table and index;
+2. fetches the waiting build's `pwa-build.json` (not precached, `no-store`)
+   and rejects an update whose declared Dexie version is older or whose
+   contract drops a table/index the current database uses.
+
+The second check compares build contracts; it does not execute the incoming
+build's migration. A truly broken future migration still needs a staged
+migration test or an update e2e with a deliberately newer schema. When the file
+cannot be fetched, activation is refused and the prompt stays visible so the
+user can export a backup first.
+
+Runtime image/font caches are versioned (`CACHE_VERSION` in `pwa.config.js`).
+After the new worker takes control the app deletes older `pysplit-images-*` and
+`pysplit-fonts-*` caches; `cleanupOutdatedCaches` only covers Workbox precache
+entries.
 
 ## 8. Explicit non-goals
 

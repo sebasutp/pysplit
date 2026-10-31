@@ -1,0 +1,111 @@
+# Production-shaped deployment: nginx serves the SPA and proxies /api to one
+# Uvicorn worker with a persistent SQLite volume.
+#
+#   cp .env.production.example .env   # set BASE_URL and JWT_SECRET
+#   docker compose config
+#   docker compose build
+#   docker compose up -d
+#   curl -f http://localhost:8080/api/health/readiness
+#
+# The optional backup service runs on a profile:
+#   docker compose --profile backup up -d backup
+#
+# See docs/runbook-cutover.md for the full cutover and rollback procedure.
+name: pysplit
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: pysplit-api:local
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Compose-only switch, deliberately separate from ENVIRONMENT so a
+      # development .env copied for ./dev cannot disable production guards.
+      ENVIRONMENT: ${PYSPLIT_ENVIRONMENT:-production}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/pysplit.db}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+      LOG_FORMAT: ${LOG_FORMAT:-json}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # nginx overwrites these headers, so the API may trust them.
+      TRUST_FORWARDED_HEADERS: ${TRUST_FORWARDED_HEADERS:-true}
+      ENABLE_MOCK_LOGIN: "false"
+    volumes:
+      - pysplit_data:/data
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/readiness', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+        VITE_IMAGE_MAX_DIMENSION: ${VITE_IMAGE_MAX_DIMENSION:-1600}
+        VITE_IMAGE_QUALITY: ${VITE_IMAGE_QUALITY:-0.82}
+    image: pysplit-web:local
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      # Separate from the dev-only WEB_PORT so a copied .env cannot change the
+      # production entrypoint by accident.
+      - "${COMPOSE_WEB_PORT:-8080}:80"
+    security_opt:
+      - no-new-privileges:true
+
+  # Optional scheduled backup sidecar. It shares the data volume read-only and
+  # writes timestamped, checksummed backups to a separate volume.
+  backup:
+    profiles: ["backup"]
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: pysplit-api:local
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/pysplit.db}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+      BACKUP_OUTPUT: /backups
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-86400}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+    entrypoint: ["python"]
+    command: ["/app/scripts/backup_loop.py"]
+    # The image's HTTP healthcheck does not apply to this loop-only container.
+    healthcheck:
+      disable: true
+    volumes:
+      # Read-only connections may still need to create SQLite -shm/-wal files
+      # when the API has not written yet, so the mount must be writable.
+      - pysplit_data:/data
+      - pysplit_backups:/backups
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  pysplit_data:
+  pysplit_backups:

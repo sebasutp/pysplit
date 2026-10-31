@@ -1,0 +1,248 @@
+[
+  {
+    "name": "three-participants",
+    "expenses": [
+      {
+        "id": "b1",
+        "expense_date": "2026-03-01",
+        "title": "Expense",
+        "amount": 9000,
+        "category_id": 0,
+        "paid_by_id": "alice",
+        "paid_for": [
+          {
+            "participant_id": "alice",
+            "shares": 1
+          },
+          {
+            "participant_id": "bob",
+            "shares": 1
+          },
+          {
+            "participant_id": "carol",
+            "shares": 1
+          }
+        ],
+        "split_mode": "EVENLY",
+        "is_reimbursement": false,
+        "recurrence_rule": "NONE"
+      },
+      {
+        "id": "b2",
+        "expense_date": "2026-03-01",
+        "title": "Expense",
+        "amount": 3000,
+        "category_id": 0,
+        "paid_by_id": "bob",
+        "paid_for": [
+          {
+            "participant_id": "alice",
+            "shares": 1
+          },
+          {
+            "participant_id": "bob",
+            "shares": 1
+          },
+          {
+            "participant_id": "carol",
+            "shares": 1
+          }
+        ],
+        "split_mode": "EVENLY",
+        "is_reimbursement": false,
+        "recurrence_rule": "NONE"
+      },
+      {
+        "id": "b3",
+        "expense_date": "2026-03-01",
+        "title": "Expense",
+        "amount": 1550,
+        "category_id": 0,
+        "paid_by_id": "carol",
+        "paid_for": [
+          {
+            "participant_id": "alice",
+            "shares": 1
+          },
+          {
+            "participant_id": "carol",
+            "shares": 1
+          }
+        ],
+        "split_mode": "BY_SHARES",
+        "is_reimbursement": false,
+        "recurrence_rule": "NONE"
+      },
+      {
+        "id": "b4",
+        "expense_date": "2026-03-01",
+        "title": "Expense",
+        "amount": -1200,
+        "category_id": 0,
+        "paid_by_id": "alice",
+        "paid_for": [
+          {
+            "participant_id": "alice",
+            "shares": 1
+          },
+          {
+            "participant_id": "bob",
+            "shares": 1
+          }
+        ],
+        "split_mode": "EVENLY",
+        "is_reimbursement": true,
+        "recurrence_rule": "NONE"
+      }
+    ],
+    "expected": {
+      "balances": {
+        "alice": {
+          "paid": 7800,
+          "paidFor": 4175,
+          "total": 3625
+        },
+        "bob": {
+          "paid": 3000,
+          "paidFor": 3400,
+          "total": -400
+        },
+        "carol": {
+          "paid": 1550,
+          "paidFor": 4775,
+          "total": -3225
+        }
+      },
+      "reimbursements": [
+        {
+          "from": "carol",
+          "to": "alice",
+          "amount": 3225
+        },
+        {
+          "from": "bob",
+          "to": "alice",
+          "amount": 400
+        }
+      ],
+      "public": {
+        "alice": {
+          "paid": 3625,
+          "paidFor": 0,
+          "total": 3625
+        },
+        "bob": {
+          "paid": 0,
+          "paidFor": 400,
+          "total": -400
+        },
+        "carol": {
+          "paid": 0,
+          "paidFor": 3225,
+          "total": -3225
+        }
+      }
+    }
+  },
+  {
+    "name": "reimbursement",
+    "expenses": [
+      {
+        "id": "r1",
+        "expense_date": "2026-03-01",
+        "title": "Expense",
+        "amount": 1000,
+        "category_id": 0,
+        "paid_by_id": "a",
+        "paid_for": [
+          {
+            "participant_id": "a",
+            "shares": 1
+          },
+          {
+            "participant_id": "b",
+            "shares": 1
+          }
+        ],
+        "split_mode": "EVENLY",
+        "is_reimbursement": false,
+        "recurrence_rule": "NONE"
+      }
+    ],
+    "expected": {
+      "balances": {
+        "a": {
+          "paid": 1000,
+          "paidFor": 500,
+          "total": 500
+        },
+        "b": {
+          "paid": 0,
+          "paidFor": 500,
+          "total": -500
+        }
+      },
+      "reimbursements": [
+        {
+          "from": "b",
+          "to": "a",
+          "amount": 500
+        }
+      ],
+      "public": {
+        "a": {
+          "paid": 500,
+          "paidFor": 0,
+          "total": 500
+        },
+        "b": {
+          "paid": 0,
+          "paidFor": 500,
+          "total": -500
+        }
+      }
+    }
+  },
+  {
+    "name": "zero-total",
+    "expenses": [
+      {
+        "id": "z1",
+        "expense_date": "2026-03-01",
+        "title": "Expense",
+        "amount": 0,
+        "category_id": 0,
+        "paid_by_id": "a",
+        "paid_for": [
+          {
+            "participant_id": "a",
+            "shares": 1
+          },
+          {
+            "participant_id": "b",
+            "shares": 1
+          }
+        ],
+        "split_mode": "EVENLY",
+        "is_reimbursement": false,
+        "recurrence_rule": "NONE"
+      }
+    ],
+    "expected": {
+      "balances": {
+        "a": {
+          "paid": 0,
+          "paidFor": 0,
+          "total": 0
+        },
+        "b": {
+          "paid": 0,
+          "paidFor": 0,
+          "total": 0
+        }
+      },
+      "reimbursements": [],
+      "public": {}
+    }
+  }
+]

@@ -6,6 +6,7 @@ only. Business logic lives in ``services`` and HTTP handlers live in ``api``.
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -15,6 +16,7 @@ from fastapi.responses import JSONResponse
 from app.api import (
     activities,
     admin,
+    attachments,
     auth,
     balances,
     categories,
@@ -22,12 +24,13 @@ from app.api import (
     features,
     groups,
     health,
-    receipts,
     stats,
     sync,
 )
 from app.api.errors import service_error
 from app.core.config import Settings, get_settings
+from app.core.logging import RequestContextMiddleware, configure_logging
+from app.core.observability import init_sentry
 from app.services.errors import ServiceError
 from app.storage import close_storage
 
@@ -43,6 +46,12 @@ async def _lifespan(_app: FastAPI):
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
+    configure_logging(settings)
+    init_sentry(settings)
+    if settings.ai_mock:
+        logging.getLogger(__name__).warning(
+            "AI_MOCK is enabled; receipt extraction uses local fixtures and makes no provider calls"
+        )
 
     api_prefix = settings.api_prefix.rstrip("/")
     app = FastAPI(
@@ -70,6 +79,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["Authorization", "Content-Type", "X-CSRF-Token", "X-Request-ID"],
     )
 
+    # Added last so Starlette makes it the outermost middleware. It then wraps
+    # CORS as well, giving preflight and rejected-origin responses a request id.
+    app.add_middleware(RequestContextMiddleware, settings=settings)
+
     app.include_router(health.router, prefix=settings.api_prefix)
     app.include_router(auth.router, prefix=settings.api_prefix)
     app.include_router(admin.router, prefix=settings.api_prefix)
@@ -81,8 +94,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(stats.router, prefix=settings.api_prefix)
     app.include_router(activities.router, prefix=settings.api_prefix)
     app.include_router(expenses.router, prefix=settings.api_prefix)
-    app.include_router(receipts.router, prefix=settings.api_prefix)
-    app.include_router(receipts.ai_router, prefix=settings.api_prefix)
+    app.include_router(attachments.router, prefix=settings.api_prefix)
+    app.include_router(attachments.ai_router, prefix=settings.api_prefix)
     app.include_router(sync.router, prefix=settings.api_prefix)
 
     return app

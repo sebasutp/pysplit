@@ -185,34 +185,23 @@ class ChatCompletionClient:
         base = get_ai_base_url(self.settings) or DEFAULT_OPENAI_BASE_URL
         return f"{base.rstrip('/')}/chat/completions"
 
-    def complete(
-        self,
-        *,
-        model: str,
-        messages: list[dict[str, Any]],
-        response_format: dict[str, Any],
-    ) -> str | None:
+    def _post(self, *, model: str, messages: list[dict[str, Any]], payload: dict[str, Any]):
         headers = {"content-type": "application/json"}
         api_key = get_ai_api_key(self.settings)
         if api_key:
             headers["authorization"] = f"Bearer {api_key}"
-        payload = {
-            "model": model,
-            "response_format": {"type": "json_schema", "json_schema": response_format},
-            "messages": messages,
-        }
+        payload = {"model": model, **payload, "messages": messages}
         try:
-            response = self._client.post(self._endpoint(), headers=headers, json=payload)
+            return self._client.post(self._endpoint(), headers=headers, json=payload)
         except httpx.HTTPError as exc:
             raise AiError("AI provider is unreachable") from exc
 
-        if response.status_code >= 400:
-            raise AiError(f"AI provider returned HTTP {response.status_code}")
+    @staticmethod
+    def _content(response: httpx.Response) -> str | None:
         try:
             body = response.json()
         except (ValueError, json.JSONDecodeError) as exc:
             raise AiError("AI provider returned invalid JSON") from exc
-
         choices = body.get("choices") if isinstance(body, dict) else None
         if not isinstance(choices, list) or not choices:
             return None
@@ -220,10 +209,62 @@ class ChatCompletionClient:
         content = message.get("content") if isinstance(message, dict) else None
         return content if isinstance(content, str) else None
 
+    def complete(
+        self,
+        *,
+        model: str,
+        messages: list[dict[str, Any]],
+        response_format: dict[str, Any],
+    ) -> str | None:
+        mode = self.settings.ai_response_format
+        if mode == "json_object":
+            response = self._post(
+                model=model,
+                messages=[
+                    *messages,
+                    {"role": "system", "content": "Reply with a single JSON object only."},
+                ],
+                payload={"response_format": {"type": "json_object"}},
+            )
+        else:
+            response = self._post(
+                model=model,
+                messages=messages,
+                payload={
+                    "response_format": {
+                        "type": "json_schema",
+                        "json_schema": response_format,
+                    }
+                },
+            )
+            if (
+                mode == "auto"
+                and response.status_code in {400, 422}
+                and "response_format" in response.text.lower()
+            ):
+                response = self._post(
+                    model=model,
+                    messages=[
+                        *messages,
+                        {"role": "system", "content": "Reply with a single JSON object only."},
+                    ],
+                    payload={"response_format": {"type": "json_object"}},
+                )
+
+        if response.status_code >= 400:
+            raise AiError(f"AI provider returned HTTP {response.status_code}")
+        return self._content(response)
+
 
 def get_ai_client(
     settings: Settings,
     *,
     http_client: httpx.Client | None = None,
 ) -> ChatCompletionClient:
+    if settings.ai_mock:
+        # Imported lazily to keep the fixture module independent of this module's
+        # import order and avoid a cycle.
+        from app.services.ai_mock import MockChatCompletionClient
+
+        return MockChatCompletionClient(delay_ms=settings.ai_mock_delay_ms)  # type: ignore[return-value]
     return ChatCompletionClient(settings, http_client=http_client)

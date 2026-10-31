@@ -1,6 +1,6 @@
 /** One expense row in the group's expense list. */
 
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import { balanceForParticipant, categoryIcon, paidForLabel } from '../../utils/expenses'
@@ -32,6 +32,10 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
       (expense.paid_for || []).some(
         (/** @type {any} */ row) => row.participant_id === activeUserId,
       ))
+  const attachments = expense.attachments || []
+  const receiptAttachment = attachments.find(
+    (/** @type {any} */ attachment) => attachment.receipt_status,
+  )
   const original =
     expense.original_amount !== null &&
     expense.original_amount !== undefined &&
@@ -70,9 +74,14 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
                 {t('ExpenseForm.reimbursement', 'Reimbursement')}
               </span>
             ) : null}
-            {expense.receipt ? (
+            {receiptAttachment ? (
               <span aria-hidden="true" title={t('ReceiptItems.title', 'Receipt items')}>
                 🧾
+              </span>
+            ) : null}
+            {expense.pending ? (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-900">
+                Pending sync
               </span>
             ) : null}
           </div>
@@ -88,9 +97,18 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
                 })}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">{expense.expense_date}</p>
-          {Array.isArray(expense.documents) && expense.documents.length ? (
+          {attachments.length ? (
             <p className="mt-0.5 text-xs text-muted-foreground">
-              📎 {expense.documents.length}
+              📎 {attachments.length}{' '}
+              <Link
+                to={`/groups/${group.id}/expenses/${expense.id}/items`}
+                className="text-primary underline"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {receiptAttachment
+                  ? t('ReceiptItems.title', 'Receipt items')
+                  : t('Attachments.view', 'View attachments')}
+              </Link>
             </p>
           ) : null}
         </div>

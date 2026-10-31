@@ -1,4 +1,4 @@
-"""Stage 5B tests: expenses, split modes, documents and updates."""
+"""Stage 5B tests: expenses, split modes, attachments and updates."""
 
 from __future__ import annotations
 
@@ -8,9 +8,8 @@ import pytest
 from sqlmodel import Session, select
 
 from app.models.activity import Activity
+from app.models.attachment import Attachment
 from app.models.expense import Expense
-from app.models.expense_document import ExpenseDocument
-from app.models.receipt import Receipt
 from app.models.recurring_expense_link import RecurringExpenseLink
 from tests.helpers import make_expense, make_group
 
@@ -115,9 +114,6 @@ def test_create_by_amount(client, session: Session):
         original_currency="EUR",
         conversion_rate="1.0010",
         notes="Team dinner",
-        documents=[
-            {"id": "doc-1", "url": "https://example.com/receipt.jpg", "width": 10, "height": 20}
-        ],
     )
     response = client.post(f"/api/groups/{group.id}/expenses", json=payload)
     assert response.status_code == 201, response.text
@@ -130,7 +126,7 @@ def test_create_by_amount(client, session: Session):
         people["Alice"].id: 500,
         people["Bob"].id: 501,
     }
-    assert body["documents"][0]["id"] == "doc-1"
+    assert body["attachments"] == []
     assert body["category"]["id"] == 1
 
     activity = session.exec(select(Activity).where(Activity.expense_id == body["id"])).one()
@@ -339,12 +335,7 @@ def test_update_expense(client, session: Session):
     group, people = make_group(session)
     created = client.post(
         f"/api/groups/{group.id}/expenses",
-        json=_payload(
-            people,
-            documents=[
-                {"id": "old-doc", "url": "https://example.com/old.jpg", "width": 1, "height": 1}
-            ],
-        ),
+        json=_payload(people),
     ).json()
 
     partial = client.patch(
@@ -354,7 +345,6 @@ def test_update_expense(client, session: Session):
     assert partial.status_code == 200
     assert partial.json()["title"] == "Updated title"
     assert partial.json()["version"] == 2
-    assert partial.json()["documents"][0]["id"] == "old-doc"
 
     replaced = client.patch(
         f"/api/groups/{group.id}/expenses/{created['id']}",
@@ -364,9 +354,6 @@ def test_update_expense(client, session: Session):
             "paid_for": [
                 {"participant_id": people["Alice"].id, "shares": 1},
                 {"participant_id": people["Bob"].id, "shares": 3},
-            ],
-            "documents": [
-                {"id": "new-doc", "url": "https://example.com/new.jpg", "width": 2, "height": 3}
             ],
             "notes": None,
         },
@@ -379,7 +366,7 @@ def test_update_expense(client, session: Session):
         people["Alice"].id: 1,
         people["Bob"].id: 3,
     }
-    assert [doc["id"] for doc in body["documents"]] == ["new-doc"]
+    assert body["attachments"] == []
     assert body["version"] == 3
 
     activities = session.exec(
@@ -465,23 +452,6 @@ def test_expense_input_bounds(client, session: Session):
     )
     assert too_many_paid_for.status_code == 422
 
-    too_many_documents = client.post(
-        f"/api/groups/{group.id}/expenses",
-        json=_payload(
-            people,
-            documents=[
-                {
-                    "id": f"doc-{index}",
-                    "url": "https://example.com/x.jpg",
-                    "width": 1,
-                    "height": 1,
-                }
-                for index in range(21)
-            ],
-        ),
-    )
-    assert too_many_documents.status_code == 422
-
     absurd_rate = client.post(
         f"/api/groups/{group.id}/expenses",
         json=_payload(people, conversion_rate="1" * 30),
@@ -553,21 +523,20 @@ def test_delete_expense(client, session: Session):
     group, people = make_group(session)
     created = client.post(
         f"/api/groups/{group.id}/expenses",
-        json=_payload(
-            people,
-            recurrence_rule="MONTHLY",
-            documents=[
-                {"id": "doc-delete", "url": "https://example.com/x.jpg", "width": 1, "height": 1}
-            ],
-        ),
+        json=_payload(people, recurrence_rule="MONTHLY"),
     ).json()
-    # Receipt belongs to the expense and must become orphaned on delete.
     session.add(
-        Receipt(
-            id="receipt-delete",
+        Attachment(
+            id="attachment-delete",
             group_id=group.id,
-            image_url="https://example.com/receipt.jpg",
             expense_id=created["id"],
+            storage_key="attachments/delete.png",
+            url="/api/groups/x/attachments/attachment-delete/file",
+            filename="receipt.png",
+            content_type="image/png",
+            byte_size=1,
+            width=1,
+            height=1,
         )
     )
     session.commit()
@@ -580,10 +549,9 @@ def test_delete_expense(client, session: Session):
     session.expire_all()
     expense = session.get(Expense, created["id"])
     assert expense is not None and expense.deleted_at is not None
-    document = session.get(ExpenseDocument, "doc-delete")
-    assert document is not None and document.expense_id is None
-    receipt = session.get(Receipt, "receipt-delete")
-    assert receipt is not None and receipt.expense_id is None
+    attachment = session.get(Attachment, "attachment-delete")
+    assert attachment is not None and attachment.expense_id is None
+    assert attachment.deleted_at is not None
     assert (
         session.exec(
             select(RecurringExpenseLink).where(
@@ -601,40 +569,31 @@ def test_delete_expense(client, session: Session):
     assert activity.data == "Dinner"
 
 
-def test_upload_download_and_delete_document(make_client, session: Session, tmp_path):
-    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
+def test_upload_download_and_delete_attachment(make_client, session: Session, tmp_path):
+    client = make_client(upload_dir=str(tmp_path))
     group, people = make_group(session)
     created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
 
     upload = client.post(
-        f"/api/groups/{group.id}/expenses/{created['id']}/documents",
+        f"/api/groups/{group.id}/attachments",
         files={"file": ("receipt.png", b"\x89PNG\r\n\x1a\nexample", "image/png")},
-        data={"width": "640", "height": "480"},
+        data={"expense_id": created["id"], "width": "640", "height": "480"},
     )
     assert upload.status_code == 201, upload.text
-    document = upload.json()
-    assert document["width"] == 640
-    assert document["height"] == 480
-    assert document["url"].endswith(f"/documents/{document['id']}")
-    assert list((tmp_path / "documents").glob("*.png"))
+    attachment = upload.json()
+    assert attachment["width"] == 640
+    assert attachment["height"] == 480
+    assert attachment["url"].endswith(f"/attachments/{attachment['id']}/file")
+    assert list((tmp_path / "attachments").rglob("*.png"))
 
-    download = client.get(
-        f"/api/groups/{group.id}/expenses/{created['id']}/documents/{document['id']}"
-    )
+    download = client.get(f"/api/groups/{group.id}/attachments/{attachment['id']}/file")
     assert download.status_code == 200
     assert download.content.startswith(b"\x89PNG")
     assert download.headers["content-type"].startswith("image/png")
 
-    deleted = client.delete(
-        f"/api/groups/{group.id}/expenses/{created['id']}/documents/{document['id']}"
-    )
+    deleted = client.delete(f"/api/groups/{group.id}/attachments/{attachment['id']}")
     assert deleted.status_code == 204
-    assert (
-        client.get(
-            f"/api/groups/{group.id}/expenses/{created['id']}/documents/{document['id']}"
-        ).status_code
-        == 404
-    )
+    assert client.get(f"/api/groups/{group.id}/attachments/{attachment['id']}").status_code == 404
 
 
 @pytest.mark.parametrize(
@@ -652,34 +611,35 @@ def test_document_upload_rejects_invalid_types_and_empty(
     payload,
     expected,
 ):
-    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
+    client = make_client(upload_dir=str(tmp_path))
     group, people = make_group(session)
     created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
     response = client.post(
-        f"/api/groups/{group.id}/expenses/{created['id']}/documents",
+        f"/api/groups/{group.id}/attachments",
         files={"file": ("x.bin", payload, content_type)},
+        data={"expense_id": created["id"]},
     )
     assert response.status_code == expected
 
 
 def test_document_upload_enforces_size_limit(make_client, session: Session, tmp_path):
-    client = make_client(
-        enable_expense_documents=True, upload_dir=str(tmp_path), max_upload_bytes=3
-    )
+    client = make_client(upload_dir=str(tmp_path), max_upload_bytes=3)
     group, people = make_group(session)
     created = client.post(f"/api/groups/{group.id}/expenses", json=_payload(people)).json()
     response = client.post(
-        f"/api/groups/{group.id}/expenses/{created['id']}/documents",
-        files={"file": ("x.png", b"1234", "image/png")},
+        f"/api/groups/{group.id}/attachments",
+        files={"file": ("x.png", b"\x89PNG\r\n\x1a\n", "image/png")},
+        data={"expense_id": created["id"]},
     )
     assert response.status_code == 413
 
 
 def test_document_upload_requires_existing_expense(make_client, session: Session, tmp_path):
-    client = make_client(enable_expense_documents=True, upload_dir=str(tmp_path))
+    client = make_client(upload_dir=str(tmp_path))
     group, _people = make_group(session)
     response = client.post(
-        f"/api/groups/{group.id}/expenses/missing/documents",
-        files={"file": ("x.png", b"1234", "image/png")},
+        f"/api/groups/{group.id}/attachments",
+        files={"file": ("x.png", b"\x89PNG\r\n\x1a\n", "image/png")},
+        data={"expense_id": "missing"},
     )
     assert response.status_code == 404

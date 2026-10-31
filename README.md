@@ -120,6 +120,92 @@ https://app.example.com/api/auth/oauth/google/callback
 proxied `Host` header. The `/api` proxy stays on the same origin, so there is
 no CORS or cross-site cookie configuration to manage.
 
+## Receipt scanning with AI
+
+Receipt scanning is optional. Attachments (images and PDFs) always work; the AI
+flags only control extraction and category suggestions. Configuration is
+server-only: never expose these values as `VITE_*` variables.
+
+Local development already enables the AI flags and mock login. To try the whole
+flow without a provider key:
+
+```bash
+AI_MOCK=true ./dev
+```
+
+The mock returns a realistic restaurant receipt from
+`backend/app/services/ai_mock_responses.json`; it makes no network call and is
+always rejected when `ENVIRONMENT=production`. `./dev` enables passwordless
+development login, so the authenticated AI endpoints work without configuring
+Google or GitHub. You can also create a development session directly:
+
+```bash
+curl -X POST http://127.0.0.1:5173/api/auth/mock-login \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: http://127.0.0.1:5173' \
+  -d '{"email":"dev@example.com","name":"Dev","tier":"group_creators"}'
+```
+
+### Gemini
+
+Use Gemini's OpenAI-compatible endpoint and a vision-capable model:
+
+```dotenv
+ENABLE_RECEIPT_AI=true
+ENABLE_CATEGORY_EXTRACT=true
+AI_API_KEY=your-google-ai-studio-key
+AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+AI_MODEL_RECEIPT_EXTRACT=gemini-3.8-flash
+AI_MODEL_RECEIPT_ITEMS_EXTRACT=gemini-3.8-flash
+AI_MODEL_CATEGORY_EXTRACT=gemini-3.8-flash
+```
+
+### DeepSeek
+
+DeepSeek also exposes an OpenAI-compatible API. Use a vision-capable model such
+as `deepseek-flash`; `deepseek-v4-pro` does not accept image input:
+
+```dotenv
+ENABLE_RECEIPT_AI=true
+ENABLE_CATEGORY_EXTRACT=true
+AI_API_KEY=your-deepseek-key
+AI_BASE_URL=https://api.deepseek.com
+AI_MODEL_RECEIPT_EXTRACT=deepseek-flash
+AI_MODEL_RECEIPT_ITEMS_EXTRACT=deepseek-flash
+AI_MODEL_CATEGORY_EXTRACT=deepseek-flash
+```
+
+If a provider rejects strict JSON-schema output, `AI_RESPONSE_FORMAT=auto`
+retries with JSON-object mode automatically. Set it to `json_object` if your
+provider needs that from the first request.
+
+### Development versus production
+
+- `./dev` turns on `ENABLE_RECEIPT_AI`, `ENABLE_CATEGORY_EXTRACT`, mock login
+  and the local upload directory by default. Attachments themselves are never
+  feature-gated.
+- Production keeps the AI flags off unless you set them explicitly, as in
+  `.env.production.example`. Use a real key from a secret manager and keep
+  `AI_MOCK` and `ENABLE_MOCK_LOGIN` off.
+- Every real extraction attempt is a paid model call. `RECEIPT_MAX_ATTEMPTS`
+  caps retries per uploaded file; `AI_RATE_LIMIT_PER_MINUTE` and
+  `UPLOAD_RATE_LIMIT_PER_MINUTE` cap usage.
+- Images are compressed in the browser before upload. The defaults are 1600 px
+  and quality 0.82; override them with `VITE_IMAGE_MAX_DIMENSION` and
+  `VITE_IMAGE_QUALITY`.
+- PDFs are stored and downloadable as normal attachments. They are not sent to
+  the receipt AI and do not get an inline preview; use the “Open” link.
+
+### The two receipt flows
+
+1. **Receipt first**: choose “Create expense from receipt”. An online scan
+   returns the line items immediately, so they are visible before the expense is
+   saved. Saving opens the “Assign items” screen, where each item can be assigned
+   to participants and applied to the expense.
+2. **Expense first**: create the expense, open it, attach an image, and click
+   “Scan with AI”. The “Assign items” screen opens, and it is also reachable from
+   the attachment list and next to “Advanced splitting options”.
+
 ## Tests and checks
 
 Run everything:

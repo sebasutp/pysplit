@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { repository } from '../../services/repository'
 import { CURRENCY_SYMBOLS } from '../../utils/currency'
-import { saveRecentGroup, setActiveUser } from '../../utils/recent-groups'
+import { saveRecentGroup } from '../../utils/recent-groups'
 import { ErrorState } from '../common/States'
 import { Button } from '../ui/Button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card'
@@ -17,6 +17,7 @@ import { Input, Textarea } from '../ui/Input'
 const participantSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(2, 'min2').max(50, 'max50'),
+  pending: z.boolean().optional(),
 })
 
 export const groupFormSchema = z
@@ -67,6 +68,7 @@ function valuesFromInitial(initial, defaultCurrencyCode, t) {
         ? initial.participants.map((/** @type {any} */ participant) => ({
             id: participant.id,
             name: participant.name,
+            pending: Boolean(participant.pending),
           }))
         : [
             { name: t('GroupForm.Participants.John', 'John') },
@@ -332,6 +334,14 @@ export function GroupForm({
                     {errors[`participants.${index}.name`]}
                   </p>
                 ) : null}
+                {participant.pending ? (
+                  <p
+                    data-testid="participant-pending"
+                    className="mt-1 text-xs text-muted-foreground"
+                  >
+                    {t('Pending.participant', 'Pending sync')}
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -385,10 +395,6 @@ export function CreateGroup({ defaultCurrencyCode = 'USD' }) {
           })),
         })
         saveRecentGroup({ id: group.id, name: group.name })
-        // A freshly created group has no active participant yet. Record that
-        // answer explicitly so the "Who are you?" dialog does not open on the
-        // new group (the reference stores `None` after creation too).
-        setActiveUser(group.id, null)
         navigate(`/groups/${group.id}`)
       }}
     />

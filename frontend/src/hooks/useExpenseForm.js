@@ -20,6 +20,7 @@ import {
   parseAmount,
 } from '../utils/currency'
 import { isIncome } from '../utils/expenses'
+import { prepareUpload } from '../utils/attachments'
 
 /**
  * Format a Date as a `yyyy-mm-dd` string using the local calendar date.
@@ -169,8 +170,31 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [documents, setDocuments] = useState(/** @type {any[]} */ (expense?.documents || []))
-  const [pendingFiles, setPendingFiles] = useState(/** @type {File[]} */ ([]))
+  const [attachments, setAttachments] = useState(
+    /** @type {any[]} */ (expense?.attachments || []),
+  )
+  const [scanningId, setScanningId] = useState(/** @type {string|null} */ (null))
+  const [scannedReceipt, setScannedReceipt] = useState(/** @type {any|null} */ (null))
+  const [pendingReceiptTotal, setPendingReceiptTotal] = useState(
+    /** @type {any|null} */ (null),
+  )
+
+  // A total-only scan queued offline is extracted after reconnect, when its
+  // original form is gone. Offer the result on the next new expense instead of
+  // leaving it in metadata that nothing reads.
+  useEffect(() => {
+    if (editing || !group.id) return undefined
+    let cancelled = false
+    repository.attachments
+      .pendingTotal(group.id)
+      .then((value) => {
+        if (!cancelled) setPendingReceiptTotal(value)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [editing, group.id])
 
   const foreign = Boolean(selectedCurrency && selectedCurrency !== group.currency_code)
   const income = isIncome(parseAmount(amountInput))
@@ -325,10 +349,46 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
 
   /** @param {any} result */
   function applyExtracted(result) {
+    if (!result) return
     if (result.title) setTitle(result.title)
-    if (result.amount) setAmountInput(majorUnits(Math.round(result.amount * 100)))
+    else if (result.merchant) setTitle(result.merchant)
+    // Total-only responses use major units; item extraction returns the
+    // stored minor-unit total.
+    const minorAmount =
+      result.total != null
+        ? Number(result.total)
+        : result.amount != null
+          ? Math.round(Number(result.amount) * 100)
+          : null
+    if (minorAmount != null && Number.isFinite(minorAmount)) {
+      setAmountInput(majorUnits(Math.round(minorAmount)))
+    }
     if (result.date) setExpenseDate(result.date)
-    if (result.category_id) setCategoryId(String(result.category_id))
+    if (result.category_id != null) setCategoryId(String(result.category_id))
+    if (Array.isArray(result.items) && result.items.length) {
+      setScannedReceipt({
+        attachment: result.attachment || null,
+        items: result.items,
+        total: result.total ?? minorAmount,
+        merchant: result.merchant || result.title || null,
+      })
+    }
+    if (result.attachment) addScannedAttachment(result.attachment)
+  }
+
+  function consumePendingReceiptTotal() {
+    setPendingReceiptTotal(null)
+    void repository.attachments.clearPendingTotal(group.id).catch(() => {})
+  }
+
+  function applyPendingReceiptTotal() {
+    if (!pendingReceiptTotal) return
+    applyExtracted(pendingReceiptTotal)
+    consumePendingReceiptTotal()
+  }
+
+  function dismissPendingReceiptTotal() {
+    consumePendingReceiptTotal()
   }
 
   /** @returns {string[]} */
@@ -444,18 +504,19 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
         saved = await repository.expenses.create(group.id, payload)
       }
 
-      // New expenses can only receive documents once they exist; upload the
-      // staged files immediately after creation (queued uploads arrive in M2).
-      if (!editing && saved && pendingFiles.length) {
-        for (const file of pendingFiles) {
+      // Attachments are uploaded as group-scoped files before the expense
+      // exists. Link them now that the expense has an id.
+      if (!editing && saved) {
+        for (const attachment of attachments) {
+          if (attachment.expense_id) continue
           try {
-            await repository.documents.upload(group.id, saved.id, file)
+            await repository.attachments.link(group.id, attachment.id, saved.id)
           } catch {
             toast({
-              title: t('ExpenseDocumentsInput.ErrorToast.title', 'Error while uploading document'),
+              title: t('ExpenseDocumentsInput.ErrorToast.title', 'Error while attaching file'),
               description: t(
                 'ExpenseDocumentsInput.ErrorToast.description',
-                'Something wrong happened when uploading the document. Please retry later or select a different file.',
+                'The file was uploaded but could not be linked to the expense. Retry from the expense page.',
               ),
             })
           }
@@ -476,7 +537,12 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
         }
       }
 
-      navigate(`/groups/${group.id}/expenses`)
+      navigate(
+        !editing && scannedReceipt?.items?.length && saved?.id
+          ? `/groups/${group.id}/expenses/${saved.id}/items`
+          : `/groups/${group.id}/expenses`,
+        { replace: !editing && scannedReceipt?.items?.length && saved?.id },
+      )
       void saved
     } catch (caught) {
       const conflict =
@@ -523,43 +589,94 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
   }
 
   /** @param {React.ChangeEvent<HTMLInputElement>} event */
-  async function handleDocuments(event) {
+  async function handleAttachments(event) {
     const files = [...(event.target.files || [])]
     if (!files.length) return
-    if (!editing || !expense) {
-      setPendingFiles((previous) => [...previous, ...files])
-      return
-    }
     for (const file of files) {
       try {
-        const document = await repository.documents.upload(group.id, expense.id, file)
-        setDocuments((previous) => [...previous, document])
+        const prepared = await prepareUpload(file)
+        const attachment = await repository.attachments.upload(group.id, prepared.file, {
+          expense_id: expense?.id,
+          width: prepared.width,
+          height: prepared.height,
+        })
+        setAttachments((previous) => [...previous, attachment])
       } catch (caught) {
         toast({
-          title: t('ExpenseDocumentsInput.ErrorToast.title', 'Error while uploading document'),
+          title: t('ExpenseDocumentsInput.ErrorToast.title', 'Error while uploading file'),
           description:
             caught instanceof Error
               ? caught.message
               : t(
                   'ExpenseDocumentsInput.ErrorToast.description',
-                  'Something wrong happened when uploading the document. Please retry later or select a different file.',
+                  'Something wrong happened when uploading the file. Please retry later or select a different file.',
                 ),
         })
       }
     }
+    event.target.value = ''
   }
 
-  /** @param {string} documentId */
-  async function removeDocument(documentId) {
-    if (!expense) return
+  /** @param {string} attachmentId */
+  async function removeAttachment(attachmentId) {
     try {
-      await repository.documents.remove(group.id, expense.id, documentId)
-      setDocuments((previous) =>
-        previous.filter((/** @type {any} */ document) => document.id !== documentId),
+      await repository.attachments.remove(group.id, attachmentId)
+      setAttachments((previous) =>
+        previous.filter((/** @type {any} */ attachment) => attachment.id !== attachmentId),
       )
     } catch {
-      // Leave the document in place; the server is authoritative.
+      // Leave the attachment in place; the server is authoritative.
     }
+  }
+
+  /** @param {any} attachment */
+  async function scanAttachment(attachment) {
+    setScanningId(attachment.id)
+    try {
+      const result = await repository.attachments.extractItems(
+        group.id,
+        attachment.id,
+        expense?.id ? { expense_id: expense.id } : {},
+      )
+      if (result?.attachment) {
+        setAttachments((previous) =>
+          previous.map((item) =>
+            item.id === attachment.id ? { ...item, ...result.attachment } : item,
+          ),
+        )
+      }
+      toast({
+        title: t('Attachments.scanComplete', 'Receipt scanned'),
+        description: t(
+          'Attachments.scanCompleteDescription',
+          'Assign the extracted items to participants.',
+        ),
+      })
+      return result
+    } catch (caught) {
+      toast({
+        title: t('Attachments.scanError', 'The receipt could not be scanned'),
+        description:
+          caught && typeof caught === 'object' && 'detail' in caught
+            ? String(caught.detail)
+            : undefined,
+      })
+      return null
+    } finally {
+      setScanningId(null)
+    }
+  }
+
+  /** @param {any} attachment */
+  function addScannedAttachment(attachment) {
+    if (!attachment?.id) return
+    setAttachments((previous) => {
+      const index = previous.findIndex((item) => item.id === attachment.id)
+      if (index === -1) return [...previous, attachment]
+      const next = [...previous]
+      next[index] = { ...next[index], ...attachment }
+      return next
+    })
   }
 
   return {
@@ -611,12 +728,18 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
     error,
     deleteOpen,
     setDeleteOpen,
-    documents,
-    pendingFiles,
+    attachments,
+    scanningId,
+    scannedReceipt,
     handleSubmit,
     handleDelete,
-    handleDocuments,
-    removeDocument,
+    handleAttachments,
+    removeAttachment,
+    scanAttachment,
+    addScannedAttachment,
     applyExtracted,
+    pendingReceiptTotal,
+    applyPendingReceiptTotal,
+    dismissPendingReceiptTotal,
   }
 }

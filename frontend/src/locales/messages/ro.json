@@ -12,7 +12,7 @@
     "groups": "Grupuri"
   },
   "Footer": {
-    "madeIn": "Dezvoltat în Montréal, Québec 🇨🇦",
+    "madeIn": "Dezvoltat în Zürich, Elveția 🇨🇭",
     "builtBy": "Dezvoltat de către <author>Sebastien Castiel</author> și <source>contribuitori</source>"
   },
   "Expenses": {
@@ -285,7 +285,9 @@
       "title": "Eroare la adăugarea documentului.",
       "description": "Ceva a mers greșit la adăugarea fișierului. Încearcă mai târziu sau cum un alt fișier.",
       "retry": "Reîncearcă"
-    }
+    },
+    "queued": "Pending upload",
+    "open": "Open"
   },
   "CreateFromReceipt": {
     "Dialog": {
@@ -310,7 +312,9 @@
       "title": "Eroare la adăugarea documentului.",
       "description": "Ceva a mers greșit la adăugarea fișierului. Încearcă mai târziu sau cum un alt fișier.",
       "retry": "Reîncearcă"
-    }
+    },
+    "queued": "Queued. The receipt will be scanned after you reconnect.",
+    "offline": "Scanning resumes when you are online."
   },
   "ReceiptItems": {
     "title": "Receipt items",
@@ -398,7 +402,10 @@
       "total": "total {current} → {new}",
       "cancel": "Cancel",
       "confirm": "Apply"
-    }
+    },
+    "scanPending": "Scan queued",
+    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
+    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
   },
   "Balances": {
     "title": "Solduri",
@@ -622,8 +629,13 @@
   },
   "Pwa": {
     "updateTitle": "Update available",
-    "updateDescription": "A new version of Spliit is available.",
-    "reload": "Reload"
+    "updateDescription": "A new version of pysplit is available.",
+    "reload": "Reload",
+    "updating": "Updating…",
+    "offlineReady": "Ready to work offline",
+    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
+    "dismiss": "Dismiss",
+    "install": "Install app"
   },
   "Auth": {
     "signIn": "Sign in",
@@ -640,5 +652,21 @@
     "totalExpenses": "Total Expenses",
     "registeredUsers": "Registered Users",
     "userManagement": "User Management & Permission Tiers"
+  },
+  "Storage": {
+    "title": "Offline storage",
+    "loading": "Checking this device…",
+    "unsupported": "This browser cannot report storage status.",
+    "usage": "{{used}} of {{quota}} used",
+    "unknown": "unknown",
+    "persisted": "Storage is persistent on this device.",
+    "notPersisted": "The browser may evict offline data if the device runs low on space.",
+    "keep": "Keep data on this device",
+    "refresh": "Refresh",
+    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
+    "warning": "Storage is getting full. A backup is recommended."
+  },
+  "Pending": {
+    "participant": "Pending sync"
   }
 }

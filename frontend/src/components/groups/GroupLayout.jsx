@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Outlet, useOutletContext, useParams } from 'react-router-dom'
 
 import { useActiveUser } from '../../hooks/useActiveUser'
+import { useAuth } from '../../hooks/useAuth'
 import { useGroup } from '../../hooks/useGroup'
 import { repository } from '../../services/repository'
 import {
@@ -17,9 +18,16 @@ import { ErrorState, LoadingState } from '../common/States'
 import { ActiveUserDialog } from './ActiveUserDialog'
 import { GroupHeader } from './GroupHeader'
 
+/** @param {unknown} name */
+function normalizeName(name) {
+  if (typeof name !== 'string') return ''
+  return name.normalize('NFKC').trim().replace(/\s+/g, ' ').toLowerCase()
+}
+
 export function GroupLayout() {
   const { groupId } = useParams()
   const { group, details, loading, error, reload } = useGroup(groupId)
+  const { user } = useAuth()
   const { activeUserId, setActiveUserId } = useActiveUser(groupId || '')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [pendingResolvedFor, setPendingResolvedFor] = useState(
@@ -58,6 +66,16 @@ export function GroupLayout() {
     setPendingResolvedFor(group.id)
   }, [group, pendingResolvedFor, setActiveUserId])
 
+  // Preselect the participant that matches the signed-in account name. The
+  // dialog still opens so the choice is explicit, and an existing active user
+  // (or the explicit "nobody" answer) always wins over this suggestion.
+  const accountName = normalizeName(user?.name)
+  const accountParticipant = accountName
+    ? group?.participants?.find(
+        (/** @type {any} */ participant) => normalizeName(participant.name) === accountName,
+      )
+    : null
+
   if (loading && !group) return <LoadingState />
   if (error) {
     return <ErrorState detail={error.detail || error.message} onRetry={() => void reload()} />
@@ -78,7 +96,7 @@ export function GroupLayout() {
       <ActiveUserDialog
         open={dialogOpen}
         participants={group.participants || []}
-        initialValue={activeUserId}
+        initialValue={activeUserId ?? accountParticipant?.id ?? null}
         onOpenChange={setDialogOpen}
         onSave={(participantId) => {
           setActiveUserId(participantId)

@@ -21,14 +21,13 @@ from alembic import command
 from app.core.config import get_settings
 from app.models import (
     Activity,
+    Attachment,
     Category,
     Expense,
-    ExpenseDocument,
     ExpensePaidFor,
     Group,
     ImportRun,
     Participant,
-    Receipt,
     User,
     UserGroup,
 )
@@ -58,16 +57,15 @@ TARGET_TABLES = {
     "categories",
     "expenses",
     "expense_paid_for",
-    "expense_documents",
     "activities",
     "recurring_expense_links",
     "users",
     "accounts",
     "user_groups",
-    "receipts",
-    "receipt_items",
-    "receipt_item_portions",
-    "receipt_opt_outs",
+    "attachments",
+    "attachment_items",
+    "attachment_item_portions",
+    "attachment_opt_outs",
     "sync_changes",
     "sync_operations",
     "import_runs",
@@ -156,16 +154,15 @@ def test_import_creates_all_tables_and_every_row(imported):
         "categories": 44,
         "expenses": 9,
         "expense_paid_for": 20,
-        "expense_documents": 2,
         "activities": 3,
         "recurring_expense_links": 2,
         "users": 2,
         "accounts": 2,
         "user_groups": 3,
-        "receipts": 2,
-        "receipt_items": 3,
-        "receipt_item_portions": 4,
-        "receipt_opt_outs": 1,
+        "attachments": 3,
+        "attachment_items": 3,
+        "attachment_item_portions": 4,
+        "attachment_opt_outs": 1,
     }
     for table, expected_count in expected.items():
         assert count(target, table) == expected_count, table
@@ -254,13 +251,13 @@ def test_import_preserves_timestamps_booleans_and_decimals(imported):
     assert user_group["is_archived"] == 0
 
 
-def test_import_preserves_orphan_documents_and_activities(imported):
+def test_import_skips_orphan_documents_and_preserves_activities(imported):
     target, _ = imported
     connection = sqlite3.connect(target)
     connection.row_factory = sqlite3.Row
     try:
         orphan_doc = connection.execute(
-            "SELECT * FROM expense_documents WHERE id = 'doc-orphan'"
+            "SELECT * FROM attachments WHERE id = 'doc-orphan'"
         ).fetchone()
         orphan_activity = connection.execute(
             "SELECT * FROM activities WHERE id = 'act-delete'"
@@ -271,7 +268,9 @@ def test_import_preserves_orphan_documents_and_activities(imported):
     finally:
         connection.close()
 
-    assert orphan_doc["expense_id"] is None
+    # The unified attachment table requires a group, so orphan legacy documents
+    # are intentionally dropped.
+    assert orphan_doc is None
     assert orphan_activity["expense_id"] == "exp-deleted-long-ago"
     assert closed_link["next_expense_created_at"] == "2026-02-28 00:00:00.000000"
     assert closed_link["next_expense_date"] == "2026-02-28 00:00:00.000000"
@@ -442,38 +441,27 @@ def test_composite_primary_keys_reject_duplicates(schema_session):
     engine.dispose()
 
 
-def test_receipt_unique_constraints(schema_session):
+def test_attachment_expense_cascade(schema_session):
     session, engine = schema_session
     _seed_minimal(session)
-    session.add(Receipt(id="r1", group_id="g", image_url="https://x/1.jpg"))
-    session.add(Receipt(id="r2", group_id="g", image_url="https://x/1.jpg"))
-    with pytest.raises(IntegrityError):
-        session.commit()
-    session.rollback()
-
-    session.add(Receipt(id="r1", group_id="g", image_url="https://x/1.jpg", expense_id="e"))
-    session.add(Receipt(id="r2", group_id="g", image_url="https://x/2.jpg", expense_id="e"))
-    with pytest.raises(IntegrityError):
-        session.commit()
-    session.rollback()
-    engine.dispose()
-
-
-def test_expense_document_orphan_and_set_null(schema_session):
-    session, engine = schema_session
-    _seed_minimal(session)
-    session.add(ExpenseDocument(id="d", url="u", width=1, height=1))
-    session.commit()
-
-    document = session.get(ExpenseDocument, "d")
-    assert document is not None and document.expense_id is None
-
-    session.add(ExpenseDocument(id="d2", url="u2", width=1, height=1, expense_id="e"))
+    session.add(
+        Attachment(
+            id="a1",
+            group_id="g",
+            expense_id="e",
+            storage_key="attachments/a1.png",
+            url="u",
+            filename="a1.png",
+            content_type="image/png",
+            byte_size=1,
+            width=1,
+            height=1,
+        )
+    )
     session.commit()
     session.delete(session.get(Expense, "e"))
     session.commit()
-    document = session.get(ExpenseDocument, "d2")
-    assert document is not None and document.expense_id is None
+    assert session.get(Attachment, "a1") is None
     engine.dispose()
 
 
@@ -615,7 +603,7 @@ def test_verify_detects_lost_or_changed_rows(imported):
     connection = sqlite3.connect(target)
     try:
         connection.execute("UPDATE expenses SET amount = 1001 WHERE id = 'exp-even'")
-        connection.execute("DELETE FROM receipt_opt_outs")
+        connection.execute("DELETE FROM attachment_opt_outs")
         connection.commit()
     finally:
         connection.close()
@@ -623,7 +611,7 @@ def test_verify_detects_lost_or_changed_rows(imported):
     assert not summary["ok"]
     joined = "\n".join(summary["problems"])
     assert "expenses" in joined
-    assert "receipt_opt_outs" in joined
+    assert "attachment_opt_outs" in joined
 
 
 def test_verify_detects_timestamp_truncation(imported):
@@ -667,7 +655,7 @@ def test_import_primary_reference_database(tmp_path: Path):
     assert result["status"] == "imported"
     assert result["counts"]["groups"] == 6
     assert result["counts"]["expenses"] == 122
-    assert result["counts"]["receipts"] == 1
+    assert result["counts"]["attachments"] == 1
     assert result["seeded_categories"] == 0
     summary = verify(PRIMARY_DB, target, GOLDEN_DIR, require_golden=True)
     assert summary["ok"], summary["problems"]

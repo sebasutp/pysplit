@@ -131,7 +131,8 @@ and the session stays in its cached state.
 ## 3. Groups and membership
 
 ```js
-groups.list({ ids?, status?, signal })    // → list of Group
+groups.list({ ids?, status?, limit?, offset?, signal })
+  // → { items: Group[], total, limit, offset }
 groups.get(groupId, { signal })           // → Group | null
 groups.details(groupId, { signal })       // → { group, participants_with_expenses }
 groups.create(input, { signal })          // → Group
@@ -140,14 +141,40 @@ groups.removeMembership(groupId, { signal }) // → void
 groups.recordAccess(groupId, { signal })  // → void (debounced by caller)
 groups.setStarred(groupId, value, { signal })   // → Membership
 groups.setArchived(groupId, value, { signal })  // → Membership
-groups.sync({ groupIds, signal })         // → { groups, user_groups, is_authenticated }
-                                          //   sends only { group_ids: [...] }
+groups.sync({ groupIds, starredGroupIds?, archivedGroupIds?, claimGroupIds?, signal })
+  // → { groups, user_groups, is_authenticated }
+  //   sends { group_ids, starred_group_ids, archived_group_ids }
 ```
 
 `status` is `'recent' | 'starred' | 'archived' | 'all'`; the local repository
 resolves recent/starred/archived from Dexie metadata and the membership table.
+The default and `'all'` both include archived groups, matching the server.
+`ids` filters the result to exactly those groups. Guests keep star/archive in
+Dexie metadata; authenticated users keep it in the membership table.
 `groups.create` requires an authenticated tier on the server; offline creation
 is allowed only when a cached permitted tier exists and is revalidated on push.
+
+An authenticated list read does not send cached recent IDs as claims. A stale
+recent entry on another device must not re-create a membership that was removed
+elsewhere; capability URLs grant access through `recordAccess` instead.
+`groupIds` is sent for guest reads, and for an authenticated caller only when
+`claimGroupIds` is explicitly set.
+
+On the guest-to-account transition, `groups.sync` is also the merge boundary.
+Every locally known group ID and the guest star/archive sets are persisted as
+`user_group` outbox operations plus a `pending_group_merge` marker before the
+account becomes current. The marker is reconciled after a push cycle reports no
+errors: the server returns the complete membership scope, and the local
+repository updates the existing group rows in place (no duplicate cache or
+membership rows), prefetches the returned groups, and clears the marker. If the
+request fails, the marker survives and the next successful sync cycle retries
+it. While the marker is pending, its group IDs and any group with queued outbox
+work are protected from list-scope pruning, so a stale response cannot delete a
+guest group, its offline expenses, or its claim. Guest preferences are sent as
+positive signals only; the server keeps star and archive mutually exclusive,
+with archive winning. Membership uses arrival-order last-writer-wins per user:
+a stale `base_version` still applies and replaces the stored flags, and a
+removal only drops the membership, not the group's server-side financial data.
 
 ### Group shape
 
@@ -194,8 +221,8 @@ expenses.update(groupId, expenseId, input, { base_version?, signal }) // → Exp
 expenses.remove(groupId, expenseId, { base_version?, signal })        // → void
 ```
 
-Filters: `from`/`to` are inclusive `YYYY-MM-DD` dates. The list includes paid-for
-rows, documents and the receipt summary needed by the row UI.
+Filters: `from`/`to` are inclusive `YYYY-MM-DD` dates. The list includes
+paid-for rows and the attachments needed by the row UI.
 
 ### Expense shape
 
@@ -206,10 +233,10 @@ rows, documents and the receipt summary needed by the row UI.
   conversion_rate: string | null,
   paid_by_id, is_reimbursement, split_mode: 'EVENLY'|'BY_SHARES'|'BY_PERCENTAGE'|'BY_AMOUNT',
   notes, recurrence_rule: 'NONE'|'DAILY'|'WEEKLY'|'MONTHLY',
+  is_recurring_head: boolean,
   created_at, updated_at, version, deleted_at,
   paid_for: [{ participant_id, shares }],
-  documents: [{ id, url, width, height }],
-  receipt: { id, status } | null
+  attachments: [AttachmentRead]
 }
 ```
 
@@ -250,38 +277,49 @@ activities.list(groupId, { cursor, limit, signal })
   // → { items, next_cursor, has_more }
 ```
 
-## 10. Receipts and AI
+## 10. Attachments and AI
 
 ```js
-receipts.get(groupId, { receipt_id?, expense_id?, signal })
-  // → { receipt, items, opt_outs, split } | null
-receipts.upload(groupId, file, { width, height, signal })   // → { url, width, height }
-receipts.extractTotal(groupId, { image_url }, { signal })   // → Receipt
-receipts.extractItems(groupId, { image_url, image_width, image_height }, { signal }) // → Receipt
-receipts.addItem(groupId, receiptId, input, { signal })     // → ReceiptState
-receipts.updateItem(groupId, receiptId, itemId, input, { signal }) // → ReceiptState
-receipts.deleteItem(groupId, receiptId, itemId, { signal }) // → ReceiptState
-receipts.setPortions(groupId, receiptId, itemId, portions, { signal }) // → ReceiptState
-receipts.setOptOut(groupId, receiptId, participantId, value, { signal }) // → ReceiptState
-receipts.apply(groupId, receiptId, input, { signal })       // → { receipt, expense, split }
-receipts.link(groupId, receiptId, expenseId, { signal })    // → Receipt
-categories.infer(title, { signal })                         // → { category_id }
+attachments.get(groupId, { attachment_id?, expense_id?, signal })
+  // → { attachment, items, opt_outs, split } | null
+attachments.upload(groupId, file, { width, height, expense_id?, signal }) // → Attachment
+attachments.update(groupId, attachmentId, { expense_id }, { signal })     // → Attachment
+attachments.remove(groupId, attachmentId, { signal })                     // → void
+attachments.extractTotal(groupId, attachmentId, { signal })               // → TotalExtraction
+attachments.extractItems(groupId, attachmentId, { expense_id? }, { signal }) // → ExtractionResult
+attachments.pendingTotal(groupId)                                         // → queued total | null
+attachments.clearPendingTotal(groupId)                                    // → void
+attachments.addItem(groupId, attachmentId, input, { signal })             // → AttachmentState
+attachments.updateItem(groupId, attachmentId, itemId, input, { signal })  // → AttachmentState
+attachments.deleteItem(groupId, attachmentId, itemId, { signal })         // → AttachmentState
+attachments.setPortions(groupId, attachmentId, itemId, portions, { signal }) // → AttachmentState
+attachments.setOptOut(groupId, attachmentId, participantId, value, { signal }) // → AttachmentState
+attachments.apply(groupId, attachmentId, input, { signal })               // → { attachment, split }
+categories.infer(title, { signal })                                       // → { category_id }
 ```
 
-`ReceiptState` is `{ receipt, items, opt_outs, split }`, where `split` is the
-server-recomputed provisional split. Clients never send their own totals.
-AI methods are **online-only**: offline they reject with
-`offline_unsupported` (or queue an upload in the upload-specific flow).
+`AttachmentState` is `{ attachment, items, opt_outs, split }`, where `split` is
+the server-recomputed provisional split. Clients never send their own totals.
+Offline `attachments.upload` reads the file bytes before opening its Dexie
+transaction, stores the blob and returns a local placeholder with
+`url: 'local-attachment://…'`, `pending: true` and `pending_upload: true`. A
+following `extractTotal` or `extractItems` records the requested mode and
+returns either a pending marker or a placeholder state with
+`receipt_status: 'PENDING'`. The sync engine uploads and extracts after
+reconnect, then replaces the placeholder. Line-item extraction sends the known
+`expense_id` so the link survives the post-sync server bootstrap. A total-only
+result has no expense to link; it is stored locally and exposed through
+`pendingTotal`/`clearPendingTotal` until the user applies or dismisses it on a
+new expense form. Live extraction methods remain **online-only** when no queued
+upload matches. `attachments.apply`/`attachments.link` are online-only. PDFs are
+ordinary attachments and are rejected by extraction with `422`.
 
-## 11. Documents
+## 11. Local storage
 
-```js
-documents.upload(groupId, expenseId, file, { signal }) // → Document
-documents.remove(groupId, expenseId, documentId, { signal }) // → void
-```
-
-Offline uploads are queued as blobs and retried after reconnect. The repository
-may return a local placeholder document with `pending: true`.
+The Dexie stores are `attachments`, `attachmentItems`, `attachmentPortions` and
+`attachmentOptOuts`. Queued uploads use the outbox entity type
+`attachment_upload`; deletes use `attachment_remove`. The old `documents` and
+`receipt*` stores are removed by the v4 development schema.
 
 ## 12. Exports
 
@@ -296,13 +334,19 @@ server returns byte-identical content for the same data.
 ## 13. Synchronization boundary
 
 The repository exposes one synchronization entry point, `groups.sync` (see
-§3). It sends only `{ group_ids }` on the wire and returns
-`{ groups, user_groups, is_authenticated }`.
+§3). It sends `{ group_ids, starred_group_ids, archived_group_ids }` and
+returns `{ groups, user_groups, is_authenticated }`. Authenticated list reads
+send an empty `group_ids`; only guest reads and explicit `claimGroupIds`
+callers ask the server to include locally known groups.
 
 Runtime sync status, manual sync triggers and the conflict queue belong to the
 offline sync engine behind the local repository; they are not methods on the
 repository contract. Components observe pending work through the entity
-`pending` flag and offline behavior through `RepositoryError` codes.
+`pending` flag and offline behavior through `RepositoryError` codes. The
+`services/repository/index.js` module exposes a small `sync` facade
+(`sync.conflicts`, `sync.resolveConflict`, `sync.backup`, `sync.restore`) plus
+`subscribeSyncStatus` for the status UI; hooks import it from the repository
+entry point, never from `services/sync.js`.
 
 ## 14. Runtime features and administration
 
@@ -329,13 +373,14 @@ the next request because the server reloads the user row.
 | Groups create/update/remove membership | yes (queued) |
 | Expenses read/write | yes (queued) |
 | Balances/statistics/activities/categories | yes, from local data |
-| Star/archive/access | yes (queued, LWW) |
-| Receipt item/portion/opt-out/apply/link | yes on cached receipts (queued) |
-| Receipt total/item extraction, category inference | no (online-only, queued upload after reconnect) |
-| Documents upload | queued blob |
+| Star/archive/access | yes (queued, LWW); access recording is best-effort and skipped offline |
+| Attachment item/portion/opt-out edits on cached receipts | yes (queued) |
+| Attachment apply/link | no (online-only) |
+| Receipt total/item extraction, category inference | extraction no (queued upload runs after reconnect); category inference no |
+| Attachment upload/remove | yes (queued); pending placeholders are shown |
 | Admin | no (online-only) |
 | Auth refresh | deferred, retried on reconnect |
-| Exports | yes, from local data |
+| Exports | yes, from local data, byte-identical to the server |
 
 ## 16. Contract tests
 

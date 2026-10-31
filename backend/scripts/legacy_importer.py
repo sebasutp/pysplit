@@ -32,16 +32,16 @@ TABLE_MAP: dict[str, str] = {
     "Category": "categories",
     "Expense": "expenses",
     "ExpensePaidFor": "expense_paid_for",
-    "ExpenseDocument": "expense_documents",
+    "ExpenseDocument": "attachments",
     "Activity": "activities",
     "RecurringExpenseLink": "recurring_expense_links",
     "User": "users",
     "Account": "accounts",
     "UserGroup": "user_groups",
-    "Receipt": "receipts",
-    "ReceiptItem": "receipt_items",
-    "ReceiptItemPortion": "receipt_item_portions",
-    "ReceiptOptOut": "receipt_opt_outs",
+    "Receipt": "attachments",
+    "ReceiptItem": "attachment_items",
+    "ReceiptItemPortion": "attachment_item_portions",
+    "ReceiptOptOut": "attachment_opt_outs",
 }
 
 # Deliberately not migrated: users log in again with the new flow.
@@ -425,21 +425,6 @@ def _build_rows(
         for row in _rows(connection, "ExpensePaidFor", "expenseId, participantId, shares")
     ]
 
-    buckets["expense_documents"] = [
-        {
-            "id": row["id"],
-            "url": row["url"],
-            "width": parse_required_int(row["width"]),
-            "height": parse_required_int(row["height"]),
-            "expense_id": parse_str(row["expenseId"]),
-            "created_at": now,
-            "updated_at": now,
-            "version": 1,
-            "deleted_at": None,
-        }
-        for row in _rows(connection, "ExpenseDocument", "id, url, width, height, expenseId")
-    ]
-
     buckets["activities"] = []
     for row in _rows(
         connection,
@@ -544,7 +529,53 @@ def _build_rows(
             }
         )
 
-    buckets["receipts"] = []
+    # Legacy documents and receipts both become attachments. Orphan documents
+    # have no group and are intentionally skipped.
+    expense_groups = {
+        row["id"]: row["groupId"] for row in _rows(connection, "Expense", "id, groupId")
+    }
+    attachments: dict[str, dict[str, Any]] = {}
+
+    def content_type_for(url: str | None) -> str:
+        suffix = Path(str(url or "")).suffix.lower()
+        return {
+            ".png": "image/png",
+            ".webp": "image/webp",
+            ".pdf": "application/pdf",
+        }.get(suffix, "image/jpeg")
+
+    for row in _rows(connection, "ExpenseDocument", "id, url, width, height, expenseId"):
+        group_id = expense_groups.get(row["expenseId"])
+        if group_id is None:
+            continue
+        content_type = content_type_for(row["url"])
+        attachments[row["id"]] = {
+            "id": row["id"],
+            "group_id": group_id,
+            "expense_id": parse_str(row["expenseId"]),
+            "storage_key": f"legacy/{row['id']}",
+            "url": row["url"],
+            "filename": Path(str(row["url"] or "")).name or f"{row['id']}.jpg",
+            "content_type": content_type,
+            "byte_size": 0,
+            "width": parse_required_int(row["width"], default=1),
+            "height": parse_required_int(row["height"], default=1),
+            "thumbnail_url": row["url"] if content_type.startswith("image/") else None,
+            "receipt_status": None,
+            "attempts": 0,
+            "raw_extraction": None,
+            "provider": None,
+            "model": None,
+            "merchant": None,
+            "receipt_date": None,
+            "currency_code": None,
+            "total": None,
+            "created_at": now,
+            "updated_at": now,
+            "version": 1,
+            "deleted_at": None,
+        }
+
     for row in _rows(
         connection,
         "Receipt",
@@ -553,30 +584,36 @@ def _build_rows(
         "createdAt, updatedAt",
     ):
         created_at = parse_datetime(row["createdAt"]) or now
-        buckets["receipts"].append(
-            {
-                "id": row["id"],
-                "group_id": row["groupId"],
-                "image_url": row["imageUrl"],
-                "image_width": parse_optional_int(row["imageWidth"]),
-                "image_height": parse_optional_int(row["imageHeight"]),
-                "status": row["status"] or "PENDING",
-                "raw_extraction": parse_str(row["rawExtraction"]),
-                "provider": parse_str(row["provider"]),
-                "model": parse_str(row["model"]),
-                "merchant": parse_str(row["merchant"]),
-                "receipt_date": parse_datetime(row["receiptDate"]),
-                "currency_code": parse_str(row["currencyCode"]),
-                "total": parse_optional_int(row["total"]),
-                "expense_id": parse_str(row["expenseId"]),
-                "created_at": created_at,
-                "updated_at": parse_datetime(row["updatedAt"]) or created_at,
-                "version": 1,
-                "deleted_at": None,
-            }
-        )
+        content_type = content_type_for(row["imageUrl"])
+        attachments[row["id"]] = {
+            "id": row["id"],
+            "group_id": row["groupId"],
+            "expense_id": parse_str(row["expenseId"]),
+            "storage_key": f"legacy/{row['id']}",
+            "url": row["imageUrl"],
+            "filename": Path(str(row["imageUrl"] or "")).name or f"{row['id']}.jpg",
+            "content_type": content_type,
+            "byte_size": 0,
+            "width": parse_optional_int(row["imageWidth"]) or 1,
+            "height": parse_optional_int(row["imageHeight"]) or 1,
+            "thumbnail_url": row["imageUrl"] if content_type.startswith("image/") else None,
+            "receipt_status": row["status"] or "PENDING",
+            "attempts": 0,
+            "raw_extraction": parse_str(row["rawExtraction"]),
+            "provider": parse_str(row["provider"]),
+            "model": parse_str(row["model"]),
+            "merchant": parse_str(row["merchant"]),
+            "receipt_date": parse_datetime(row["receiptDate"]),
+            "currency_code": parse_str(row["currencyCode"]),
+            "total": parse_optional_int(row["total"]),
+            "created_at": created_at,
+            "updated_at": parse_datetime(row["updatedAt"]) or created_at,
+            "version": 1,
+            "deleted_at": None,
+        }
+    buckets["attachments"] = list(attachments.values())
 
-    buckets["receipt_items"] = []
+    buckets["attachment_items"] = []
     for row in _rows(
         connection,
         "ReceiptItem",
@@ -584,10 +621,10 @@ def _build_rows(
         "isAdjustment, position, createdAt, updatedAt",
     ):
         created_at = parse_datetime(row["createdAt"]) or now
-        buckets["receipt_items"].append(
+        buckets["attachment_items"].append(
             {
                 "id": row["id"],
-                "receipt_id": row["receiptId"],
+                "attachment_id": row["receiptId"],
                 "name": row["name"],
                 "quantity_milli": parse_required_int(row["quantityMilli"], default=1000),
                 "unit_price": parse_optional_int(row["unitPrice"]),
@@ -602,14 +639,14 @@ def _build_rows(
             }
         )
 
-    buckets["receipt_item_portions"] = []
+    buckets["attachment_item_portions"] = []
     for row in _rows(
         connection,
         "ReceiptItemPortion",
         "id, itemId, target, participantId, quantityMilli, createdAt, updatedAt",
     ):
         created_at = parse_datetime(row["createdAt"]) or now
-        buckets["receipt_item_portions"].append(
+        buckets["attachment_item_portions"].append(
             {
                 "id": row["id"],
                 "item_id": row["itemId"],
@@ -623,13 +660,13 @@ def _build_rows(
             }
         )
 
-    buckets["receipt_opt_outs"] = []
+    buckets["attachment_opt_outs"] = []
     for row in _rows(connection, "ReceiptOptOut", "id, receiptId, participantId, createdAt"):
         created_at = parse_datetime(row["createdAt"]) or now
-        buckets["receipt_opt_outs"].append(
+        buckets["attachment_opt_outs"].append(
             {
                 "id": row["id"],
-                "receipt_id": row["receiptId"],
+                "attachment_id": row["receiptId"],
                 "participant_id": row["participantId"],
                 "created_at": created_at,
                 "updated_at": created_at,
@@ -708,16 +745,15 @@ def import_database(
                 "participants",
                 "expenses",
                 "expense_paid_for",
-                "expense_documents",
                 "activities",
                 "recurring_expense_links",
                 "users",
                 "accounts",
                 "user_groups",
-                "receipts",
-                "receipt_items",
-                "receipt_item_portions",
-                "receipt_opt_outs",
+                "attachments",
+                "attachment_items",
+                "attachment_item_portions",
+                "attachment_opt_outs",
             ):
                 rows = buckets[table_name]
                 if rows:

@@ -25,11 +25,11 @@ beforeEach(() => {
 
 describe('feature and category caches', () => {
   it('shares one feature request between mounts until cleared', async () => {
-    featuresGet.mockResolvedValue({ receipt_items: true })
+    featuresGet.mockResolvedValue({ receipt_ai: true })
 
     const first = renderHook(() => useFeatures())
     await waitFor(() => expect(first.result.current.loading).toBe(false))
-    expect(first.result.current.features.receipt_items).toBe(true)
+    expect(first.result.current.features.receipt_ai).toBe(true)
 
     const second = renderHook(() => useFeatures())
     await waitFor(() => expect(second.result.current.loading).toBe(false))

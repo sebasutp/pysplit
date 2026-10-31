@@ -1,0 +1,312 @@
+{
+  "expenses": [
+    {
+      "id": "b1",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 9000,
+      "category_id": 0,
+      "paid_by_id": "alice",
+      "paid_for": [
+        {
+          "participant_id": "alice",
+          "shares": 1
+        },
+        {
+          "participant_id": "bob",
+          "shares": 1
+        },
+        {
+          "participant_id": "carol",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE",
+      "category": {
+        "id": 0,
+        "grouping": "Uncategorized",
+        "name": "General"
+      }
+    },
+    {
+      "id": "b2",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 3000,
+      "category_id": 0,
+      "paid_by_id": "bob",
+      "paid_for": [
+        {
+          "participant_id": "alice",
+          "shares": 1
+        },
+        {
+          "participant_id": "bob",
+          "shares": 1
+        },
+        {
+          "participant_id": "carol",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE",
+      "category": {
+        "id": 0,
+        "grouping": "Uncategorized",
+        "name": "General"
+      }
+    },
+    {
+      "id": "b3",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 1550,
+      "category_id": 0,
+      "paid_by_id": "carol",
+      "paid_for": [
+        {
+          "participant_id": "alice",
+          "shares": 1
+        },
+        {
+          "participant_id": "carol",
+          "shares": 1
+        }
+      ],
+      "split_mode": "BY_SHARES",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE",
+      "category": {
+        "id": 0,
+        "grouping": "Uncategorized",
+        "name": "General"
+      }
+    },
+    {
+      "id": "b4",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": -1200,
+      "category_id": 0,
+      "paid_by_id": "alice",
+      "paid_for": [
+        {
+          "participant_id": "alice",
+          "shares": 1
+        },
+        {
+          "participant_id": "bob",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": true,
+      "recurrence_rule": "NONE",
+      "category": {
+        "id": 0,
+        "grouping": "Uncategorized",
+        "name": "General"
+      }
+    },
+    {
+      "id": "t1",
+      "expense_date": "2026-01-31",
+      "title": "Groceries",
+      "amount": 2500,
+      "category_id": 9,
+      "paid_by_id": "alice",
+      "paid_for": [
+        {
+          "participant_id": "alice",
+          "shares": 1
+        },
+        {
+          "participant_id": "bob",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "MONTHLY",
+      "category": {
+        "id": 9,
+        "grouping": "Food and Drink",
+        "name": "Groceries"
+      }
+    },
+    {
+      "id": "t2",
+      "expense_date": "2026-02-28",
+      "title": "Bread",
+      "amount": 800,
+      "category_id": 9,
+      "paid_by_id": "bob",
+      "paid_for": [
+        {
+          "participant_id": "bob",
+          "shares": 1
+        },
+        {
+          "participant_id": "carol",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE",
+      "category": {
+        "id": 9,
+        "grouping": "Food and Drink",
+        "name": "Groceries"
+      }
+    },
+    {
+      "id": "t3",
+      "expense_date": "2026-04-02",
+      "title": "Train",
+      "amount": 1200,
+      "category_id": 27,
+      "paid_by_id": "carol",
+      "paid_for": [
+        {
+          "participant_id": "alice",
+          "shares": 1
+        },
+        {
+          "participant_id": "carol",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "WEEKLY",
+      "category": {
+        "id": 27,
+        "grouping": "Transportation",
+        "name": "Transportation"
+      }
+    }
+  ],
+  "participants": [
+    {
+      "id": "alice",
+      "name": "Alice"
+    },
+    {
+      "id": "bob",
+      "name": "Bob"
+    },
+    {
+      "id": "carol",
+      "name": "Carol"
+    }
+  ],
+  "expected": {
+    "total_group_spending": 18050,
+    "total_active_user_paid_for": 11500,
+    "total_active_user_share": 6625,
+    "spending_by_category": [
+      {
+        "categoryId": 0,
+        "grouping": "Uncategorized",
+        "name": "General",
+        "total": 13550
+      },
+      {
+        "categoryId": 9,
+        "grouping": "Food and Drink",
+        "name": "Groceries",
+        "total": 3300
+      },
+      {
+        "categoryId": 27,
+        "grouping": "Transportation",
+        "name": "Transportation",
+        "total": 1200
+      }
+    ],
+    "spending_by_participant": [
+      {
+        "participantId": "alice",
+        "name": "Alice",
+        "paid": 11500,
+        "paidCount": 2,
+        "share": 6625
+      },
+      {
+        "participantId": "bob",
+        "name": "Bob",
+        "paid": 3800,
+        "paidCount": 2,
+        "share": 5650
+      },
+      {
+        "participantId": "carol",
+        "name": "Carol",
+        "paid": 2750,
+        "paidCount": 2,
+        "share": 5775
+      }
+    ],
+    "spending_over_time": [
+      {
+        "month": "2026-01",
+        "total": 2500
+      },
+      {
+        "month": "2026-02",
+        "total": 800
+      },
+      {
+        "month": "2026-03",
+        "total": 13550
+      },
+      {
+        "month": "2026-04",
+        "total": 1200
+      }
+    ],
+    "summary": {
+      "expenseCount": 6,
+      "totalSpending": 18050,
+      "averageExpense": 3008,
+      "largestExpense": {
+        "title": "Expense",
+        "amount": 9000
+      },
+      "firstDate": "2026-01-31",
+      "lastDate": "2026-04-02"
+    },
+    "recurring": {
+      "count": 2,
+      "byPeriod": [
+        {
+          "period": "WEEKLY",
+          "count": 1,
+          "total": 1200
+        },
+        {
+          "period": "MONTHLY",
+          "count": 1,
+          "total": 2500
+        }
+      ],
+      "estimatedMonthly": 7718,
+      "estimatedYearly": 92614
+    },
+    "range_2026_02": [
+      "t2"
+    ],
+    "category_9": [
+      "t2",
+      "t1"
+    ],
+    "month_2026_01": [
+      "t1"
+    ]
+  }
+}

@@ -8,7 +8,7 @@ BACKEND = Path(__file__).resolve().parents[1]
 ROUTERS = (
     "groups.py",
     "expenses.py",
-    "receipts.py",
+    "attachments.py",
     "balances.py",
     "stats.py",
     "activities.py",
@@ -79,14 +79,19 @@ def test_stage_six_sync_router_does_not_import_models_or_sql():
 
 
 def test_stage_seven_specs_exist():
-    for name in ("test_receipts.py", "test_ai.py", "test_receipt_apply.py"):
+    for name in ("test_attachments.py", "test_ai.py", "test_receipt_apply.py"):
         assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
 
 
-def test_stage_seven_receipt_router_is_http_only():
-    source = (BACKEND / "app" / "api" / "receipts.py").read_text()
+def test_stage_eleven_sync_specs_exist():
+    for name in ("test_group_sync.py", "test_groups_sync.py", "test_admin.py"):
+        assert (BACKEND / "tests" / name).is_file(), f"missing {name}"
+
+
+def test_stage_seven_attachment_router_is_http_only():
+    source = (BACKEND / "app" / "api" / "attachments.py").read_text()
     for forbidden in ("app.models", "sqlmodel", "sqlalchemy", "app.core.database"):
-        assert forbidden not in source, f"receipts.py imports {forbidden}"
+        assert forbidden not in source, f"attachments.py imports {forbidden}"
 
 
 def test_stage_seven_receipt_parsers_are_pure():

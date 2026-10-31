@@ -44,9 +44,27 @@ class Settings(BaseSettings):
     debug: bool = False
     api_prefix: str = "/api"
 
+    # --- Logging and observability ---------------------------------------
+    # ``json`` emits one structured object per line for container log
+    # collectors; ``text`` is friendlier for local development. The request id
+    # header is echoed on every response and included in request logs.
+    log_level: str = "INFO"
+    log_format: Literal["json", "text"] = "text"
+    request_id_header: str = "X-Request-ID"
+    # Optional Sentry integration. The SDK is not a hard dependency: when the
+    # value is set but ``sentry-sdk`` is not installed, startup logs a warning
+    # and continues. No DSN means no network calls.
+    sentry_dsn: str | None = None
+    sentry_traces_sample_rate: float = 0.0
+
     # SQLite by default. The dev launcher and Docker override this with an
     # absolute path so no database is written next to the source tree.
     database_url: str = "sqlite:///./data/dev/pysplit.db"
+    # Wait this long for a writer lock before SQLite returns ``database is
+    # locked``. Production runs a single Uvicorn worker with short
+    # transactions; the timeout prevents transient 500s during a backup or
+    # checkpoint.
+    sqlite_busy_timeout_ms: int = 5000
 
     # Comma-separated list; parsed into a list by `cors_origins_list`.
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
@@ -118,12 +136,10 @@ class Settings(BaseSettings):
     # when the S3_* variables are configured.
     upload_dir: str = "data/uploads"
     max_upload_bytes: int = 10 * 1024 * 1024
-    upload_allowed_types: str = "image/jpeg,image/png,image/webp"
+    upload_allowed_types: str = "image/jpeg,image/png,image/webp,application/pdf"
     upload_rate_limit_per_minute: int = 60
-    enable_receipt_extract: bool = False
-    enable_receipt_items: bool = False
+    enable_receipt_ai: bool = False
     enable_category_extract: bool = False
-    enable_expense_documents: bool = False
 
     # --- S3-compatible document storage ---------------------------------
     # All optional. When the key/secret/bucket/region quartet is present the
@@ -150,6 +166,12 @@ class Settings(BaseSettings):
     openai_model_category_extract: str | None = None
     ai_timeout_seconds: float = 60.0
     ai_rate_limit_per_minute: int = 20
+    # Local-only deterministic fixture mode. Never allowed in production.
+    ai_mock: bool = False
+    ai_mock_delay_ms: int = 0
+    # ``auto`` retries with JSON-object mode when a provider rejects strict
+    # JSON-schema response_format.
+    ai_response_format: Literal["auto", "json_schema", "json_object"] = "auto"
 
     # --- Receipt item limits --------------------------------------------
     # Mirror the reference server-side caps. The item amount matches the
@@ -197,6 +219,29 @@ class Settings(BaseSettings):
         parsed = urlsplit(value)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("frontend_url must be an http(s) URL")
+        return value
+
+    @field_validator("log_level")
+    @classmethod
+    def _normalise_log_level(cls, value: str) -> str:
+        cleaned = value.strip().upper()
+        if cleaned not in {"CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"}:
+            raise ValueError("log_level must be a standard Python logging level")
+        return cleaned
+
+    @field_validator("request_id_header")
+    @classmethod
+    def _valid_request_id_header(cls, value: str) -> str:
+        cleaned = value.strip()
+        if not cleaned or not re.fullmatch(r"[A-Za-z0-9-]+", cleaned):
+            raise ValueError("request_id_header must be a valid HTTP header name")
+        return cleaned
+
+    @field_validator("sentry_traces_sample_rate")
+    @classmethod
+    def _valid_sentry_rate(cls, value: float) -> float:
+        if not 0.0 <= value <= 1.0:
+            raise ValueError("sentry_traces_sample_rate must be between 0 and 1")
         return value
 
     @field_validator("cors_origin_regex")
@@ -271,6 +316,7 @@ class Settings(BaseSettings):
         "receipt_extraction_stale_seconds",
         "receipt_max_attempts",
         "sync_rate_limit_per_minute",
+        "sqlite_busy_timeout_ms",
     )
     @classmethod
     def _positive_receipt_limit(cls, value: int) -> int:
@@ -283,6 +329,13 @@ class Settings(BaseSettings):
     def _positive_ai_timeout(cls, value: float) -> float:
         if value <= 0:
             raise ValueError("must be positive")
+        return value
+
+    @field_validator("ai_mock_delay_ms")
+    @classmethod
+    def _non_negative_mock_delay(cls, value: int) -> int:
+        if value < 0:
+            raise ValueError("must not be negative")
         return value
 
     @field_validator(
@@ -302,6 +355,7 @@ class Settings(BaseSettings):
         "openai_model_receipt_items_extract",
         "ai_model_category_extract",
         "openai_model_category_extract",
+        "sentry_dsn",
         mode="before",
     )
     @classmethod
@@ -335,6 +389,8 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _require_production_secret(self) -> Settings:
         if self.environment.lower() == "production":
+            if self.ai_mock:
+                raise ValueError("AI_MOCK must not be enabled in production")
             if not self.jwt_secret or self.jwt_secret == DEVELOPMENT_JWT_SECRET:
                 raise ValueError("JWT_SECRET must be set to a unique value in production")
             if len(self.jwt_secret) < 32:
@@ -395,8 +451,8 @@ class Settings(BaseSettings):
         ]
 
     @property
-    def receipt_extract_enabled(self) -> bool:
-        return self.enable_receipt_extract or self.enable_receipt_items
+    def receipt_ai_enabled(self) -> bool:
+        return self.enable_receipt_ai
 
     @property
     def ai_api_key_resolved(self) -> str | None:

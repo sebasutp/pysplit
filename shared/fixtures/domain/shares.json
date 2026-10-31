@@ -1,0 +1,218 @@
+[
+  {
+    "name": "even-two-of-three",
+    "expense": {
+      "id": "e-even",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 100,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 1
+        },
+        {
+          "participant_id": "b",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": 50,
+      "b": 50
+    }
+  },
+  {
+    "name": "one-third",
+    "expense": {
+      "id": "e-third",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 100,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 1
+        },
+        {
+          "participant_id": "b",
+          "shares": 1
+        },
+        {
+          "participant_id": "c",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": 34,
+      "b": 33,
+      "c": 33
+    }
+  },
+  {
+    "name": "half-of-odd",
+    "expense": {
+      "id": "e-half",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 101,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 1
+        },
+        {
+          "participant_id": "b",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": 51,
+      "b": 50
+    }
+  },
+  {
+    "name": "by-shares",
+    "expense": {
+      "id": "e-shares",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 101,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 2
+        },
+        {
+          "participant_id": "b",
+          "shares": 1
+        },
+        {
+          "participant_id": "c",
+          "shares": 1
+        }
+      ],
+      "split_mode": "BY_SHARES",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": 51,
+      "b": 25,
+      "c": 25
+    }
+  },
+  {
+    "name": "by-percentage",
+    "expense": {
+      "id": "e-percentage",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 1000,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 3333
+        },
+        {
+          "participant_id": "b",
+          "shares": 3333
+        },
+        {
+          "participant_id": "c",
+          "shares": 3334
+        }
+      ],
+      "split_mode": "BY_PERCENTAGE",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": 333,
+      "b": 333,
+      "c": 334
+    }
+  },
+  {
+    "name": "negative-income",
+    "expense": {
+      "id": "e-income",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": -100,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 1
+        },
+        {
+          "participant_id": "b",
+          "shares": 1
+        },
+        {
+          "participant_id": "c",
+          "shares": 1
+        }
+      ],
+      "split_mode": "EVENLY",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": -33,
+      "b": -34,
+      "c": -33
+    }
+  },
+  {
+    "name": "zero-shares",
+    "expense": {
+      "id": "e-zero",
+      "expense_date": "2026-03-01",
+      "title": "Expense",
+      "amount": 100,
+      "category_id": 0,
+      "paid_by_id": "a",
+      "paid_for": [
+        {
+          "participant_id": "a",
+          "shares": 0
+        },
+        {
+          "participant_id": "b",
+          "shares": 0
+        }
+      ],
+      "split_mode": "BY_SHARES",
+      "is_reimbursement": false,
+      "recurrence_rule": "NONE"
+    },
+    "expected": {
+      "a": 0,
+      "b": 0
+    }
+  }
+]

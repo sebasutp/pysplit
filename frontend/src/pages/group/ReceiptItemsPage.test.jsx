@@ -21,11 +21,11 @@ vi.mock('../../components/groups/GroupLayout', () => ({
 }))
 
 vi.mock('../../hooks/useFeatures', () => ({
-  useFeatures: () => ({ features: { receipt_items: false }, loading: false }),
+  useFeatures: () => ({ features: { receipt_ai: false }, loading: false }),
 }))
 
 vi.mock('../../services/repository', () => ({
-  repository: { expenses: { get }, receipts: {} },
+  repository: { expenses: { get }, attachments: {} },
 }))
 
 beforeEach(() => {

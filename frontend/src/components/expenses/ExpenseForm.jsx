@@ -17,6 +17,7 @@ import { ExpenseCurrencyCard } from './ExpenseCurrencyCard'
 import { ExpenseDocumentsCard } from './ExpenseDocumentsCard'
 import { ExpenseFormActions } from './ExpenseFormActions'
 import { ExpenseDeleteDialog } from './ExpenseDeleteDialog'
+import { Button } from '../ui/Button'
 
 /**
  * @param {{
@@ -32,6 +33,12 @@ export function ExpenseForm({ group, categories, expense = null, activeUserId = 
   const navigate = useNavigate()
   const form = useExpenseForm({ group, categories, expense, activeUserId })
   const participants = group.participants || []
+  const itemsPath = expense
+    ? `/groups/${group.id}/expenses/${expense.id}/items`
+    : null
+  const hasReceipt = Boolean(
+    form.attachments.some((/** @type {any} */ attachment) => attachment.receipt_status),
+  )
 
   return (
     <form onSubmit={form.handleSubmit} noValidate className="flex flex-col gap-4">
@@ -47,7 +54,9 @@ export function ExpenseForm({ group, categories, expense = null, activeUserId = 
         </h2>
         <ReceiptScanButton
           groupId={group.id}
+          expenseId={expense?.id}
           features={features}
+          onUploaded={form.addScannedAttachment}
           onExtracted={form.applyExtracted}
         />
       </div>
@@ -56,6 +65,33 @@ export function ExpenseForm({ group, categories, expense = null, activeUserId = 
         <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
           {form.error}
         </p>
+      ) : null}
+
+      {form.pendingReceiptTotal ? (
+        <div
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-500/40 bg-amber-500/5 p-3 text-sm"
+        >
+          <span>
+            {t(
+              'ExpenseForm.pendingReceiptTotal',
+              'A receipt scanned while offline is ready.',
+            )}
+          </span>
+          <span className="flex gap-2">
+            <Button type="button" size="sm" onClick={form.applyPendingReceiptTotal}>
+              {t('ExpenseForm.pendingReceiptTotalApply', 'Use scanned total')}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={form.dismissPendingReceiptTotal}
+            >
+              {t('ExpenseForm.pendingReceiptTotalDismiss', 'Dismiss')}
+            </Button>
+          </span>
+        </div>
       ) : null}
 
       <ExpenseBasicsCard
@@ -90,6 +126,7 @@ export function ExpenseForm({ group, categories, expense = null, activeUserId = 
         setAllChecked={form.setAllChecked}
         applySplitDefaults={form.applySplitDefaults}
         toggleAdvanced={form.toggleAdvanced}
+        onAssignItems={itemsPath && hasReceipt ? () => navigate(itemsPath) : undefined}
         group={group}
       />
 
@@ -116,10 +153,23 @@ export function ExpenseForm({ group, categories, expense = null, activeUserId = 
         setNotes={form.setNotes}
         isReimbursement={form.isReimbursement}
         setIsReimbursement={form.setIsReimbursement}
-        handleDocuments={form.handleDocuments}
-        pendingFiles={form.pendingFiles}
-        documents={form.documents}
-        removeDocument={form.removeDocument}
+        handleAttachments={form.handleAttachments}
+        attachments={form.attachments}
+        removeAttachment={form.removeAttachment}
+        canScan={Boolean(features?.receipt_ai)}
+        scanningId={form.scanningId}
+        onScan={async (attachment) => {
+          const result = await form.scanAttachment(attachment)
+          if (result && expense) {
+            navigate(`/groups/${group.id}/expenses/${expense.id}/items`)
+          }
+        }}
+        onReview={() => {
+          if (expense) navigate(`/groups/${group.id}/expenses/${expense.id}/items`)
+        }}
+        receipt={form.scannedReceipt}
+        currency={form.currency}
+        locale={i18n.resolvedLanguage || i18n.language || 'en-US'}
       />
 
       <ExpenseFormActions

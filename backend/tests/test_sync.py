@@ -8,13 +8,13 @@ from sqlmodel import Session, select
 
 from app.core.enums import UserTier
 from app.models.activity import Activity
+from app.models.attachment import Attachment
+from app.models.attachment_item import AttachmentItem
+from app.models.attachment_item_portion import AttachmentItemPortion
+from app.models.attachment_opt_out import AttachmentOptOut
 from app.models.expense import Expense
 from app.models.group import Group
 from app.models.participant import Participant
-from app.models.receipt import Receipt
-from app.models.receipt_item import ReceiptItem
-from app.models.receipt_item_portion import ReceiptItemPortion
-from app.models.receipt_opt_out import ReceiptOptOut
 from app.models.recurring_expense_link import RecurringExpenseLink
 from app.models.sync_change import SyncChange
 from app.models.user_group import UserGroup
@@ -119,7 +119,7 @@ def test_push_create_pull_and_bootstrap(client, session: Session):
     assert snapshot["cursor"] >= result["seq"]
 
 
-def test_bootstrap_includes_receipts_and_user_membership(client, session: Session):
+def test_bootstrap_includes_attachments_and_user_membership(client, session: Session):
     user = make_user(session)
     group, people = make_group(session)
     session.add(
@@ -138,20 +138,26 @@ def test_bootstrap_includes_receipts_and_user_membership(client, session: Sessio
         amount=500,
     )
     now = datetime.now(UTC)
-    receipt = Receipt(
-        id="rcp_1",
+    attachment = Attachment(
+        id="att_1",
         group_id=group.id,
-        image_url="https://example.com/receipt.jpg",
-        status="PARSED",
-        total=500,
         expense_id=expense.id,
+        storage_key="attachments/receipt.jpg",
+        url="https://example.com/receipt.jpg",
+        filename="receipt.jpg",
+        content_type="image/jpeg",
+        byte_size=1,
+        width=1,
+        height=1,
+        receipt_status="EXTRACTED",
+        total=500,
         created_at=now,
     )
-    session.add(receipt)
+    session.add(attachment)
     session.add(
-        ReceiptItem(
-            id="ritem_1",
-            receipt_id=receipt.id,
+        AttachmentItem(
+            id="aitem_1",
+            attachment_id=attachment.id,
             name="Soup",
             amount=500,
             position=0,
@@ -159,9 +165,9 @@ def test_bootstrap_includes_receipts_and_user_membership(client, session: Sessio
         )
     )
     session.add(
-        ReceiptItemPortion(
-            id="rportion_1",
-            item_id="ritem_1",
+        AttachmentItemPortion(
+            id="aportion_1",
+            item_id="aitem_1",
             target=people["Alice"].id,
             participant_id=people["Alice"].id,
             quantity_milli=1000,
@@ -169,9 +175,9 @@ def test_bootstrap_includes_receipts_and_user_membership(client, session: Sessio
         )
     )
     session.add(
-        ReceiptOptOut(
-            id="ropt_1",
-            receipt_id=receipt.id,
+        AttachmentOptOut(
+            id="aopt_1",
+            attachment_id=attachment.id,
             participant_id=people["Bob"].id,
             created_at=now,
         )
@@ -187,10 +193,10 @@ def test_bootstrap_includes_receipts_and_user_membership(client, session: Sessio
     body = response.json()
     assert body["user_group"]["user_id"] == user.id
     assert body["user_group"]["is_starred"] is True
-    assert body["receipts"][0]["receipt"]["id"] == "rcp_1"
-    assert body["receipts"][0]["items"][0]["name"] == "Soup"
-    assert body["receipts"][0]["portions"][0]["target"] == people["Alice"].id
-    assert body["receipts"][0]["opt_outs"][0]["participant_id"] == people["Bob"].id
+    assert body["attachments"][0]["attachment"]["id"] == "att_1"
+    assert body["attachments"][0]["items"][0]["name"] == "Soup"
+    assert body["attachments"][0]["portions"][0]["target"] == people["Alice"].id
+    assert body["attachments"][0]["opt_outs"][0]["participant_id"] == people["Bob"].id
 
 
 def test_replayed_operation_applies_once(client, session: Session):
