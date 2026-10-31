@@ -12,14 +12,14 @@ from app.core.config import Settings, get_settings
 from app.core.enums import UserTier
 from app.core.ids import new_id
 from app.core.security import create_access_token
+from app.models.attachment import Attachment
+from app.models.attachment_item import AttachmentItem
+from app.models.attachment_item_portion import AttachmentItemPortion
+from app.models.attachment_opt_out import AttachmentOptOut
 from app.models.expense import Expense
 from app.models.expense_paid_for import ExpensePaidFor
 from app.models.group import Group
 from app.models.participant import Participant
-from app.models.receipt import Receipt
-from app.models.receipt_item import ReceiptItem
-from app.models.receipt_item_portion import ReceiptItemPortion
-from app.models.receipt_opt_out import ReceiptOptOut
 from app.models.user import User
 from app.services.categories import ensure_default_categories
 from app.utils.dates import date_to_datetime
@@ -196,32 +196,34 @@ def make_receipt(
     image_url: str | None = None,
     total: int | None = None,
     expense_id: str | None = None,
-) -> Receipt:
-    """Insert a receipt with ordered items, portions and opt-outs.
-
-    This bypasses the AI path so receipt/apply tests are deterministic and
-    never touch the network.
-    """
+) -> Attachment:
+    """Insert a receipt attachment with ordered items, portions and opt-outs."""
     now = datetime.now(UTC)
-    receipt = Receipt(
-        id=new_id("rcpt"),
+    attachment = Attachment(
+        id=new_id("att"),
         group_id=group.id,
-        image_url=image_url or f"https://uploads.example.com/{uuid4().hex}.png",
-        status=status,
-        total=total,
         expense_id=expense_id,
+        storage_key=f"attachments/{group.id}/{uuid4().hex}.png",
+        url=image_url or f"https://uploads.example.com/{uuid4().hex}.png",
+        filename="receipt.png",
+        content_type="image/png",
+        byte_size=1,
+        width=800,
+        height=600,
+        receipt_status=status,
+        total=total,
         created_at=now,
         updated_at=now,
         version=1,
     )
-    session.add(receipt)
+    session.add(attachment)
     session.flush()
     for index, item in enumerate(items):
-        item_id = new_id("ritem")
+        item_id = new_id("aitem")
         session.add(
-            ReceiptItem(
+            AttachmentItem(
                 id=item_id,
-                receipt_id=receipt.id,
+                attachment_id=attachment.id,
                 name=item.get("name", f"Item {index}"),
                 quantity_milli=int(item.get("quantity_milli", 1000)),
                 unit_price=item.get("unit_price"),
@@ -237,8 +239,8 @@ def make_receipt(
         for portion in item.get("portions", []):
             target = portion.get("target", "PARTICIPANT")
             session.add(
-                ReceiptItemPortion(
-                    id=new_id("rport"),
+                AttachmentItemPortion(
+                    id=new_id("aportion"),
                     item_id=item_id,
                     target=target,
                     participant_id=(
@@ -254,9 +256,9 @@ def make_receipt(
             )
     for participant_id in opt_outs:
         session.add(
-            ReceiptOptOut(
-                id=new_id("ropt"),
-                receipt_id=receipt.id,
+            AttachmentOptOut(
+                id=new_id("aopt"),
+                attachment_id=attachment.id,
                 participant_id=participant_id,
                 created_at=now,
                 updated_at=now,
@@ -264,8 +266,8 @@ def make_receipt(
             )
         )
     if total is None:
-        receipt.total = sum(int(item["amount"]) for item in items)
-        session.add(receipt)
+        attachment.total = sum(int(item["amount"]) for item in items)
+        session.add(attachment)
     session.commit()
-    session.refresh(receipt)
-    return receipt
+    session.refresh(attachment)
+    return attachment

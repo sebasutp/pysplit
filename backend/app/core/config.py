@@ -136,12 +136,10 @@ class Settings(BaseSettings):
     # when the S3_* variables are configured.
     upload_dir: str = "data/uploads"
     max_upload_bytes: int = 10 * 1024 * 1024
-    upload_allowed_types: str = "image/jpeg,image/png,image/webp"
+    upload_allowed_types: str = "image/jpeg,image/png,image/webp,application/pdf"
     upload_rate_limit_per_minute: int = 60
-    enable_receipt_extract: bool = False
-    enable_receipt_items: bool = False
+    enable_receipt_ai: bool = False
     enable_category_extract: bool = False
-    enable_expense_documents: bool = False
 
     # --- S3-compatible document storage ---------------------------------
     # All optional. When the key/secret/bucket/region quartet is present the
@@ -168,6 +166,12 @@ class Settings(BaseSettings):
     openai_model_category_extract: str | None = None
     ai_timeout_seconds: float = 60.0
     ai_rate_limit_per_minute: int = 20
+    # Local-only deterministic fixture mode. Never allowed in production.
+    ai_mock: bool = False
+    ai_mock_delay_ms: int = 0
+    # ``auto`` retries with JSON-object mode when a provider rejects strict
+    # JSON-schema response_format.
+    ai_response_format: Literal["auto", "json_schema", "json_object"] = "auto"
 
     # --- Receipt item limits --------------------------------------------
     # Mirror the reference server-side caps. The item amount matches the
@@ -327,6 +331,13 @@ class Settings(BaseSettings):
             raise ValueError("must be positive")
         return value
 
+    @field_validator("ai_mock_delay_ms")
+    @classmethod
+    def _non_negative_mock_delay(cls, value: int) -> int:
+        if value < 0:
+            raise ValueError("must not be negative")
+        return value
+
     @field_validator(
         "s3_upload_key",
         "s3_upload_secret",
@@ -378,6 +389,8 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _require_production_secret(self) -> Settings:
         if self.environment.lower() == "production":
+            if self.ai_mock:
+                raise ValueError("AI_MOCK must not be enabled in production")
             if not self.jwt_secret or self.jwt_secret == DEVELOPMENT_JWT_SECRET:
                 raise ValueError("JWT_SECRET must be set to a unique value in production")
             if len(self.jwt_secret) < 32:
@@ -438,8 +451,8 @@ class Settings(BaseSettings):
         ]
 
     @property
-    def receipt_extract_enabled(self) -> bool:
-        return self.enable_receipt_extract or self.enable_receipt_items
+    def receipt_ai_enabled(self) -> bool:
+        return self.enable_receipt_ai
 
     @property
     def ai_api_key_resolved(self) -> str | None:

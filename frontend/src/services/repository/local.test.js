@@ -89,26 +89,30 @@ async function reset() {
     expense_id: 'e1',
     data: null,
   })
-  await db.receipts.put({
+  await db.attachments.put({
     id: 'r1',
     group_id: 'g1',
-    image_url: '/uploads/receipt.jpg',
-    image_width: 100,
-    image_height: 200,
-    status: 'EXTRACTED',
+    expense_id: 'e1',
+    url: '/uploads/receipt.jpg',
+    thumbnail_url: '/uploads/receipt.jpg',
+    filename: 'receipt.jpg',
+    content_type: 'image/jpeg',
+    byte_size: 4,
+    width: 100,
+    height: 200,
+    receipt_status: 'EXTRACTED',
     merchant: null,
     receipt_date: null,
     currency_code: 'USD',
     total: 1000,
-    expense_id: null,
     created_at: '2026-01-02T10:00:00.000Z',
     updated_at: '2026-01-02T10:00:00.000Z',
     version: 1,
     deleted_at: null,
   })
-  await db.receiptItems.put({
+  await db.attachmentItems.put({
     id: 'i1',
-    receipt_id: 'r1',
+    attachment_id: 'r1',
     name: 'Pizza',
     quantity_milli: 1000,
     unit_price: 1000,
@@ -165,7 +169,7 @@ describe('local repository', () => {
     const activities = await localRepository.activities.list('g1', { limit: 5 })
     expect(activities.items[0].expense).toMatchObject({ title: 'Dinner', amount: 9000 })
 
-    const receipt = await localRepository.receipts.get('g1', { receipt_id: 'r1' })
+    const receipt = await localRepository.attachments.get('g1', { attachment_id: 'r1' })
     expect(receipt.items).toHaveLength(1)
     expect(receipt.split.items_total).toBe(1000)
     expect(receipt.split.participants.map((/** @type {any} */ row) => row.total)).toEqual([500, 500])
@@ -608,16 +612,16 @@ describe('local repository', () => {
   })
 
   it('queues an offline receipt item create before its portion edit', async () => {
-    const created = await localRepository.receipts.addItem('g1', 'r1', {
+    const created = await localRepository.attachments.addItem('g1', 'r1', {
       name: 'Fries',
       quantity_milli: 1000,
       amount: 300,
       is_shared: true,
     })
     const item = created.items.find((/** @type {any} */ row) => row.name === 'Fries')
-    expect(item.id).toMatch(/^ri_/)
+    expect(item.id).toMatch(/^ai_/)
 
-    const updated = await localRepository.receipts.setPortions('g1', 'r1', item.id, [
+    const updated = await localRepository.attachments.setPortions('g1', 'r1', item.id, [
       { target: 'PARTICIPANT', participant_id: 'a', quantity_milli: 1000 },
     ])
     const stored = updated.items.find((/** @type {any} */ row) => row.id === item.id)
@@ -625,8 +629,8 @@ describe('local repository', () => {
 
     const outbox = await db.outbox.orderBy('seq').toArray()
     expect(outbox.map((row) => [row.entity_type, row.op_type])).toEqual([
-      ['receipt_item', 'create'],
-      ['receipt_portion', 'update'],
+      ['attachment_item', 'create'],
+      ['attachment_portion', 'update'],
     ])
     expect(outbox[0].payload.id).toBe(item.id)
     expect(outbox[1].entity_id).toBe(item.id)
@@ -634,7 +638,7 @@ describe('local repository', () => {
 
   it('rejects online-only operations while offline', async () => {
     await expect(
-      localRepository.receipts.extractTotal('g1', { image_url: '/uploads/x.jpg' }),
+      localRepository.attachments.extractTotal('g1', 'r1'),
     ).rejects.toMatchObject({ code: 'offline_unsupported' })
     await expect(localRepository.admin.metrics()).rejects.toMatchObject({
       code: 'offline_unsupported',

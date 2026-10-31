@@ -1,9 +1,9 @@
-/** Optional "create expense from receipt" upload used by the expense form. */
+/** Upload a receipt, extract its total and hand the result to the form. */
 
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { compressImage, imageDimensions } from '../../utils/compress-image'
+import { prepareUpload } from '../../utils/attachments'
 import { useOnlineStatus } from '../../hooks/useOnlineStatus'
 import { repository } from '../../services/repository'
 import { Button } from '../ui/Button'
@@ -12,11 +12,19 @@ import { Alert, AlertDescription } from '../ui/Feedback'
 /**
  * @param {{
  *   groupId: string,
+ *   expenseId?: string|null,
  *   features: any,
+ *   onUploaded?: (attachment: any) => void,
  *   onExtracted: (result: any) => void,
  * }} props
  */
-export function ReceiptScanButton({ groupId, features, onExtracted }) {
+export function ReceiptScanButton({
+  groupId,
+  expenseId = null,
+  features,
+  onUploaded,
+  onExtracted,
+}) {
   const { t } = useTranslation()
   const online = useOnlineStatus()
   const input = useRef(/** @type {HTMLInputElement|null} */ (null))
@@ -24,7 +32,7 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
 
-  if (!features?.receipt_extract) return null
+  if (!features?.receipt_ai) return null
 
   /** @param {React.ChangeEvent<HTMLInputElement>} event */
   async function handleFile(event) {
@@ -34,12 +42,21 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
     setError('')
     setNotice('')
     try {
-      const compressed = await compressImage(file)
-      const size = await imageDimensions(compressed)
-      const image = await repository.receipts.upload(groupId, compressed, size)
-      const result = await repository.receipts.extractTotal(groupId, {
-        image_url: image.url,
+      const prepared = await prepareUpload(file)
+      const attachment = await repository.attachments.upload(groupId, prepared.file, {
+        expense_id: expenseId || undefined,
+        width: prepared.width,
+        height: prepared.height,
       })
+      onUploaded?.(attachment)
+      // Online scans return the line items immediately so the form can show
+      // them before the expense is saved. Offline scans keep the cheaper
+      // total-only queue that the sync engine can replay after reconnecting.
+      const result = online
+        ? await repository.attachments.extractItems(groupId, attachment.id, {
+            expense_id: expenseId || undefined,
+          })
+        : await repository.attachments.extractTotal(groupId, attachment.id)
       if (result.pending) {
         setNotice(
           t(
@@ -48,13 +65,13 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
           ),
         )
       } else {
-        onExtracted(result)
+        onExtracted({ ...result, attachment })
       }
     } catch (caught) {
       setError(
         caught && typeof caught === 'object' && 'detail' in caught
           ? String(caught.detail)
-          : t('CreateFromReceipt.ErrorToast.title', 'Error while uploading document'),
+          : t('CreateFromReceipt.ErrorToast.title', 'Error while uploading receipt'),
       )
     } finally {
       setPending(false)
@@ -64,7 +81,13 @@ export function ReceiptScanButton({ groupId, features, onExtracted }) {
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <input ref={input} type="file" accept="image/*" hidden onChange={handleFile} />
+      <input
+        ref={input}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={handleFile}
+      />
       <Button
         variant="outline"
         size="sm"

@@ -15,9 +15,9 @@ application shell boots from the service worker.
 > change rows. REST mutations still do not; the outbox therefore uses
 > `/sync/push` for all synchronizable writes. Receipt item edits use a REST
 > transport in the outbox and are refreshed by bootstrap rather than appearing
-> in another device's change feed. Receipt image/document uploads are stored as
-> blobs in Dexie and uploaded after reconnect; receipt extraction runs then.
-> Receipt apply/link and category inference remain online-only. Stage 11 adds
+> in another device's change feed. Attachment uploads are stored as blobs in
+> Dexie and uploaded after reconnect; receipt extraction runs then. Attachment
+> apply/link and category inference remain online-only. Stage 11 adds
 > authenticated group claiming: a guest cache is converted into account
 > memberships in place, and the claim is durably queued if synchronization is
 > unavailable. See §2.1, §3 and §5.
@@ -34,10 +34,10 @@ application shell boots from the service worker.
 | CSV/JSON export | Yes | Yes, from local data | — |
 | Star/archive and active-user preferences | Yes | Yes | Yes |
 | Group access recording | Yes | Best effort | No; skipped offline |
-| Receipt item/portion/opt-out edits on cached receipts | Yes | Yes | Yes |
+| Attachment item/portion/opt-out edits on cached receipts | Yes | Yes | Yes |
 | Receipt total/item extraction (AI) | Yes | No | Yes; image upload queues, extraction runs after reconnect |
 | Category inference (AI) | Yes | No | No |
-| Expense document upload/removal | Yes | Yes, placeholder shown | Yes; blobs upload after reconnect |
+| Attachment upload/removal (images and PDFs) | Yes | Yes, placeholder shown | Yes; blobs upload after reconnect |
 | Admin operations | Yes | No | No |
 | Live currency-rate lookup | Yes | Last cached rate or manual override | — |
 | Authentication refresh | Yes | Deferred | Retried on reconnect |
@@ -96,12 +96,12 @@ scan is waiting.
 
 ## 3. AI and uploads offline
 
-Image attachments are durable offline writes. `receipts.upload` and
-`documents.upload` read the file bytes **before** opening the Dexie transaction,
+Attachments are durable offline writes. `attachments.upload` reads the file
+bytes **before** opening the Dexie transaction,
 then store the blob and append the queued operation inside it. Reading a
 `File` inside the transaction would let it expire in a real browser
 (`PrematureCommitError`) and leave partial rows behind, so the transaction only
-contains Dexie work. The UI immediately shows a local receipt/document
+contains Dexie work. The UI immediately shows a local attachment
 placeholder with a pending marker. When the browser reconnects the sync engine
 uploads the blob, runs the requested total or line-item extraction, replaces
 the placeholder with the canonical server rows and removes the local blob.
@@ -109,7 +109,7 @@ Retries keep the uploaded image URL so a lost extraction response does not
 upload a second copy.
 
 Line-item scans send the known `expense_id` with `extract-items`, so the server
-stores the link before the post-sync bootstrap replaces the local receipt.
+stores the link before the post-sync bootstrap replaces the local attachment.
 Total-only scans have no expense to link; their result is kept as pending
 metadata and offered on the next new expense form ("Use scanned total"), where
 applying or dismissing it consumes the entry.
@@ -175,7 +175,7 @@ A single global banner reports:
 - **conflict** (opens the conflict dialog).
 
 Pending markers appear on expenses, changed participants, pending receipt
-scans and queued document uploads. The storage panel includes the same backup
+scans and queued attachment uploads. The storage panel includes the same backup
 controls as before, so a low-quota warning is actionable. The user can trigger a
 manual sync at any time; startup, `online`, visibility, mutation and manual
 retry are the reliable triggers. Background Sync is not required and is not

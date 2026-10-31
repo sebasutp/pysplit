@@ -6,6 +6,7 @@ only. Business logic lives in ``services`` and HTTP handlers live in ``api``.
 
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -15,6 +16,7 @@ from fastapi.responses import JSONResponse
 from app.api import (
     activities,
     admin,
+    attachments,
     auth,
     balances,
     categories,
@@ -22,7 +24,6 @@ from app.api import (
     features,
     groups,
     health,
-    receipts,
     stats,
     sync,
 )
@@ -47,6 +48,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings)
     init_sentry(settings)
+    if settings.ai_mock:
+        logging.getLogger(__name__).warning(
+            "AI_MOCK is enabled; receipt extraction uses local fixtures and makes no provider calls"
+        )
 
     api_prefix = settings.api_prefix.rstrip("/")
     app = FastAPI(
@@ -89,8 +94,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(stats.router, prefix=settings.api_prefix)
     app.include_router(activities.router, prefix=settings.api_prefix)
     app.include_router(expenses.router, prefix=settings.api_prefix)
-    app.include_router(receipts.router, prefix=settings.api_prefix)
-    app.include_router(receipts.ai_router, prefix=settings.api_prefix)
+    app.include_router(attachments.router, prefix=settings.api_prefix)
+    app.include_router(attachments.ai_router, prefix=settings.api_prefix)
     app.include_router(sync.router, prefix=settings.api_prefix)
 
     return app

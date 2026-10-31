@@ -771,12 +771,17 @@ function normalizePaidFor(rows, splitMode, amount) {
 }
 
 /**
- * @param {any} receipt
+ * Assemble one attachment's receipt state from local rows.
+ *
+ * @param {any} attachment
  * @param {any[]} participants
  * @returns {Promise<any>}
  */
-async function receiptState(receipt, participants) {
-  const items = await db.receiptItems.where('receipt_id').equals(receipt.id).toArray()
+async function attachmentState(attachment, participants) {
+  const items = await db.attachmentItems
+    .where('attachment_id')
+    .equals(attachment.id)
+    .toArray()
   const visibleItems = items.filter((item) => !item.deleted_at).sort((first, second) => {
     if (Number(first.position) !== Number(second.position)) {
       return Number(first.position) - Number(second.position)
@@ -785,7 +790,7 @@ async function receiptState(receipt, participants) {
   })
   const ids = visibleItems.map((item) => item.id)
   const portions = ids.length
-    ? await db.receiptPortions.where('item_id').anyOf(ids).toArray()
+    ? await db.attachmentPortions.where('item_id').anyOf(ids).toArray()
     : []
   const portionsByItem = new Map()
   for (const portion of portions) {
@@ -794,7 +799,10 @@ async function receiptState(receipt, participants) {
     list.push(portion)
     portionsByItem.set(portion.item_id, list)
   }
-  const optOuts = await db.receiptOptOuts.where('receipt_id').equals(receipt.id).toArray()
+  const optOuts = await db.attachmentOptOuts
+    .where('attachment_id')
+    .equals(attachment.id)
+    .toArray()
   const optedOutIds = optOuts
     .filter((row) => !row.deleted_at)
     .map((row) => row.participant_id)
@@ -829,7 +837,7 @@ async function receiptState(receipt, participants) {
     .filter((item) => item.is_adjustment)
     .reduce((sum, item) => sum + Number(item.amount), 0)
   return {
-    receipt,
+    attachment,
     items: itemsWithPortions,
     opt_outs: optedOutIds,
     split: {
@@ -2105,29 +2113,15 @@ const activities = {
   },
 }
 
-/**
- * Find the queued upload behind a local receipt URL.
- *
- * @param {string} groupId
- * @param {string} imageUrl
- */
-async function queuedReceiptUpload(groupId, imageUrl) {
-  if (!String(imageUrl).startsWith('local-receipt://')) return null
-  const id = String(imageUrl).slice('local-receipt://'.length)
-  const row = await db.outbox.where('entity_id').equals(id).first()
-  if (!row || row.entity_type !== 'receipt_upload' || row.group_id !== groupId) return null
+/** Find the queued upload behind a local attachment id. */
+async function queuedAttachmentUpload(groupId, attachmentId) {
+  const row = await db.outbox.where('entity_id').equals(attachmentId).first()
+  if (!row || row.entity_type !== 'attachment_upload' || row.group_id !== groupId) return null
   return row
 }
 
-/**
- * Persist the extraction mode on the queued upload so the sync engine knows
- * whether to run total or line-item extraction after reconnect.
- *
- * @param {any} row
- * @param {'total'|'items'} mode
- * @param {Record<string, unknown>} [patch]
- */
-async function markReceiptUploadMode(row, mode, patch = {}) {
+/** Persist the extraction mode on a queued upload. */
+async function markAttachmentUploadMode(row, mode, patch = {}) {
   const current = await db.outbox.get(row.seq)
   if (!current || current.status === 'failed') return
   await db.outbox.put({
@@ -2138,31 +2132,41 @@ async function markReceiptUploadMode(row, mode, patch = {}) {
   scheduleSync()
 }
 
-/**
- * Create the local placeholder receipt shown while its image waits offline.
- *
- * @param {string} groupId
- * @param {any} operation
- * @param {any} input
- */
-async function ensurePendingReceipt(groupId, operation, input) {
-  const receiptId = operation.entity_id
-  const existing = await db.receipts.get(receiptId)
-  if (existing) return existing
+/** Create the local placeholder shown while a file waits offline. */
+async function ensurePendingAttachment(groupId, operation, input) {
+  const attachmentId = operation.entity_id
+  const existing = await db.attachments.get(attachmentId)
+  if (existing) {
+    const updated = {
+      ...existing,
+      expense_id: input.expense_id || existing.expense_id || operation.payload?.expense_id || null,
+      receipt_status: existing.receipt_status || 'PENDING',
+      pending_scan: true,
+      updated_at: nowIso(),
+    }
+    await db.attachments.put(updated)
+    return updated
+  }
   const timestamp = nowIso()
-  const receipt = {
-    id: receiptId,
+  const attachment = {
+    id: attachmentId,
     group_id: groupId,
-    image_url: `local-receipt://${receiptId}`,
-    image_width: Number(input.image_width || operation.payload?.width || 1),
-    image_height: Number(input.image_height || operation.payload?.height || 1),
-    status: 'PENDING',
+    expense_id: input.expense_id || operation.payload?.expense_id || null,
+    url: `local-attachment://${attachmentId}`,
+    thumbnail_url: `local-attachment://${attachmentId}`,
+    filename: operation.payload?.filename || 'attachment',
+    content_type: operation.payload?.content_type || 'application/octet-stream',
+    byte_size: 0,
+    width: Number(input.image_width || operation.payload?.width || 1),
+    height: Number(input.image_height || operation.payload?.height || 1),
+    receipt_status: 'PENDING',
     attempts: 0,
     merchant: null,
     receipt_date: null,
     currency_code: null,
     total: null,
-    expense_id: input.expense_id || operation.payload?.expense_id || null,
+    provider: null,
+    model: null,
     created_at: timestamp,
     updated_at: timestamp,
     version: 1,
@@ -2170,217 +2174,291 @@ async function ensurePendingReceipt(groupId, operation, input) {
     pending: true,
     pending_scan: true,
   }
-  await db.receipts.put(receipt)
-  return receipt
+  await db.attachments.put(attachment)
+  return attachment
 }
 
-const receipts = {
+const attachments = {
   async get(groupId, options = {}, _read = {}) {
     return run(async () => {
       checkAbort(_read)
       await requireGroup(groupId)
-      let receipt = null
-      if (options.receipt_id) receipt = await db.receipts.get(options.receipt_id)
+      let attachment = null
+      if (options.attachment_id) attachment = await db.attachments.get(options.attachment_id)
       else if (options.expense_id) {
-        receipt = await db.receipts.where('expense_id').equals(options.expense_id).first()
+        const rows = await db.attachments.where('expense_id').equals(options.expense_id).toArray()
+        attachment =
+          rows
+            .filter((row) => !row.deleted_at && row.receipt_status)
+            .sort((first, second) =>
+              String(first.created_at || '') < String(second.created_at || '') ? -1 : 1,
+            )[0] || null
       }
-      if (!receipt || receipt.group_id !== groupId || receipt.deleted_at) return null
+      // A full snapshot may have removed this row just before the caller read
+      // it (or a local-only row was replaced by its server copy). Refresh once
+      // before reporting a missing attachment.
+      if (
+        options.attachment_id &&
+        (!attachment || attachment.group_id !== groupId || attachment.deleted_at) &&
+        isOnline()
+      ) {
+        await bootstrapGroup(groupId, { updateCursor: false }).catch(() => {})
+        attachment = await db.attachments.get(options.attachment_id)
+      }
+      if (!attachment || attachment.group_id !== groupId || attachment.deleted_at) return null
       const group = await requireGroup(groupId)
-      return receiptState(receipt, group.participants)
+      return attachmentState(attachment, group.participants)
     })
   },
-  /**
-   * @returns {Promise<any>}
-   */
+
   async upload(groupId, file, options = {}) {
     return run(async () => {
       checkAbort(options)
       await requireGroup(groupId)
-      if (isOnline()) {
-        try {
-          return await onlineRepository.receipts.upload(groupId, file, options)
-        } catch (error) {
-          if (!retryableUploadError(error)) throw error
-          // A lost upload response is safe to retry because uploads are keyed
-          // by the generated receipt id on the client.
-        }
-      }
-      const receiptId = newId('receipt')
       const width = Number(options.width || 1)
       const height = Number(options.height || 1)
-      const url = `local-receipt://${receiptId}`
-      // Read the file before opening the Dexie transaction; an external await
-      // inside it would commit it early in a real browser.
+      const expenseId = options.expense_id || null
+      if (isOnline()) {
+        try {
+          const attachment = await onlineRepository.attachments.upload(groupId, file, {
+            ...options,
+            width,
+            height,
+          })
+          await db.attachments.put({
+            ...attachment,
+            expense_id: expenseId || attachment.expense_id || null,
+            pending: false,
+          })
+          return attachment
+        } catch (error) {
+          if (!retryableUploadError(error)) throw error
+        }
+      }
+
+      const attachmentId = newId('att')
+      const timestamp = nowIso()
+      const attachment = {
+        id: attachmentId,
+        group_id: groupId,
+        expense_id: expenseId,
+        url: `local-attachment://${attachmentId}`,
+        thumbnail_url: `local-attachment://${attachmentId}`,
+        filename: file.name || 'attachment',
+        content_type: file.type || 'application/octet-stream',
+        byte_size: Number(file.size || 0),
+        width,
+        height,
+        receipt_status: null,
+        attempts: 0,
+        merchant: null,
+        receipt_date: null,
+        currency_code: null,
+        total: null,
+        provider: null,
+        model: null,
+        created_at: timestamp,
+        updated_at: timestamp,
+        version: 1,
+        deleted_at: null,
+        pending: true,
+        pending_upload: true,
+      }
       const data = await fileBytes(file)
-      await db.transaction('rw', [db.blobs, db.outbox], async () => {
-        await queueBlob({
-          groupId,
-          kind: 'receipt',
-          entityId: receiptId,
-          expenseId: options.expense_id || null,
-          file,
-          data,
-          width,
-          height,
-          payload: { mode: null },
-        })
+      await db.transaction('rw', [db.attachments, db.blobs, db.outbox], async () => {
+        await db.attachments.put(attachment)
+        await queueBlob({ groupId, entityId: attachmentId, expenseId, file, data, width, height })
       })
       scheduleSync()
-      return { url, width, height, pending: true, upload_id: receiptId, receipt_id: receiptId }
+      return attachment
     })
   },
-  /**
-   * A total-only receipt scanned while offline is extracted after reconnect,
-   * when its original form may be gone. The result is kept here until the user
-   * chooses to apply it to a new expense.
-   *
-   * @param {string} groupId
-   * @returns {Promise<any|null>}
-   */
+
   async pendingTotal(groupId) {
     return run(async () => {
       const value = await getMetadata(`pending_receipt_total:${groupId}`, null)
       return value && typeof value === 'object' ? value : null
     })
   },
-  /**
-   * Consume the pending total so the same scan is not offered twice.
-   *
-   * @param {string} groupId
-   * @returns {Promise<void>}
-   */
+
   async clearPendingTotal(groupId) {
     await run(async () => {
       await db.metadata.delete(`pending_receipt_total:${groupId}`)
     })
   },
-  async extractTotal(groupId, input, options = {}) {
+
+  async extractTotal(groupId, attachmentId, options = {}) {
     return run(async () => {
       checkAbort(options)
-      const queued = await queuedReceiptUpload(groupId, input.image_url)
+      const queued = await queuedAttachmentUpload(groupId, attachmentId)
       if (queued) {
-        await markReceiptUploadMode(queued, 'total')
-        return {
-          amount: null,
-          category_id: null,
-          date: null,
-          title: null,
-          pending: true,
-        }
+        await markAttachmentUploadMode(queued, 'total')
+        return { amount: null, category_id: null, date: null, title: null, pending: true }
       }
       if (!isOnline()) {
         throw new RepositoryError('Receipt extraction is available when online', {
           code: 'offline_unsupported',
         })
       }
-      const result = await onlineRepository.receipts.extractTotal(groupId, input, options)
-      await refreshReceiptFromServer(groupId, result)
-      return result
+      return onlineRepository.attachments.extractTotal(groupId, attachmentId, options)
     })
   },
-  async extractItems(groupId, input, options = {}) {
+
+  async extractItems(groupId, attachmentId, input = {}, options = {}) {
     return run(async () => {
       checkAbort(options)
-      const queued = await queuedReceiptUpload(groupId, input.image_url)
+      const queued = await queuedAttachmentUpload(groupId, attachmentId)
       if (queued) {
         const group = await requireGroup(groupId)
-        const receipt = await ensurePendingReceipt(groupId, queued, input)
-        await markReceiptUploadMode(
+        const attachment = await ensurePendingAttachment(groupId, queued, input)
+        await markAttachmentUploadMode(
           queued,
           'items',
           input.expense_id ? { expense_id: input.expense_id } : {},
         )
-        return receiptState(receipt, group.participants)
+        return attachmentState(attachment, group.participants)
       }
       if (!isOnline()) {
         throw new RepositoryError('Receipt extraction is available when online', {
           code: 'offline_unsupported',
         })
       }
-      const result = await onlineRepository.receipts.extractItems(groupId, input, options)
-      await refreshReceiptFromServer(groupId, result)
+      const result = await onlineRepository.attachments.extractItems(
+        groupId,
+        attachmentId,
+        input,
+        options,
+      )
+      // The extraction response already contains the attachment and its items.
+      // Avoid a full group bootstrap here: it is unnecessary and a slower
+      // snapshot could race with the just-stored receipt rows.
+      await refreshAttachmentFromServer(groupId, result, { refreshGroup: false })
       return result
     })
   },
-  async addItem(groupId, receiptId, input, options = {}) {
-    return mutateReceipt(groupId, receiptId, 'receipt_item', 'create', input, options)
+
+  async addItem(groupId, attachmentId, input, options = {}) {
+    return mutateAttachment(groupId, attachmentId, 'attachment_item', 'create', input, options)
   },
-  async updateItem(groupId, receiptId, itemId, input, options = {}) {
-    return mutateReceipt(groupId, receiptId, 'receipt_item', 'update', input, options, itemId)
+  async updateItem(groupId, attachmentId, itemId, input, options = {}) {
+    return mutateAttachment(groupId, attachmentId, 'attachment_item', 'update', input, options, itemId)
   },
-  async deleteItem(groupId, receiptId, itemId, options = {}) {
-    return mutateReceipt(groupId, receiptId, 'receipt_item', 'delete', {}, options, itemId)
+  async deleteItem(groupId, attachmentId, itemId, options = {}) {
+    return mutateAttachment(groupId, attachmentId, 'attachment_item', 'delete', {}, options, itemId)
   },
-  async setPortions(groupId, receiptId, itemId, portions, options = {}) {
-    return mutateReceipt(
+  async setPortions(groupId, attachmentId, itemId, portions, options = {}) {
+    return mutateAttachment(groupId, attachmentId, 'attachment_portion', 'update', { portions }, options, itemId)
+  },
+  async setOptOut(groupId, attachmentId, participantId, value, options = {}) {
+    return mutateAttachment(
       groupId,
-      receiptId,
-      'receipt_portion',
-      'update',
-      { portions },
-      options,
-      itemId,
-    )
-  },
-  async setOptOut(groupId, receiptId, participantId, value, options = {}) {
-    return mutateReceipt(
-      groupId,
-      receiptId,
-      'receipt_opt_out',
+      attachmentId,
+      'attachment_opt_out',
       value ? 'create' : 'delete',
       { participant_id: participantId, opted_out: value },
       options,
       participantId,
     )
   },
-  async apply(groupId, receiptId, input, options = {}) {
+  async apply(groupId, attachmentId, input, options = {}) {
     return run(async () => {
       if (!isOnline()) {
         throw new RepositoryError('Applying a receipt requires a connection', {
           code: 'offline_unsupported',
         })
       }
-      const result = await onlineRepository.receipts.apply(groupId, receiptId, input, options)
-      await refreshReceiptFromServer(groupId, result)
+      const result = await onlineRepository.attachments.apply(groupId, attachmentId, input, options)
+      await refreshAttachmentFromServer(groupId, result)
       return result
     })
   },
-  async link(groupId, receiptId, expenseId, options = {}) {
+  async link(groupId, attachmentId, expenseId, options = {}) {
     return run(async () => {
       if (!isOnline()) {
-        throw new RepositoryError('Linking a receipt requires a connection', {
+        throw new RepositoryError('Linking an attachment requires a connection', {
           code: 'offline_unsupported',
         })
       }
-      const result = await onlineRepository.receipts.link(groupId, receiptId, expenseId, options)
-      await refreshReceiptFromServer(groupId, result)
+      const result = await onlineRepository.attachments.update(
+        groupId,
+        attachmentId,
+        { expense_id: expenseId },
+        options,
+      )
+      await db.attachments.put({ ...result, pending: false })
       return result
+    })
+  },
+  async update(groupId, attachmentId, input, options = {}) {
+    return run(async () => {
+      checkAbort(options)
+      await requireGroup(groupId)
+      if (input.expense_id !== undefined) {
+        return attachments.link(groupId, attachmentId, input.expense_id, options)
+      }
+      const attachment = await db.attachments.get(attachmentId)
+      if (!attachment || attachment.group_id !== groupId || attachment.deleted_at) {
+        throw new RepositoryError('Attachment not found', { code: 'not_found', status: 404 })
+      }
+      return attachment
+    })
+  },
+  async remove(groupId, attachmentId, options = {}) {
+    await run(async () => {
+      checkAbort(options)
+      await requireGroup(groupId)
+      const upload = await queuedOperation('attachment_upload', attachmentId)
+      if (upload) {
+        await db.transaction('rw', [db.attachments, db.blobs, db.outbox], async () => {
+          await db.attachments.delete(attachmentId)
+          await db.outbox.delete(upload.seq)
+          if (upload.meta?.blob_id) await db.blobs.delete(upload.meta.blob_id)
+        })
+        return
+      }
+      if (isOnline()) {
+        try {
+          await onlineRepository.attachments.remove(groupId, attachmentId, options)
+          await db.attachments.delete(attachmentId)
+          return
+        } catch (error) {
+          if (!retryableUploadError(error)) throw error
+        }
+      }
+      if (await queuedOperation('attachment_remove', attachmentId)) return
+      await db.transaction('rw', [db.attachments, db.outbox], async () => {
+        await db.attachments.delete(attachmentId)
+        await enqueue({
+          op_id: newId('op'),
+          group_id: groupId,
+          entity_type: 'attachment_remove',
+          entity_id: attachmentId,
+          op_type: 'delete',
+          payload: {},
+          transport: 'blob',
+          meta: {},
+        })
+      })
+      scheduleSync()
     })
   },
 }
 
-/**
- * @param {string} groupId
- * @param {any} payload
- */
-async function refreshReceiptFromServer(groupId, payload) {
-  const receipt = payload?.receipt
-  if (receipt?.id) {
-    await db.receipts.put(receipt)
-    const items = payload.items || []
-    for (const item of items) {
-      await db.receiptItems.put(item)
-      await db.receiptPortions.where('item_id').equals(item.id).delete()
-      if (item.portions?.length) {
-        await db.receiptPortions.bulkPut(item.portions)
-      }
+/** Overwrite a local attachment with a server extraction result. */
+async function refreshAttachmentFromServer(groupId, payload, options = {}) {
+  const attachment = payload?.attachment
+  if (attachment?.id) {
+    await db.attachments.put({ ...attachment, pending: false })
+    for (const item of payload.items || []) {
+      await db.attachmentItems.put({ ...item, pending: false })
+      await db.attachmentPortions.where('item_id').equals(item.id).delete()
+      if (item.portions?.length) await db.attachmentPortions.bulkPut(item.portions)
     }
-    const optOuts = payload.opt_outs || []
-    await db.receiptOptOuts.where('receipt_id').equals(receipt.id).delete()
-    for (const participantId of optOuts) {
-      await db.receiptOptOuts.put({
-        id: `${receipt.id}:${participantId}`,
-        receipt_id: receipt.id,
+    await db.attachmentOptOuts.where('attachment_id').equals(attachment.id).delete()
+    for (const participantId of payload.opt_outs || []) {
+      await db.attachmentOptOuts.put({
+        id: `${attachment.id}:${participantId}`,
+        attachment_id: attachment.id,
         participant_id: participantId,
         updated_at: nowIso(),
         version: 1,
@@ -2388,41 +2466,41 @@ async function refreshReceiptFromServer(groupId, payload) {
       })
     }
   }
-  if (groupId) await bootstrapGroup(groupId, { updateCursor: false }).catch(() => {})
+  if (groupId && options.refreshGroup !== false) {
+    await bootstrapGroup(groupId, { updateCursor: false }).catch(() => {})
+  }
 }
 
-/**
- * Apply a receipt item mutation locally and queue a REST transport operation.
- *
- * @param {string} groupId
- * @param {string} receiptId
- * @param {string} entityType
- * @param {'create'|'update'|'delete'} opType
- * @param {any} input
- * @param {any} options
- * @param {string} [entityId]
- */
-async function mutateReceipt(groupId, receiptId, entityType, opType, input, options, entityId) {
+/** Apply an attachment item mutation locally and queue its REST operation. */
+async function mutateAttachment(groupId, attachmentId, entityType, opType, input, options, entityId) {
   return run(async () => {
     checkAbort(options)
     await requireGroup(groupId)
-    const receipt = await db.receipts.get(receiptId)
-    if (!receipt || receipt.group_id !== groupId || receipt.deleted_at) {
-      throw new RepositoryError('Receipt not found', { code: 'not_found', status: 404 })
+    let attachment = await db.attachments.get(attachmentId)
+    if (
+      (!attachment || attachment.group_id !== groupId || attachment.deleted_at) &&
+      isOnline()
+    ) {
+      // The row may be missing because a stale snapshot raced this edit.
+      // Refresh from the server and retry before surfacing a 404 to the user.
+      await bootstrapGroup(groupId, { updateCursor: false }).catch(() => {})
+      attachment = await db.attachments.get(attachmentId)
+    }
+    if (!attachment || attachment.group_id !== groupId || attachment.deleted_at) {
+      throw new RepositoryError('Attachment not found', { code: 'not_found', status: 404 })
     }
     const timestamp = nowIso()
-    let targetId = entityId || newId('ri')
-
+    let targetId = entityId || newId('ai')
     await db.transaction(
       'rw',
-      [db.receiptItems, db.receiptPortions, db.receiptOptOuts, db.outbox],
+      [db.attachmentItems, db.attachmentPortions, db.attachmentOptOuts, db.outbox],
       async () => {
-        if (entityType === 'receipt_item') {
+        if (entityType === 'attachment_item') {
           if (opType === 'create') {
-            const items = await db.receiptItems.where('receipt_id').equals(receiptId).toArray()
-            await db.receiptItems.put({
+            const items = await db.attachmentItems.where('attachment_id').equals(attachmentId).toArray()
+            await db.attachmentItems.put({
               id: targetId,
-              receipt_id: receiptId,
+              attachment_id: attachmentId,
               name: input.name,
               quantity_milli: Number(input.quantity_milli || 1000),
               unit_price: input.unit_price ?? null,
@@ -2437,9 +2515,9 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
               pending: true,
             })
           } else if (opType === 'update') {
-            const item = await db.receiptItems.get(targetId)
+            const item = await db.attachmentItems.get(targetId)
             if (!item) throw new RepositoryError('Item not found', { code: 'not_found', status: 404 })
-            await db.receiptItems.put({
+            await db.attachmentItems.put({
               ...item,
               ...input,
               updated_at: timestamp,
@@ -2447,9 +2525,9 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
               pending: true,
             })
           } else {
-            const item = await db.receiptItems.get(targetId)
+            const item = await db.attachmentItems.get(targetId)
             if (item) {
-              await db.receiptItems.put({
+              await db.attachmentItems.put({
                 ...item,
                 deleted_at: timestamp,
                 updated_at: timestamp,
@@ -2458,12 +2536,12 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
               })
             }
           }
-        } else if (entityType === 'receipt_portion') {
-          const item = await db.receiptItems.get(entityId)
+        } else if (entityType === 'attachment_portion') {
+          const item = await db.attachmentItems.get(entityId)
           if (!item) throw new RepositoryError('Item not found', { code: 'not_found', status: 404 })
-          await db.receiptPortions.where('item_id').equals(entityId).delete()
+          await db.attachmentPortions.where('item_id').equals(entityId).delete()
           const rows = (input.portions || []).map((portion, index) => ({
-            id: newId('rp'),
+            id: newId('ap'),
             item_id: entityId,
             target: portion.target,
             participant_id: portion.participant_id ?? null,
@@ -2474,22 +2552,18 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
             deleted_at: null,
             position: index,
           }))
-          if (rows.length) await db.receiptPortions.bulkPut(rows)
+          if (rows.length) await db.attachmentPortions.bulkPut(rows)
           targetId = entityId
-        } else if (entityType === 'receipt_opt_out') {
-          const existing = await db.receiptOptOuts.get(`${receiptId}:${entityId}`)
+        } else if (entityType === 'attachment_opt_out') {
+          const existing = await db.attachmentOptOuts.get(`${attachmentId}:${entityId}`)
           if (opType === 'delete') {
             if (existing) {
-              await db.receiptOptOuts.put({
-                ...existing,
-                deleted_at: timestamp,
-                updated_at: timestamp,
-              })
+              await db.attachmentOptOuts.put({ ...existing, deleted_at: timestamp, updated_at: timestamp })
             }
           } else {
-            await db.receiptOptOuts.put({
-              id: `${receiptId}:${entityId}`,
-              receipt_id: receiptId,
+            await db.attachmentOptOuts.put({
+              id: `${attachmentId}:${entityId}`,
+              attachment_id: attachmentId,
               participant_id: entityId,
               created_at: existing?.created_at || timestamp,
               updated_at: timestamp,
@@ -2498,7 +2572,6 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
             })
           }
         }
-
         await enqueue({
           op_id: newId('op'),
           group_id: groupId,
@@ -2506,80 +2579,50 @@ async function mutateReceipt(groupId, receiptId, entityType, opType, input, opti
           entity_id: targetId,
           op_type: opType,
           payload:
-            entityType === 'receipt_item' && opType === 'create'
+            entityType === 'attachment_item' && opType === 'create'
               ? { ...input, id: targetId }
               : input,
           transport: 'rest',
-          meta: { receipt_id: receiptId, participant_id: entityId, item_id: entityId },
+          meta: { attachment_id: attachmentId, participant_id: entityId, item_id: entityId },
         })
       },
     )
     await flushGroup(groupId)
     const group = await requireGroup(groupId)
-    const updatedReceipt = await db.receipts.get(receiptId)
-    return receiptState(updatedReceipt, group.participants)
+    return attachmentState(await db.attachments.get(attachmentId), group.participants)
   })
 }
 
-/**
- * File/Blob to ArrayBuffer without relying on FileReader, which is not
- * available in every service-worker-like environment.
- *
- * @param {File|Blob} file
- * @returns {Promise<ArrayBuffer>}
- */
 async function fileBytes(file) {
   if (typeof file.arrayBuffer === 'function') return file.arrayBuffer()
   return new Response(file).arrayBuffer()
 }
 
-/** @param {any} error @returns {boolean} */
 function retryableUploadError(error) {
   const code = error && typeof error === 'object' && 'code' in error ? String(error.code) : 'network'
   return ['network', 'server', 'rate_limited'].includes(code)
 }
 
-/**
- * Put a queued blob and its outbox row inside the caller's transaction.
- *
- * The bytes must already be read: awaiting `File.arrayBuffer()` inside a
- * Dexie transaction lets the transaction expire in real browsers
- * (`PrematureCommitError`). Callers read the data before opening the
- * transaction and pass it here as `data`.
- *
- * @param {{
- *   groupId: string,
- *   kind: 'document'|'receipt',
- *   entityId: string,
- *   expenseId?: string|null,
- *   file: File|Blob,
- *   data: Blob|ArrayBuffer,
- *   width?: number,
- *   height?: number,
- *   payload?: Record<string, unknown>,
- * }} input
- */
 async function queueBlob(input) {
   const blobId = newId('blob')
   const opId = newId('op')
-  const data = input.data
   await db.blobs.put({
     id: blobId,
     group_id: input.groupId,
-    kind: input.kind,
+    kind: 'attachment',
     entity_id: input.entityId,
     expense_id: input.expenseId || null,
-    filename: input.file.name || `${input.kind}.bin`,
+    filename: input.file.name || 'attachment.bin',
     content_type: input.file.type || 'application/octet-stream',
     width: Number(input.width || 1),
     height: Number(input.height || 1),
-    data,
+    data: input.data,
     created_at: nowIso(),
   })
   await enqueue({
     op_id: opId,
     group_id: input.groupId,
-    entity_type: input.kind === 'document' ? 'document_upload' : 'receipt_upload',
+    entity_type: 'attachment_upload',
     entity_id: input.entityId,
     op_type: 'create',
     payload: {
@@ -2596,121 +2639,12 @@ async function queueBlob(input) {
   return { blobId, opId }
 }
 
-/** @param {string} entityType @param {string} entityId */
 async function queuedOperation(entityType, entityId) {
   return db.outbox
     .where('entity_id')
     .equals(entityId)
     .filter((row) => row.entity_type === entityType)
     .first()
-}
-
-const documents = {
-  async upload(groupId, expenseId, file, options = {}) {
-    return run(async () => {
-      checkAbort(options)
-      await requireGroup(groupId)
-      const width = Number(options.width || 1)
-      const height = Number(options.height || 1)
-      if (isOnline()) {
-        try {
-          const document = await onlineRepository.documents.upload(groupId, expenseId, file, {
-            ...options,
-            width,
-            height,
-          })
-          await db.documents.put({
-            ...document,
-            expense_id: expenseId,
-            created_at: nowIso(),
-            pending: false,
-          })
-          return document
-        } catch (error) {
-          if (!retryableUploadError(error)) throw error
-          // A transport failure falls through to the durable queue.
-        }
-      }
-
-      const documentId = newId('doc')
-      const timestamp = nowIso()
-      const document = {
-        id: documentId,
-        url: `/local-uploads/${documentId}`,
-        width,
-        height,
-        expense_id: expenseId,
-        created_at: timestamp,
-        updated_at: timestamp,
-        version: 1,
-        deleted_at: null,
-        pending: true,
-        pending_upload: true,
-      }
-      // Read the file before opening the Dexie transaction; an external await
-      // inside it would commit it early in a real browser.
-      const data = await fileBytes(file)
-      await db.transaction('rw', [db.documents, db.blobs, db.outbox], async () => {
-        await db.documents.put(document)
-        await queueBlob({
-          groupId,
-          kind: 'document',
-          entityId: documentId,
-          expenseId,
-          file,
-          data,
-          width,
-          height,
-        })
-      })
-      scheduleSync()
-      return document
-    })
-  },
-  async remove(groupId, expenseId, documentId, options = {}) {
-    await run(async () => {
-      checkAbort(options)
-      await requireGroup(groupId)
-      const upload = await queuedOperation('document_upload', documentId)
-      if (upload) {
-        // The bytes never reached the server, so drop the placeholder and its
-        // blob instead of queueing a delete for a document that does not exist.
-        await db.transaction('rw', [db.documents, db.blobs, db.outbox], async () => {
-          await db.documents.delete(documentId)
-          await db.outbox.delete(upload.seq)
-          const blobId = upload.meta?.blob_id
-          if (blobId) await db.blobs.delete(blobId)
-        })
-        return
-      }
-
-      if (isOnline()) {
-        try {
-          await onlineRepository.documents.remove(groupId, expenseId, documentId, options)
-          await db.documents.delete(documentId)
-          return
-        } catch (error) {
-          if (!retryableUploadError(error)) throw error
-        }
-      }
-
-      if (await queuedOperation('document_remove', documentId)) return
-      await db.transaction('rw', [db.documents, db.outbox], async () => {
-        await db.documents.delete(documentId)
-        await enqueue({
-          op_id: newId('op'),
-          group_id: groupId,
-          entity_type: 'document_remove',
-          entity_id: documentId,
-          op_type: 'delete',
-          payload: { expense_id: expenseId },
-          transport: 'blob',
-          meta: { expense_id: expenseId },
-        })
-      })
-      scheduleSync()
-    })
-  },
 }
 
 const exportsRepository = {
@@ -2959,10 +2893,8 @@ const features = {
       }
       return (
         (await getMetadata('features', null)) || {
-          receipt_extract: false,
-          receipt_items: false,
-          category_extract: false,
-          expense_documents: false,
+          receipt_ai: false,
+          category_ai: false,
         }
       )
     })
@@ -3036,8 +2968,7 @@ export const localRepository = {
   balances,
   stats,
   activities,
-  receipts,
-  documents,
+  attachments,
   exports: exportsRepository,
   features,
   admin,

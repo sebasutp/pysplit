@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { repository } from '../../services/repository'
 import { CURRENCY_SYMBOLS } from '../../utils/currency'
-import { saveRecentGroup, setActiveUser } from '../../utils/recent-groups'
+import { saveRecentGroup } from '../../utils/recent-groups'
 import { ErrorState } from '../common/States'
 import { Button } from '../ui/Button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/Card'
@@ -395,10 +395,6 @@ export function CreateGroup({ defaultCurrencyCode = 'USD' }) {
           })),
         })
         saveRecentGroup({ id: group.id, name: group.name })
-        // A freshly created group has no active participant yet. Record that
-        // answer explicitly so the "Who are you?" dialog does not open on the
-        // new group (the reference stores `None` after creation too).
-        setActiveUser(group.id, null)
         navigate(`/groups/${group.id}`)
       }}
     />

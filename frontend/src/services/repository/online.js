@@ -493,21 +493,19 @@ const activities = {
   },
 }
 
-const receipts = {
+const attachments = {
   /**
    * @param {string} groupId
-   * @param {{receipt_id?: string, expense_id?: string}} [options]
+   * @param {{attachment_id?: string, expense_id?: string}} [options]
    * @param {ReadOptions} [read]
    * @returns {Promise<any | null>}
    */
   async get(groupId, options = {}, read = {}) {
     return run(async () => {
-      const path = options.receipt_id
-        ? `${groupPath(groupId)}/receipts/${encodeURIComponent(options.receipt_id)}`
-        : options.expense_id
-          ? `${groupPath(groupId)}/expenses/${encodeURIComponent(options.expense_id)}/receipt`
-          : null
-      if (!path) return null
+      if (!options.attachment_id) return null
+      const path = `${groupPath(groupId)}/attachments/${encodeURIComponent(
+        options.attachment_id,
+      )}/receipt`
       try {
         return await api.get(path, { signal: read.signal })
       } catch (error) {
@@ -524,12 +522,12 @@ const receipts = {
     })
   },
   /**
-   * Upload a receipt image (online only in M1).
+   * Upload one attachment (image or PDF).
    *
    * @param {string} groupId
    * @param {File|Blob} file
-   * @param {{signal?: AbortSignal, width?: number, height?: number}} [options]
-   * @returns {Promise<{url: string, width: number, height: number}>}
+   * @param {{signal?: AbortSignal, width?: number, height?: number, expense_id?: string}} [options]
+   * @returns {Promise<any>}
    */
   async upload(groupId, file, options = {}) {
     return run(async () => {
@@ -537,48 +535,74 @@ const receipts = {
       form.append('file', file)
       form.append('width', String(options.width || 1))
       form.append('height', String(options.height || 1))
-      return /** @type {{url: string, width: number, height: number}} */ (
-        await api.post(`${groupPath(groupId)}/receipts/upload`, {
-          body: form,
-          signal: options.signal,
-        })
-      )
+      if (options.expense_id) form.append('expense_id', options.expense_id)
+      return api.post(`${groupPath(groupId)}/attachments`, {
+        body: form,
+        signal: options.signal,
+      })
     })
   },
   /**
    * @param {string} groupId
-   * @param {{image_url: string}} input
+   * @param {string} attachmentId
+   * @param {{expense_id: string|null}} input
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async extractTotal(groupId, input, options = {}) {
+  async update(groupId, attachmentId, input, options = {}) {
     return run(async () =>
-      api.post(`${groupPath(groupId)}/receipts/extract-total`, {
-        body: input,
+      api.patch(
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(attachmentId)}`,
+        { body: { expense_id: input.expense_id ?? null }, signal: options.signal },
+      ),
+    )
+  },
+  /**
+   * @param {string} groupId
+   * @param {string} attachmentId
+   * @param {ReadOptions} [options]
+   * @returns {Promise<void>}
+   */
+  async remove(groupId, attachmentId, options = {}) {
+    await run(async () =>
+      api.delete(`${groupPath(groupId)}/attachments/${encodeURIComponent(attachmentId)}`, {
         signal: options.signal,
       }),
     )
   },
   /**
    * @param {string} groupId
-   * @param {any} input
+   * @param {string} attachmentId
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async extractItems(groupId, input, options = {}) {
+  async extractTotal(groupId, attachmentId, options = {}) {
     return run(async () =>
-      api.post(`${groupPath(groupId)}/receipts/extract-items`, {
-        body: input,
-        signal: options.signal,
-      }),
+      api.post(
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(attachmentId)}/extract-total`,
+        { signal: options.signal },
+      ),
     )
   },
   /**
-   * A queued total-only extraction is local state; the online repository has
-   * no equivalent to read or clear.
-   *
-   * @returns {Promise<null>}
+   * @param {string} groupId
+   * @param {string} attachmentId
+   * @param {{expense_id?: string}} [input]
+   * @param {ReadOptions} [options]
+   * @returns {Promise<any>}
    */
+  async extractItems(groupId, attachmentId, input = {}, options = {}) {
+    return run(async () =>
+      api.post(
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(attachmentId)}/extract-items`,
+        {
+          body: input.expense_id ? { expense_id: input.expense_id } : {},
+          signal: options.signal,
+        },
+      ),
+    )
+  },
+  /** @returns {Promise<null>} */
   async pendingTotal() {
     return null
   },
@@ -586,146 +610,102 @@ const receipts = {
   async clearPendingTotal() {},
   /**
    * @param {string} groupId
-   * @param {string} receiptId
+   * @param {string} attachmentId
    * @param {any} input
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async addItem(groupId, receiptId, input, options = {}) {
+  async addItem(groupId, attachmentId, input, options = {}) {
     return run(async () =>
-      api.post(`${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/items`, {
-        body: input,
-        signal: options.signal,
-      }),
-    )
-  },
-  /**
-   * @param {string} groupId
-   * @param {string} receiptId
-   * @param {string} itemId
-   * @param {any} input
-   * @param {ReadOptions} [options]
-   * @returns {Promise<any>}
-   */
-  async updateItem(groupId, receiptId, itemId, input, options = {}) {
-    return run(async () =>
-      api.patch(
-        `${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/items/${encodeURIComponent(itemId)}`,
+      api.post(
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(attachmentId)}/items`,
         { body: input, signal: options.signal },
       ),
     )
   },
   /**
    * @param {string} groupId
-   * @param {string} receiptId
+   * @param {string} attachmentId
+   * @param {string} itemId
+   * @param {any} input
+   * @param {ReadOptions} [options]
+   * @returns {Promise<any>}
+   */
+  async updateItem(groupId, attachmentId, itemId, input, options = {}) {
+    return run(async () =>
+      api.patch(
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(
+          attachmentId,
+        )}/items/${encodeURIComponent(itemId)}`,
+        { body: input, signal: options.signal },
+      ),
+    )
+  },
+  /**
+   * @param {string} groupId
+   * @param {string} attachmentId
    * @param {string} itemId
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async deleteItem(groupId, receiptId, itemId, options = {}) {
+  async deleteItem(groupId, attachmentId, itemId, options = {}) {
     return run(async () =>
       api.delete(
-        `${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/items/${encodeURIComponent(itemId)}`,
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(
+          attachmentId,
+        )}/items/${encodeURIComponent(itemId)}`,
         { signal: options.signal },
       ),
     )
   },
   /**
    * @param {string} groupId
-   * @param {string} receiptId
+   * @param {string} attachmentId
    * @param {string} itemId
    * @param {any[]} portions
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async setPortions(groupId, receiptId, itemId, portions, options = {}) {
+  async setPortions(groupId, attachmentId, itemId, portions, options = {}) {
     return run(async () =>
       api.put(
-        `${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/items/${encodeURIComponent(itemId)}/portions`,
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(
+          attachmentId,
+        )}/items/${encodeURIComponent(itemId)}/portions`,
         { body: { portions }, signal: options.signal },
       ),
     )
   },
   /**
    * @param {string} groupId
-   * @param {string} receiptId
+   * @param {string} attachmentId
    * @param {string} participantId
    * @param {boolean} value
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async setOptOut(groupId, receiptId, participantId, value, options = {}) {
+  async setOptOut(groupId, attachmentId, participantId, value, options = {}) {
     return run(async () =>
       api.put(
-        `${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/opt-outs/${encodeURIComponent(participantId)}`,
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(
+          attachmentId,
+        )}/opt-outs/${encodeURIComponent(participantId)}`,
         { body: { opted_out: value }, signal: options.signal },
       ),
     )
   },
   /**
    * @param {string} groupId
-   * @param {string} receiptId
+   * @param {string} attachmentId
    * @param {{expense_id: string, participant_id?: string}} input
    * @param {ReadOptions} [options]
    * @returns {Promise<any>}
    */
-  async apply(groupId, receiptId, input, options = {}) {
+  async apply(groupId, attachmentId, input, options = {}) {
     return run(async () =>
-      api.post(`${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/apply`, {
-        body: input,
-        signal: options.signal,
-      }),
-    )
-  },
-  /**
-   * @param {string} groupId
-   * @param {string} receiptId
-   * @param {string} expenseId
-   * @param {ReadOptions} [options]
-   * @returns {Promise<any>}
-   */
-  async link(groupId, receiptId, expenseId, options = {}) {
-    return run(async () =>
-      api.post(`${groupPath(groupId)}/receipts/${encodeURIComponent(receiptId)}/link`, {
-        body: { expense_id: expenseId },
-        signal: options.signal,
-      }),
-    )
-  },
-}
-
-const documents = {
-  /**
-   * @param {string} groupId
-   * @param {string} expenseId
-   * @param {File|Blob} file
-   * @param {{signal?: AbortSignal, width?: number, height?: number}} [options]
-   * @returns {Promise<any>}
-   */
-  async upload(groupId, expenseId, file, options = {}) {
-    return run(async () => {
-      const form = new FormData()
-      form.append('file', file)
-      form.append('width', String(options.width || 1))
-      form.append('height', String(options.height || 1))
-      return api.post(
-        `${groupPath(groupId)}/expenses/${encodeURIComponent(expenseId)}/documents`,
-        { body: form, signal: options.signal },
-      )
-    })
-  },
-  /**
-   * @param {string} groupId
-   * @param {string} expenseId
-   * @param {string} documentId
-   * @param {ReadOptions} [options]
-   * @returns {Promise<void>}
-   */
-  async remove(groupId, expenseId, documentId, options = {}) {
-    await run(async () =>
-      api.delete(
-        `${groupPath(groupId)}/expenses/${encodeURIComponent(expenseId)}/documents/${encodeURIComponent(documentId)}`,
-        { signal: options.signal },
+      api.post(
+        `${groupPath(groupId)}/attachments/${encodeURIComponent(attachmentId)}/apply`,
+        { body: input, signal: options.signal },
       ),
     )
   },
@@ -893,8 +873,7 @@ export const onlineRepository = {
   balances,
   stats,
   activities,
-  receipts,
-  documents,
+  attachments,
   exports: exportsRepository,
   features,
   admin,

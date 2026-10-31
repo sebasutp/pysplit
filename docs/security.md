@@ -9,12 +9,12 @@ Related: `adr/0003-auth.md`, [`../MIGRATION_PLAN.md`](../MIGRATION_PLAN.md) §2.
 
 Group-scoped endpoints are deliberately **unauthenticated** so that an existing
 shared link keeps working (MIGRATION_PLAN §2.6). That includes group, participant,
-expense, receipt and expense-document reads and writes. There are no per-group
+expense, receipt and attachment reads and writes. There are no per-group
 ACLs in v1.
 
 Anyone who has a group URL can read the group and can create, edit or delete its
 data. This is a link-as-capability model, not privacy. Do not put secrets in
-group fields, notes or receipts, and do not treat possession of a URL as proof of
+group fields, notes or attachments, and do not treat possession of a URL as proof of
 identity. The explicit exceptions are account mutations (group creation and
 star/archive membership changes), admin endpoints, and the AI endpoints, which
 require a signed-in user. Group-list sync and access recording are optionally
@@ -75,19 +75,21 @@ The UI and documentation must not imply that shared links are private. See
 ## 4. Uploads and AI
 
 - Uploads enforce `MAX_UPLOAD_BYTES`, an allowed content-type list, and
-  server-generated storage keys. Receipt image keys are group-scoped
-  (`receipts/{group_id}/…`); an image id presented under another group's route
-  is rejected. Document reads re-check that the document belongs to the expense
-  and group in the route.
-- `ENABLE_EXPENSE_DOCUMENTS=false` (the default) makes document upload,
-  download and delete return `403`.
+  server-generated storage keys. Attachment keys are group-scoped
+  (`attachments/{group_id}/…`); an id presented under another group's route is
+  rejected. Attachment reads re-check the group and optional expense link.
+- File signatures are checked in addition to the browser-provided MIME type,
+  so a renamed executable is not accepted as an image or PDF.
 - Receipt extraction and category inference require an authenticated bearer
-  user (`401` otherwise). AI URLs are restricted to configured storage or the
-  app's own upload routes, which limits server-side request forgery.
+  user (`401` otherwise). The model receives an inline `data:` URL read from
+  the stored attachment; callers cannot submit an arbitrary image URL.
+- PDFs are stored and downloaded as attachments but are not sent to the AI.
 - AI extraction retries are bounded by `RECEIPT_MAX_ATTEMPTS` (default 3). The
   cap is per uploaded image; exhausted attempts return `409` and require a new
-  upload. `ReceiptRead.provider` is a stable public label
+  upload. `AttachmentRead.provider` is a stable public label
   (`openai-compatible`, `google` or `disabled`), never the internal base URL.
+- `AI_MOCK=true` returns local fixtures without a provider call and is rejected
+  when `ENVIRONMENT=production`.
 
 ## 5. Known limitations
 
@@ -122,9 +124,9 @@ The UI and documentation must not imply that shared links are private. See
       cache header; `add_header` is not inherited once a location defines one.
 - [ ] TLS terminates at the proxy; the public origin matches `BASE_URL` and the
       CORS allowlist; `/api` is proxied, not served from disk.
-- [ ] Feature flags (`ENABLE_RECEIPT_EXTRACT`, `ENABLE_RECEIPT_ITEMS`,
-      `ENABLE_CATEGORY_EXTRACT`, `ENABLE_EXPENSE_DOCUMENTS`) are off unless
-      intended, and AI credentials are scoped to the provider.
+- [ ] AI feature flags (`ENABLE_RECEIPT_AI`, `ENABLE_CATEGORY_EXTRACT`) and
+      `AI_MOCK` are off unless intended, and AI credentials are scoped to the
+      provider.
 - [ ] Backups use `scripts/backup.py` (SQLite online backup API) — never a
       raw copy of a live WAL file. Store backups off-host, record checksums, and
       test a restore with `scripts/restore.py --dry-run` and one real restore.

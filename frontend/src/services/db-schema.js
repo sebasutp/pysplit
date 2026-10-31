@@ -7,7 +7,7 @@
  * before activating a waiting update.
  */
 
-export const DATABASE_SCHEMA_VERSION = 3
+export const DATABASE_SCHEMA_VERSION = 4
 
 export const STORES_V2 = {
   groups: 'id, updated_at, version, deleted_at',
@@ -37,19 +37,35 @@ export const STORES_V3 = {
   outbox: '++seq, op_id, group_id, status, next_attempt_at, entity_id, entity_type',
 }
 
-/** Tables every Stage 10 build must find after a Dexie upgrade. */
-export const REQUIRED_TABLES = Object.freeze(Object.keys(STORES_V3).sort())
+// v4 replaces the separate document/receipt tables with one attachment model.
+// This is a destructive development migration; old local rows are discarded.
+export const STORES_V4 = {
+  groups: 'id, updated_at, version, deleted_at',
+  participants: 'id, group_id, updated_at, version, deleted_at, position',
+  expenses: 'id, group_id, expense_date, updated_at, version, deleted_at',
+  paidFor: '[expense_id+participant_id], expense_id, participant_id',
+  activities: 'id, group_id, time',
+  attachments: 'id, group_id, expense_id, updated_at, version, deleted_at',
+  attachmentItems: 'id, attachment_id, position, updated_at, version, deleted_at',
+  attachmentPortions: 'id, item_id, updated_at, version, deleted_at',
+  attachmentOptOuts:
+    'id, attachment_id, participant_id, updated_at, version, deleted_at',
+  categories: 'id',
+  userGroups: 'id, user_id, group_id, [user_id+group_id], updated_at, version, deleted_at',
+  outbox: '++seq, op_id, group_id, status, next_attempt_at, entity_id, entity_type',
+  syncState: 'scope',
+  conflicts: '++id, group_id, entity_type, entity_id, created_at',
+  blobs: 'id, group_id, kind, entity_id',
+  metadata: 'key',
+}
 
-/**
- * Index names (the part after the primary key) for each required table. The
- * build contract ships these so an update can be rejected before activation
- * when the incoming build expects a table/index the current database lacks.
- *
- * @type {Readonly<Record<string, readonly string[]>>}
- */
+/** Tables every current build must find after a Dexie upgrade. */
+export const REQUIRED_TABLES = Object.freeze(Object.keys(STORES_V4).sort())
+
+/** Index names (the part after the primary key) for each required table. */
 export const REQUIRED_INDEXES = Object.freeze(
   Object.fromEntries(
-    Object.entries(STORES_V3).map(([table, spec]) => [
+    Object.entries(STORES_V4).map(([table, spec]) => [
       table,
       spec
         .split(',')

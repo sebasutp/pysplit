@@ -221,8 +221,8 @@ expenses.update(groupId, expenseId, input, { base_version?, signal }) // → Exp
 expenses.remove(groupId, expenseId, { base_version?, signal })        // → void
 ```
 
-Filters: `from`/`to` are inclusive `YYYY-MM-DD` dates. The list includes paid-for
-rows, documents and the receipt summary needed by the row UI.
+Filters: `from`/`to` are inclusive `YYYY-MM-DD` dates. The list includes
+paid-for rows and the attachments needed by the row UI.
 
 ### Expense shape
 
@@ -236,8 +236,7 @@ rows, documents and the receipt summary needed by the row UI.
   is_recurring_head: boolean,
   created_at, updated_at, version, deleted_at,
   paid_for: [{ participant_id, shares }],
-  documents: [{ id, url, width, height }],
-  receipt: { id, status } | null
+  attachments: [AttachmentRead]
 }
 ```
 
@@ -278,54 +277,49 @@ activities.list(groupId, { cursor, limit, signal })
   // → { items, next_cursor, has_more }
 ```
 
-## 10. Receipts and AI
+## 10. Attachments and AI
 
 ```js
-receipts.get(groupId, { receipt_id?, expense_id?, signal })
-  // → { receipt, items, opt_outs, split } | null
-receipts.upload(groupId, file, { width, height, expense_id?, signal }) // → { url, width, height }
-receipts.extractTotal(groupId, { image_url }, { signal })   // → Receipt
-receipts.extractItems(groupId, { image_url, image_width, image_height, expense_id? }, { signal }) // → Receipt
-receipts.pendingTotal(groupId)                              // → queued total result | null
-receipts.clearPendingTotal(groupId)                         // → void
-receipts.addItem(groupId, receiptId, input, { signal })     // → ReceiptState
-receipts.updateItem(groupId, receiptId, itemId, input, { signal }) // → ReceiptState
-receipts.deleteItem(groupId, receiptId, itemId, { signal }) // → ReceiptState
-receipts.setPortions(groupId, receiptId, itemId, portions, { signal }) // → ReceiptState
-receipts.setOptOut(groupId, receiptId, participantId, value, { signal }) // → ReceiptState
-receipts.apply(groupId, receiptId, input, { signal })       // → { receipt, expense, split }
-receipts.link(groupId, receiptId, expenseId, { signal })    // → Receipt
-categories.infer(title, { signal })                         // → { category_id }
+attachments.get(groupId, { attachment_id?, expense_id?, signal })
+  // → { attachment, items, opt_outs, split } | null
+attachments.upload(groupId, file, { width, height, expense_id?, signal }) // → Attachment
+attachments.update(groupId, attachmentId, { expense_id }, { signal })     // → Attachment
+attachments.remove(groupId, attachmentId, { signal })                     // → void
+attachments.extractTotal(groupId, attachmentId, { signal })               // → TotalExtraction
+attachments.extractItems(groupId, attachmentId, { expense_id? }, { signal }) // → ExtractionResult
+attachments.pendingTotal(groupId)                                         // → queued total | null
+attachments.clearPendingTotal(groupId)                                    // → void
+attachments.addItem(groupId, attachmentId, input, { signal })             // → AttachmentState
+attachments.updateItem(groupId, attachmentId, itemId, input, { signal })  // → AttachmentState
+attachments.deleteItem(groupId, attachmentId, itemId, { signal })         // → AttachmentState
+attachments.setPortions(groupId, attachmentId, itemId, portions, { signal }) // → AttachmentState
+attachments.setOptOut(groupId, attachmentId, participantId, value, { signal }) // → AttachmentState
+attachments.apply(groupId, attachmentId, input, { signal })               // → { attachment, split }
+categories.infer(title, { signal })                                       // → { category_id }
 ```
 
-`ReceiptState` is `{ receipt, items, opt_outs, split }`, where `split` is the
-server-recomputed provisional split. Clients never send their own totals.
-Offline `receipts.upload` reads the file bytes before opening its Dexie
-transaction, stores the blob and returns a local placeholder
-`{ url: 'local-receipt://…', pending: true }`; a following `extractTotal` or
-`extractItems` records the requested mode and returns either a pending marker or
-a placeholder `ReceiptState` with `status: 'PENDING'`. The sync engine uploads
-and extracts after reconnect, then replaces the placeholder. Line-item
-extraction sends the known `expense_id` so the link survives the post-sync
-server bootstrap. A total-only result has no expense to link; it is stored
-locally and exposed through `pendingTotal`/`clearPendingTotal` until the user
-applies or dismisses it on a new expense form. Live extraction methods remain
-**online-only** when no queued upload matches. `receipts.apply`/`receipts.link`
-are online-only.
+`AttachmentState` is `{ attachment, items, opt_outs, split }`, where `split` is
+the server-recomputed provisional split. Clients never send their own totals.
+Offline `attachments.upload` reads the file bytes before opening its Dexie
+transaction, stores the blob and returns a local placeholder with
+`url: 'local-attachment://…'`, `pending: true` and `pending_upload: true`. A
+following `extractTotal` or `extractItems` records the requested mode and
+returns either a pending marker or a placeholder state with
+`receipt_status: 'PENDING'`. The sync engine uploads and extracts after
+reconnect, then replaces the placeholder. Line-item extraction sends the known
+`expense_id` so the link survives the post-sync server bootstrap. A total-only
+result has no expense to link; it is stored locally and exposed through
+`pendingTotal`/`clearPendingTotal` until the user applies or dismisses it on a
+new expense form. Live extraction methods remain **online-only** when no queued
+upload matches. `attachments.apply`/`attachments.link` are online-only. PDFs are
+ordinary attachments and are rejected by extraction with `422`.
 
-## 11. Documents
+## 11. Local storage
 
-```js
-documents.upload(groupId, expenseId, file, { signal }) // → Document
-documents.remove(groupId, expenseId, documentId, { signal }) // → void
-```
-
-Offline upload returns a local placeholder Document with `pending: true` and
-queues its blob. The bytes are read before the Dexie transaction so a real
-browser cannot expire it mid-write; the placeholder, blob and outbox row commit
-together. Offline removal drops a never-uploaded placeholder immediately or
-queues the server delete and removes the local row. The sync engine uploads or
-deletes after reconnect.
+The Dexie stores are `attachments`, `attachmentItems`, `attachmentPortions` and
+`attachmentOptOuts`. Queued uploads use the outbox entity type
+`attachment_upload`; deletes use `attachment_remove`. The old `documents` and
+`receipt*` stores are removed by the v4 development schema.
 
 ## 12. Exports
 
@@ -380,10 +374,10 @@ the next request because the server reloads the user row.
 | Expenses read/write | yes (queued) |
 | Balances/statistics/activities/categories | yes, from local data |
 | Star/archive/access | yes (queued, LWW); access recording is best-effort and skipped offline |
-| Receipt item/portion/opt-out edits on cached receipts | yes (queued) |
-| Receipt apply/link | no (online-only) |
+| Attachment item/portion/opt-out edits on cached receipts | yes (queued) |
+| Attachment apply/link | no (online-only) |
 | Receipt total/item extraction, category inference | extraction no (queued upload runs after reconnect); category inference no |
-| Documents upload/remove | yes (queued); pending placeholders are shown |
+| Attachment upload/remove | yes (queued); pending placeholders are shown |
 | Admin | no (online-only) |
 | Auth refresh | deferred, retried on reconnect |
 | Exports | yes, from local data, byte-identical to the server |

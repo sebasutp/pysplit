@@ -22,3 +22,17 @@ What would be better:
 
 * In activity I see "created by Someone" even though I am logged in. In spliit, when I user enters a group for the first time the app asks it which user he/she is and uses that from then on to identify the user.
 * If "Information is empty", it should not show up in the tabs.
+* The UI says made in Montreal. But this was made in Zurich/Switzerland by Sebastian Gomez.
+
+
+## Round 2
+
+### AI Recept processing
+
+* It seems like I have to save the receipt first before I can see the items when successfully processed by the mock AI
+* Change the name from "Review items" to "Assign items" and make it visible also near the "Advances split options" button
+* When I click "Assign to" in an item and select 2 people I get an error "Could not save your change - Attachment not found"
+* After the user clicks "Apply to expense" the user should be taken back automatically to the previous screen
+* It seems that the itemized AI summary is being deleted sometimes for some weird reason. I processed one item successfully, then got an error assigning an item to 2 people and when I looked again the attachment had disappeared.
+* I see errors in the dev console:
+  - Uncaught TypeError: Cannot read properties of undefined (reading 'startTime')

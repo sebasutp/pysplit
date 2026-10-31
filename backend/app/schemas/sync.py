@@ -83,8 +83,8 @@ class SyncPullResponse(BaseModel):
     has_more: bool
 
 
-class SyncReceiptSnapshot(BaseModel):
-    receipt: dict[str, Any]
+class SyncAttachmentSnapshot(BaseModel):
+    attachment: dict[str, Any]
     items: list[dict[str, Any]] = Field(default_factory=list)
     portions: list[dict[str, Any]] = Field(default_factory=list)
     opt_outs: list[dict[str, Any]] = Field(default_factory=list)
@@ -96,6 +96,6 @@ class SyncBootstrapResponse(BaseModel):
     participants: list[ParticipantRead] = Field(default_factory=list)
     expenses: list[ExpenseRead] = Field(default_factory=list)
     activities: list[ActivityRead] = Field(default_factory=list)
-    receipts: list[SyncReceiptSnapshot] = Field(default_factory=list)
+    attachments: list[SyncAttachmentSnapshot] = Field(default_factory=list)
     categories: list[CategoryRead] = Field(default_factory=list)
     user_group: dict[str, Any] | None = None

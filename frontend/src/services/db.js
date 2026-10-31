@@ -14,7 +14,7 @@ import {
   REQUIRED_INDEXES,
   REQUIRED_TABLES,
   STORES_V2,
-  STORES_V3,
+  STORES_V4,
 } from './db-schema'
 
 export {
@@ -23,7 +23,7 @@ export {
   REQUIRED_INDEXES,
   REQUIRED_TABLES,
   STORES_V2,
-  STORES_V3,
+  STORES_V4,
 } from './db-schema'
 
 /**
@@ -33,12 +33,11 @@ export {
  *   participants: EntityTable,
  *   expenses: EntityTable,
  *   paidFor: EntityTable,
- *   documents: EntityTable,
  *   activities: EntityTable,
- *   receipts: EntityTable,
- *   receiptItems: EntityTable,
- *   receiptPortions: EntityTable,
- *   receiptOptOuts: EntityTable,
+ *   attachments: EntityTable,
+ *   attachmentItems: EntityTable,
+ *   attachmentPortions: EntityTable,
+ *   attachmentOptOuts: EntityTable,
  *   categories: EntityTable,
  *   userGroups: EntityTable,
  *   outbox: EntityTable,
@@ -52,7 +51,7 @@ export {
 const database = new Dexie('pysplit')
 
 database.version(2).stores(STORES_V2)
-database.version(DATABASE_SCHEMA_VERSION).stores(STORES_V3)
+database.version(DATABASE_SCHEMA_VERSION).stores(STORES_V4)
 
 /** @type {PysplitDb} */
 export const db = /** @type {any} */ (database)
@@ -137,7 +136,12 @@ export async function verifyIncomingBuildCompatibility(contract) {
       `Incoming build schema v${incomingVersion} is older than local v${currentVersion}`,
     )
   }
-  const currentTables = new Set(db.tables.map((table) => table.name))
+  // Only tables this build actually requires matter for an update. A Dexie
+  // upgrade may leave obsolete stores from a previous development schema; they
+  // are not a reason to reject an otherwise compatible build.
+  const currentTables = new Set(
+    db.tables.map((table) => table.name).filter((name) => REQUIRED_TABLES.includes(name)),
+  )
   const incomingTables = new Set(contract?.requiredTables || [])
   const missingTables = [...currentTables].filter((name) => !incomingTables.has(name))
   if (missingTables.length) {
@@ -250,10 +254,9 @@ export async function liveExpenses(groupId) {
  */
 export async function readExpense(expense) {
   if (!expense) return null
-  const [paidFor, documents, receipt] = await Promise.all([
+  const [paidFor, attachments] = await Promise.all([
     db.paidFor.where('expense_id').equals(expense.id).toArray(),
-    db.documents.where('expense_id').equals(expense.id).toArray(),
-    db.receipts.where('expense_id').equals(expense.id).first(),
+    db.attachments.where('expense_id').equals(expense.id).toArray(),
   ])
   const category = await db.categories.get(Number(expense.category_id || 0))
   return {
@@ -274,14 +277,11 @@ export async function readExpense(expense) {
         ...(row.amount != null ? { amount: row.amount } : {}),
         ...(row.percentage != null ? { percentage: row.percentage } : {}),
       })),
-    documents: documents
+    attachments: attachments
       .filter((row) => !row.deleted_at)
       .sort((first, second) =>
         String(first.created_at || '') < String(second.created_at || '') ? -1 : 1,
-      )
-      .map((row) => ({ id: row.id, url: row.url, width: row.width, height: row.height })),
-    receipt:
-      receipt && !receipt.deleted_at ? { id: receipt.id, status: receipt.status } : null,
+      ),
     pending: Boolean(expense.pending),
   }
 }
@@ -296,10 +296,9 @@ export async function readExpenses(groupId, expenses) {
   const categoryRows = await db.categories.toArray()
   const categories = new Map(categoryRows.map((row) => [Number(row.id), row]))
   const ids = expenses.map((row) => row.id)
-  const [paidFor, documents, receipts] = await Promise.all([
+  const [paidFor, attachments] = await Promise.all([
     ids.length ? db.paidFor.where('expense_id').anyOf(ids).toArray() : [],
-    ids.length ? db.documents.where('expense_id').anyOf(ids).toArray() : [],
-    ids.length ? db.receipts.where('expense_id').anyOf(ids).toArray() : [],
+    ids.length ? db.attachments.where('expense_id').anyOf(ids).toArray() : [],
   ])
   const paidForByExpense = new Map()
   for (const row of paidFor) {
@@ -308,16 +307,12 @@ export async function readExpenses(groupId, expenses) {
     list.push(row)
     paidForByExpense.set(row.expense_id, list)
   }
-  const documentsByExpense = new Map()
-  for (const row of documents) {
-    if (row.deleted_at) continue
-    const list = documentsByExpense.get(row.expense_id) || []
+  const attachmentsByExpense = new Map()
+  for (const row of attachments) {
+    if (row.deleted_at || !row.expense_id) continue
+    const list = attachmentsByExpense.get(row.expense_id) || []
     list.push(row)
-    documentsByExpense.set(row.expense_id, list)
-  }
-  const receiptByExpense = new Map()
-  for (const row of receipts) {
-    if (!row.deleted_at && row.expense_id) receiptByExpense.set(row.expense_id, row)
+    attachmentsByExpense.set(row.expense_id, list)
   }
 
   return expenses.map((expense) => ({
@@ -332,14 +327,9 @@ export async function readExpenses(groupId, expenses) {
             : 0,
       )
       .map((row) => ({ participant_id: row.participant_id, shares: row.shares })),
-    documents: (documentsByExpense.get(expense.id) || [])
-      .sort((first, second) =>
-        String(first.created_at || '') < String(second.created_at || '') ? -1 : 1,
-      )
-      .map((row) => ({ id: row.id, url: row.url, width: row.width, height: row.height })),
-    receipt: receiptByExpense.has(expense.id)
-      ? { id: receiptByExpense.get(expense.id).id, status: receiptByExpense.get(expense.id).status }
-      : null,
+    attachments: (attachmentsByExpense.get(expense.id) || []).sort((first, second) =>
+      String(first.created_at || '') < String(second.created_at || '') ? -1 : 1,
+    ),
     pending: Boolean(expense.pending),
   }))
 }
@@ -392,33 +382,35 @@ async function capturePendingSnapshotState(groupId) {
     )
   const participantIds = entityIds('participant')
   const expenseIds = entityIds('expense')
-  const itemIds = entityIds('receipt_item')
+  const itemIds = entityIds('attachment_item')
   const optOutIds = new Set(
     operations
-      .filter((operation) => operation.entity_type === 'receipt_opt_out')
-      .map((operation) => `${operation.meta?.receipt_id}:${operation.entity_id}`),
+      .filter((operation) => operation.entity_type === 'attachment_opt_out')
+      .map((operation) => `${operation.meta?.attachment_id}:${operation.entity_id}`),
   )
-  const receiptIds = new Set(
+  const attachmentIds = new Set(
     operations
-      .filter((operation) => operation.meta?.receipt_id)
-      .map((operation) => operation.meta.receipt_id),
+      .filter((operation) => operation.meta?.attachment_id)
+      .map((operation) => operation.meta.attachment_id),
   )
+  for (const operation of operations) {
+    if (operation.entity_type === 'attachment_upload') attachmentIds.add(operation.entity_id)
+  }
   const groupPending = operations.some((operation) => operation.entity_type === 'group')
 
   const anyOf = (table, key, ids) => (ids.size ? table.where(key).anyOf([...ids]).toArray() : [])
-  const [group, participants, expenses, paidFor, documents, receipts, items, portions, optOuts] =
+  const [group, participants, expenses, paidFor, attachments, items, portions, optOuts] =
     await Promise.all([
       groupPending ? db.groups.get(groupId) : null,
       anyOf(db.participants, 'id', participantIds),
       anyOf(db.expenses, 'id', expenseIds),
       anyOf(db.paidFor, 'expense_id', expenseIds),
-      anyOf(db.documents, 'expense_id', expenseIds),
-      anyOf(db.receipts, 'id', receiptIds),
-      anyOf(db.receiptItems, 'id', itemIds),
-      anyOf(db.receiptPortions, 'item_id', itemIds),
-      anyOf(db.receiptOptOuts, 'id', optOutIds),
+      anyOf(db.attachments, 'id', attachmentIds),
+      anyOf(db.attachmentItems, 'id', itemIds),
+      anyOf(db.attachmentPortions, 'item_id', itemIds),
+      anyOf(db.attachmentOptOuts, 'id', optOutIds),
     ])
-  return { group, participants, expenses, paidFor, documents, receipts, items, portions, optOuts }
+  return { group, participants, expenses, paidFor, attachments, items, portions, optOuts }
 }
 
 /**
@@ -442,12 +434,11 @@ export async function replaceGroupSnapshot(snapshot, options = {}) {
       db.participants,
       db.expenses,
       db.paidFor,
-      db.documents,
+      db.attachments,
+      db.attachmentItems,
+      db.attachmentPortions,
+      db.attachmentOptOuts,
       db.activities,
-      db.receipts,
-      db.receiptItems,
-      db.receiptPortions,
-      db.receiptOptOuts,
       db.categories,
       db.userGroups,
       db.outbox,
@@ -495,12 +486,28 @@ export async function replaceGroupSnapshot(snapshot, options = {}) {
       await db.expenses.where('group_id').equals(groupId).delete()
       if (expenseIds.length) {
         await db.paidFor.where('expense_id').anyOf(expenseIds).delete()
-        await db.documents.where('expense_id').anyOf(expenseIds).delete()
       }
+      const oldAttachments = await db.attachments.where('group_id').equals(groupId).toArray()
+      const oldAttachmentIds = oldAttachments.map((row) => row.id)
+      const oldItems = oldAttachmentIds.length
+        ? await db.attachmentItems.where('attachment_id').anyOf(oldAttachmentIds).toArray()
+        : []
+      if (oldItems.length) {
+        await db.attachmentPortions
+          .where('item_id')
+          .anyOf(oldItems.map((item) => item.id))
+          .delete()
+      }
+      if (oldAttachmentIds.length) {
+        await db.attachmentItems.where('attachment_id').anyOf(oldAttachmentIds).delete()
+        await db.attachmentOptOuts.where('attachment_id').anyOf(oldAttachmentIds).delete()
+      }
+      await db.attachments.where('group_id').equals(groupId).delete()
+
       const paidForRows = []
-      const documentRows = []
+      const attachmentRows = []
       for (const expense of expenses) {
-        const { paid_for: paidFor, documents, category: _category, receipt: _receipt, ...base } = expense
+        const { paid_for: paidFor, attachments, category: _category, ...base } = expense
         await db.expenses.put({
           ...base,
           category_id: Number(base.category_id || _category?.id || 0),
@@ -509,59 +516,42 @@ export async function replaceGroupSnapshot(snapshot, options = {}) {
         for (const row of paidFor || []) {
           paidForRows.push({ ...row, expense_id: expense.id })
         }
-        for (const document of documents || []) {
-          documentRows.push({ ...document, expense_id: expense.id, created_at: now })
+        for (const attachment of attachments || []) {
+          attachmentRows.push({ ...attachment, expense_id: expense.id, pending: false })
         }
       }
+
+      const itemRows = []
+      const portionRows = []
+      const optOutRows = []
+      const snapshots = Array.isArray(snapshot.attachments) ? snapshot.attachments : []
+      for (const entry of snapshots) {
+        const attachment = entry.attachment || {}
+        if (!attachment.id) continue
+        attachmentRows.push({ ...attachment, pending: false })
+        for (const item of entry.items || []) itemRows.push(item)
+        for (const portion of entry.portions || []) portionRows.push(portion)
+        for (const optOut of entry.opt_outs || []) optOutRows.push(optOut)
+      }
       if (paidForRows.length) await db.paidFor.bulkPut(paidForRows)
-      if (documentRows.length) await db.documents.bulkPut(documentRows)
+      if (attachmentRows.length) await db.attachments.bulkPut(attachmentRows)
+      if (itemRows.length) await db.attachmentItems.bulkPut(itemRows)
+      if (portionRows.length) await db.attachmentPortions.bulkPut(portionRows)
+      if (optOutRows.length) await db.attachmentOptOuts.bulkPut(optOutRows)
       if (pending.expenses.length) {
         await db.expenses.bulkPut(pending.expenses.map((row) => ({ ...row, pending: true })))
       }
       if (pending.paidFor.length) await db.paidFor.bulkPut(pending.paidFor)
-      if (pending.documents.length) await db.documents.bulkPut(pending.documents)
+      if (pending.attachments.length) await db.attachments.bulkPut(pending.attachments)
+      if (pending.items.length) {
+        await db.attachmentItems.bulkPut(pending.items.map((row) => ({ ...row, pending: true })))
+      }
+      if (pending.portions.length) await db.attachmentPortions.bulkPut(pending.portions)
+      if (pending.optOuts.length) await db.attachmentOptOuts.bulkPut(pending.optOuts)
 
       const activities = Array.isArray(snapshot.activities) ? snapshot.activities : []
       await db.activities.where('group_id').equals(groupId).delete()
       if (activities.length) await db.activities.bulkPut(activities)
-
-      const receipts = Array.isArray(snapshot.receipts) ? snapshot.receipts : []
-      const oldReceipts = await db.receipts.where('group_id').equals(groupId).toArray()
-      const oldIds = oldReceipts.map((row) => row.id)
-      const oldItems = oldIds.length
-        ? await db.receiptItems.where('receipt_id').anyOf(oldIds).toArray()
-        : []
-      await db.receipts.where('group_id').equals(groupId).delete()
-      if (oldIds.length) {
-        await db.receiptItems.where('receipt_id').anyOf(oldIds).delete()
-        await db.receiptOptOuts.where('receipt_id').anyOf(oldIds).delete()
-      }
-      if (oldItems.length) {
-        await db.receiptPortions
-          .where('item_id')
-          .anyOf(oldItems.map((item) => item.id))
-          .delete()
-      }
-      const itemIds = []
-      const receiptItemRows = []
-      const portionRows = []
-      for (const entry of receipts) {
-        await db.receipts.put({ ...entry.receipt })
-        for (const item of entry.items || []) {
-          receiptItemRows.push(item)
-          itemIds.push(item.id)
-        }
-        for (const portion of entry.portions || []) portionRows.push(portion)
-        for (const optOut of entry.opt_outs || []) await db.receiptOptOuts.put(optOut)
-      }
-      if (receiptItemRows.length) await db.receiptItems.bulkPut(receiptItemRows)
-      if (portionRows.length) await db.receiptPortions.bulkPut(portionRows)
-      if (pending.receipts.length) await db.receipts.bulkPut(pending.receipts)
-      if (pending.items.length) {
-        await db.receiptItems.bulkPut(pending.items.map((row) => ({ ...row, pending: true })))
-      }
-      if (pending.portions.length) await db.receiptPortions.bulkPut(pending.portions)
-      if (pending.optOuts.length) await db.receiptOptOuts.bulkPut(pending.optOuts)
 
       const categories = Array.isArray(snapshot.categories) ? snapshot.categories : []
       if (categories.length) await db.categories.bulkPut(categories)
@@ -614,29 +604,68 @@ export async function applySyncChange(change) {
     return
   }
   if (change.entity_type === 'expense') {
-    const { paid_for: paidFor, documents, category: _category, receipt: _receipt, ...base } = snapshot
+    const { paid_for: paidFor, attachments, category: _category, ...base } = snapshot
     const existing = await db.expenses.get(change.entity_id)
     await db.expenses.put({
       ...base,
       pending: existing?.pending || false,
     })
+    const oldAttachments = await db.attachments
+      .where('expense_id')
+      .equals(change.entity_id)
+      .toArray()
+    const incomingAttachments = Array.isArray(attachments) ? attachments : oldAttachments
+    const incomingIds = new Set(incomingAttachments.map((/** @type {any} */ row) => row.id))
+    // Expense snapshots carry attachment metadata but not their receipt items.
+    // Keep the existing item/portion/opt-out rows for attachments that remain,
+    // otherwise every unrelated expense update would erase the itemized split.
+    const removedIds = oldAttachments
+      .filter((row) => !incomingIds.has(row.id))
+      .map((row) => row.id)
+    const removedItems = removedIds.length
+      ? await db.attachmentItems.where('attachment_id').anyOf(removedIds).toArray()
+      : []
+    if (removedItems.length) {
+      await db.attachmentPortions
+        .where('item_id')
+        .anyOf(removedItems.map((item) => item.id))
+        .delete()
+    }
+    if (removedIds.length) {
+      await db.attachmentItems.where('attachment_id').anyOf(removedIds).delete()
+      await db.attachmentOptOuts.where('attachment_id').anyOf(removedIds).delete()
+      await db.attachments.where('id').anyOf(removedIds).delete()
+    }
     await db.paidFor.where('expense_id').equals(change.entity_id).delete()
-    await db.documents.where('expense_id').equals(change.entity_id).delete()
     if (base.deleted_at == null) {
       if (paidFor?.length) {
         await db.paidFor.bulkPut(
           paidFor.map((row) => ({ ...row, expense_id: change.entity_id })),
         )
       }
-      if (documents?.length) {
-        await db.documents.bulkPut(
-          documents.map((row) => ({
+      if (incomingAttachments.length) {
+        await db.attachments.bulkPut(
+          incomingAttachments.map((row) => ({
             ...row,
             expense_id: change.entity_id,
-            created_at: row.created_at || nowIso(),
+            pending: false,
           })),
         )
       }
+    } else if (oldAttachments.length) {
+      // The whole expense is gone, so its attachments and receipt details are
+      // gone too.
+      const allIds = oldAttachments.map((row) => row.id)
+      const allItems = await db.attachmentItems.where('attachment_id').anyOf(allIds).toArray()
+      if (allItems.length) {
+        await db.attachmentPortions
+          .where('item_id')
+          .anyOf(allItems.map((item) => item.id))
+          .delete()
+      }
+      await db.attachmentItems.where('attachment_id').anyOf(allIds).delete()
+      await db.attachmentOptOuts.where('attachment_id').anyOf(allIds).delete()
+      await db.attachments.where('expense_id').equals(change.entity_id).delete()
     }
     return
   }
@@ -695,12 +724,11 @@ export async function deleteLocalGroup(groupId) {
       db.participants,
       db.expenses,
       db.paidFor,
-      db.documents,
+      db.attachments,
+      db.attachmentItems,
+      db.attachmentPortions,
+      db.attachmentOptOuts,
       db.activities,
-      db.receipts,
-      db.receiptItems,
-      db.receiptPortions,
-      db.receiptOptOuts,
       db.userGroups,
       db.outbox,
       db.conflicts,
@@ -708,31 +736,29 @@ export async function deleteLocalGroup(groupId) {
       db.metadata,
     ],
     async () => {
-      const expenses = await db.expenses.where('group_id').equals(groupId).toArray()
-      const expenseIds = expenses.map((row) => row.id)
-      const receipts = await db.receipts.where('group_id').equals(groupId).toArray()
-      const receiptIds = receipts.map((row) => row.id)
-      const items = receiptIds.length
-        ? await db.receiptItems.where('receipt_id').anyOf(receiptIds).toArray()
+      const expenseIds = (await db.expenses.where('group_id').equals(groupId).toArray()).map(
+        (row) => row.id,
+      )
+      const attachments = await db.attachments.where('group_id').equals(groupId).toArray()
+      const attachmentIds = attachments.map((row) => row.id)
+      const items = attachmentIds.length
+        ? await db.attachmentItems.where('attachment_id').anyOf(attachmentIds).toArray()
         : []
-      if (expenseIds.length) {
-        await db.paidFor.where('expense_id').anyOf(expenseIds).delete()
-        await db.documents.where('expense_id').anyOf(expenseIds).delete()
-      }
+      if (expenseIds.length) await db.paidFor.where('expense_id').anyOf(expenseIds).delete()
       if (items.length) {
-        await db.receiptPortions
+        await db.attachmentPortions
           .where('item_id')
           .anyOf(items.map((item) => item.id))
           .delete()
       }
-      if (receiptIds.length) {
-        await db.receiptItems.where('receipt_id').anyOf(receiptIds).delete()
-        await db.receiptOptOuts.where('receipt_id').anyOf(receiptIds).delete()
+      if (attachmentIds.length) {
+        await db.attachmentItems.where('attachment_id').anyOf(attachmentIds).delete()
+        await db.attachmentOptOuts.where('attachment_id').anyOf(attachmentIds).delete()
       }
       await db.expenses.where('group_id').equals(groupId).delete()
       await db.participants.where('group_id').equals(groupId).delete()
       await db.activities.where('group_id').equals(groupId).delete()
-      await db.receipts.where('group_id').equals(groupId).delete()
+      await db.attachments.where('group_id').equals(groupId).delete()
       await db.userGroups.where('group_id').equals(groupId).delete()
       await db.outbox.where('group_id').equals(groupId).delete()
       await db.conflicts.where('group_id').equals(groupId).delete()

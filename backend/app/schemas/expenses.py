@@ -1,4 +1,4 @@
-"""Expense and document request/response schemas."""
+"""Expense request/response schemas."""
 
 from __future__ import annotations
 
@@ -10,13 +10,13 @@ from urllib.parse import urlsplit
 from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
 
 from app.core.enums import RecurrenceRule, SplitMode
+from app.schemas.attachments import AttachmentRead
 from app.schemas.categories import CategoryRead
 from app.schemas.common import UTCDateTime
 
 MAX_AMOUNT = 10_000_000_00
 MAX_TITLE_LENGTH = 200
 MAX_PAID_FOR_ENTRIES = 100
-MAX_DOCUMENTS = 20
 MAX_CONVERSION_RATE_DIGITS = 18
 MAX_CONVERSION_RATE_DECIMALS = 9
 MAX_SHARES = 1_000_000
@@ -30,18 +30,6 @@ def _valid_url(value: str) -> str:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise ValueError("must be an absolute http(s) URL or a same-origin path")
     return cleaned
-
-
-class DocumentInput(BaseModel):
-    id: str | None = Field(default=None, min_length=1, max_length=64)
-    url: str = Field(min_length=1, max_length=2000)
-    width: int = Field(ge=1)
-    height: int = Field(ge=1)
-
-    @field_validator("url")
-    @classmethod
-    def _url(cls, value: str) -> str:
-        return _valid_url(value)
 
 
 class ExpensePaidForInput(BaseModel):
@@ -77,7 +65,6 @@ class ExpenseCreate(BaseModel):
     notes: str | None = Field(default=None, max_length=20_000)
     recurrence_rule: RecurrenceRule = RecurrenceRule.NONE
     paid_for: list[ExpensePaidForInput] = Field(min_length=1, max_length=MAX_PAID_FOR_ENTRIES)
-    documents: list[DocumentInput] = Field(default_factory=list, max_length=MAX_DOCUMENTS)
     participant_id: str | None = Field(
         default=None,
         max_length=64,
@@ -145,7 +132,6 @@ class ExpenseUpdate(BaseModel):
     paid_for: list[ExpensePaidForInput] | None = Field(
         default=None, max_length=MAX_PAID_FOR_ENTRIES
     )
-    documents: list[DocumentInput] | None = Field(default=None, max_length=MAX_DOCUMENTS)
     participant_id: str | None = Field(
         default=None,
         max_length=64,
@@ -198,18 +184,6 @@ class ExpensePaidForRead(BaseModel):
     participant_name: str | None = None
 
 
-class ExpenseDocumentRead(BaseModel):
-    id: str
-    url: str
-    width: int
-    height: int
-
-
-class ReceiptSummary(BaseModel):
-    id: str
-    status: str
-
-
 class ExpenseRead(BaseModel):
     id: str
     group_id: str
@@ -233,8 +207,7 @@ class ExpenseRead(BaseModel):
     version: int = 1
     deleted_at: UTCDateTime | None = None
     paid_for: list[ExpensePaidForRead] = Field(default_factory=list)
-    documents: list[ExpenseDocumentRead] = Field(default_factory=list)
-    receipt: ReceiptSummary | None = None
+    attachments: list[AttachmentRead] = Field(default_factory=list)
 
 
 class ExpenseList(BaseModel):

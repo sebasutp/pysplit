@@ -2310,13 +2310,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/expenses/{expense_id}/documents": {
+    "/api/groups/{group_id}/attachments": {
       "post": {
         "tags": [
-          "expenses"
+          "attachments"
         ],
-        "summary": "Upload Document",
-        "operationId": "upload_document_api_groups__group_id__expenses__expense_id__documents_post",
+        "summary": "Upload Attachment",
+        "operationId": "upload_attachment_api_groups__group_id__attachments_post",
         "parameters": [
           {
             "name": "group_id",
@@ -2326,15 +2326,6 @@
               "type": "string",
               "title": "Group Id"
             }
-          },
-          {
-            "name": "expense_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Expense Id"
-            }
           }
         ],
         "requestBody": {
@@ -2342,7 +2333,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Body_upload_document_api_groups__group_id__expenses__expense_id__documents_post"
+                "$ref": "#/components/schemas/Body_upload_attachment_api_groups__group_id__attachments_post"
               }
             }
           }
@@ -2353,7 +2344,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExpenseDocumentRead"
+                  "$ref": "#/components/schemas/AttachmentRead"
                 }
               }
             }
@@ -2371,13 +2362,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/expenses/{expense_id}/documents/{document_id}": {
+    "/api/groups/{group_id}/attachments/{attachment_id}": {
       "get": {
         "tags": [
-          "expenses"
+          "attachments"
         ],
-        "summary": "Download Document",
-        "operationId": "download_document_api_groups__group_id__expenses__expense_id__documents__document_id__get",
+        "summary": "Get Attachment",
+        "operationId": "get_attachment_api_groups__group_id__attachments__attachment_id__get",
         "parameters": [
           {
             "name": "group_id",
@@ -2389,21 +2380,12 @@
             }
           },
           {
-            "name": "expense_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Expense Id"
-            }
-          },
-          {
-            "name": "document_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Document Id"
+              "title": "Attachment Id"
             }
           }
         ],
@@ -2412,7 +2394,68 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "attachments"
+        ],
+        "summary": "Update Attachment",
+        "operationId": "update_attachment_api_groups__group_id__attachments__attachment_id__patch",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Group Id"
+            }
+          },
+          {
+            "name": "attachment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attachment Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachmentLinkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentRead"
+                }
               }
             }
           },
@@ -2430,10 +2473,10 @@
       },
       "delete": {
         "tags": [
-          "expenses"
+          "attachments"
         ],
-        "summary": "Delete Document",
-        "operationId": "delete_document_api_groups__group_id__expenses__expense_id__documents__document_id__delete",
+        "summary": "Delete Attachment",
+        "operationId": "delete_attachment_api_groups__group_id__attachments__attachment_id__delete",
         "parameters": [
           {
             "name": "group_id",
@@ -2445,21 +2488,12 @@
             }
           },
           {
-            "name": "expense_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Expense Id"
-            }
-          },
-          {
-            "name": "document_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Document Id"
+              "title": "Attachment Id"
             }
           }
         ],
@@ -2480,65 +2514,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/upload": {
-      "post": {
-        "tags": [
-          "receipts"
-        ],
-        "summary": "Upload Receipt Image",
-        "operationId": "upload_receipt_image_api_groups__group_id__receipts_upload_post",
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Group Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_upload_receipt_image_api_groups__group_id__receipts_upload_post"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReceiptImageRead"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/groups/{group_id}/receipts/images/{image_id}": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/file": {
       "get": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Get Receipt Image",
-        "operationId": "get_receipt_image_api_groups__group_id__receipts_images__image_id__get",
+        "summary": "Get Attachment File",
+        "operationId": "get_attachment_file_api_groups__group_id__attachments__attachment_id__file_get",
         "parameters": [
           {
             "name": "group_id",
@@ -2550,12 +2532,12 @@
             }
           },
           {
-            "name": "image_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Image Id"
+              "title": "Attachment Id"
             }
           }
         ],
@@ -2581,13 +2563,62 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/extract-total": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/thumbnail": {
+      "get": {
+        "tags": [
+          "attachments"
+        ],
+        "summary": "Get Attachment Thumbnail",
+        "operationId": "get_attachment_thumbnail_api_groups__group_id__attachments__attachment_id__thumbnail_get",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Group Id"
+            }
+          },
+          {
+            "name": "attachment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attachment Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/groups/{group_id}/attachments/{attachment_id}/extract-total": {
       "post": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
         "summary": "Extract Total",
-        "operationId": "extract_total_api_groups__group_id__receipts_extract_total_post",
+        "operationId": "extract_total_api_groups__group_id__attachments__attachment_id__extract_total_post",
         "parameters": [
           {
             "name": "group_id",
@@ -2597,25 +2628,24 @@
               "type": "string",
               "title": "Group Id"
             }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReceiptExtractRequest"
-              }
+          },
+          {
+            "name": "attachment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attachment Id"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptTotalExtraction"
+                  "$ref": "#/components/schemas/AttachmentTotalExtraction"
                 }
               }
             }
@@ -2633,13 +2663,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/extract-items": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/extract-items": {
       "post": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
         "summary": "Extract Items",
-        "operationId": "extract_items_api_groups__group_id__receipts_extract_items_post",
+        "operationId": "extract_items_api_groups__group_id__attachments__attachment_id__extract_items_post",
         "parameters": [
           {
             "name": "group_id",
@@ -2649,14 +2679,30 @@
               "type": "string",
               "title": "Group Id"
             }
+          },
+          {
+            "name": "attachment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attachment Id"
+            }
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReceiptExtractRequest"
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AttachmentExtractItemsRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
               }
             }
           }
@@ -2667,7 +2713,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptExtractionResult"
+                  "$ref": "#/components/schemas/AttachmentExtractionResult"
                 }
               }
             }
@@ -2685,13 +2731,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/{receipt_id}": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/receipt": {
       "get": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Get Receipt",
-        "operationId": "get_receipt_api_groups__group_id__receipts__receipt_id__get",
+        "summary": "Get Attachment Receipt",
+        "operationId": "get_attachment_receipt_api_groups__group_id__attachments__attachment_id__receipt_get",
         "parameters": [
           {
             "name": "group_id",
@@ -2703,12 +2749,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           }
         ],
@@ -2718,7 +2764,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
+                  "$ref": "#/components/schemas/AttachmentState"
                 }
               }
             }
@@ -2736,64 +2782,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/expenses/{expense_id}/receipt": {
-      "get": {
-        "tags": [
-          "receipts"
-        ],
-        "summary": "Get Receipt For Expense",
-        "operationId": "get_receipt_for_expense_api_groups__group_id__expenses__expense_id__receipt_get",
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Group Id"
-            }
-          },
-          {
-            "name": "expense_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Expense Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/groups/{group_id}/receipts/{receipt_id}/items": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/items": {
       "post": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Add Receipt Item",
-        "operationId": "add_receipt_item_api_groups__group_id__receipts__receipt_id__items_post",
+        "summary": "Add Attachment Item",
+        "operationId": "add_attachment_item_api_groups__group_id__attachments__attachment_id__items_post",
         "parameters": [
           {
             "name": "group_id",
@@ -2805,12 +2800,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           }
         ],
@@ -2819,7 +2814,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReceiptItemCreate"
+                "$ref": "#/components/schemas/AttachmentItemCreate"
               }
             }
           }
@@ -2830,7 +2825,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
+                  "$ref": "#/components/schemas/AttachmentState"
                 }
               }
             }
@@ -2848,13 +2843,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/items/{item_id}": {
       "patch": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Update Receipt Item",
-        "operationId": "update_receipt_item_api_groups__group_id__receipts__receipt_id__items__item_id__patch",
+        "summary": "Update Attachment Item",
+        "operationId": "update_attachment_item_api_groups__group_id__attachments__attachment_id__items__item_id__patch",
         "parameters": [
           {
             "name": "group_id",
@@ -2866,12 +2861,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           },
           {
@@ -2889,7 +2884,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReceiptItemUpdate"
+                "$ref": "#/components/schemas/AttachmentItemUpdate"
               }
             }
           }
@@ -2900,7 +2895,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
+                  "$ref": "#/components/schemas/AttachmentState"
                 }
               }
             }
@@ -2919,10 +2914,10 @@
       },
       "delete": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Delete Receipt Item",
-        "operationId": "delete_receipt_item_api_groups__group_id__receipts__receipt_id__items__item_id__delete",
+        "summary": "Delete Attachment Item",
+        "operationId": "delete_attachment_item_api_groups__group_id__attachments__attachment_id__items__item_id__delete",
         "parameters": [
           {
             "name": "group_id",
@@ -2934,12 +2929,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           },
           {
@@ -2958,7 +2953,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
+                  "$ref": "#/components/schemas/AttachmentState"
                 }
               }
             }
@@ -2976,13 +2971,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/{receipt_id}/items/{item_id}/portions": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/items/{item_id}/portions": {
       "put": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Set Receipt Item Portions",
-        "operationId": "set_receipt_item_portions_api_groups__group_id__receipts__receipt_id__items__item_id__portions_put",
+        "summary": "Set Attachment Item Portions",
+        "operationId": "set_attachment_item_portions_api_groups__group_id__attachments__attachment_id__items__item_id__portions_put",
         "parameters": [
           {
             "name": "group_id",
@@ -2994,12 +2989,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           },
           {
@@ -3017,7 +3012,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReceiptPortionsReplace"
+                "$ref": "#/components/schemas/AttachmentPortionsReplace"
               }
             }
           }
@@ -3028,7 +3023,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
+                  "$ref": "#/components/schemas/AttachmentState"
                 }
               }
             }
@@ -3046,13 +3041,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/{receipt_id}/opt-outs/{participant_id}": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/opt-outs/{participant_id}": {
       "put": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Set Receipt Opt Out",
-        "operationId": "set_receipt_opt_out_api_groups__group_id__receipts__receipt_id__opt_outs__participant_id__put",
+        "summary": "Set Attachment Opt Out",
+        "operationId": "set_attachment_opt_out_api_groups__group_id__attachments__attachment_id__opt_outs__participant_id__put",
         "parameters": [
           {
             "name": "group_id",
@@ -3064,12 +3059,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           },
           {
@@ -3087,7 +3082,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReceiptOptOutUpdate"
+                "$ref": "#/components/schemas/AttachmentOptOutUpdate"
               }
             }
           }
@@ -3098,7 +3093,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptState"
+                  "$ref": "#/components/schemas/AttachmentState"
                 }
               }
             }
@@ -3116,13 +3111,13 @@
         }
       }
     },
-    "/api/groups/{group_id}/receipts/{receipt_id}/apply": {
+    "/api/groups/{group_id}/attachments/{attachment_id}/apply": {
       "post": {
         "tags": [
-          "receipts"
+          "attachments"
         ],
-        "summary": "Apply Receipt",
-        "operationId": "apply_receipt_api_groups__group_id__receipts__receipt_id__apply_post",
+        "summary": "Apply Attachment",
+        "operationId": "apply_attachment_api_groups__group_id__attachments__attachment_id__apply_post",
         "parameters": [
           {
             "name": "group_id",
@@ -3134,12 +3129,12 @@
             }
           },
           {
-            "name": "receipt_id",
+            "name": "attachment_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Receipt Id"
+              "title": "Attachment Id"
             }
           }
         ],
@@ -3148,7 +3143,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReceiptApplyRequest"
+                "$ref": "#/components/schemas/AttachmentApplyRequest"
               }
             }
           }
@@ -3159,68 +3154,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReceiptApplyResult"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/groups/{group_id}/receipts/{receipt_id}/link": {
-      "post": {
-        "tags": [
-          "receipts"
-        ],
-        "summary": "Link Receipt",
-        "operationId": "link_receipt_api_groups__group_id__receipts__receipt_id__link_post",
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Group Id"
-            }
-          },
-          {
-            "name": "receipt_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Receipt Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReceiptLinkRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReceiptRead"
+                  "$ref": "#/components/schemas/AttachmentApplyResult"
                 }
               }
             }
@@ -3781,6 +3715,878 @@
         ],
         "title": "AdminUserRead"
       },
+      "AttachmentApplyRequest": {
+        "properties": {
+          "expense_id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Expense Id"
+          },
+          "participant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participant Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expense_id"
+        ],
+        "title": "AttachmentApplyRequest"
+      },
+      "AttachmentApplyResult": {
+        "properties": {
+          "attachment": {
+            "$ref": "#/components/schemas/AttachmentRead"
+          },
+          "split": {
+            "$ref": "#/components/schemas/AttachmentSplitRead"
+          }
+        },
+        "type": "object",
+        "required": [
+          "attachment",
+          "split"
+        ],
+        "title": "AttachmentApplyResult"
+      },
+      "AttachmentExtractItemsRequest": {
+        "properties": {
+          "expense_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expense Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AttachmentExtractItemsRequest"
+      },
+      "AttachmentExtractionResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "EXTRACTED",
+              "FAILED"
+            ],
+            "title": "Status"
+          },
+          "attachment_id": {
+            "type": "string",
+            "title": "Attachment Id"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "items_total": {
+            "type": "integer",
+            "title": "Items Total",
+            "default": 0
+          },
+          "merchant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "currency_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Code"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "attachment": {
+            "$ref": "#/components/schemas/AttachmentRead"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AttachmentItemRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "opt_outs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Opt Outs"
+          },
+          "split": {
+            "$ref": "#/components/schemas/AttachmentSplitRead"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "attachment_id",
+          "attachment",
+          "split"
+        ],
+        "title": "AttachmentExtractionResult"
+      },
+      "AttachmentItemCreate": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "quantity_milli": {
+            "type": "integer",
+            "maximum": 1000000000.0,
+            "minimum": 1.0,
+            "title": "Quantity Milli"
+          },
+          "amount": {
+            "type": "integer",
+            "maximum": 1000000000.0,
+            "minimum": 1.0,
+            "title": "Amount"
+          },
+          "is_shared": {
+            "type": "boolean",
+            "title": "Is Shared",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "quantity_milli",
+          "amount"
+        ],
+        "title": "AttachmentItemCreate"
+      },
+      "AttachmentItemRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "attachment_id": {
+            "type": "string",
+            "title": "Attachment Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "quantity_milli": {
+            "type": "integer",
+            "title": "Quantity Milli"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "is_shared": {
+            "type": "boolean",
+            "title": "Is Shared"
+          },
+          "is_adjustment": {
+            "type": "boolean",
+            "title": "Is Adjustment"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "default": 1
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At"
+          },
+          "portions": {
+            "items": {
+              "$ref": "#/components/schemas/AttachmentPortionRead"
+            },
+            "type": "array",
+            "title": "Portions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "attachment_id",
+          "name",
+          "quantity_milli",
+          "amount",
+          "is_shared",
+          "is_adjustment",
+          "position"
+        ],
+        "title": "AttachmentItemRead"
+      },
+      "AttachmentItemUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "quantity_milli": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity Milli"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 1000000000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "is_shared": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Shared"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AttachmentItemUpdate"
+      },
+      "AttachmentLinkRequest": {
+        "properties": {
+          "expense_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expense Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AttachmentLinkRequest"
+      },
+      "AttachmentOptOutUpdate": {
+        "properties": {
+          "opted_out": {
+            "type": "boolean",
+            "title": "Opted Out"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "opted_out"
+        ],
+        "title": "AttachmentOptOutUpdate"
+      },
+      "AttachmentPortionInput": {
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "PARTICIPANT",
+              "SHARED"
+            ],
+            "title": "Target"
+          },
+          "participant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participant Id"
+          },
+          "quantity_milli": {
+            "type": "integer",
+            "maximum": 1000000000.0,
+            "minimum": 0.0,
+            "title": "Quantity Milli"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "target",
+          "quantity_milli"
+        ],
+        "title": "AttachmentPortionInput"
+      },
+      "AttachmentPortionRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "PARTICIPANT",
+              "SHARED"
+            ],
+            "title": "Target"
+          },
+          "participant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Participant Id"
+          },
+          "quantity_milli": {
+            "type": "integer",
+            "title": "Quantity Milli"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "item_id",
+          "target",
+          "quantity_milli"
+        ],
+        "title": "AttachmentPortionRead"
+      },
+      "AttachmentPortionsReplace": {
+        "properties": {
+          "portions": {
+            "items": {
+              "$ref": "#/components/schemas/AttachmentPortionInput"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Portions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AttachmentPortionsReplace"
+      },
+      "AttachmentRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "group_id": {
+            "type": "string",
+            "title": "Group Id"
+          },
+          "expense_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expense Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url"
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "byte_size": {
+            "type": "integer",
+            "title": "Byte Size",
+            "default": 0
+          },
+          "width": {
+            "type": "integer",
+            "title": "Width",
+            "default": 1
+          },
+          "height": {
+            "type": "integer",
+            "title": "Height",
+            "default": 1
+          },
+          "receipt_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "EXTRACTING",
+                  "EXTRACTED",
+                  "FAILED"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Status"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts",
+            "default": 0
+          },
+          "merchant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Merchant"
+          },
+          "receipt_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Date"
+          },
+          "currency_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Code"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "default": 1
+          },
+          "deleted_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deleted At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "group_id",
+          "url",
+          "filename",
+          "content_type",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AttachmentRead"
+      },
+      "AttachmentSplitParticipant": {
+        "properties": {
+          "participant_id": {
+            "type": "string",
+            "title": "Participant Id"
+          },
+          "direct": {
+            "type": "integer",
+            "title": "Direct"
+          },
+          "shared": {
+            "type": "integer",
+            "title": "Shared"
+          },
+          "unassigned": {
+            "type": "integer",
+            "title": "Unassigned"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_id",
+          "direct",
+          "shared",
+          "unassigned",
+          "total"
+        ],
+        "title": "AttachmentSplitParticipant"
+      },
+      "AttachmentSplitRead": {
+        "properties": {
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/AttachmentSplitParticipant"
+            },
+            "type": "array",
+            "title": "Participants"
+          },
+          "items_total": {
+            "type": "integer",
+            "title": "Items Total"
+          },
+          "shared_pool": {
+            "type": "integer",
+            "title": "Shared Pool"
+          },
+          "unassigned_pool": {
+            "type": "integer",
+            "title": "Unassigned Pool"
+          },
+          "all_opted_out": {
+            "type": "boolean",
+            "title": "All Opted Out"
+          },
+          "participant_totals": {
+            "items": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Participant Totals"
+          },
+          "unassigned": {
+            "type": "integer",
+            "title": "Unassigned",
+            "default": 0
+          },
+          "shared": {
+            "type": "integer",
+            "title": "Shared",
+            "default": 0
+          },
+          "adjustments": {
+            "type": "integer",
+            "title": "Adjustments",
+            "default": 0
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "items_total",
+          "shared_pool",
+          "unassigned_pool",
+          "all_opted_out"
+        ],
+        "title": "AttachmentSplitRead"
+      },
+      "AttachmentState": {
+        "properties": {
+          "attachment": {
+            "$ref": "#/components/schemas/AttachmentRead"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AttachmentItemRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "opt_outs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Opt Outs"
+          },
+          "split": {
+            "$ref": "#/components/schemas/AttachmentSplitRead"
+          }
+        },
+        "type": "object",
+        "required": [
+          "attachment",
+          "split"
+        ],
+        "title": "AttachmentState"
+      },
+      "AttachmentTotalExtraction": {
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "type": "object",
+        "title": "AttachmentTotalExtraction"
+      },
       "AuthProviders": {
         "properties": {
           "google": {
@@ -3825,12 +4631,24 @@
         ],
         "title": "BalanceEntry"
       },
-      "Body_upload_document_api_groups__group_id__expenses__expense_id__documents_post": {
+      "Body_upload_attachment_api_groups__group_id__attachments_post": {
         "properties": {
           "file": {
             "type": "string",
             "contentMediaType": "application/octet-stream",
             "title": "File"
+          },
+          "expense_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expense Id"
           },
           "width": {
             "type": "integer",
@@ -3849,33 +4667,7 @@
         "required": [
           "file"
         ],
-        "title": "Body_upload_document_api_groups__group_id__expenses__expense_id__documents_post"
-      },
-      "Body_upload_receipt_image_api_groups__group_id__receipts_upload_post": {
-        "properties": {
-          "file": {
-            "type": "string",
-            "contentMediaType": "application/octet-stream",
-            "title": "File"
-          },
-          "width": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Width",
-            "default": 1
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Height",
-            "default": 1
-          }
-        },
-        "type": "object",
-        "required": [
-          "file"
-        ],
-        "title": "Body_upload_receipt_image_api_groups__group_id__receipts_upload_post"
+        "title": "Body_upload_attachment_api_groups__group_id__attachments_post"
       },
       "CategoryInferenceRequest": {
         "properties": {
@@ -4003,46 +4795,6 @@
           "total"
         ],
         "title": "CategorySpending"
-      },
-      "DocumentInput": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 64,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "url": {
-            "type": "string",
-            "maxLength": 2000,
-            "minLength": 1,
-            "title": "Url"
-          },
-          "width": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Width"
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1.0,
-            "title": "Height"
-          }
-        },
-        "type": "object",
-        "required": [
-          "url",
-          "width",
-          "height"
-        ],
-        "title": "DocumentInput"
       },
       "DrilldownExpense": {
         "properties": {
@@ -4201,14 +4953,6 @@
             "minItems": 1,
             "title": "Paid For"
           },
-          "documents": {
-            "items": {
-              "$ref": "#/components/schemas/DocumentInput"
-            },
-            "type": "array",
-            "maxItems": 20,
-            "title": "Documents"
-          },
           "participant_id": {
             "anyOf": [
               {
@@ -4249,34 +4993,6 @@
         },
         "type": "object",
         "title": "ExpenseDeleteOptions"
-      },
-      "ExpenseDocumentRead": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "url": {
-            "type": "string",
-            "title": "Url"
-          },
-          "width": {
-            "type": "integer",
-            "title": "Width"
-          },
-          "height": {
-            "type": "integer",
-            "title": "Height"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "url",
-          "width",
-          "height"
-        ],
-        "title": "ExpenseDocumentRead"
       },
       "ExpenseDrilldown": {
         "properties": {
@@ -4556,22 +5272,12 @@
             "type": "array",
             "title": "Paid For"
           },
-          "documents": {
+          "attachments": {
             "items": {
-              "$ref": "#/components/schemas/ExpenseDocumentRead"
+              "$ref": "#/components/schemas/AttachmentRead"
             },
             "type": "array",
-            "title": "Documents"
-          },
-          "receipt": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ReceiptSummary"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "title": "Attachments"
           }
         },
         "type": "object",
@@ -4753,21 +5459,6 @@
             ],
             "title": "Paid For"
           },
-          "documents": {
-            "anyOf": [
-              {
-                "items": {
-                  "$ref": "#/components/schemas/DocumentInput"
-                },
-                "type": "array",
-                "maxItems": 20
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Documents"
-          },
           "participant_id": {
             "anyOf": [
               {
@@ -4798,24 +5489,14 @@
       },
       "FeatureFlags": {
         "properties": {
-          "receipt_extract": {
+          "receipt_ai": {
             "type": "boolean",
-            "title": "Receipt Extract",
+            "title": "Receipt Ai",
             "default": false
           },
-          "receipt_items": {
+          "category_ai": {
             "type": "boolean",
-            "title": "Receipt Items",
-            "default": false
-          },
-          "category_extract": {
-            "type": "boolean",
-            "title": "Category Extract",
-            "default": false
-          },
-          "expense_documents": {
-            "type": "boolean",
-            "title": "Expense Documents",
+            "title": "Category Ai",
             "default": false
           }
         },
@@ -5694,932 +6375,6 @@
         "type": "object",
         "title": "ReadinessResponse"
       },
-      "ReceiptApplyRequest": {
-        "properties": {
-          "expense_id": {
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-            "title": "Expense Id"
-          },
-          "participant_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 64,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Participant Id"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "expense_id"
-        ],
-        "title": "ReceiptApplyRequest"
-      },
-      "ReceiptApplyResult": {
-        "properties": {
-          "receipt": {
-            "$ref": "#/components/schemas/ReceiptRead"
-          },
-          "expense": {
-            "$ref": "#/components/schemas/ExpenseRead"
-          },
-          "split": {
-            "$ref": "#/components/schemas/ReceiptSplitRead"
-          }
-        },
-        "type": "object",
-        "required": [
-          "receipt",
-          "expense",
-          "split"
-        ],
-        "title": "ReceiptApplyResult"
-      },
-      "ReceiptExtractRequest": {
-        "properties": {
-          "image_url": {
-            "type": "string",
-            "maxLength": 2000,
-            "minLength": 1,
-            "title": "Image Url"
-          },
-          "image_width": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "minimum": 1.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Width"
-          },
-          "image_height": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "minimum": 1.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Height"
-          },
-          "expense_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 64,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expense Id"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "image_url"
-        ],
-        "title": "ReceiptExtractRequest"
-      },
-      "ReceiptExtractionResult": {
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "EXTRACTED",
-              "FAILED"
-            ],
-            "title": "Status"
-          },
-          "receipt_id": {
-            "type": "string",
-            "title": "Receipt Id"
-          },
-          "total": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Total"
-          },
-          "items_total": {
-            "type": "integer",
-            "title": "Items Total",
-            "default": 0
-          },
-          "merchant": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Merchant"
-          },
-          "date": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Date"
-          },
-          "currency_code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Currency Code"
-          },
-          "category_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category Id"
-          },
-          "receipt": {
-            "$ref": "#/components/schemas/ReceiptRead"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ReceiptItemRead"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "opt_outs": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Opt Outs"
-          },
-          "split": {
-            "$ref": "#/components/schemas/ReceiptSplitRead"
-          }
-        },
-        "type": "object",
-        "required": [
-          "status",
-          "receipt_id",
-          "receipt",
-          "split"
-        ],
-        "title": "ReceiptExtractionResult"
-      },
-      "ReceiptImageRead": {
-        "properties": {
-          "url": {
-            "type": "string",
-            "title": "Url"
-          },
-          "width": {
-            "type": "integer",
-            "title": "Width"
-          },
-          "height": {
-            "type": "integer",
-            "title": "Height"
-          }
-        },
-        "type": "object",
-        "required": [
-          "url",
-          "width",
-          "height"
-        ],
-        "title": "ReceiptImageRead"
-      },
-      "ReceiptItemCreate": {
-        "properties": {
-          "id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 64,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "maxLength": 200,
-            "minLength": 1,
-            "title": "Name"
-          },
-          "quantity_milli": {
-            "type": "integer",
-            "maximum": 1000000000.0,
-            "minimum": 1.0,
-            "title": "Quantity Milli"
-          },
-          "amount": {
-            "type": "integer",
-            "maximum": 1000000000.0,
-            "minimum": 1.0,
-            "title": "Amount"
-          },
-          "is_shared": {
-            "type": "boolean",
-            "title": "Is Shared",
-            "default": false
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "name",
-          "quantity_milli",
-          "amount"
-        ],
-        "title": "ReceiptItemCreate"
-      },
-      "ReceiptItemRead": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "receipt_id": {
-            "type": "string",
-            "title": "Receipt Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "quantity_milli": {
-            "type": "integer",
-            "title": "Quantity Milli"
-          },
-          "unit_price": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Unit Price"
-          },
-          "amount": {
-            "type": "integer",
-            "title": "Amount"
-          },
-          "is_shared": {
-            "type": "boolean",
-            "title": "Is Shared"
-          },
-          "is_adjustment": {
-            "type": "boolean",
-            "title": "Is Adjustment"
-          },
-          "position": {
-            "type": "integer",
-            "title": "Position"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version",
-            "default": 1
-          },
-          "updated_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Updated At"
-          },
-          "deleted_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deleted At"
-          },
-          "portions": {
-            "items": {
-              "$ref": "#/components/schemas/ReceiptPortionRead"
-            },
-            "type": "array",
-            "title": "Portions"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "receipt_id",
-          "name",
-          "quantity_milli",
-          "amount",
-          "is_shared",
-          "is_adjustment",
-          "position"
-        ],
-        "title": "ReceiptItemRead"
-      },
-      "ReceiptItemUpdate": {
-        "properties": {
-          "name": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 200,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Name"
-          },
-          "quantity_milli": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1000000000.0,
-                "minimum": 1.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Quantity Milli"
-          },
-          "amount": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 1000000000.0,
-                "minimum": 1.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Amount"
-          },
-          "is_shared": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Is Shared"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "title": "ReceiptItemUpdate"
-      },
-      "ReceiptLinkRequest": {
-        "properties": {
-          "expense_id": {
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-            "title": "Expense Id"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "expense_id"
-        ],
-        "title": "ReceiptLinkRequest"
-      },
-      "ReceiptOptOutUpdate": {
-        "properties": {
-          "opted_out": {
-            "type": "boolean",
-            "title": "Opted Out"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "opted_out"
-        ],
-        "title": "ReceiptOptOutUpdate"
-      },
-      "ReceiptPortionInput": {
-        "properties": {
-          "target": {
-            "type": "string",
-            "enum": [
-              "PARTICIPANT",
-              "SHARED"
-            ],
-            "title": "Target"
-          },
-          "participant_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 64,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Participant Id"
-          },
-          "quantity_milli": {
-            "type": "integer",
-            "maximum": 1000000000.0,
-            "minimum": 0.0,
-            "title": "Quantity Milli"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "target",
-          "quantity_milli"
-        ],
-        "title": "ReceiptPortionInput"
-      },
-      "ReceiptPortionRead": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "item_id": {
-            "type": "string",
-            "title": "Item Id"
-          },
-          "target": {
-            "type": "string",
-            "enum": [
-              "PARTICIPANT",
-              "SHARED"
-            ],
-            "title": "Target"
-          },
-          "participant_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Participant Id"
-          },
-          "quantity_milli": {
-            "type": "integer",
-            "title": "Quantity Milli"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version",
-            "default": 1
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "item_id",
-          "target",
-          "quantity_milli"
-        ],
-        "title": "ReceiptPortionRead"
-      },
-      "ReceiptPortionsReplace": {
-        "properties": {
-          "portions": {
-            "items": {
-              "$ref": "#/components/schemas/ReceiptPortionInput"
-            },
-            "type": "array",
-            "maxItems": 100,
-            "title": "Portions"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "title": "ReceiptPortionsReplace"
-      },
-      "ReceiptRead": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "group_id": {
-            "type": "string",
-            "title": "Group Id"
-          },
-          "image_url": {
-            "type": "string",
-            "title": "Image Url"
-          },
-          "image_width": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Width"
-          },
-          "image_height": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Height"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "EXTRACTING",
-              "EXTRACTED",
-              "FAILED"
-            ],
-            "title": "Status"
-          },
-          "attempts": {
-            "type": "integer",
-            "title": "Attempts",
-            "default": 0
-          },
-          "merchant": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Merchant"
-          },
-          "receipt_date": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Receipt Date"
-          },
-          "currency_code": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Currency Code"
-          },
-          "total": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Total"
-          },
-          "expense_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Expense Id"
-          },
-          "provider": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Provider"
-          },
-          "model": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Model"
-          },
-          "created_at": {
-            "type": "string",
-            "title": "Created At"
-          },
-          "updated_at": {
-            "type": "string",
-            "title": "Updated At"
-          },
-          "version": {
-            "type": "integer",
-            "title": "Version",
-            "default": 1
-          },
-          "deleted_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Deleted At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "group_id",
-          "image_url",
-          "status",
-          "created_at",
-          "updated_at"
-        ],
-        "title": "ReceiptRead"
-      },
-      "ReceiptSplitParticipant": {
-        "properties": {
-          "participant_id": {
-            "type": "string",
-            "title": "Participant Id"
-          },
-          "direct": {
-            "type": "integer",
-            "title": "Direct"
-          },
-          "shared": {
-            "type": "integer",
-            "title": "Shared"
-          },
-          "unassigned": {
-            "type": "integer",
-            "title": "Unassigned"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          }
-        },
-        "type": "object",
-        "required": [
-          "participant_id",
-          "direct",
-          "shared",
-          "unassigned",
-          "total"
-        ],
-        "title": "ReceiptSplitParticipant"
-      },
-      "ReceiptSplitRead": {
-        "properties": {
-          "participants": {
-            "items": {
-              "$ref": "#/components/schemas/ReceiptSplitParticipant"
-            },
-            "type": "array",
-            "title": "Participants"
-          },
-          "items_total": {
-            "type": "integer",
-            "title": "Items Total"
-          },
-          "shared_pool": {
-            "type": "integer",
-            "title": "Shared Pool"
-          },
-          "unassigned_pool": {
-            "type": "integer",
-            "title": "Unassigned Pool"
-          },
-          "all_opted_out": {
-            "type": "boolean",
-            "title": "All Opted Out"
-          },
-          "participant_totals": {
-            "items": {
-              "additionalProperties": {
-                "anyOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "string"
-                  }
-                ]
-              },
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Participant Totals"
-          },
-          "unassigned": {
-            "type": "integer",
-            "title": "Unassigned",
-            "default": 0
-          },
-          "shared": {
-            "type": "integer",
-            "title": "Shared",
-            "default": 0
-          },
-          "adjustments": {
-            "type": "integer",
-            "title": "Adjustments",
-            "default": 0
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total",
-            "default": 0
-          }
-        },
-        "type": "object",
-        "required": [
-          "items_total",
-          "shared_pool",
-          "unassigned_pool",
-          "all_opted_out"
-        ],
-        "title": "ReceiptSplitRead"
-      },
-      "ReceiptState": {
-        "properties": {
-          "receipt": {
-            "$ref": "#/components/schemas/ReceiptRead"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ReceiptItemRead"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "opt_outs": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Opt Outs"
-          },
-          "split": {
-            "$ref": "#/components/schemas/ReceiptSplitRead"
-          }
-        },
-        "type": "object",
-        "required": [
-          "receipt",
-          "split"
-        ],
-        "title": "ReceiptState"
-      },
-      "ReceiptSummary": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "status"
-        ],
-        "title": "ReceiptSummary"
-      },
-      "ReceiptTotalExtraction": {
-        "properties": {
-          "amount": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Amount"
-          },
-          "category_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Category Id"
-          },
-          "date": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Date"
-          },
-          "title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          }
-        },
-        "type": "object",
-        "title": "ReceiptTotalExtraction"
-      },
       "RecurrenceRule": {
         "type": "string",
         "enum": [
@@ -7114,6 +6869,44 @@
         "type": "object",
         "title": "StatsRange"
       },
+      "SyncAttachmentSnapshot": {
+        "properties": {
+          "attachment": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Attachment"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "portions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Portions"
+          },
+          "opt_outs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Opt Outs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "attachment"
+        ],
+        "title": "SyncAttachmentSnapshot"
+      },
       "SyncBootstrapResponse": {
         "properties": {
           "cursor": {
@@ -7144,12 +6937,12 @@
             "type": "array",
             "title": "Activities"
           },
-          "receipts": {
+          "attachments": {
             "items": {
-              "$ref": "#/components/schemas/SyncReceiptSnapshot"
+              "$ref": "#/components/schemas/SyncAttachmentSnapshot"
             },
             "type": "array",
-            "title": "Receipts"
+            "title": "Attachments"
           },
           "categories": {
             "items": {
@@ -7490,44 +7283,6 @@
           "status"
         ],
         "title": "SyncPushResult"
-      },
-      "SyncReceiptSnapshot": {
-        "properties": {
-          "receipt": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Receipt"
-          },
-          "items": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "portions": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Portions"
-          },
-          "opt_outs": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "type": "array",
-            "title": "Opt Outs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "receipt"
-        ],
-        "title": "SyncReceiptSnapshot"
       },
       "TierCounts": {
         "properties": {

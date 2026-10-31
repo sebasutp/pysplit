@@ -274,9 +274,10 @@ test('queues an offline document in a real browser and uploads it exactly once',
   const document = await page.evaluate(
     async ({ groupId, expenseId }) => {
       const { localRepository } = await import('/src/services/repository/local.js')
-      const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3, 4])
+      const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4])
       const file = new File([bytes], 'offline-proof.png', { type: 'image/png' })
-      return localRepository.documents.upload(groupId, expenseId, file, {
+      return localRepository.attachments.upload(groupId, file, {
+        expense_id: expenseId,
         width: 10,
         height: 20,
       })
@@ -290,11 +291,11 @@ test('queues an offline document in a real browser and uploads it exactly once',
     const outbox = await db.outbox.toArray()
     return {
       blobs: await db.blobs.count(),
-      documents: await db.documents.count(),
-      uploads: outbox.filter((row) => row.entity_type === 'document_upload').length,
+      attachments: await db.attachments.count(),
+      uploads: outbox.filter((row) => row.entity_type === 'attachment_upload').length,
     }
   })
-  expect(queued).toEqual({ blobs: 1, documents: 1, uploads: 1 })
+  expect(queued).toEqual({ blobs: 1, attachments: 1, uploads: 1 })
 
   // The blob row, placeholder and outbox row all survive a reload.
   await page.reload()
@@ -303,7 +304,7 @@ test('queues an offline document in a real browser and uploads it exactly once',
     return {
       blobs: await db.blobs.count(),
       uploads: (await db.outbox.toArray()).filter(
-        (row) => row.entity_type === 'document_upload',
+        (row) => row.entity_type === 'attachment_upload',
       ).length,
     }
   })
@@ -319,7 +320,7 @@ test('queues an offline document in a real browser and uploads it exactly once',
         )
         if (!response.ok()) return -1
         const body = await response.json()
-        return (body.documents || []).length
+        return (body.attachments || []).length
       },
       { timeout: 30_000 },
     )

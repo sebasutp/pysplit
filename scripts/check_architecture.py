@@ -20,7 +20,7 @@ FRONTEND = ROOT / "frontend"
 ROUTERS = (
     "groups.py",
     "expenses.py",
-    "receipts.py",
+    "attachments.py",
     "balances.py",
     "stats.py",
     "activities.py",

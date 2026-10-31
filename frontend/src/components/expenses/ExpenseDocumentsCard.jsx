@@ -1,8 +1,9 @@
-/** Notes, reimbursement flag and document attachments. */
+/** Notes, reimbursement flag and unified attachments. */
 
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '../ui/Button'
+import { AttachmentList } from '../attachments/AttachmentList'
+import { ReceiptItemsPreview } from '../attachments/ReceiptItemsPreview'
 import { Card, CardContent } from '../ui/Card'
 import { FormField } from '../ui/Form'
 import { Textarea } from '../ui/Input'
@@ -13,10 +14,16 @@ import { Textarea } from '../ui/Input'
  *   setNotes: (value: string) => void,
  *   isReimbursement: boolean,
  *   setIsReimbursement: (value: boolean) => void,
- *   handleDocuments: (event: React.ChangeEvent<HTMLInputElement>) => void,
- *   pendingFiles: File[],
- *   documents: any[],
- *   removeDocument: (documentId: string) => void,
+ *   handleAttachments: (event: React.ChangeEvent<HTMLInputElement>) => void,
+ *   attachments: any[],
+ *   removeAttachment: (attachmentId: string) => void,
+ *   onScan?: (attachment: any) => void,
+ *   onReview?: (attachment: any) => void,
+ *   canScan?: boolean,
+ *   scanningId?: string|null,
+ *   receipt?: any|null,
+ *   currency?: any,
+ *   locale?: string,
  * }} props
  */
 export function ExpenseDocumentsCard({
@@ -24,10 +31,16 @@ export function ExpenseDocumentsCard({
   setNotes,
   isReimbursement,
   setIsReimbursement,
-  handleDocuments,
-  pendingFiles,
-  documents,
-  removeDocument,
+  handleAttachments,
+  attachments,
+  removeAttachment,
+  onScan,
+  onReview,
+  canScan = false,
+  scanningId = null,
+  receipt = null,
+  currency = null,
+  locale = 'en-US',
 }) {
   const { t } = useTranslation()
 
@@ -53,45 +66,33 @@ export function ExpenseDocumentsCard({
           {t('ExpenseForm.isReimbursementField.label', 'This is a reimbursement')}
         </label>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label className="mb-1 block text-sm font-medium" htmlFor="expense-attachments">
             {t('ExpenseForm.attachDocuments', 'Attach documents')}
           </label>
-          <input type="file" multiple onChange={handleDocuments} />
-          {pendingFiles.length ? (
-            <ul className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
-              {pendingFiles.map((file, index) => (
-                <li key={`${file.name}-${index}`}>
-                  {file.name} · {t('ExpenseDocumentsInput.pending', 'uploads when saved')}
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {documents.length ? (
-            <ul className="mt-2 flex flex-col gap-1 text-sm">
-              {documents.map((document) => (
-                <li key={document.id} className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-2">
-                    <span className="underline">{document.id}</span>
-                    {document.pending || document.pending_upload ? (
-                      <span
-                        data-testid="document-pending"
-                        className="text-xs text-muted-foreground"
-                      >
-                        {t('ExpenseDocumentsInput.queued', 'Pending upload')}
-                      </span>
-                    ) : (
-                      <a href={document.url} target="_blank" rel="noreferrer" className="underline">
-                        {t('ExpenseDocumentsInput.open', 'Open')}
-                      </a>
-                    )}
-                  </span>
-                  <Button variant="ghost" size="sm" onClick={() => void removeDocument(document.id)}>
-                    {t('ExpenseForm.DeletePopup.label', 'Delete')}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          <input
+            id="expense-attachments"
+            type="file"
+            multiple
+            accept="image/*,application/pdf"
+            onChange={handleAttachments}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(
+              'Attachments.help',
+              'Images are compressed before upload. PDFs are kept as attachments and open in a new tab.',
+            )}
+          </p>
+          <div className="mt-2">
+            <AttachmentList
+              attachments={attachments}
+              onRemove={removeAttachment}
+              onScan={onScan}
+              onReview={onReview}
+              canScan={canScan}
+              scanningId={scanningId}
+            />
+            <ReceiptItemsPreview receipt={receipt} currency={currency} locale={locale} />
+          </div>
         </div>
       </CardContent>
     </Card>

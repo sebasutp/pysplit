@@ -8,8 +8,8 @@ test.use({ seedActiveUser: false })
 
 /**
  * Puts the browser in the state a first-time visitor is in: the group exists,
- * but this device has never picked an active user. Creating a group through
- * the UI records the group's active-user key itself, so it has to be cleared.
+ * but this device has never picked an active user. Clear any keys left by
+ * earlier navigations so each scenario starts unanswered.
  */
 async function forgetActiveUser(page: import('@playwright/test').Page) {
   await page.evaluate(() => {

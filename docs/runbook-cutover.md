@@ -266,7 +266,7 @@ them. Stop the API before restoring so the old SQLite file has no open writers.
 Run on staging after the production-shaped stack is built, not on production.
 
 1. Cut over to the new stack.
-2. Create a test expense and a receipt/document attachment.
+2. Create a test expense and an image/PDF attachment.
 3. Record the new write IDs.
 4. Stop the new stack and point the proxy back to the old stack.
 5. Start the old stack and verify its data is intact; the new test expense must

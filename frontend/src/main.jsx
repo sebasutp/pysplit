@@ -5,7 +5,12 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { startSync } from './services/repository'
 import { startPwa } from './services/pwa'
+import { stabilizeResourceTiming } from './utils/resource-timing'
 import './styles/index.css'
+
+// Install before the first render: React's Suspense image estimator reads
+// Resource Timing entries during commit.
+stabilizeResourceTiming()
 
 const container = document.getElementById('root')
 if (!container) {

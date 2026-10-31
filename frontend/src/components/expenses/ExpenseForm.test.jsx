@@ -21,10 +21,13 @@ vi.mock('../../services/repository', () => ({
       update,
       remove: vi.fn(),
     },
-    documents: { upload: vi.fn(), remove: vi.fn() },
-    receipts: {
+    attachments: {
       upload: vi.fn(),
+      update: vi.fn(),
+      link: vi.fn(),
+      remove: vi.fn(),
       extractTotal: vi.fn(),
+      extractItems: vi.fn(),
       pendingTotal,
       clearPendingTotal,
     },
@@ -66,7 +69,7 @@ const expense = {
   original_amount: null,
   conversion_rate: null,
   version: 7,
-  documents: [],
+  attachments: [],
 }
 
 beforeEach(() => {
@@ -195,6 +198,47 @@ describe('ExpenseForm', () => {
 
     await waitFor(() => expect(create).toHaveBeenCalled())
     expect(create.mock.calls[0][1]).not.toHaveProperty('base_version')
+  })
+
+  it('offers “Assign items” next to the advanced split options when a receipt exists', async () => {
+    const user = userEvent.setup()
+    const withReceipt = {
+      ...expense,
+      attachments: [
+        {
+          id: 'attachment-1',
+          filename: 'receipt.jpg',
+          content_type: 'image/jpeg',
+          receipt_status: 'EXTRACTED',
+          url: '/uploads/receipt.jpg',
+        },
+      ],
+    }
+    render(
+      <MemoryRouter initialEntries={['/groups/group-1/expenses/expense-1/edit']}>
+        <ToastProvider>
+          <Routes>
+            <Route
+              path="/groups/group-1/expenses/expense-1/edit"
+              element={
+                <ExpenseForm
+                  group={group}
+                  categories={categories}
+                  expense={withReceipt}
+                  activeUserId="p1"
+                />
+              }
+            />
+            <Route path="/groups/group-1/expenses/expense-1/items" element={<div>items screen</div>} />
+          </Routes>
+        </ToastProvider>
+      </MemoryRouter>,
+    )
+
+    const assignButtons = screen.getAllByRole('button', { name: 'Assign items' })
+    expect(assignButtons).toHaveLength(2)
+    await user.click(assignButtons[0])
+    expect(await screen.findByText('items screen')).toBeInTheDocument()
   })
 
   it('shows a conflict message and stays on the form when the update is rejected', async () => {

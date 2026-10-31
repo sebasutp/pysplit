@@ -1,4 +1,4 @@
-"""Receipt item table (legacy Prisma ``ReceiptItem``)."""
+"""Line item belonging to a receipt attachment."""
 
 from __future__ import annotations
 
@@ -11,13 +11,15 @@ from app.models.base import SyncColumns, utc_now
 from app.models.types import UTCDateTime
 
 
-class ReceiptItem(SyncColumns, table=True):
-    __tablename__ = "receipt_items"
-    __table_args__ = (Index("ix_receipt_items_receipt_position", "receipt_id", "position"),)
+class AttachmentItem(SyncColumns, table=True):
+    __tablename__ = "attachment_items"
+    __table_args__ = (
+        Index("ix_attachment_items_attachment_position", "attachment_id", "position"),
+    )
 
     id: str = Field(primary_key=True, max_length=64)
-    receipt_id: str = Field(
-        foreign_key="receipts.id",
+    attachment_id: str = Field(
+        foreign_key="attachments.id",
         ondelete="CASCADE",
         index=True,
         nullable=False,

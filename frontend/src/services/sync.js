@@ -47,6 +47,14 @@ let channel = null
 let started = false
 /** @type {(() => Promise<any>) | null} */
 let groupScopeReconciler = null
+/**
+ * Per-group generation counter for full snapshots. Bootstraps are not
+ * serialized, so a slow response could otherwise overwrite newer local state
+ * (for example a just-extracted receipt attachment) with an older snapshot.
+ *
+ * @type {Map<string, number>}
+ */
+const bootstrapGenerations = new Map()
 
 /**
  * Register the repository callback that claims locally known guest groups and
@@ -229,28 +237,30 @@ async function handleResult(result, operation) {
 async function pushRestOperation(operation) {
   const meta = operation.meta || {}
   const groupPath = `/groups/${encodeURIComponent(operation.group_id)}`
-  const receiptPath = `${groupPath}/receipts/${encodeURIComponent(meta.receipt_id || '')}`
-  if (operation.entity_type === 'receipt_item') {
+  const attachmentPath = `${groupPath}/attachments/${encodeURIComponent(
+    meta.attachment_id || '',
+  )}`
+  if (operation.entity_type === 'attachment_item') {
     if (operation.op_type === 'create') {
       // The server accepts a client id so a retried create is idempotent and
       // later portions/updates can address the same item.
-      return api.post(`${receiptPath}/items`, {
+      return api.post(`${attachmentPath}/items`, {
         body: { ...operation.payload, id: operation.entity_id },
       })
     }
-    const itemPath = `${receiptPath}/items/${encodeURIComponent(operation.entity_id)}`
+    const itemPath = `${attachmentPath}/items/${encodeURIComponent(operation.entity_id)}`
     if (operation.op_type === 'delete') return api.delete(itemPath)
     return api.patch(itemPath, { body: operation.payload })
   }
-  if (operation.entity_type === 'receipt_portion') {
+  if (operation.entity_type === 'attachment_portion') {
     return api.put(
-      `${receiptPath}/items/${encodeURIComponent(meta.item_id || operation.entity_id)}/portions`,
+      `${attachmentPath}/items/${encodeURIComponent(meta.item_id || operation.entity_id)}/portions`,
       { body: { portions: operation.payload?.portions || [] } },
     )
   }
-  if (operation.entity_type === 'receipt_opt_out') {
+  if (operation.entity_type === 'attachment_opt_out') {
     return api.put(
-      `${receiptPath}/opt-outs/${encodeURIComponent(meta.participant_id || operation.entity_id)}`,
+      `${attachmentPath}/opt-outs/${encodeURIComponent(meta.participant_id || operation.entity_id)}`,
       { body: { opted_out: Boolean(operation.payload?.opted_out) } },
     )
   }
@@ -269,50 +279,52 @@ function queuedFile(blobRow) {
 }
 
 /**
- * Persist a receipt extraction result over the local placeholder receipt.
+ * Persist an attachment extraction result over the local placeholder.
  *
  * @param {any} operation
  * @param {any} result
- * @param {string} imageUrl
+ * @param {any} uploaded
  */
-async function applyQueuedReceiptExtraction(operation, result, imageUrl) {
-  const receipt = result?.receipt
-  if (!receipt?.id) return
-  const expenseId =
-    operation.payload?.expense_id || receipt.expense_id || null
+async function applyQueuedAttachmentExtraction(operation, result, uploaded) {
+  const attachment = result?.attachment
+  if (!attachment?.id) return
+  const expenseId = operation.payload?.expense_id || attachment.expense_id || null
   await db.transaction(
     'rw',
-    [db.receipts, db.receiptItems, db.receiptPortions, db.receiptOptOuts],
+    [db.attachments, db.attachmentItems, db.attachmentPortions, db.attachmentOptOuts],
     async () => {
-      if (operation.entity_id !== receipt.id) {
-        await db.receipts.delete(operation.entity_id)
+      if (operation.entity_id !== attachment.id) {
+        await db.attachments.delete(operation.entity_id)
       }
-      await db.receipts.put({
-        ...receipt,
-        image_url: receipt.image_url || imageUrl,
+      await db.attachments.put({
+        ...uploaded,
+        ...attachment,
         expense_id: expenseId,
         pending: false,
         pending_scan: false,
       })
-      await db.receiptItems.where('receipt_id').equals(operation.entity_id).delete()
-      if (receipt.id !== operation.entity_id) {
-        await db.receiptItems.where('receipt_id').equals(receipt.id).delete()
+      await db.attachmentItems
+        .where('attachment_id')
+        .equals(operation.entity_id)
+        .delete()
+      if (attachment.id !== operation.entity_id) {
+        await db.attachmentItems.where('attachment_id').equals(attachment.id).delete()
       }
       for (const item of result.items || []) {
         const { portions, ...row } = item
-        await db.receiptItems.put({ ...row, pending: false })
-        await db.receiptPortions.where('item_id').equals(item.id).delete()
+        await db.attachmentItems.put({ ...row, pending: false })
+        await db.attachmentPortions.where('item_id').equals(item.id).delete()
         if (portions?.length) {
-          await db.receiptPortions.bulkPut(
+          await db.attachmentPortions.bulkPut(
             portions.map((portion) => ({ ...portion, pending: false })),
           )
         }
       }
-      await db.receiptOptOuts.where('receipt_id').equals(receipt.id).delete()
+      await db.attachmentOptOuts.where('attachment_id').equals(attachment.id).delete()
       for (const participantId of result.opt_outs || []) {
-        await db.receiptOptOuts.put({
-          id: `${receipt.id}:${participantId}`,
-          receipt_id: receipt.id,
+        await db.attachmentOptOuts.put({
+          id: `${attachment.id}:${participantId}`,
+          attachment_id: attachment.id,
           participant_id: participantId,
           created_at: nowIso(),
           updated_at: nowIso(),
@@ -341,17 +353,16 @@ async function pushBlobOperation(operation) {
     ? await db.blobs.get(operation.meta.blob_id)
     : null
 
-  if (operation.entity_type === 'document_remove') {
-    const expenseId = operation.payload?.expense_id || operation.meta?.expense_id
+  if (operation.entity_type === 'attachment_remove') {
     try {
       await api.delete(
-        `${groupPath}/expenses/${encodeURIComponent(expenseId)}/documents/${encodeURIComponent(operation.entity_id)}`,
+        `${groupPath}/attachments/${encodeURIComponent(operation.entity_id)}`,
       )
     } catch (error) {
       const code = error && typeof error === 'object' && 'code' in error ? error.code : 'network'
       if (code !== 'not_found') throw error
     }
-    await db.documents.delete(operation.entity_id)
+    await db.attachments.delete(operation.entity_id)
     return null
   }
 
@@ -361,84 +372,81 @@ async function pushBlobOperation(operation) {
     })
   }
 
-  if (operation.entity_type === 'document_upload') {
-    const expenseId = operation.payload?.expense_id || blobRow.expense_id
+  if (operation.entity_type !== 'attachment_upload') {
+    throw Object.assign(new Error(`Unsupported queued upload ${operation.entity_type}`), {
+      code: 'validation',
+    })
+  }
+
+  let uploaded = operation.payload?.attachment
+  if (!uploaded) {
     const form = new FormData()
     form.append('file', queuedFile(blobRow))
     form.append('width', String(operation.payload?.width || blobRow.width || 1))
     form.append('height', String(operation.payload?.height || blobRow.height || 1))
-    const document = await api.post(
-      `${groupPath}/expenses/${encodeURIComponent(expenseId)}/documents`,
-      { body: form },
-    )
-    await db.transaction('rw', [db.documents, db.blobs], async () => {
-      await db.documents.delete(operation.entity_id)
-      await db.documents.put({
-        ...document,
-        expense_id: expenseId,
-        created_at: nowIso(),
-        pending: false,
+    if (operation.payload?.expense_id) {
+      form.append('expense_id', String(operation.payload.expense_id))
+    }
+    uploaded = await api.post(`${groupPath}/attachments`, { body: form })
+    const current = await db.outbox.get(operation.seq)
+    if (current) {
+      await db.outbox.put({
+        ...current,
+        payload: { ...current.payload, attachment: uploaded },
+        updated_at: nowIso(),
       })
-      await db.blobs.delete(blobRow.id)
+    }
+  }
+
+  const mode = operation.payload?.mode
+  if (mode === 'items') {
+    const result = await api.post(
+      `${groupPath}/attachments/${encodeURIComponent(uploaded.id)}/extract-items`,
+      {
+        body: operation.payload?.expense_id
+          ? { expense_id: operation.payload.expense_id }
+          : {},
+      },
+    )
+    await applyQueuedAttachmentExtraction(operation, result, uploaded)
+  } else if (mode === 'total') {
+    const result = await api.post(
+      `${groupPath}/attachments/${encodeURIComponent(uploaded.id)}/extract-total`,
+      { body: {} },
+    )
+    await db.transaction('rw', [db.attachments], async () => {
+      await db.attachments.delete(operation.entity_id)
+      await db.attachments.put({
+        ...uploaded,
+        expense_id: operation.payload?.expense_id || uploaded.expense_id || null,
+        pending: false,
+        pending_upload: false,
+      })
+    })
+    await setMetadata(`pending_receipt_total:${operation.group_id}`, {
+      ...result,
+      attachment_id: uploaded.id,
+      created_at: nowIso(),
     })
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('pysplit:refresh'))
     }
-    return document
-  }
-
-  if (operation.entity_type === 'receipt_upload') {
-    let imageUrl = operation.payload?.image_url
-    if (!imageUrl) {
-      const form = new FormData()
-      form.append('file', queuedFile(blobRow))
-      form.append('width', String(operation.payload?.width || blobRow.width || 1))
-      form.append('height', String(operation.payload?.height || blobRow.height || 1))
-      const image = await api.post(`${groupPath}/receipts/upload`, { body: form })
-      imageUrl = image.url
-      const current = await db.outbox.get(operation.seq)
-      if (current) {
-        await db.outbox.put({
-          ...current,
-          payload: { ...current.payload, image_url: imageUrl },
-          updated_at: nowIso(),
-        })
-      }
+  } else {
+    await db.transaction('rw', [db.attachments], async () => {
+      await db.attachments.delete(operation.entity_id)
+      await db.attachments.put({
+        ...uploaded,
+        expense_id: operation.payload?.expense_id || uploaded.expense_id || null,
+        pending: false,
+        pending_upload: false,
+      })
+    })
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('pysplit:refresh'))
     }
-
-    const mode = operation.payload?.mode
-    if (mode === 'items') {
-      const result = await api.post(`${groupPath}/receipts/extract-items`, {
-        body: {
-          image_url: imageUrl,
-          image_width: operation.payload?.width || blobRow.width || 1,
-          image_height: operation.payload?.height || blobRow.height || 1,
-          ...(operation.payload?.expense_id
-            ? { expense_id: operation.payload.expense_id }
-            : {}),
-        },
-      })
-      await applyQueuedReceiptExtraction(operation, result, imageUrl)
-    } else if (mode === 'total') {
-      const result = await api.post(`${groupPath}/receipts/extract-total`, {
-        body: { image_url: imageUrl },
-      })
-      await setMetadata(`pending_receipt_total:${operation.group_id}`, {
-        ...result,
-        image_url: imageUrl,
-        created_at: nowIso(),
-      })
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('pysplit:refresh'))
-      }
-    }
-    await db.blobs.delete(blobRow.id)
-    return imageUrl
   }
-
-  throw Object.assign(new Error(`Unsupported queued upload ${operation.entity_type}`), {
-    code: 'validation',
-  })
+  await db.blobs.delete(blobRow.id)
+  return uploaded
 }
 
 /**
@@ -500,7 +508,7 @@ export async function pushPending(options = {}) {
     }
   }
 
-  const receiptGroups = new Set()
+  const attachmentGroups = new Set()
   for (const groupId of groupIds) {
     for (;;) {
       const batch = await pendingOperations({
@@ -521,8 +529,8 @@ export async function pushPending(options = {}) {
               if (operation.transport === 'blob') await pushBlobOperation(operation)
               else await pushRestOperation(operation)
               await markApplied(operation.op_id)
-              if (operation.transport === 'rest' || operation.entity_type === 'receipt_upload') {
-                receiptGroups.add(groupId)
+              if (operation.transport === 'rest' || operation.transport === 'blob') {
+                attachmentGroups.add(groupId)
               }
               totals.applied += 1
             } catch (error) {
@@ -561,9 +569,9 @@ export async function pushPending(options = {}) {
       if (totals.applied + totals.conflicts === progressBefore) break
     }
   }
-  // Only receipt mutations need a snapshot refresh; ordinary expense pushes
-  // already return their canonical entity.
-  for (const groupId of receiptGroups) {
+  // Attachment mutations and queued uploads need a snapshot refresh; ordinary
+  // expense pushes already return their canonical entity.
+  for (const groupId of attachmentGroups) {
     await bootstrapGroup(groupId, { updateCursor: false }).catch(() => {})
   }
 
@@ -678,9 +686,14 @@ export async function pullChanges() {
  */
 export async function bootstrapGroup(groupId, options = {}) {
   const scope = await currentScope()
+  const generation = (bootstrapGenerations.get(groupId) || 0) + 1
+  bootstrapGenerations.set(groupId, generation)
   const snapshot = await api.get(
     `/sync/bootstrap?group_id=${encodeURIComponent(groupId)}`,
   )
+  // A newer bootstrap for this group started while we were waiting. Applying
+  // this older snapshot would delete rows the newer one already restored.
+  if (bootstrapGenerations.get(groupId) !== generation) return snapshot
   await replaceGroupSnapshot(snapshot)
   if (options.updateCursor !== false && !(await readCursor(scope))) {
     const cursor = Number(snapshot?.cursor || 0)
@@ -1088,22 +1101,19 @@ export async function discardFailed() {
     if (row.entity_type === 'expense') {
       await db.expenses.delete(row.entity_id)
       await db.paidFor.where('expense_id').equals(row.entity_id).delete()
-      await db.documents.where('expense_id').equals(row.entity_id).delete()
+      await db.attachments.where('expense_id').equals(row.entity_id).delete()
     } else if (row.entity_type === 'participant') {
       await db.participants.delete(row.entity_id)
-    } else if (row.entity_type === 'receipt_item') {
-      await db.receiptItems.delete(row.entity_id)
-      await db.receiptPortions.where('item_id').equals(row.entity_id).delete()
-    } else if (row.entity_type === 'receipt_opt_out') {
-      const id = `${row.meta?.receipt_id}:${row.entity_id}`
-      await db.receiptOptOuts.delete(id)
-    } else if (row.entity_type === 'document_upload') {
-      await db.documents.delete(row.entity_id)
-      if (row.meta?.blob_id) await db.blobs.delete(row.meta.blob_id)
-    } else if (row.entity_type === 'receipt_upload') {
-      await db.receipts.delete(row.entity_id)
-      await db.receiptItems.where('receipt_id').equals(row.entity_id).delete()
-      await db.receiptOptOuts.where('receipt_id').equals(row.entity_id).delete()
+    } else if (row.entity_type === 'attachment_item') {
+      await db.attachmentItems.delete(row.entity_id)
+      await db.attachmentPortions.where('item_id').equals(row.entity_id).delete()
+    } else if (row.entity_type === 'attachment_opt_out') {
+      const id = `${row.meta?.attachment_id}:${row.entity_id}`
+      await db.attachmentOptOuts.delete(id)
+    } else if (row.entity_type === 'attachment_upload') {
+      await db.attachments.delete(row.entity_id)
+      await db.attachmentItems.where('attachment_id').equals(row.entity_id).delete()
+      await db.attachmentOptOuts.where('attachment_id').equals(row.entity_id).delete()
       if (row.meta?.blob_id) await db.blobs.delete(row.meta.blob_id)
     }
   }

@@ -62,6 +62,48 @@ async function seedGroup() {
   ])
 }
 
+const serverAttachment = {
+  id: 'att-server',
+  group_id: 'g1',
+  expense_id: 'e1',
+  url: 'https://files.example/scan.png',
+  thumbnail_url: 'https://files.example/scan.png',
+  filename: 'scan.png',
+  content_type: 'image/png',
+  byte_size: 4,
+  width: 10,
+  height: 20,
+  receipt_status: 'EXTRACTED',
+  attempts: 1,
+  merchant: 'Corner Shop',
+  receipt_date: '2026-02-01',
+  currency_code: 'USD',
+  total: 1000,
+  provider: 'openai-compatible',
+  model: 'mock',
+  created_at: '2026-02-01T10:00:00.000Z',
+  updated_at: '2026-02-01T10:00:00.000Z',
+  version: 2,
+  deleted_at: null,
+}
+
+const serverItem = {
+  id: 'ai1',
+  attachment_id: 'att-server',
+  name: 'Pizza',
+  quantity_milli: 1000,
+  unit_price: 1000,
+  amount: 1000,
+  is_shared: true,
+  is_adjustment: false,
+  position: 0,
+  created_at: '2026-02-01T10:00:00.000Z',
+  updated_at: '2026-02-01T10:00:00.000Z',
+  version: 1,
+  deleted_at: null,
+  portions: [],
+}
+
 beforeEach(async () => {
   await ready()
   await db.transaction('rw', db.tables, async () => {
@@ -77,58 +119,56 @@ afterEach(async () => {
   vi.restoreAllMocks()
 })
 
-describe('queued uploads', () => {
-  it('stores an offline document as a placeholder plus a blob outbox row', async () => {
-    const document = await localRepository.documents.upload(
+describe('queued attachments', () => {
+  it('stores an offline attachment as a placeholder plus a blob outbox row', async () => {
+    const attachment = await localRepository.attachments.upload(
       'g1',
-      'e1',
       fakeFile('receipt.png', 'image/png'),
-      { width: 12, height: 24 },
+      { width: 12, height: 24, expense_id: 'e1' },
     )
 
-    expect(document).toMatchObject({
+    expect(attachment).toMatchObject({
       width: 12,
       height: 24,
       expense_id: 'e1',
       pending: true,
       pending_upload: true,
     })
-    expect(await db.documents.get(document.id)).toMatchObject({ pending_upload: true })
+    expect(await db.attachments.get(attachment.id)).toMatchObject({ pending_upload: true })
     expect(await db.blobs.count()).toBe(1)
-
     const [operation] = await db.outbox.toArray()
     expect(operation).toMatchObject({
-      entity_type: 'document_upload',
+      entity_type: 'attachment_upload',
       transport: 'blob',
       status: 'pending',
     })
     expect(operation.meta.blob_id).toBeTruthy()
   })
 
-  it('uploads a queued document and replaces the placeholder with the server row', async () => {
-    const document = await localRepository.documents.upload(
+  it('uploads a queued attachment and replaces the placeholder', async () => {
+    const attachment = await localRepository.attachments.upload(
       'g1',
-      'e1',
       fakeFile('receipt.png', 'image/png'),
-      { width: 12, height: 24 },
+      { width: 12, height: 24, expense_id: 'e1' },
     )
     await stopSync()
     Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
     post.mockResolvedValue({
-      id: 'doc-server',
-      url: '/api/groups/g1/expenses/e1/documents/doc-server',
-      width: 12,
-      height: 24,
+      ...serverAttachment,
+      id: 'att-server',
+      receipt_status: null,
+      merchant: null,
+      total: null,
     })
 
     await pushPending({ ignoreBackoff: true })
 
     expect(post).toHaveBeenCalledWith(
-      '/groups/g1/expenses/e1/documents',
+      '/groups/g1/attachments',
       expect.objectContaining({ body: expect.any(FormData) }),
     )
-    expect(await db.documents.get(document.id)).toBeUndefined()
-    expect(await db.documents.get('doc-server')).toMatchObject({
+    expect(await db.attachments.get(attachment.id)).toBeUndefined()
+    expect(await db.attachments.get('att-server')).toMatchObject({
       expense_id: 'e1',
       pending: false,
     })
@@ -136,97 +176,59 @@ describe('queued uploads', () => {
     expect(await db.outbox.count()).toBe(0)
   })
 
-  it('records an expense link supplied when extraction is requested offline', async () => {
-    const image = await localRepository.receipts.upload(
+  it('queues a total-only scan while offline', async () => {
+    const attachment = await localRepository.attachments.upload(
       'g1',
       fakeFile('scan.png', 'image/png'),
       { width: 10, height: 20 },
     )
-    const state = await localRepository.receipts.extractItems('g1', {
-      image_url: image.url,
-      image_width: 10,
-      image_height: 20,
+    const result = await localRepository.attachments.extractTotal('g1', attachment.id)
+    expect(result.pending).toBe(true)
+    const [queued] = await db.outbox.toArray()
+    expect(queued.payload.mode).toBe('total')
+  })
+
+  it('records an expense link supplied when extraction is requested offline', async () => {
+    const image = await localRepository.attachments.upload(
+      'g1',
+      fakeFile('scan.png', 'image/png'),
+      { width: 10, height: 20 },
+    )
+    const state = await localRepository.attachments.extractItems('g1', image.id, {
       expense_id: 'e1',
     })
 
-    expect(state.receipt).toMatchObject({ pending_scan: true, expense_id: 'e1' })
+    expect(state.attachment).toMatchObject({ pending_scan: true, expense_id: 'e1' })
     const [queued] = await db.outbox.toArray()
     expect(queued.payload).toMatchObject({ mode: 'items', expense_id: 'e1' })
   })
 
-  it('keeps a queued receipt scan pending and completes it after reconnect', async () => {
-    const image = await localRepository.receipts.upload(
+  it('keeps a queued scan pending and completes it after reconnect', async () => {
+    const image = await localRepository.attachments.upload(
       'g1',
       fakeFile('scan.png', 'image/png'),
       { width: 10, height: 20, expense_id: 'e1' },
     )
-    expect(image.pending).toBe(true)
-
-    const state = await localRepository.receipts.extractItems('g1', {
-      image_url: image.url,
-      image_width: 10,
-      image_height: 20,
-    })
-    expect(state.receipt).toMatchObject({
-      status: 'PENDING',
+    const state = await localRepository.attachments.extractItems('g1', image.id)
+    expect(state.attachment).toMatchObject({
+      receipt_status: 'PENDING',
       pending_scan: true,
       expense_id: 'e1',
     })
     expect(state.items).toEqual([])
 
-    const [queued] = await db.outbox.toArray()
-    expect(queued.payload.mode).toBe('items')
-
     await stopSync()
     Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
-    const receipt = {
-      id: 'r-server',
-      group_id: 'g1',
-      image_url: 'https://files.example/scan.png',
-      image_width: 10,
-      image_height: 20,
-      status: 'EXTRACTED',
-      attempts: 1,
-      merchant: 'Corner Shop',
-      receipt_date: '2026-02-01',
-      currency_code: 'USD',
-      total: 1000,
-      expense_id: null,
-      created_at: '2026-02-01T10:00:00.000Z',
-      updated_at: '2026-02-01T10:00:00.000Z',
-      version: 2,
-      deleted_at: null,
-    }
-    const item = {
-      id: 'ri1',
-      receipt_id: 'r-server',
-      name: 'Pizza',
-      quantity_milli: 1000,
-      unit_price: 1000,
-      amount: 1000,
-      is_shared: true,
-      is_adjustment: false,
-      position: 0,
-      created_at: '2026-02-01T10:00:00.000Z',
-      updated_at: '2026-02-01T10:00:00.000Z',
-      version: 1,
-      deleted_at: null,
-      portions: [],
-    }
     post.mockImplementation((/** @type {string} */ path) => {
-      if (path.endsWith('/receipts/upload')) {
-        return Promise.resolve({
-          url: 'https://files.example/scan.png',
-          width: 10,
-          height: 20,
-        })
+      if (path.endsWith('/attachments')) {
+        return Promise.resolve({ ...serverAttachment, receipt_status: 'PENDING' })
       }
-      if (path.endsWith('/receipts/extract-items')) {
+      if (path.endsWith('/extract-items')) {
         return Promise.resolve({
           status: 'EXTRACTED',
-          receipt_id: 'r-server',
-          receipt: { ...receipt, expense_id: 'e1' },
-          items: [item],
+          attachment_id: 'att-server',
+          attachment: serverAttachment,
+          items: [serverItem],
           opt_outs: ['b'],
           split: {},
         })
@@ -242,15 +244,15 @@ describe('queued uploads', () => {
       ],
       expenses: [],
       activities: [],
-      receipts: [
+      attachments: [
         {
-          receipt: { ...receipt, expense_id: 'e1' },
-          items: [item],
+          attachment: serverAttachment,
+          items: [serverItem],
           portions: [],
           opt_outs: [
             {
-              id: 'r-server:b',
-              receipt_id: 'r-server',
+              id: 'att-server:b',
+              attachment_id: 'att-server',
               participant_id: 'b',
               created_at: '2026-02-01T10:00:00.000Z',
               updated_at: '2026-02-01T10:00:00.000Z',
@@ -266,30 +268,23 @@ describe('queued uploads', () => {
     await pushPending({ ignoreBackoff: true })
 
     expect(post).toHaveBeenCalledWith(
-      '/groups/g1/receipts/extract-items',
+      '/groups/g1/attachments/att-server/extract-items',
       expect.objectContaining({
-        body: expect.objectContaining({
-          expense_id: 'e1',
-          image_url: 'https://files.example/scan.png',
-        }),
+        body: expect.objectContaining({ expense_id: 'e1' }),
       }),
     )
-    expect(await db.receipts.get(image.receipt_id)).toBeUndefined()
-    expect(await db.receipts.get('r-server')).toMatchObject({
-      status: 'EXTRACTED',
+    expect(await db.attachments.get(image.id)).toBeUndefined()
+    expect(await db.attachments.get('att-server')).toMatchObject({
+      receipt_status: 'EXTRACTED',
       expense_id: 'e1',
     })
-    expect((await db.receipts.get('r-server')).pending_scan).toBeFalsy()
-    expect(await db.receiptItems.get('ri1')).toMatchObject({ name: 'Pizza' })
-    expect(await db.receiptOptOuts.get('r-server:b')).toMatchObject({
+    expect(await db.attachmentItems.get('ai1')).toMatchObject({ name: 'Pizza' })
+    expect(await db.attachmentOptOuts.get('att-server:b')).toMatchObject({
       participant_id: 'b',
     })
-    // The post-push bootstrap must keep the link visible to the expense page.
     await expect(
-      localRepository.receipts.get('g1', { expense_id: 'e1' }),
-    ).resolves.toMatchObject({
-      receipt: { id: 'r-server', expense_id: 'e1' },
-    })
+      localRepository.attachments.get('g1', { expense_id: 'e1' }),
+    ).resolves.toMatchObject({ attachment: { id: 'att-server', expense_id: 'e1' } })
     expect(await db.blobs.count()).toBe(0)
     expect(await db.outbox.count()).toBe(0)
   })

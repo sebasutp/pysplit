@@ -70,7 +70,7 @@ function snapshot(groupId, expenses = []) {
     ],
     expenses,
     activities: [],
-    receipts: [],
+    attachments: [],
     categories: [],
   }
 }
@@ -134,8 +134,7 @@ describe('list-only group bootstrap', () => {
             { participant_id: 'a', shares: 1 },
             { participant_id: 'b', shares: 1 },
           ],
-          documents: [],
-          receipt: null,
+          attachments: [],
         },
       ]),
     )

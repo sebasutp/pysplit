@@ -106,28 +106,22 @@ def test_anonymous_ai_calls_do_not_consume_the_ai_budget(make_client, session, m
     ai_rate_limiter.reset()
     fake = _FakeAi()
     monkeypatch.setattr(ai_service, "get_ai_client", lambda _settings: fake)
-    client = make_client(enable_receipt_extract=True, ai_rate_limit_per_minute=1)
+    client = make_client(enable_receipt_ai=True, ai_rate_limit_per_minute=1)
     group, _people = make_group(session)
-    payload = {"image_url": "/api/groups/g/receipts/images/img_missing.png"}
+    upload = client.post(
+        f"/api/groups/{group.id}/attachments",
+        files={"file": ("receipt.png", b"\x89PNG\r\n\x1a\nexample", "image/png")},
+    )
+    attachment_id = upload.json()["id"]
+    path = f"/api/groups/{group.id}/attachments/{attachment_id}/extract-total"
 
     # Authentication fails before the paid-call limiter is touched.
-    assert (
-        client.post(f"/api/groups/{group.id}/receipts/extract-total", json=payload).status_code
-        == 401
-    )
-    assert (
-        client.post(f"/api/groups/{group.id}/receipts/extract-total", json=payload).status_code
-        == 401
-    )
+    assert client.post(path).status_code == 401
+    assert client.post(path).status_code == 401
 
     headers = access_headers(make_user(session))
-    response = client.post(
-        f"/api/groups/{group.id}/receipts/extract-total",
-        json=payload,
-        headers=headers,
-    )
-    # The unknown image is rejected after the rate-limit check, which proves
-    # the authenticated caller still has its full budget.
-    assert response.status_code == 422, response.text
-    assert fake.calls == 0
+    response = client.post(path, headers=headers)
+    # The anonymous failures did not consume the authenticated caller's budget.
+    assert response.status_code == 200, response.text
+    assert fake.calls == 1
     ai_rate_limiter.reset()

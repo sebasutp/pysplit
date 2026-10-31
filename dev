@@ -154,10 +154,8 @@ export BASE_URL="${BASE_URL:-$PUBLIC_ORIGIN}"
 export ENABLE_MOCK_LOGIN="${ENABLE_MOCK_LOGIN:-true}"
 # Local development defaults to the Stage 8D online features. Production keeps
 # the opt-in defaults from the application settings.
-export ENABLE_RECEIPT_EXTRACT="${ENABLE_RECEIPT_EXTRACT:-true}"
-export ENABLE_RECEIPT_ITEMS="${ENABLE_RECEIPT_ITEMS:-true}"
+export ENABLE_RECEIPT_AI="${ENABLE_RECEIPT_AI:-true}"
 export ENABLE_CATEGORY_EXTRACT="${ENABLE_CATEGORY_EXTRACT:-true}"
-export ENABLE_EXPENSE_DOCUMENTS="${ENABLE_EXPENSE_DOCUMENTS:-true}"
 # The Playwright suite signs in per test context; keep the local limiter from
 # throttling a full run. Production keeps the conservative defaults.
 export AUTH_RATE_LIMIT_PER_MINUTE="${AUTH_RATE_LIMIT_PER_MINUTE:-1000}"

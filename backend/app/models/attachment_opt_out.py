@@ -1,4 +1,4 @@
-"""Receipt opt-out table (legacy Prisma ``ReceiptOptOut``)."""
+"""Participant opt-out from an attachment's unassigned pool."""
 
 from __future__ import annotations
 
@@ -11,19 +11,19 @@ from app.models.base import SyncColumns, utc_now
 from app.models.types import UTCDateTime
 
 
-class ReceiptOptOut(SyncColumns, table=True):
-    __tablename__ = "receipt_opt_outs"
+class AttachmentOptOut(SyncColumns, table=True):
+    __tablename__ = "attachment_opt_outs"
     __table_args__ = (
         UniqueConstraint(
-            "receipt_id",
+            "attachment_id",
             "participant_id",
-            name="uq_receipt_opt_outs_receipt_participant",
+            name="uq_attachment_opt_outs_attachment_participant",
         ),
     )
 
     id: str = Field(primary_key=True, max_length=64)
-    receipt_id: str = Field(
-        foreign_key="receipts.id",
+    attachment_id: str = Field(
+        foreign_key="attachments.id",
         ondelete="CASCADE",
         index=True,
         nullable=False,

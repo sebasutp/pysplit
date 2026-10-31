@@ -5,10 +5,8 @@ import { useEffect, useState } from 'react'
 import { repository } from '../services/repository'
 
 const DISABLED = {
-  receipt_extract: false,
-  receipt_items: false,
-  category_extract: false,
-  expense_documents: false,
+  receipt_ai: false,
+  category_ai: false,
 }
 
 /** @type {Promise<any>|null} */

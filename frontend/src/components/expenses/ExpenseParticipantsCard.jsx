@@ -28,6 +28,7 @@ const SPLIT_MODES = /** @type {const} */ ([
  *   setAllChecked: (checked: boolean) => void,
  *   applySplitDefaults: (mode: string) => void,
  *   toggleAdvanced: () => void,
+ *   onAssignItems?: () => void,
  *   group: any,
  * }} props
  */
@@ -43,6 +44,7 @@ export function ExpenseParticipantsCard({
   setAllChecked,
   applySplitDefaults,
   toggleAdvanced,
+  onAssignItems,
   group,
 }) {
   const { t } = useTranslation()
@@ -108,10 +110,15 @@ export function ExpenseParticipantsCard({
           })}
         </ul>
 
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={toggleAdvanced}>
             {t('ExpenseForm.advancedOptions', 'Advanced splitting options…')}
           </Button>
+          {onAssignItems ? (
+            <Button variant="outline" size="sm" onClick={onAssignItems}>
+              {t('ExpenseForm.assignItems', 'Assign items')}
+            </Button>
+          ) : null}
         </div>
 
         {advanced ? (

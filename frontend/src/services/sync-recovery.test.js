@@ -13,7 +13,7 @@ vi.mock('./api', () => ({
 import { api } from './api'
 import { db, readCursor, writeCursor } from './db'
 import { outboxRow, pendingCount } from './outbox'
-import { discardFailed, pullChanges, pushPending } from './sync'
+import { bootstrapGroup, discardFailed, pullChanges, pushPending } from './sync'
 
 const post = /** @type {any} */ (api.post)
 const get = /** @type {any} */ (api.get)
@@ -63,7 +63,7 @@ describe('pull cursor recovery', () => {
         participants: [],
         expenses: [],
         activities: [],
-        receipts: [],
+        attachments: [],
         categories: [],
       })
     })
@@ -82,6 +82,69 @@ describe('pull cursor recovery', () => {
 
     expect(get).toHaveBeenCalledTimes(2)
     expect(post.mock.calls.at(-1)[1].body.cursor).toBe(10)
+  })
+})
+
+describe('bootstrap snapshot ordering', () => {
+  it('does not let a slow older snapshot overwrite newer state', async () => {
+    /** @type {(value: any) => void} */
+    let resolveFirst = () => {}
+    /** @type {(value: any) => void} */
+    let resolveSecond = () => {}
+    const first = new Promise((resolve) => {
+      resolveFirst = resolve
+    })
+    const second = new Promise((resolve) => {
+      resolveSecond = resolve
+    })
+    get.mockReturnValueOnce(first).mockReturnValueOnce(second)
+
+    const firstCall = bootstrapGroup('g1', { updateCursor: false })
+    const secondCall = bootstrapGroup('g1', { updateCursor: false })
+
+    resolveSecond({
+      group: { id: 'g1', name: 'Newest', version: 2 },
+      participants: [],
+      expenses: [
+        {
+          id: 'e1',
+          group_id: 'g1',
+          title: 'Dinner',
+          amount: 1000,
+          version: 2,
+          deleted_at: null,
+          paid_for: [],
+          attachments: [
+            {
+              id: 'a1',
+              group_id: 'g1',
+              expense_id: 'e1',
+              receipt_status: 'EXTRACTED',
+              version: 2,
+            },
+          ],
+        },
+      ],
+      activities: [],
+      attachments: [],
+      categories: [],
+    })
+    await secondCall
+    expect((await db.groups.get('g1'))?.name).toBe('Newest')
+    expect(await db.attachments.get('a1')).toBeTruthy()
+
+    resolveFirst({
+      group: { id: 'g1', name: 'Older', version: 1 },
+      participants: [],
+      expenses: [],
+      activities: [],
+      attachments: [],
+      categories: [],
+    })
+    await firstCall
+
+    expect((await db.groups.get('g1'))?.name).toBe('Newest')
+    expect(await db.attachments.get('a1')).toBeTruthy()
   })
 })
 

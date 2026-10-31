@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { db, replaceGroupSnapshot } from './db'
+import { db, applySyncChange, replaceGroupSnapshot } from './db'
 import {
   discardFailed,
   failedCount,
@@ -147,7 +147,7 @@ describe('outbox ordering and failures', () => {
       participants: [],
       expenses: [],
       activities: [],
-      receipts: [],
+      attachments: [],
       categories: [],
     })
 
@@ -160,21 +160,107 @@ describe('outbox ordering and failures', () => {
     expect(await db.paidFor.where('expense_id').equals('e-local').count()).toBe(1)
   })
 
-  it('removes orphaned portions when replacing receipt snapshots', async () => {
+  it('removes orphaned portions when replacing attachment snapshots', async () => {
     await db.groups.put({ id: 'g1', name: 'Trip', version: 1 })
-    await db.receipts.put({ id: 'r1', group_id: 'g1', version: 1 })
-    await db.receiptItems.put({ id: 'old-item', receipt_id: 'r1', version: 1, position: 0 })
-    await db.receiptPortions.put({ id: 'old-portion', item_id: 'old-item', version: 1 })
+    await db.attachments.put({ id: 'r1', group_id: 'g1', version: 1 })
+    await db.attachmentItems.put({ id: 'old-item', attachment_id: 'r1', version: 1, position: 0 })
+    await db.attachmentPortions.put({ id: 'old-portion', item_id: 'old-item', version: 1 })
 
     await replaceGroupSnapshot({
       group: { id: 'g1', name: 'Trip', version: 2 },
       participants: [],
       expenses: [],
       activities: [],
-      receipts: [{ receipt: { id: 'r1', group_id: 'g1', version: 2 }, items: [], portions: [] }],
+      attachments: [{ attachment: { id: 'r1', group_id: 'g1', version: 2 }, items: [], portions: [] }],
       categories: [],
     })
 
-    expect(await db.receiptPortions.where('item_id').equals('old-item').count()).toBe(0)
+    expect(await db.attachmentPortions.where('item_id').equals('old-item').count()).toBe(0)
+  })
+
+  it('keeps receipt items when an expense snapshot update arrives', async () => {
+    await db.attachments.put({
+      id: 'r1',
+      group_id: 'g1',
+      expense_id: 'e1',
+      receipt_status: 'EXTRACTED',
+      version: 1,
+    })
+    await db.attachmentItems.put({
+      id: 'item-1',
+      attachment_id: 'r1',
+      name: 'Pizza',
+      amount: 1000,
+      quantity_milli: 1000,
+      position: 0,
+      version: 1,
+    })
+    await db.attachmentPortions.put({
+      id: 'portion-1',
+      item_id: 'item-1',
+      target: 'PARTICIPANT',
+      participant_id: 'p1',
+      quantity_milli: 1000,
+      version: 1,
+    })
+
+    // Expense snapshots include attachment metadata but not the itemized split.
+    await applySyncChange({
+      entity_type: 'expense',
+      entity_id: 'e1',
+      op_type: 'update',
+      snapshot: {
+        id: 'e1',
+        group_id: 'g1',
+        title: 'Dinner',
+        amount: 1000,
+        version: 2,
+        deleted_at: null,
+        paid_for: [],
+        attachments: [
+          {
+            id: 'r1',
+            group_id: 'g1',
+            expense_id: 'e1',
+            receipt_status: 'EXTRACTED',
+            version: 2,
+          },
+        ],
+      },
+    })
+
+    expect(await db.attachmentItems.get('item-1')).toMatchObject({ name: 'Pizza' })
+    expect(await db.attachmentPortions.get('portion-1')).toMatchObject({ participant_id: 'p1' })
+    expect(await db.attachments.get('r1')).toMatchObject({ version: 2 })
+  })
+
+  it('removes receipt details when an expense snapshot drops an attachment', async () => {
+    await db.attachments.put({
+      id: 'r1',
+      group_id: 'g1',
+      expense_id: 'e1',
+      receipt_status: 'EXTRACTED',
+      version: 1,
+    })
+    await db.attachmentItems.put({ id: 'item-1', attachment_id: 'r1', version: 1, position: 0 })
+
+    await applySyncChange({
+      entity_type: 'expense',
+      entity_id: 'e1',
+      op_type: 'update',
+      snapshot: {
+        id: 'e1',
+        group_id: 'g1',
+        title: 'Dinner',
+        amount: 1000,
+        version: 2,
+        deleted_at: null,
+        paid_for: [],
+        attachments: [],
+      },
+    })
+
+    expect(await db.attachments.get('r1')).toBeUndefined()
+    expect(await db.attachmentItems.get('item-1')).toBeUndefined()
   })
 })

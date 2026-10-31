@@ -13,7 +13,11 @@ COPY frontend/ ./
 # Same-origin /api is the production default. Override only for a split origin
 # (the backend CORS allowlist must include that origin).
 ARG VITE_API_BASE_URL=/api
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ARG VITE_IMAGE_MAX_DIMENSION=1600
+ARG VITE_IMAGE_QUALITY=0.82
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL} \
+    VITE_IMAGE_MAX_DIMENSION=${VITE_IMAGE_MAX_DIMENSION} \
+    VITE_IMAGE_QUALITY=${VITE_IMAGE_QUALITY}
 RUN npm run build
 
 FROM nginx:1.29-alpine AS runtime

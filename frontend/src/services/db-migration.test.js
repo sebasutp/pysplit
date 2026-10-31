@@ -61,7 +61,7 @@ describe('Dexie schema updates', () => {
     vi.resetModules()
     loaded = await import('./db')
     await expect(loaded.verifyDatabaseCompatibility()).resolves.toMatchObject({
-      version: 3,
+      version: 4,
     })
 
     expect(await loaded.db.groups.get('g1')).toMatchObject({ name: 'Old cached group' })
@@ -78,12 +78,14 @@ describe('Dexie schema updates', () => {
   })
 
   it('accepts the emitted build contract and rejects an older or narrower one', async () => {
+    await Dexie.delete('pysplit')
+    vi.resetModules()
     loaded = await import('./db')
     const contract = loaded.DATABASE_BUILD_CONTRACT
 
     await expect(loaded.verifyIncomingBuildCompatibility(contract)).resolves.toEqual({
-      version: 3,
-      incomingVersion: 3,
+      version: 4,
+      incomingVersion: 4,
     })
     await expect(
       loaded.verifyIncomingBuildCompatibility({ ...contract, schemaVersion: 2 }),

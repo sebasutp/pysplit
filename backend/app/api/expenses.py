@@ -1,48 +1,27 @@
-"""Expense, recurrence, export and document HTTP endpoints."""
+"""Expense, recurrence and export HTTP endpoints."""
 
 from __future__ import annotations
 
 from datetime import date
 from typing import Annotated
 
-from fastapi import (
-    APIRouter,
-    Body,
-    File,
-    Form,
-    Query,
-    Request,
-    Response,
-    UploadFile,
-    status,
-)
+from fastapi import APIRouter, Body, Query, Response, status
 
-from app.api.deps import SessionDep, SettingsDep
-from app.core.config import Settings
-from app.core.limits import enforce_upload_rate_limit
+from app.api.deps import SessionDep
 from app.schemas.expenses import (
     ExpenseCreate,
     ExpenseDeleteOptions,
-    ExpenseDocumentRead,
     ExpenseList,
     ExpenseRead,
     ExpenseUpdate,
 )
-from app.services import documents as documents_service
 from app.services import expenses as expenses_service
 from app.services import exports as exports_service
-from app.services.errors import ForbiddenError
-from app.storage import get_storage
 
 router = APIRouter(prefix="/groups", tags=["expenses"])
 
 LimitQuery = Annotated[int, Query(ge=1, le=200)]
 OffsetQuery = Annotated[int, Query(ge=0)]
-
-
-def _require_documents(settings: Settings) -> None:
-    if not settings.enable_expense_documents:
-        raise ForbiddenError("Expense documents are not enabled.")
 
 
 def _export_response(file) -> Response:
@@ -156,82 +135,5 @@ def delete_expense(
         group_id,
         expense_id,
         participant_id=participant_id or body_participant,
-    )
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.post(
-    "/{group_id}/expenses/{expense_id}/documents",
-    response_model=ExpenseDocumentRead,
-    status_code=status.HTTP_201_CREATED,
-)
-async def upload_document(
-    group_id: str,
-    expense_id: str,
-    request: Request,
-    session: SessionDep,
-    settings: SettingsDep,
-    file: Annotated[UploadFile, File()],
-    width: Annotated[int, Form(ge=1)] = 1,
-    height: Annotated[int, Form(ge=1)] = 1,
-) -> ExpenseDocumentRead:
-    enforce_upload_rate_limit(request, settings)
-    _require_documents(settings)
-    data = await file.read(settings.max_upload_bytes + 1)
-    return documents_service.save_document(
-        session,
-        get_storage(settings),
-        group_id=group_id,
-        expense_id=expense_id,
-        data=data,
-        content_type=file.content_type,
-        max_bytes=settings.max_upload_bytes,
-        allowed_types=settings.upload_allowed_type_list,
-        width=width,
-        height=height,
-    )
-
-
-@router.get("/{group_id}/expenses/{expense_id}/documents/{document_id}")
-def download_document(
-    group_id: str,
-    expense_id: str,
-    document_id: str,
-    session: SessionDep,
-    settings: SettingsDep,
-) -> Response:
-    _require_documents(settings)
-    _document, data, media_type, filename = documents_service.resolve_document(
-        session,
-        get_storage(settings),
-        group_id=group_id,
-        expense_id=expense_id,
-        document_id=document_id,
-    )
-    return Response(
-        content=data,
-        media_type=media_type,
-        headers={"Content-Disposition": f'inline; filename="{filename}"'},
-    )
-
-
-@router.delete(
-    "/{group_id}/expenses/{expense_id}/documents/{document_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-def delete_document(
-    group_id: str,
-    expense_id: str,
-    document_id: str,
-    session: SessionDep,
-    settings: SettingsDep,
-) -> Response:
-    _require_documents(settings)
-    documents_service.delete_document(
-        session,
-        get_storage(settings),
-        group_id=group_id,
-        expense_id=expense_id,
-        document_id=document_id,
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
