@@ -87,15 +87,20 @@ a checkpoint first.
 
 ## 4. Import and verify
 
+Import and verify into a host staging directory first. The production database
+lives in the `pysplit_data` Docker volume, not at the host `/data` path.
+
 ```bash
 cd /workspace/backend
+rm -rf /tmp/pysplit-import && mkdir -p /tmp/pysplit-import
 PYTHONPATH=. .venv/bin/python scripts/import_legacy_sqlite.py \
   --source /tmp/restore-check/spliit.db \
-  --target /data/pysplit.db
+  --target /tmp/pysplit-import/pysplit.db
 PYTHONPATH=. .venv/bin/python scripts/verify_import.py \
   --old /tmp/restore-check/spliit.db \
-  --new /data/pysplit.db
-sqlite3 /data/pysplit.db "PRAGMA foreign_key_check; PRAGMA integrity_check;"
+  --new /tmp/pysplit-import/pysplit.db
+sqlite3 /tmp/pysplit-import/pysplit.db \
+  "PRAGMA foreign_key_check; PRAGMA integrity_check;"
 ```
 
 Abort and roll back if any count, sum, balance or integrity check fails. Do not
@@ -105,13 +110,24 @@ backup still exists, never for a live database that might have accepted writes.
 
 ## 5. Start the new stack
 
-Set production values in `.env` first (never commit it):
+Create the production environment file (never commit it) and fill the required
+secret. The template already sets `ENVIRONMENT=production`, so the API refuses
+to start without a valid `JWT_SECRET` and `BASE_URL`.
+
+```bash
+cd /workspace
+cp .env.production.example .env
+# Replace JWT_SECRET with: openssl rand -hex 32
+# Replace BASE_URL with the public HTTPS origin.
+```
+
+Relevant values:
 
 ```dotenv
 ENVIRONMENT=production
 BASE_URL=https://spliit.example.com
 JWT_SECRET=<unique, at least 32 characters>
-WEB_PORT=8080
+COMPOSE_WEB_PORT=8080
 LOG_FORMAT=json
 ENABLE_MOCK_LOGIN=false
 TRUST_FORWARDED_HEADERS=true
@@ -126,15 +142,16 @@ host.
 cd /workspace
 docker compose config                 # interpolation check
 docker compose build
+# Copy the verified staging database into the named volume as UID 10001.
+docker run --rm --entrypoint python \
+  -v pysplit_pysplit_data:/data \
+  -v /tmp/pysplit-import:/import:ro \
+  pysplit-api:local -c \
+  "import shutil; shutil.copy2('/import/pysplit.db', '/data/pysplit.db')"
 docker compose up -d
 docker compose ps
 curl -f http://localhost:8080/api/health/readiness
 ```
-
-If the import target was `/data/pysplit.db` outside the Compose volume, either
-import inside the volume or copy the verified file into
-`/var/lib/docker/volumes/pysplit_pysplit_data/_data/pysplit.db` while the stack
-is stopped. Prefer importing directly into the mounted volume path.
 
 Start the optional scheduled backup sidecar:
 
@@ -143,10 +160,12 @@ docker compose --profile backup up -d backup
 docker compose exec backup python /app/scripts/backup.py --help
 ```
 
-The sidecar backs up every `BACKUP_INTERVAL_SECONDS` (default 24 h) into the
-`pysplit_backups` volume and deletes directories older than
-`BACKUP_RETENTION_DAYS` (default 14). Copy that volume off-host on the same
-schedule; a backup on the same disk is not a disaster recovery plan.
+The sidecar reads the same `DATABASE_URL` and `UPLOAD_DIR` as the API, backs
+up every `BACKUP_INTERVAL_SECONDS` (default 24 h) into the `pysplit_backups`
+volume, and deletes directories older than `BACKUP_RETENTION_DAYS` (default 14).
+A missing uploads directory is logged and the database is still backed up. Copy
+the backup volume off-host on the same schedule; a backup on the same disk is
+not a disaster recovery plan.
 
 Smoke test, in this order:
 
@@ -163,9 +182,12 @@ Smoke test, in this order:
 
 ## 6. Switch the reverse proxy
 
-Point the public hostname at the new nginx service (`WEB_PORT`, default 8080 on
-the host, port 80 in the container). Keep the old upstream configuration saved.
-Verify:
+Point the public hostname at the new nginx service (`COMPOSE_WEB_PORT`, default
+8080 on the host, port 80 in the container). Keep the old upstream configuration
+saved. nginx replaces `X-Forwarded-For` with the direct peer address so clients
+cannot spoof rate-limit identities. If a CDN or edge proxy sits in front of
+nginx, configure `set_real_ip_from` / `real_ip_header` there so `$remote_addr`
+is the real client. Verify:
 
 - HTTPS terminates at the edge and redirects HTTP to HTTPS;
 - cookies are `HttpOnly; Secure; SameSite=Lax` and scoped to `/api/auth` for
@@ -211,9 +233,12 @@ manually before retrying. Do not run two writers against one database.
 Restoring the new stack from its own backup, if that is ever needed:
 
 ```bash
+cd /workspace
 docker compose down
-cd /workspace/backend
-PYTHONPATH=. .venv/bin/python scripts/restore.py \
+docker run --rm --entrypoint python \
+  -v pysplit_pysplit_data:/data \
+  -v pysplit_pysplit_backups:/backups \
+  pysplit-api:local /app/scripts/restore.py \
   --backup /backups/pysplit-backup-... \
   --database /data/pysplit.db \
   --uploads /data/uploads
@@ -221,9 +246,10 @@ docker compose up -d
 curl -f http://localhost:8080/api/health/readiness
 ```
 
-`restore.py` verifies checksums first and renames existing targets to
-`.pre-restore-<timestamp>` siblings instead of deleting them. Stop the API
-before restoring so the old SQLite file has no open writers.
+`restore.py` verifies the manifest, checksums and SQLite integrity first. It
+moves stale `-wal`/`-shm` sidecars aside with the old database and renames
+existing targets to `.pre-restore-<timestamp>` siblings instead of deleting
+them. Stop the API before restoring so the old SQLite file has no open writers.
 
 ## 9. After a successful cutover
 
@@ -245,8 +271,9 @@ Run on staging after the production-shaped stack is built, not on production.
 4. Stop the new stack and point the proxy back to the old stack.
 5. Start the old stack and verify its data is intact; the new test expense must
    not exist there.
-6. Back up the old database with `scripts/backup.py`, import into a fresh
-   `/data`, and verify with `scripts/verify_import.py`.
+6. Back up the old database with `scripts/backup.py`, restore it into a scratch
+   directory, import into a fresh `/tmp` target, and verify with
+   `scripts/verify_import.py` before copying it into a fresh volume.
 7. Cut over again and confirm the re-import reproduces the pre-drill state; the
    test write was only in the discarded new volume.
 8. Record elapsed time for stop, backup, import, start, proxy switch and

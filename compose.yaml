@@ -1,7 +1,8 @@
 # Production-shaped deployment: nginx serves the SPA and proxies /api to one
 # Uvicorn worker with a persistent SQLite volume.
 #
-#   cp .env.example .env      # set BASE_URL and JWT_SECRET
+#   cp .env.production.example .env   # set BASE_URL and JWT_SECRET
+#   docker compose config
 #   docker compose build
 #   docker compose up -d
 #   curl -f http://localhost:8080/api/health/readiness
@@ -23,7 +24,9 @@ services:
       - path: .env
         required: false
     environment:
-      ENVIRONMENT: ${ENVIRONMENT:-production}
+      # Compose-only switch, deliberately separate from ENVIRONMENT so a
+      # development .env copied for ./dev cannot disable production guards.
+      ENVIRONMENT: ${PYSPLIT_ENVIRONMENT:-production}
       DATABASE_URL: ${DATABASE_URL:-sqlite:////data/pysplit.db}
       UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
       LOG_FORMAT: ${LOG_FORMAT:-json}
@@ -61,7 +64,9 @@ services:
       api:
         condition: service_healthy
     ports:
-      - "${WEB_PORT:-8080}:80"
+      # Separate from the dev-only WEB_PORT so a copied .env cannot change the
+      # production entrypoint by accident.
+      - "${COMPOSE_WEB_PORT:-8080}:80"
     security_opt:
       - no-new-privileges:true
 
@@ -74,39 +79,27 @@ services:
       dockerfile: Dockerfile.api
     image: pysplit-api:local
     restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
     env_file:
       - path: .env
         required: false
     environment:
       DATABASE_URL: ${DATABASE_URL:-sqlite:////data/pysplit.db}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/data/uploads}
+      BACKUP_OUTPUT: /backups
       BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-86400}
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        set -eu
-        mkdir -p /backups
-        while true; do
-          python /app/scripts/backup.py \
-            --database /data/pysplit.db \
-            --uploads /data/uploads \
-            --output /backups
-          python - <<'PY'
-        import os
-        import shutil
-        import time
-        from pathlib import Path
-
-        retention = int(os.environ.get("BACKUP_RETENTION_DAYS", "14"))
-        cutoff = time.time() - retention * 86400
-        for path in sorted(Path("/backups").glob("pysplit-backup-*")):
-            if path.is_dir() and path.stat().st_mtime < cutoff:
-                shutil.rmtree(path, ignore_errors=True)
-        PY
-          sleep "${BACKUP_INTERVAL_SECONDS:-86400}"
-        done
+    entrypoint: ["python"]
+    command: ["/app/scripts/backup_loop.py"]
+    # The image's HTTP healthcheck does not apply to this loop-only container.
+    healthcheck:
+      disable: true
     volumes:
-      - pysplit_data:/data:ro
+      # Read-only connections may still need to create SQLite -shm/-wal files
+      # when the API has not written yet, so the mount must be writable.
+      - pysplit_data:/data
       - pysplit_backups:/backups
     security_opt:
       - no-new-privileges:true

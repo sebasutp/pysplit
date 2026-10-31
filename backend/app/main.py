@@ -65,10 +65,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         http_exc = service_error(exc)
         return JSONResponse(status_code=http_exc.status_code, content={"detail": http_exc.detail})
 
-    # Added before CORS so the request id is available to every later layer
-    # and is echoed even on a CORS preflight response.
-    app.add_middleware(RequestContextMiddleware, settings=settings)
-
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins_list,
@@ -77,6 +73,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "X-CSRF-Token", "X-Request-ID"],
     )
+
+    # Added last so Starlette makes it the outermost middleware. It then wraps
+    # CORS as well, giving preflight and rejected-origin responses a request id.
+    app.add_middleware(RequestContextMiddleware, settings=settings)
 
     app.include_router(health.router, prefix=settings.api_prefix)
     app.include_router(auth.router, prefix=settings.api_prefix)

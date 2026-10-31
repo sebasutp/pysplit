@@ -32,6 +32,19 @@ def test_invalid_request_id_is_replaced(client: TestClient) -> None:
     assert response.status_code == 200
 
 
+def test_cors_preflight_carries_the_request_id(client: TestClient) -> None:
+    response = client.options(
+        "/api/health",
+        headers={
+            "Origin": "http://localhost:5173",
+            "Access-Control-Request-Method": "GET",
+            "X-Request-ID": "preflight-123",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["X-Request-ID"] == "preflight-123"
+
+
 def test_custom_request_id_header(make_client) -> None:
     client = make_client(request_id_header="X-Correlation-ID")
     response = client.get("/api/health", headers={"X-Correlation-ID": "trace-9"})

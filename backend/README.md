@@ -153,16 +153,24 @@ cannot read the API host's CSRF cookie.
 ## Production
 
 The deployable stack is the repository-root `compose.yaml` with
-`Dockerfile.api` and `Dockerfile.web`. The API runs Alembic before Uvicorn and
-uses one worker against SQLite in `/data`. See `docs/runbook-cutover.md` for the
-cutover and rollback procedure, and `docs/performance.md` for the measured
-budgets.
+`Dockerfile.api` and `Dockerfile.web`. Create the production environment from
+`.env.production.example` (not the development `.env.example`), set `BASE_URL`
+and a unique `JWT_SECRET`, then run:
+
+```bash
+docker compose build && docker compose up -d
+```
+
+The API runs Alembic before Uvicorn and uses one worker against SQLite in
+`/data`. See `docs/runbook-cutover.md` for the cutover and rollback procedure,
+and `docs/performance.md` for the measured budgets.
 
 Operational scripts:
 
 ```bash
 python scripts/backup.py --database /data/pysplit.db \
   --uploads /data/uploads --output /backups
+python scripts/backup_loop.py --once          # reads DATABASE_URL/UPLOAD_DIR
 python scripts/restore.py --backup /backups/pysplit-backup-... \
   --database /data/pysplit.db --uploads /data/uploads
 python scripts/performance_check.py

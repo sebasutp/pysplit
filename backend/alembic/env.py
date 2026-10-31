@@ -19,7 +19,10 @@ from app.core.config import get_settings
 config = context.config
 
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # Alembic's config declares only its own loggers. The default
+    # ``disable_existing_loggers=True`` would silence application loggers for
+    # the rest of the process (tests import the app before running Alembic).
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 settings = get_settings()
 # `%` must be escaped for ConfigParser interpolation.

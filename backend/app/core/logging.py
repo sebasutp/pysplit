@@ -35,7 +35,6 @@ _LOG_EXTRA_FIELDS = (
     "status_code",
     "duration_ms",
     "client",
-    "user_id",
 )
 
 

@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import shutil
+import sqlite3
 import sys
 import tarfile
 import tempfile
@@ -93,6 +94,41 @@ def _replace_preserving_existing(path: Path, replacement: Path) -> Path | None:
     return retired
 
 
+def _sqlite_integrity_check(path: Path) -> str:
+    """Run ``PRAGMA integrity_check`` on an existing database file."""
+    with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as connection:
+        rows = [str(row[0]) for row in connection.execute("PRAGMA integrity_check")]
+    if rows != ["ok"]:
+        _fail(f"database integrity check failed: {', '.join(rows)}")
+    return "ok"
+
+
+def _replace_database(database: Path, replacement: Path) -> tuple[Path | None, list[Path]]:
+    """Replace a database and retire any stale WAL/SHM sidecars with it.
+
+    Leaving an old ``-wal`` beside a freshly restored main file lets SQLite
+    replay pages from the previous database onto the new one. The sidecars must
+    move aside in the same operation, even if the old process crashed and left
+    them behind.
+    """
+    database.parent.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    retired_sidecars: list[Path] = []
+    for suffix in ("-wal", "-shm"):
+        sidecar = Path(f"{database}{suffix}")
+        if sidecar.exists():
+            retired = sidecar.with_name(f"{sidecar.name}.pre-restore-{stamp}")
+            os.replace(sidecar, retired)
+            retired_sidecars.append(retired)
+
+    retired_main: Path | None = None
+    if database.exists():
+        retired_main = database.with_name(f"{database.name}.pre-restore-{stamp}")
+        os.replace(database, retired_main)
+    os.replace(replacement, database)
+    return retired_main, retired_sidecars
+
+
 def restore_backup(
     *,
     backup_dir: Path,
@@ -113,9 +149,7 @@ def restore_backup(
         if not isinstance(uploads_artifact, dict):
             _fail("backup does not contain uploads")
         source_uploads = _verify_artifact(backup_dir, uploads_artifact, "uploads")
-    elif isinstance(uploads_artifact, dict):
-        # The caller did not ask for uploads; leave the live directory alone.
-        source_uploads = None
+    integrity = _sqlite_integrity_check(source_database)
 
     result: dict[str, object] = {
         "backup": str(backup_dir),
@@ -125,6 +159,7 @@ def restore_backup(
         "dry_run": dry_run,
         "restored_database": False,
         "restored_uploads": False,
+        "integrity_check": integrity,
     }
     if dry_run:
         result["ok"] = True
@@ -136,6 +171,7 @@ def restore_backup(
     try:
         staged_database = staging_root / "pysplit.db"
         shutil.copy2(source_database, staged_database)
+        _sqlite_integrity_check(staged_database)
 
         staged_uploads: Path | None = None
         if uploads is not None and source_uploads is not None:
@@ -148,15 +184,16 @@ def restore_backup(
             if not staged_uploads.is_dir():
                 _fail("uploads archive does not contain an uploads directory")
 
+        retired_database, retired_sidecars = _replace_database(database, staged_database)
+        result["retired_database"] = str(retired_database) if retired_database else None
+        result["retired_database_sidecars"] = [str(path) for path in retired_sidecars]
+        result["restored_database"] = True
+
         retired_uploads: Path | None = None
         if uploads is not None and staged_uploads is not None:
             retired_uploads = _replace_preserving_existing(uploads.resolve(), staged_uploads)
             result["retired_uploads"] = str(retired_uploads) if retired_uploads else None
             result["restored_uploads"] = True
-
-        retired_database = _replace_preserving_existing(database, staged_database)
-        result["retired_database"] = str(retired_database) if retired_database else None
-        result["restored_database"] = True
     finally:
         shutil.rmtree(staging_root, ignore_errors=True)
 
@@ -202,6 +239,8 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Restored uploads to {result['uploads']}")
             if result.get("retired_database"):
                 print(f"Previous database kept at {result['retired_database']}")
+            for sidecar in result.get("retired_database_sidecars", []):
+                print(f"Previous SQLite sidecar kept at {sidecar}")
             if result.get("retired_uploads"):
                 print(f"Previous uploads kept at {result['retired_uploads']}")
     return 0

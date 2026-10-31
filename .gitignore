@@ -36,6 +36,7 @@ data/
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # Editors / OS
 .DS_Store

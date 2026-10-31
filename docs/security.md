@@ -62,7 +62,10 @@ The UI and documentation must not imply that shared links are private. See
 - `TRUST_FORWARDED_HEADERS=false` by default. Set it to `true` only when a known
   reverse proxy overwrites `X-Forwarded-Proto`, `X-Forwarded-Host` and
   `X-Forwarded-For`. Enabling it behind an untrusted client lets callers spoof
-  the origin and their rate-limit identity.
+  the origin and their rate-limit identity. The Compose web tier replaces
+  `X-Forwarded-For` with `$remote_addr` rather than appending to a
+  client-supplied value. If a CDN or edge proxy is in front of nginx, configure
+  `set_real_ip_from`/`real_ip_header` there so `$remote_addr` is the client.
 - Rate limits run in-process: authentication per IP and account, AI per caller,
   uploads per caller, and `/api/sync/*` per caller. They return `429` with
   `Retry-After`. The limiter is memory-only, so it is per process and resets on
@@ -110,6 +113,13 @@ The UI and documentation must not imply that shared links are private. See
       manager — never committed `.env` files or the image.
 - [ ] `ENABLE_MOCK_LOGIN=false`; `TRUST_FORWARDED_HEADERS` reflects an actual
       trusted proxy; `COOKIE_SECURE` is not weakened.
+- [ ] `.env.production.example` was used for Compose, not the development
+      `.env.example`. Compose derives `ENVIRONMENT` from
+      `PYSPLIT_ENVIRONMENT` (default `production`) and the host port from
+      `COMPOSE_WEB_PORT`, so a copied development file cannot disable the
+      production JWT/cookie guards.
+- [ ] nginx includes the security-header snippet in every location that sets a
+      cache header; `add_header` is not inherited once a location defines one.
 - [ ] TLS terminates at the proxy; the public origin matches `BASE_URL` and the
       CORS allowlist; `/api` is proxied, not served from disk.
 - [ ] Feature flags (`ENABLE_RECEIPT_EXTRACT`, `ENABLE_RECEIPT_ITEMS`,
