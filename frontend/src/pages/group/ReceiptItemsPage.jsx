@@ -157,6 +157,18 @@ export function ReceiptItemsPage() {
         expense_id: expenseId,
       })
       setState(result)
+      if (result?.status === 'FAILED' || result?.attachment?.receipt_status === 'FAILED') {
+        toast({
+          title: t('Attachments.scanError', 'The receipt could not be scanned'),
+          description:
+            (typeof result.error === 'string' && result.error) ||
+            t(
+              'ReceiptItems.scanUnavailable',
+              'Check the server AI configuration and try again.',
+            ),
+        })
+        return
+      }
       toast({
         title: attachment.pending
           ? t('ReceiptItems.scanPending', 'Scan queued')
@@ -191,6 +203,18 @@ export function ReceiptItemsPage() {
         expense_id: expenseId,
       })
       setState(result)
+      if (result?.status === 'FAILED' || result?.attachment?.receipt_status === 'FAILED') {
+        toast({
+          title: t('Attachments.scanError', 'The receipt could not be scanned'),
+          description:
+            (typeof result.error === 'string' && result.error) ||
+            t(
+              'ReceiptItems.scanUnavailable',
+              'Check the server AI configuration and try again.',
+            ),
+        })
+        return
+      }
       toast({
         title: t('ReceiptItems.extracted', 'Receipt scanned'),
         description: t('ReceiptItems.extractedDescription', 'Assign the extracted items below.'),

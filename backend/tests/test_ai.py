@@ -327,9 +327,8 @@ def test_extract_total_endpoint(make_client, session, tmp_path, monkeypatch):
     assert body["amount"] == 24.5
     assert body["category_id"] == "7"
     assert len(fake.calls) == 1
-    assert fake.calls[0]["messages"][1]["content"][0]["image_url"]["url"].startswith(
-        "data:image/png;base64,"
-    )
+    content = fake.calls[0]["messages"][0]["content"]
+    assert content[1]["image_url"]["url"].startswith("data:image/png;base64,")
 
 
 def test_extract_items_endpoint(make_client, session, tmp_path, monkeypatch):
@@ -501,6 +500,29 @@ def test_ai_provider_failure_becomes_failed_attachment(make_client, session, tmp
     )
     assert response.status_code == 200
     assert response.json()["status"] == "FAILED"
+    assert response.json()["error"] == "provider down"
+
+
+def test_unconfigured_ai_returns_failed_attachment(make_client, session, tmp_path):
+    """No key/endpoint is a provider failure, not an unhandled 500."""
+    client = make_client(enable_receipt_ai=True, upload_dir=str(tmp_path))
+    group, _people = make_group(session)
+    attachment_id = _upload(client, group.id).json()["id"]
+
+    with pytest.raises(ai_service.AiError, match="not configured"):
+        ai_service.get_ai_client(Settings(_env_file=None))
+
+    response = client.post(
+        f"/api/groups/{group.id}/attachments/{attachment_id}/extract-items",
+        json={},
+        headers=_auth(session),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "FAILED"
+    assert body["attachment"]["receipt_status"] == "FAILED"
+    assert body["items"] == []
+    assert body["error"] == "AI provider is not configured"
 
 
 def test_mock_ai_fixtures_parse_with_real_parsers():
@@ -542,6 +564,32 @@ def test_ai_mock_is_rejected_in_production():
         )
 
 
+def test_client_falls_back_to_system_ca_bundle(monkeypatch):
+    """A missing/unreadable certifi bundle must not disable every AI call."""
+    settings = Settings(_env_file=None, ai_api_key="secret")
+    calls: list[dict] = []
+
+    class DummyClient:
+        closed = False
+
+        def close(self) -> None:
+            self.closed = True
+
+    dummy = DummyClient()
+
+    def factory(*_args, **kwargs):
+        calls.append(kwargs)
+        if len(calls) == 1:
+            raise OSError("no certificate or crl found")
+        return dummy
+
+    monkeypatch.setattr(ai_service.httpx, "Client", factory)
+    client = ai_service.ChatCompletionClient(settings)
+    assert len(calls) == 2
+    assert callable(getattr(calls[1].get("verify"), "load_verify_locations", None))
+    assert client._client is dummy
+
+
 def test_json_object_fallback(monkeypatch):
     settings = Settings(
         _env_file=None,
@@ -572,6 +620,101 @@ def test_json_object_fallback(monkeypatch):
     assert content == '{"categoryId": 7}'
     assert calls[0]["response_format"]["type"] == "json_schema"
     assert calls[1]["response_format"]["type"] == "json_object"
+
+
+def test_auto_retries_generic_400_in_json_object_mode(monkeypatch):
+    """Gemini's generic INVALID_ARGUMENT must still trigger the fallback."""
+    settings = Settings(
+        _env_file=None,
+        ai_api_key="secret",
+        ai_base_url="https://ai.example.com/v1",
+        ai_response_format="auto",
+    )
+    calls = []
+
+    def handler(request):
+        calls.append(json.loads(request.content))
+        if len(calls) == 1:
+            return httpx.Response(
+                400,
+                json={"error": {"message": "Request contains an invalid argument."}},
+            )
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": '{"categoryId": 7}'}}]},
+        )
+
+    client = ai_service.ChatCompletionClient(
+        settings,
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    content = client.complete(
+        model="model-x",
+        messages=[{"role": "user", "content": "hi"}],
+        response_format=ai_service.CATEGORY_EXTRACT_JSON_SCHEMA,
+    )
+    assert content == '{"categoryId": 7}'
+    assert calls[0]["response_format"]["type"] == "json_schema"
+    assert calls[1]["response_format"]["type"] == "json_object"
+    assert calls[1]["messages"][0]["role"] == "system"
+
+
+def test_auto_falls_back_to_no_response_format(monkeypatch):
+    settings = Settings(
+        _env_file=None,
+        ai_api_key="secret",
+        ai_base_url="https://ai.example.com/v1",
+        ai_response_format="auto",
+    )
+    calls = []
+
+    def handler(request):
+        calls.append(json.loads(request.content))
+        if len(calls) < 3:
+            return httpx.Response(400, json={"error": {"message": "invalid argument"}})
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": '{"categoryId": 7}'}}]},
+        )
+
+    client = ai_service.ChatCompletionClient(
+        settings,
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    content = client.complete(
+        model="model-x",
+        messages=[{"role": "user", "content": "hi"}],
+        response_format=ai_service.CATEGORY_EXTRACT_JSON_SCHEMA,
+    )
+    assert content == '{"categoryId": 7}'
+    assert len(calls) == 3
+    assert "response_format" not in calls[2]
+
+
+def test_ai_error_includes_provider_detail(monkeypatch):
+    settings = Settings(
+        _env_file=None,
+        ai_api_key="secret",
+        ai_base_url="https://ai.example.com/v1",
+        ai_response_format="json_object",
+    )
+
+    def handler(_request):
+        return httpx.Response(
+            400,
+            json={"error": {"message": "API key not valid. Please pass a valid API key."}},
+        )
+
+    client = ai_service.ChatCompletionClient(
+        settings,
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    with pytest.raises(ai_service.AiError, match="API key not valid"):
+        client.complete(
+            model="model-x",
+            messages=[{"role": "user", "content": "hi"}],
+            response_format=ai_service.CATEGORY_EXTRACT_JSON_SCHEMA,
+        )
 
 
 def test_category_inference_endpoint(make_client, session, monkeypatch):

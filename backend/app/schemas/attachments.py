@@ -97,6 +97,10 @@ class AttachmentState(BaseModel):
 class AttachmentExtractionResult(BaseModel):
     status: Literal["EXTRACTED", "FAILED"]
     attachment_id: str
+    # Short, user-safe provider/parse reason for a FAILED result. It is
+    # transient (not stored on the attachment) and never includes the prompt,
+    # image data or API key.
+    error: str | None = None
     total: int | None = None
     items_total: int = 0
     merchant: str | None = None
