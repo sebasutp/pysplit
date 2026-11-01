@@ -8,6 +8,7 @@ text, but talks HTTP through ``httpx`` so no vendor SDK is required.
 from __future__ import annotations
 
 import json
+import ssl
 from typing import Any
 
 import httpx
@@ -169,7 +170,19 @@ class ChatCompletionClient:
     ) -> None:
         self.settings = settings
         self._owns_client = http_client is None
-        self._client = http_client or httpx.Client(timeout=settings.ai_timeout_seconds)
+        try:
+            self._client = http_client or httpx.Client(timeout=settings.ai_timeout_seconds)
+        except (httpx.HTTPError, OSError):
+            # Some minimal images ship without a readable certifi bundle. Fall
+            # back to the interpreter's system trust store before giving up;
+            # building the client can fail before any request is made.
+            try:
+                self._client = httpx.Client(
+                    timeout=settings.ai_timeout_seconds,
+                    verify=ssl.create_default_context(),
+                )
+            except (httpx.HTTPError, OSError) as fallback_exc:
+                raise AiError("AI provider is unreachable") from fallback_exc
 
     def close(self) -> None:
         if self._owns_client:
@@ -209,6 +222,32 @@ class ChatCompletionClient:
         content = message.get("content") if isinstance(message, dict) else None
         return content if isinstance(content, str) else None
 
+    @staticmethod
+    def _error_detail(response: httpx.Response) -> str:
+        """Provider error text for logs, without echoing the request."""
+        detail = ""
+        try:
+            body = response.json()
+        except (ValueError, json.JSONDecodeError):
+            detail = response.text
+        else:
+            error = body.get("error") if isinstance(body, dict) else None
+            if isinstance(error, dict):
+                detail = str(error.get("message") or error.get("status") or "")
+            elif error:
+                detail = str(error)
+            elif isinstance(body, dict):
+                detail = str(body.get("message") or "")
+        detail = " ".join(detail.split())
+        return f" ({detail[:300]})" if detail else ""
+
+    @staticmethod
+    def _json_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [
+            {"role": "system", "content": "Reply with a single JSON object only."},
+            *messages,
+        ]
+
     def complete(
         self,
         *,
@@ -220,12 +259,17 @@ class ChatCompletionClient:
         if mode == "json_object":
             response = self._post(
                 model=model,
-                messages=[
-                    *messages,
-                    {"role": "system", "content": "Reply with a single JSON object only."},
-                ],
+                messages=self._json_messages(messages),
                 payload={"response_format": {"type": "json_object"}},
             )
+            if response.status_code in {400, 422}:
+                # Some endpoints reject response_format entirely even though
+                # they accept the JSON instruction in the system message.
+                response = self._post(
+                    model=model,
+                    messages=self._json_messages(messages),
+                    payload={},
+                )
         else:
             response = self._post(
                 model=model,
@@ -237,22 +281,28 @@ class ChatCompletionClient:
                     }
                 },
             )
-            if (
-                mode == "auto"
-                and response.status_code in {400, 422}
-                and "response_format" in response.text.lower()
-            ):
+            if mode == "auto" and response.status_code in {400, 422}:
+                # Gemini and some other OpenAI-compatible endpoints reject
+                # strict JSON-schema output with a generic 400 that does not
+                # mention response_format. Retry in JSON-object mode.
                 response = self._post(
                     model=model,
-                    messages=[
-                        *messages,
-                        {"role": "system", "content": "Reply with a single JSON object only."},
-                    ],
+                    messages=self._json_messages(messages),
                     payload={"response_format": {"type": "json_object"}},
                 )
+                if response.status_code in {400, 422}:
+                    # Last resort for providers that reject response_format
+                    # entirely: rely on the instruction and parse the text.
+                    response = self._post(
+                        model=model,
+                        messages=self._json_messages(messages),
+                        payload={},
+                    )
 
         if response.status_code >= 400:
-            raise AiError(f"AI provider returned HTTP {response.status_code}")
+            raise AiError(
+                f"AI provider returned HTTP {response.status_code}{self._error_detail(response)}"
+            )
         return self._content(response)
 
 
@@ -267,4 +317,9 @@ def get_ai_client(
         from app.services.ai_mock import MockChatCompletionClient
 
         return MockChatCompletionClient(delay_ms=settings.ai_mock_delay_ms)  # type: ignore[return-value]
+    if not settings.ai_api_key_resolved and not settings.ai_base_url_resolved:
+        # Without a key or a custom endpoint there is nothing to call. Failing
+        # here keeps the receipt endpoint's 200/FAILED contract instead of
+        # surfacing a provider or TLS error as a 500.
+        raise AiError("AI provider is not configured")
     return ChatCompletionClient(settings, http_client=http_client)

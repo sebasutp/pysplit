@@ -156,6 +156,16 @@ export ENABLE_MOCK_LOGIN="${ENABLE_MOCK_LOGIN:-true}"
 # the opt-in defaults from the application settings.
 export ENABLE_RECEIPT_AI="${ENABLE_RECEIPT_AI:-true}"
 export ENABLE_CATEGORY_EXTRACT="${ENABLE_CATEGORY_EXTRACT:-true}"
+# Receipt extraction needs a provider. When no key or custom endpoint is
+# configured, use the deterministic local fixtures instead of letting every
+# scan fail against api.openai.com without credentials. An explicit AI_MOCK (or
+# a configured provider) always wins.
+if [ -z "${AI_MOCK+x}" ] \
+  && [ -z "${AI_API_KEY:-}" ] && [ -z "${OPENAI_API_KEY:-}" ] \
+  && [ -z "${AI_BASE_URL:-}" ] && [ -z "${OPENAI_BASE_URL:-}" ]; then
+  export AI_MOCK=true
+  echo "No AI provider configured; receipt scanning uses AI_MOCK fixtures." >&2
+fi
 # The Playwright suite signs in per test context; keep the local limiter from
 # throttling a full run. Production keeps the conservative defaults.
 export AUTH_RATE_LIMIT_PER_MINUTE="${AUTH_RATE_LIMIT_PER_MINUTE:-1000}"

@@ -143,7 +143,9 @@ def test_production_env_template_keeps_production_guards_active() -> None:
     assert ".env.production.example" in _read(".gitignore")
     # The development template remains valid for ./dev.
     assert "ENVIRONMENT=development" in _read(".env.example")
-    assert "cp .env.production.example .env" in _read("docs/runbook-cutover.md")
+    # The cutover runbook was removed in the production-hardening change; the
+    # compose file still documents the required first step.
+    assert "cp .env.production.example .env" in _read("compose.yaml")
 
 
 def test_operational_scripts_exist_and_are_documented() -> None:

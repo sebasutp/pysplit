@@ -126,8 +126,10 @@ Receipt scanning is optional. Attachments (images and PDFs) always work; the AI
 flags only control extraction and category suggestions. Configuration is
 server-only: never expose these values as `VITE_*` variables.
 
-Local development already enables the AI flags and mock login. To try the whole
-flow without a provider key:
+Local development already enables the AI flags and mock login. When neither a
+provider key (`AI_API_KEY`/`OPENAI_API_KEY`) nor a custom endpoint
+(`AI_BASE_URL`/`OPENAI_BASE_URL`) is configured, `./dev` automatically sets
+`AI_MOCK=true`, so receipt scanning works out of the box. You can also force it:
 
 ```bash
 AI_MOCK=true ./dev
@@ -177,7 +179,9 @@ AI_MODEL_CATEGORY_EXTRACT=deepseek-flash
 
 If a provider rejects strict JSON-schema output, `AI_RESPONSE_FORMAT=auto`
 retries with JSON-object mode automatically. Set it to `json_object` if your
-provider needs that from the first request.
+provider needs that from the first request. If a scan still fails, the form
+shows an error and the API logs the provider error with the attachment id
+(`Receipt item extraction failed for …`).
 
 ### Development versus production
 
@@ -187,6 +191,8 @@ provider needs that from the first request.
 - Production keeps the AI flags off unless you set them explicitly, as in
   `.env.production.example`. Use a real key from a secret manager and keep
   `AI_MOCK` and `ENABLE_MOCK_LOGIN` off.
+- The API logs its resolved receipt-AI configuration at startup:
+  `Receipt AI enabled: provider=… model=… response_format=…`.
 - Every real extraction attempt is a paid model call. `RECEIPT_MAX_ATTEMPTS`
   caps retries per uploaded file; `AI_RATE_LIMIT_PER_MINUTE` and
   `UPLOAD_RATE_LIMIT_PER_MINUTE` cap usage.

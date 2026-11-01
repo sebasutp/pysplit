@@ -645,6 +645,21 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
           ),
         )
       }
+      if (
+        result?.status === 'FAILED' ||
+        result?.attachment?.receipt_status === 'FAILED'
+      ) {
+        toast({
+          title: t('Attachments.scanError', 'The receipt could not be scanned'),
+          description:
+            (typeof result.error === 'string' && result.error) ||
+            t(
+              'ReceiptItems.scanUnavailable',
+              'Check the server AI configuration and try again.',
+            ),
+        })
+        return null
+      }
       toast({
         title: t('Attachments.scanComplete', 'Receipt scanned'),
         description: t(

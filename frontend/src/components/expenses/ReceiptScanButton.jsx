@@ -64,6 +64,19 @@ export function ReceiptScanButton({
             'Queued. The receipt will be scanned after you reconnect.',
           ),
         )
+      } else if (
+        result.status === 'FAILED' ||
+        result.attachment?.receipt_status === 'FAILED'
+      ) {
+        // A provider failure is a normal 200/FAILED response. Surface the
+        // server's reason instead of pretending nothing happened.
+        setError(
+          (typeof result.error === 'string' && result.error) ||
+            t(
+              'CreateFromReceipt.scanFailed',
+              'The AI could not read this receipt. Check the server AI configuration and try again.',
+            ),
+        )
       } else {
         onExtracted({ ...result, attachment })
       }

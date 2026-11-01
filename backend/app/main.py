@@ -48,9 +48,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings)
     init_sentry(settings)
+    logger = logging.getLogger(__name__)
     if settings.ai_mock:
-        logging.getLogger(__name__).warning(
+        logger.warning(
             "AI_MOCK is enabled; receipt extraction uses local fixtures and makes no provider calls"
+        )
+    elif settings.receipt_ai_enabled:
+        logger.info(
+            "Receipt AI enabled: provider=%s model=%s response_format=%s",
+            settings.ai_provider_label,
+            settings.receipt_items_model,
+            settings.ai_response_format,
         )
 
     api_prefix = settings.api_prefix.rstrip("/")

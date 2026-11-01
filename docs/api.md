@@ -419,7 +419,8 @@ paid call. Returns:
   "split": { "…": "AttachmentSplitRead" } }
 ```
 Malformed output or provider failure records `FAILED` on the attachment and
-returns `status: "FAILED"` with an empty split. Concurrent callers race on an
+returns `status: "FAILED"`, a short `error` reason for the UI/logs, and an
+empty split. Concurrent callers race on an
 atomic claim; a stale `EXTRACTING` claim is recoverable after
 `RECEIPT_EXTRACTION_STALE_SECONDS`. The loser receives `409`. Attempts are
 bounded by `RECEIPT_MAX_ATTEMPTS`; once exhausted, further extraction returns

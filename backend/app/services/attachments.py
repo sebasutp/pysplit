@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import contextlib
 import json
+import logging
 import math
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import PurePosixPath
@@ -77,6 +78,8 @@ EXTENSION_CONTENT_TYPES = {
 IMAGE_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 SUPPORTED_CONTENT_TYPES = frozenset(CONTENT_TYPE_EXTENSIONS)
 _PUBLIC_PROVIDER_LABELS = {"openai-compatible", "google", "disabled"}
+
+logger = logging.getLogger(__name__)
 
 
 def _public_provider(provider: str | None) -> str | None:
@@ -1093,6 +1096,19 @@ def _image_for_ai(storage: BlobStorage, attachment: Attachment) -> str:
     return f"data:{attachment.content_type};base64,{encoded}"
 
 
+def _receipt_messages(prompt: str, image: str) -> list[dict[str, Any]]:
+    """One multimodal user turn, which all OpenAI-compatible providers accept."""
+    return [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": image}},
+            ],
+        }
+    ]
+
+
 def extract_total(
     session: Session,
     settings: Settings,
@@ -1114,13 +1130,11 @@ def extract_total(
             settings,
             ai_client=ai_client,
             model=settings.receipt_extract_model,
-            messages=[
-                {"role": "user", "content": [{"type": "text", "text": prompt}]},
-                {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image}}]},
-            ],
+            messages=_receipt_messages(prompt, image),
             response_format=ai_service.RECEIPT_EXTRACT_JSON_SCHEMA,
         )
-    except ai_service.AiError:
+    except ai_service.AiError as exc:
+        logger.warning("Receipt total extraction failed for %s: %s", attachment.id, exc)
         return AttachmentTotalExtraction()
 
     parsed = _parse_total_response(content)
@@ -1141,6 +1155,7 @@ def _extraction_result(
     *,
     status: str,
     category_id: str | None = None,
+    error: str | None = None,
 ) -> AttachmentExtractionResult:
     state = attachment_state(session, group_id, attachment)
     if category_id is None and attachment.raw_extraction:
@@ -1150,6 +1165,7 @@ def _extraction_result(
     return AttachmentExtractionResult(
         status=status,
         attachment_id=attachment.id,
+        error=error,
         total=attachment.total,
         items_total=state.split.items_total,
         merchant=attachment.merchant,
@@ -1220,13 +1236,11 @@ def extract_items(
             settings,
             ai_client=ai_client,
             model=model,
-            messages=[
-                {"role": "user", "content": [{"type": "text", "text": prompt}]},
-                {"role": "user", "content": [{"type": "image_url", "image_url": {"url": image}}]},
-            ],
+            messages=_receipt_messages(prompt, image),
             response_format=ai_service.RECEIPT_ITEMS_RESPONSE_FORMAT,
         )
-    except ai_service.AiError:
+    except ai_service.AiError as exc:
+        logger.warning("Receipt item extraction failed for %s: %s", attachment.id, exc)
         fail_extraction(
             session,
             attachment.id,
@@ -1240,12 +1254,18 @@ def extract_items(
             group_id,
             attachment,
             status=ReceiptStatus.FAILED.value,
+            error=str(exc)[:300],
         )
 
     parsed = parse_receipt_items_response(content, limit=settings.max_receipt_items)
     if parsed is not None:
         parsed = _cap_extraction_lists(parsed, settings.max_receipt_items)
     if parsed is None:
+        logger.warning(
+            "Receipt item extraction for %s returned unparseable content: %r",
+            attachment.id,
+            (content or "")[:500],
+        )
         fail_extraction(
             session,
             attachment.id,
@@ -1259,6 +1279,7 @@ def extract_items(
             group_id,
             attachment,
             status=ReceiptStatus.FAILED.value,
+            error="The AI response was not a valid receipt JSON object.",
         )
 
     normalized = normalize_receipt(parsed, decimal_digits(group.currency_code))
@@ -1278,6 +1299,7 @@ def extract_items(
             group_id,
             attachment,
             status=ReceiptStatus.FAILED.value,
+            error="The AI returned a receipt item outside the allowed limits.",
         )
     attachment = complete_extraction(
         session,
@@ -1323,7 +1345,8 @@ def infer_category(
             ],
             response_format=ai_service.CATEGORY_EXTRACT_JSON_SCHEMA,
         )
-    except ai_service.AiError:
+    except ai_service.AiError as exc:
+        logger.warning("Category inference failed: %s", exc)
         return 0
 
     parsed = _parse_category_response(content)
