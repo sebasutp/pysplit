@@ -38,6 +38,9 @@ data/
 !.env.example
 !.env.production.example
 
+# Production host scripts and site-specific configuration (never committed)
+/prod/
+
 # Editors / OS
 .DS_Store
 .idea/

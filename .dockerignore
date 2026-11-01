@@ -26,6 +26,7 @@ data
 spliit
 docs
 review-reports
+prod
 frontend/node_modules
 frontend/dist
 frontend/coverage

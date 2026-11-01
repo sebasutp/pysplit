@@ -30,7 +30,7 @@ def test_compose_defines_api_web_and_optional_backup() -> None:
 
     web = services["web"]
     assert web["depends_on"]["api"]["condition"] == "service_healthy"
-    assert "${COMPOSE_WEB_PORT:-8080}:80" in web["ports"]
+    assert "${COMPOSE_WEB_PORT:-8080}:8080" in web["ports"]
 
     backup = services["backup"]
     assert backup["depends_on"]["api"]["condition"] == "service_healthy"
@@ -45,7 +45,7 @@ def test_compose_defines_api_web_and_optional_backup() -> None:
 
 def test_api_dockerfile_runs_migrations_one_worker_and_a_non_root_user() -> None:
     dockerfile = _read("Dockerfile.api")
-    assert "python:3.12-slim" in dockerfile
+    assert "docker.io/library/python:3.12-slim" in dockerfile
     assert "alembic upgrade head" in _read("backend/docker-entrypoint.sh")
     assert "--workers 1" in _read("backend/docker-entrypoint.sh")
     assert "--no-proxy-headers" in _read("backend/docker-entrypoint.sh")
@@ -58,14 +58,30 @@ def test_web_dockerfile_builds_the_spa_and_serves_it_with_nginx() -> None:
     dockerfile = _read("Dockerfile.web")
     assert "npm ci" in dockerfile
     assert "npm run build" in dockerfile
-    assert "nginx:1.29-alpine" in dockerfile
+    assert "docker.io/nginxinc/nginx-unprivileged:1.29-alpine" in dockerfile
+    assert "USER 101" in dockerfile
+    assert "EXPOSE 8080" in dockerfile
     assert "frontend/nginx.conf" in dockerfile
     assert "frontend/nginx-security-headers.conf" in dockerfile
     assert "HEALTHCHECK" in dockerfile
+    # COPY preserves the checkout's mode. A production checkout made with
+    # umask 0077 would otherwise leave these files root:root 0600, which the
+    # UID 101 runtime user cannot read.
+    assert "chmod 0644 /etc/nginx/conf.d/default.conf" in dockerfile
+    assert "chmod -R a+rX /usr/share/nginx/html" in dockerfile
+    # The base image already runs as UID 101, so the chmod must be preceded by
+    # a switch to root or it fails with "Operation not permitted".
+    chmod_at = dockerfile.index("RUN chmod 0755 /etc/nginx/snippets")
+    assert dockerfile.index("USER 0") < chmod_at
+    assert dockerfile.index("USER 101", chmod_at) > chmod_at
 
 
 def test_nginx_proxies_api_without_caching_and_supports_deep_links() -> None:
     nginx = _read("frontend/nginx.conf")
+    assert "listen 8080;" in nginx
+    # The entrypoint cannot add an IPv6 listen on a read-only root filesystem,
+    # so an unconditional one would break hosts with IPv6 disabled.
+    assert "listen [::]:8080;" not in nginx
     assert "location ^~ /api/" in nginx
     assert "proxy_pass http://pysplit_api;" in nginx
     assert "proxy_set_header X-Forwarded-Proto $scheme;" in nginx
