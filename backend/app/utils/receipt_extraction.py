@@ -17,14 +17,27 @@ from typing import Any
 MAX_RECEIPT_ITEMS = 200
 
 _DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_CODE_FENCE_PATTERN = re.compile(r"^\s*```(?:json)?\s*(.*?)\s*```\s*$", re.DOTALL | re.IGNORECASE)
+
+
+def strip_json_code_fence(content: str) -> str:
+    """Strip markdown `` ```json ... ``` `` wrappers when present."""
+    match = _CODE_FENCE_PATTERN.match(content)
+    if match:
+        return match.group(1)
+    return content.strip()
 
 
 def _is_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
-def _optional_string(container: Mapping[str, Any], key: str) -> str | None:
-    value = container.get(key)
+def _optional_string(container: Mapping[str, Any], key: str, *aliases: str) -> str | None:
+    value = None
+    for candidate in (key, *aliases):
+        if candidate in container and container[candidate] is not None:
+            value = container[candidate]
+            break
     if value is None:
         return None
     if not isinstance(value, str):
@@ -32,8 +45,12 @@ def _optional_string(container: Mapping[str, Any], key: str) -> str | None:
     return value
 
 
-def _optional_number(container: Mapping[str, Any], key: str) -> float | int | None:
-    value = container.get(key)
+def _optional_number(container: Mapping[str, Any], key: str, *aliases: str) -> float | int | None:
+    value = None
+    for candidate in (key, *aliases):
+        if candidate in container and container[candidate] is not None:
+            value = container[candidate]
+            break
     if value is None:
         return None
     if not _is_number(value):
@@ -60,11 +77,13 @@ def _parse_items(value: Any, *, limit: int | None = None) -> list[dict[str, Any]
     for raw in value:
         if not isinstance(raw, Mapping):
             raise ValueError("items entries must be objects")
+        quantity_raw = raw.get("quantity")
+        quantity = 1 if quantity_raw is None else _required_number(raw, "quantity")
         items.append(
             {
                 "name": _required_string(raw, "name"),
-                "quantity": _required_number(raw, "quantity"),
-                "unit_price": _optional_number(raw, "unitPrice"),
+                "quantity": quantity,
+                "unit_price": _optional_number(raw, "unitPrice", "unit_price"),
                 "amount": _required_number(raw, "amount"),
             }
         )
@@ -74,6 +93,8 @@ def _parse_items(value: Any, *, limit: int | None = None) -> list[dict[str, Any]
 
 
 def _parse_charges(value: Any) -> list[dict[str, Any]]:
+    if value is None:
+        return []
     if not isinstance(value, list):
         raise ValueError("charges must be an array")
     charges: list[dict[str, Any]] = []
@@ -117,7 +138,7 @@ def parse_receipt_items_response(
         return None
 
     try:
-        parsed = json.loads(content)
+        parsed = json.loads(strip_json_code_fence(content))
     except (TypeError, ValueError):
         return None
     if not isinstance(parsed, Mapping):
@@ -126,12 +147,17 @@ def parse_receipt_items_response(
     try:
         items = parsed.get("items", [])
         charges = parsed.get("charges", [])
+        category_raw = (
+            parsed.get("categoryId")
+            if "categoryId" in parsed and parsed.get("categoryId") is not None
+            else parsed.get("category_id")
+        )
         return {
             "merchant": _optional_string(parsed, "merchant"),
             "date": _optional_string(parsed, "date"),
-            "currency_code": _optional_string(parsed, "currencyCode"),
+            "currency_code": _optional_string(parsed, "currencyCode", "currency_code"),
             "total": _optional_number(parsed, "total"),
-            "category_id": _category_value(parsed.get("categoryId")),
+            "category_id": _category_value(category_raw),
             "items": _parse_items(items, limit=max(1, limit)),
             "charges": _parse_charges(charges),
         }
