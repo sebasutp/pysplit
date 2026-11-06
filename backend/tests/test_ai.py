@@ -157,6 +157,43 @@ def test_ai_request_uses_json_schema_and_bearer(monkeypatch):
     assert captured["body"]["response_format"]["json_schema"]["name"] == "category_response"
 
 
+def test_ai_config_strips_surrounding_whitespace_from_api_key_and_models():
+    """Trailing whitespace from systemd/Podman EnvironmentFile must not cause
+    httpx.LocalProtocolError on the Authorization header."""
+    settings = Settings(
+        _env_file=None,
+        ai_api_key="  secret-with-trailing-space \r\n",
+        ai_base_url="  https://ai.example.com/v1/  ",
+        ai_model_receipt_items_extract="  gemini-3.5-flash-lite  ",
+    )
+    assert settings.ai_api_key == "secret-with-trailing-space"
+    assert ai_service.get_ai_api_key(settings) == "secret-with-trailing-space"
+    assert settings.receipt_items_model == "gemini-3.5-flash-lite"
+
+    captured: dict = {}
+
+    def handler(request):
+        captured["auth"] = request.headers.get("authorization")
+        captured["model"] = json.loads(request.content)["model"]
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": '{"categoryId": 7}'}}]},
+        )
+
+    client = ai_service.ChatCompletionClient(
+        settings,
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    content = client.complete(
+        model=settings.receipt_items_model,
+        messages=[{"role": "user", "content": "hi"}],
+        response_format=ai_service.CATEGORY_EXTRACT_JSON_SCHEMA,
+    )
+    assert content == '{"categoryId": 7}'
+    assert captured["auth"] == "Bearer secret-with-trailing-space"
+    assert captured["model"] == "gemini-3.5-flash-lite"
+
+
 # ---------------------------------------------------------------------------
 # Defensive parsing
 # ---------------------------------------------------------------------------

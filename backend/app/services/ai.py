@@ -148,7 +148,8 @@ def format_category_for_ai_prompt(category: Any) -> str:
 
 
 def get_ai_api_key(settings: Settings) -> str | None:
-    return settings.ai_api_key_resolved
+    key = settings.ai_api_key_resolved
+    return key.strip() if isinstance(key, str) and key.strip() else None
 
 
 def get_ai_base_url(settings: Settings) -> str | None:
