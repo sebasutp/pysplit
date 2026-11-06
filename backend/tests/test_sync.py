@@ -678,7 +678,7 @@ def test_duplicate_recurring_creates_do_not_duplicate_links(client, session: Ses
         == 0
     )
     changes = pull(client, 0, [group.id], limit=10).json()["changes"]
-    assert [change["op_type"] for change in changes] == ["create", "create"]
+    assert [change["op_type"] for change in changes] == ["create", "update", "create"]
     assert changes[-1]["snapshot"]["id"] != "exp-recurring"
     assert (
         changes[-1]["snapshot"]["expense_date"] == (moment - timedelta(days=1)).date().isoformat()

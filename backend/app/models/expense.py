@@ -72,3 +72,23 @@ class Expense(SyncColumns, table=True):
         index=True,
         max_length=64,
     )
+
+    @property
+    def is_recurring_head(self) -> bool:
+        if not self.recurrence_rule or self.recurrence_rule == "NONE":
+            return False
+        from sqlalchemy.orm import object_session
+        from sqlmodel import select
+
+        from app.models.recurring_expense_link import RecurringExpenseLink
+
+        session = object_session(self)
+        if session is None:
+            return False
+        link = session.exec(
+            select(RecurringExpenseLink).where(
+                RecurringExpenseLink.current_frame_expense_id == self.id,
+                RecurringExpenseLink.next_expense_created_at.is_(None),
+            )
+        ).first()
+        return link is not None

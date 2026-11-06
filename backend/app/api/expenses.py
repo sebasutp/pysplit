@@ -17,6 +17,7 @@ from app.schemas.expenses import (
 )
 from app.services import expenses as expenses_service
 from app.services import exports as exports_service
+from app.services import sync as sync_service
 
 router = APIRouter(prefix="/groups", tags=["expenses"])
 
@@ -99,7 +100,16 @@ def create_expense(
     payload: ExpenseCreate,
     session: SessionDep,
 ) -> ExpenseRead:
-    return expenses_service.create_expense(session, group_id, payload)
+    expense = expenses_service.create_expense(session, group_id, payload, commit=False)
+    sync_service.record_expense_change(
+        session,
+        group_id=group_id,
+        expense_id=expense.id,
+        op_type="create",
+        snapshot=expense.model_dump(mode="json"),
+    )
+    session.commit()
+    return expense
 
 
 @router.get("/{group_id}/expenses/{expense_id}", response_model=ExpenseRead)
@@ -118,7 +128,16 @@ def update_expense(
     payload: ExpenseUpdate,
     session: SessionDep,
 ) -> ExpenseRead:
-    return expenses_service.update_expense(session, group_id, expense_id, payload)
+    expense = expenses_service.update_expense(session, group_id, expense_id, payload, commit=False)
+    sync_service.record_expense_change(
+        session,
+        group_id=group_id,
+        expense_id=expense.id,
+        op_type="update",
+        snapshot=expense.model_dump(mode="json"),
+    )
+    session.commit()
+    return expense
 
 
 @router.delete("/{group_id}/expenses/{expense_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -135,5 +154,13 @@ def delete_expense(
         group_id,
         expense_id,
         participant_id=participant_id or body_participant,
+        commit=False,
     )
+    sync_service.record_expense_change(
+        session,
+        group_id=group_id,
+        expense_id=expense_id,
+        op_type="delete",
+    )
+    session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

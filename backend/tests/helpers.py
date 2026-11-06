@@ -125,6 +125,8 @@ def make_group(
         by_name[participant_name] = participant
     session.commit()
     session.refresh(group)
+    for participant in by_name.values():
+        session.refresh(participant)
     return group, by_name
 
 

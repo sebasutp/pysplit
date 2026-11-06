@@ -326,7 +326,12 @@ export async function readExpenses(groupId, expenses) {
             ? 1
             : 0,
       )
-      .map((row) => ({ participant_id: row.participant_id, shares: row.shares })),
+      .map((row) => ({
+        participant_id: row.participant_id,
+        shares: row.shares,
+        ...(row.amount != null ? { amount: row.amount } : {}),
+        ...(row.percentage != null ? { percentage: row.percentage } : {}),
+      })),
     attachments: (attachmentsByExpense.get(expense.id) || []).sort((first, second) =>
       String(first.created_at || '') < String(second.created_at || '') ? -1 : 1,
     ),
@@ -372,14 +377,24 @@ export function composeGroup(group, membership, participants) {
  * @param {string} groupId
  */
 async function capturePendingSnapshotState(groupId) {
-  const operations = await db.outbox.where('group_id').equals(groupId).toArray()
+  const [operations, conflicts] = await Promise.all([
+    db.outbox.where('group_id').equals(groupId).toArray(),
+    db.conflicts.where('group_id').equals(groupId).toArray(),
+  ])
   /** @param {string} entityType */
-  const entityIds = (entityType) =>
-    new Set(
+  const entityIds = (entityType) => {
+    const ids = new Set(
       operations
         .filter((operation) => operation.entity_type === entityType)
         .map((operation) => operation.entity_id),
     )
+    for (const conflict of conflicts) {
+      if (conflict.entity_type === entityType) {
+        ids.add(conflict.entity_id)
+      }
+    }
+    return ids
+  }
   const participantIds = entityIds('participant')
   const expenseIds = entityIds('expense')
   const itemIds = entityIds('attachment_item')
@@ -396,7 +411,9 @@ async function capturePendingSnapshotState(groupId) {
   for (const operation of operations) {
     if (operation.entity_type === 'attachment_upload') attachmentIds.add(operation.entity_id)
   }
-  const groupPending = operations.some((operation) => operation.entity_type === 'group')
+  const groupPending =
+    operations.some((operation) => operation.entity_type === 'group') ||
+    conflicts.some((conflict) => conflict.entity_type === 'group')
 
   const anyOf = (table, key, ids) => (ids.size ? table.where(key).anyOf([...ids]).toArray() : [])
   const [group, participants, expenses, paidFor, attachments, items, portions, optOuts] =
@@ -442,6 +459,7 @@ export async function replaceGroupSnapshot(snapshot, options = {}) {
       db.categories,
       db.userGroups,
       db.outbox,
+      db.conflicts,
     ],
     async () => {
       const pending = await capturePendingSnapshotState(groupId)
@@ -574,10 +592,27 @@ export async function replaceGroupSnapshot(snapshot, options = {}) {
  * Apply one full-snapshot change from `/sync/pull`.
  *
  * @param {{entity_type: string, entity_id: string, op_type: string, snapshot: any}} change
+ * @param {{fromPush?: boolean}} [options]
  */
-export async function applySyncChange(change) {
+export async function applySyncChange(change, options = {}) {
   const snapshot = change.snapshot
   if (!snapshot) return
+
+  if (!options.fromPush) {
+    const activeOp = await db.outbox
+      .where('entity_id')
+      .equals(change.entity_id)
+      .filter(
+        (op) =>
+          op.entity_type === change.entity_type &&
+          (op.status === 'pending' || op.status === 'failed'),
+      )
+      .first()
+    if (activeOp) {
+      return
+    }
+  }
+
   if (change.entity_type === 'group') {
     const existing = await db.groups.get(change.entity_id)
     await db.groups.put({
@@ -620,7 +655,7 @@ export async function applySyncChange(change) {
     // Keep the existing item/portion/opt-out rows for attachments that remain,
     // otherwise every unrelated expense update would erase the itemized split.
     const removedIds = oldAttachments
-      .filter((row) => !incomingIds.has(row.id))
+      .filter((row) => !incomingIds.has(row.id) && !row.pending)
       .map((row) => row.id)
     const removedItems = removedIds.length
       ? await db.attachmentItems.where('attachment_id').anyOf(removedIds).toArray()
@@ -688,12 +723,15 @@ export async function applySyncChange(change) {
  * @param {string} opType
  */
 export async function applyPushEntity(entityType, entityId, entity, opType) {
-  await applySyncChange({
-    entity_type: entityType,
-    entity_id: entityId,
-    op_type: opType,
-    snapshot: entity,
-  })
+  await applySyncChange(
+    {
+      entity_type: entityType,
+      entity_id: entityId,
+      op_type: opType,
+      snapshot: entity,
+    },
+    { fromPush: true },
+  )
   if (entityType === 'expense') {
     const existing = await db.expenses.get(entityId)
     if (existing) await db.expenses.put({ ...existing, pending: false })
