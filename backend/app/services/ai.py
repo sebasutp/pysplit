@@ -242,9 +242,19 @@ class ChatCompletionClient:
         return f" ({detail[:300]})" if detail else ""
 
     @staticmethod
-    def _json_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _json_messages(
+        messages: list[dict[str, Any]],
+        response_format: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        instruction = "Reply with a single JSON object only."
+        schema = response_format.get("schema") if isinstance(response_format, dict) else None
+        if isinstance(schema, dict):
+            instruction = (
+                "Reply with a single JSON object only (no markdown code fences) "
+                f"matching this JSON Schema: {json.dumps(schema, separators=(',', ':'))}"
+            )
         return [
-            {"role": "system", "content": "Reply with a single JSON object only."},
+            {"role": "system", "content": instruction},
             *messages,
         ]
 
@@ -259,7 +269,7 @@ class ChatCompletionClient:
         if mode == "json_object":
             response = self._post(
                 model=model,
-                messages=self._json_messages(messages),
+                messages=self._json_messages(messages, response_format),
                 payload={"response_format": {"type": "json_object"}},
             )
             if response.status_code in {400, 422}:
@@ -267,7 +277,7 @@ class ChatCompletionClient:
                 # they accept the JSON instruction in the system message.
                 response = self._post(
                     model=model,
-                    messages=self._json_messages(messages),
+                    messages=self._json_messages(messages, response_format),
                     payload={},
                 )
         else:
@@ -287,7 +297,7 @@ class ChatCompletionClient:
                 # mention response_format. Retry in JSON-object mode.
                 response = self._post(
                     model=model,
-                    messages=self._json_messages(messages),
+                    messages=self._json_messages(messages, response_format),
                     payload={"response_format": {"type": "json_object"}},
                 )
                 if response.status_code in {400, 422}:
@@ -295,7 +305,7 @@ class ChatCompletionClient:
                     # entirely: rely on the instruction and parse the text.
                     response = self._post(
                         model=model,
-                        messages=self._json_messages(messages),
+                        messages=self._json_messages(messages, response_format),
                         payload={},
                     )
 

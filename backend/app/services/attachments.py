@@ -55,7 +55,11 @@ from app.services.errors import (
 )
 from app.storage import BlobStorage, StorageError, get_storage
 from app.utils.currency import decimal_digits
-from app.utils.receipt_extraction import normalize_receipt, parse_receipt_items_response
+from app.utils.receipt_extraction import (
+    normalize_receipt,
+    parse_receipt_items_response,
+    strip_json_code_fence,
+)
 from app.utils.receipt_split import (
     ReceiptSplitResult,
     compute_receipt_split,
@@ -1048,13 +1052,19 @@ def _parse_total_response(content: str | None) -> dict[str, Any] | None:
     if not content:
         return None
     try:
-        parsed = json.loads(content)
+        parsed = json.loads(strip_json_code_fence(content))
     except (TypeError, ValueError):
         return None
     if not isinstance(parsed, dict):
         return None
     amount = parsed.get("amount")
-    category_id = parsed.get("categoryId")
+    category_id = (
+        parsed.get("categoryId")
+        if "categoryId" in parsed and parsed.get("categoryId") is not None
+        else parsed.get("category_id")
+    )
+    if isinstance(category_id, int) and not isinstance(category_id, bool):
+        category_id = str(category_id)
     date_value = parsed.get("date")
     title = parsed.get("title")
     if not isinstance(amount, (int, float)) or isinstance(amount, bool):
@@ -1079,18 +1089,24 @@ def _parse_category_response(content: str | None) -> int | None:
     if not content:
         return None
     try:
-        parsed = json.loads(content)
+        parsed = json.loads(strip_json_code_fence(content))
     except (TypeError, ValueError):
         return None
     if not isinstance(parsed, dict):
         return None
-    category_id = parsed.get("categoryId")
+    category_id = (
+        parsed.get("categoryId")
+        if "categoryId" in parsed and parsed.get("categoryId") is not None
+        else parsed.get("category_id")
+    )
     if isinstance(category_id, bool):
         return None
     if isinstance(category_id, int):
         return category_id
     if isinstance(category_id, float) and math.isfinite(category_id) and category_id.is_integer():
         return int(category_id)
+    if isinstance(category_id, str) and category_id.strip().isdigit():
+        return int(category_id.strip())
     return None
 
 

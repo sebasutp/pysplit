@@ -657,6 +657,149 @@ def test_auto_retries_generic_400_in_json_object_mode(monkeypatch):
     assert calls[0]["response_format"]["type"] == "json_schema"
     assert calls[1]["response_format"]["type"] == "json_object"
     assert calls[1]["messages"][0]["role"] == "system"
+    assert '"categoryId"' in calls[1]["messages"][0]["content"]
+
+
+def test_receipt_extraction_accepts_markdown_fences_and_snake_case():
+    fenced = """```json
+    {
+      "merchant": "Zurich Bistro",
+      "date": "2026-11-06",
+      "currency_code": "CHF",
+      "total": 25.5,
+      "category_id": "4",
+      "items": [
+        {"name": "Rösti", "quantity": null, "unit_price": 23.5, "amount": 23.5}
+      ],
+      "charges": null
+    }
+    ```"""
+    parsed = parse_receipt_items_response(fenced)
+    assert parsed is not None
+    assert parsed["merchant"] == "Zurich Bistro"
+    assert parsed["currency_code"] == "CHF"
+    assert parsed["category_id"] == "4"
+    assert parsed["items"] == [
+        {"name": "Rösti", "quantity": 1, "unit_price": 23.5, "amount": 23.5}
+    ]
+    assert parsed["charges"] == []
+
+
+def test_extract_items_gemini_fallback_includes_schema_and_parses_fenced_output(
+    make_client, session, tmp_path, monkeypatch
+):
+    """End-to-end: when a provider rejects json_schema with 400 and falls back
+    to json_object, the system message must carry the receipt-items schema and
+    the endpoint must accept fenced/snake_case output."""
+    calls: list[dict] = []
+
+    def handler(request):
+        calls.append(json.loads(request.content))
+        if len(calls) == 1:
+            return httpx.Response(
+                400,
+                json={"error": {"message": "Request contains an invalid argument."}},
+            )
+        fenced_reply = """```json
+        {
+          "merchant": "Café Odeon",
+          "date": "2026-11-06",
+          "currency_code": "CHF",
+          "total": 18.5,
+          "category_id": 7,
+          "items": [
+            {"name": "Cappuccino", "quantity": null, "unit_price": 6.5, "amount": 6.5},
+            {"name": "Croissant", "quantity": 2, "unit_price": 6.0, "amount": 12.0}
+          ],
+          "charges": null
+        }
+        ```"""
+        return httpx.Response(
+            200,
+            json={"choices": [{"message": {"content": fenced_reply}}]},
+        )
+
+    transport = httpx.MockTransport(handler)
+    monkeypatch.setattr(
+        ai_service,
+        "get_ai_client",
+        lambda settings: ai_service.ChatCompletionClient(
+            settings,
+            http_client=httpx.Client(transport=transport),
+        ),
+    )
+
+    client = make_client(
+        enable_receipt_ai=True,
+        upload_dir=str(tmp_path),
+        ai_api_key="gemini-key",
+        ai_base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        ai_model_receipt_items_extract="gemini-3.5-flash-lite",
+    )
+    group, _people = make_group(session)
+    headers = _auth(session)
+    attachment_id = _upload(client, group.id).json()["id"]
+
+    response = client.post(
+        f"/api/groups/{group.id}/attachments/{attachment_id}/extract-items",
+        json={},
+        headers=headers,
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "EXTRACTED"
+    assert body["merchant"] == "Café Odeon"
+    assert body["currency_code"] == "CHF"
+    assert body["category_id"] == "7"
+    assert body["total"] == 1850
+    assert len(body["items"]) == 2
+    assert body["items"][0]["quantity_milli"] == 1000
+    assert body["items"][0]["unit_price"] == 650
+
+    assert len(calls) == 2
+    assert calls[0]["response_format"]["type"] == "json_schema"
+    assert calls[1]["response_format"]["type"] == "json_object"
+    system_msg = calls[1]["messages"][0]["content"]
+    for key in ("merchant", "currencyCode", "categoryId", "unitPrice", "items", "charges"):
+        assert f'"{key}"' in system_msg
+
+
+def test_extract_total_and_category_accept_fenced_and_snake_case_output(
+    make_client, session, tmp_path, monkeypatch
+):
+    fake = FakeAiClient(
+        '```json\n{"amount": 19.5, "category_id": 4, "date": "2026-11-06", "title": "Bakery"}\n```'
+    )
+    _patch_ai(monkeypatch, fake)
+    client = make_client(
+        enable_receipt_ai=True,
+        enable_category_extract=True,
+        upload_dir=str(tmp_path),
+    )
+    group, _people = make_group(session)
+    headers = _auth(session)
+    attachment_id = _upload(client, group.id).json()["id"]
+
+    total_resp = client.post(
+        f"/api/groups/{group.id}/attachments/{attachment_id}/extract-total",
+        headers=headers,
+    )
+    assert total_resp.status_code == 200, total_resp.text
+    assert total_resp.json() == {
+        "amount": 19.5,
+        "category_id": "4",
+        "date": "2026-11-06",
+        "title": "Bakery",
+    }
+
+    fake.content = '```json\n{"category_id": "1"}\n```'
+    cat_resp = client.post(
+        "/api/ai/categories/infer",
+        json={"title": "Bakery"},
+        headers=headers,
+    )
+    assert cat_resp.status_code == 200, cat_resp.text
+    assert cat_resp.json() == {"category_id": 1}
 
 
 def test_auto_falls_back_to_no_response_format(monkeypatch):
