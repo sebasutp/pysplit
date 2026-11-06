@@ -125,3 +125,21 @@ def test_enabled_oauth_providers_require_both_credentials() -> None:
     assert Settings(
         auth_google_id="id", auth_google_secret="secret", _env_file=None
     ).enabled_oauth_providers == ["google"]
+
+
+def test_optional_string_settings_strip_surrounding_whitespace() -> None:
+    settings = Settings(
+        _env_file=None,
+        ai_api_key="  key-123  ",
+        openai_api_key="  sk-456\r\n",
+        ai_model_receipt_extract=" gemini-3.5-flash-lite ",
+        auth_google_id=" google-id ",
+        auth_google_secret=" google-secret ",
+        s3_upload_key=" s3-key ",
+    )
+    assert settings.ai_api_key == "key-123"
+    assert settings.openai_api_key == "sk-456"
+    assert settings.receipt_extract_model == "gemini-3.5-flash-lite"
+    assert settings.auth_google_id == "google-id"
+    assert settings.auth_google_secret == "google-secret"
+    assert settings.s3_upload_key == "s3-key"

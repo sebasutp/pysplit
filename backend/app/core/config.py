@@ -339,6 +339,10 @@ class Settings(BaseSettings):
         return value
 
     @field_validator(
+        "auth_google_id",
+        "auth_google_secret",
+        "auth_github_id",
+        "auth_github_secret",
         "s3_upload_key",
         "s3_upload_secret",
         "s3_upload_bucket",
@@ -360,8 +364,9 @@ class Settings(BaseSettings):
     )
     @classmethod
     def _blank_to_none(cls, value: object) -> object:
-        if isinstance(value, str) and not value.strip():
-            return None
+        if isinstance(value, str):
+            stripped = value.strip()
+            return stripped if stripped else None
         return value
 
     @field_validator("s3_public_url")
