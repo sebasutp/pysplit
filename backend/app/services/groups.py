@@ -637,6 +637,8 @@ def set_membership(
     group_id: str,
     user_id: str,
     payload: MembershipUpdate,
+    *,
+    commit: bool = True,
 ) -> UserGroupRead:
     get_active_group(session, group_id)
     membership = _ensure_membership(
@@ -646,15 +648,27 @@ def set_membership(
         is_starred=payload.is_starred,
         is_archived=payload.is_archived,
     )
-    session.commit()
-    session.refresh(membership)
+    if commit:
+        session.commit()
+        session.refresh(membership)
+    else:
+        session.flush()
     return _membership_read(membership)
 
 
-def remove_membership(session: Session, group_id: str, user_id: str | None) -> None:
+def remove_membership(
+    session: Session,
+    group_id: str,
+    user_id: str | None,
+    *,
+    commit: bool = True,
+) -> None:
     if user_id is None:
         return
     membership = find_membership(session, user_id, group_id)
     if membership is not None:
         session.delete(membership)
-        session.commit()
+        if commit:
+            session.commit()
+        else:
+            session.flush()

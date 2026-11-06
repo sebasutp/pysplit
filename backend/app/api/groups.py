@@ -27,6 +27,7 @@ from app.schemas.groups import (
     UserGroupRead,
 )
 from app.services import groups as groups_service
+from app.services import sync as sync_service
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -83,7 +84,24 @@ def create_group(
     user: GroupCreatorUser,
     session: SessionDep,
 ) -> GroupRead:
-    return groups_service.create_group(session, payload, user_id=user.id)
+    group = groups_service.create_group(session, payload, user_id=user.id, commit=False)
+    sync_service.record_group_change(
+        session,
+        group_id=group.id,
+        op_type="create",
+        user_id=user.id,
+    )
+    for p in group.participants:
+        sync_service.record_participant_change(
+            session,
+            group_id=group.id,
+            participant_id=p.id,
+            op_type="create",
+            snapshot=p.model_dump(mode="json"),
+            user_id=user.id,
+        )
+    session.commit()
+    return group
 
 
 @router.get("/{group_id}", response_model=GroupRead)
@@ -121,7 +139,50 @@ def update_group(
     payload: GroupUpdate,
     session: SessionDep,
 ) -> GroupRead:
-    return groups_service.update_group(session, group_id, payload)
+    prior_participants = (
+        groups_service.list_participants(session, group_id)
+        if payload.participants is not None
+        else None
+    )
+    group = groups_service.update_group(session, group_id, payload, commit=False)
+    sync_service.record_group_change(
+        session,
+        group_id=group_id,
+        op_type="update",
+    )
+    if prior_participants is not None:
+        prior_map = {p.id: p for p in prior_participants}
+        current_map = {p.id: p for p in group.participants}
+        for p in group.participants:
+            if p.id not in prior_map:
+                sync_service.record_participant_change(
+                    session,
+                    group_id=group_id,
+                    participant_id=p.id,
+                    op_type="create",
+                    snapshot=p.model_dump(mode="json"),
+                )
+            else:
+                prior = prior_map[p.id]
+                if prior.name != p.name:
+                    sync_service.record_participant_change(
+                        session,
+                        group_id=group_id,
+                        participant_id=p.id,
+                        op_type="update",
+                        snapshot=p.model_dump(mode="json"),
+                    )
+        for prior_id, prior in prior_map.items():
+            if prior_id not in current_map:
+                sync_service.record_participant_change(
+                    session,
+                    group_id=group_id,
+                    participant_id=prior_id,
+                    op_type="delete",
+                    snapshot=prior.model_dump(mode="json"),
+                )
+    session.commit()
+    return group
 
 
 @router.post("/{group_id}/access", status_code=status.HTTP_204_NO_CONTENT)
@@ -152,7 +213,16 @@ def add_participant(
     payload: ParticipantCreate,
     session: SessionDep,
 ) -> ParticipantRead:
-    return groups_service.add_participant(session, group_id, payload)
+    participant = groups_service.add_participant(session, group_id, payload, commit=False)
+    sync_service.record_participant_change(
+        session,
+        group_id=group_id,
+        participant_id=participant.id,
+        op_type="create",
+        snapshot=participant.model_dump(mode="json"),
+    )
+    session.commit()
+    return participant
 
 
 @router.patch("/{group_id}/participants/{participant_id}", response_model=ParticipantRead)
@@ -162,7 +232,18 @@ def update_participant(
     payload: ParticipantUpdate,
     session: SessionDep,
 ) -> ParticipantRead:
-    return groups_service.update_participant(session, group_id, participant_id, payload)
+    participant = groups_service.update_participant(
+        session, group_id, participant_id, payload, commit=False
+    )
+    sync_service.record_participant_change(
+        session,
+        group_id=group_id,
+        participant_id=participant.id,
+        op_type="update",
+        snapshot=participant.model_dump(mode="json"),
+    )
+    session.commit()
+    return participant
 
 
 @router.delete(
@@ -174,7 +255,14 @@ def delete_participant(
     participant_id: str,
     session: SessionDep,
 ) -> Response:
-    groups_service.delete_participant(session, group_id, participant_id)
+    sync_service.record_participant_change(
+        session,
+        group_id=group_id,
+        participant_id=participant_id,
+        op_type="delete",
+    )
+    groups_service.delete_participant(session, group_id, participant_id, commit=False)
+    session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -185,7 +273,18 @@ def update_membership(
     user: CurrentUser,
     session: SessionDep,
 ) -> UserGroupRead:
-    return groups_service.set_membership(session, group_id, user.id, payload)
+    membership = groups_service.set_membership(
+        session, group_id, user.id, payload, commit=False
+    )
+    sync_service.record_user_group_change(
+        session,
+        group_id=group_id,
+        user_id=user.id,
+        op_type="update",
+        snapshot=membership.model_dump(mode="json"),
+    )
+    session.commit()
+    return membership
 
 
 @router.delete("/{group_id}/membership", status_code=status.HTTP_204_NO_CONTENT)
@@ -194,5 +293,15 @@ def remove_membership(
     user: OptionalUser,
     session: SessionDep,
 ) -> Response:
-    groups_service.remove_membership(session, group_id, user.id if user else None)
+    if user:
+        sync_service.record_user_group_change(
+            session,
+            group_id=group_id,
+            user_id=user.id,
+            op_type="delete",
+        )
+        groups_service.remove_membership(session, group_id, user.id, commit=False)
+        session.commit()
+    else:
+        groups_service.remove_membership(session, group_id, None)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

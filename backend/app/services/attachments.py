@@ -989,6 +989,18 @@ def apply_attachment_to_expense(
     attachment.updated_at = moment
     attachment.version += 1
     session.add(attachment)
+
+    from app.services import sync as sync_service
+
+    sync_service.record_change(
+        session,
+        group_id=group_id,
+        entity_type="expense",
+        entity_id=expense.id,
+        op_type="update",
+        snapshot=sync_service.expense_snapshot(session, expense),
+        now=moment,
+    )
     session.commit()
     session.refresh(attachment)
     return attachment, split

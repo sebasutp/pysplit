@@ -98,12 +98,21 @@ async function refreshCounters(pending = null) {
     failedCount(),
     db.conflicts.count(),
   ])
+  const currentPhase = getSyncStatus().phase
+  let phase = currentPhase
+  if (!isOnline()) {
+    phase = 'offline'
+  } else if (conflicts) {
+    phase = 'conflict'
+  } else if (failed > 0 && currentPhase === 'error') {
+    phase = 'error'
+  }
   setSyncStatus({
     pending: count,
     failed,
     conflicts,
     online: isOnline(),
-    phase: !isOnline() ? 'offline' : conflicts ? 'conflict' : getSyncStatus().phase,
+    phase,
   })
   return { count, failed, conflicts }
 }
@@ -219,7 +228,7 @@ async function handleResult(result, operation) {
   }
 
   const code = String(result.code || 'error')
-  const retryable = ['network', 'server', 'rate_limited', 'conflict'].includes(code)
+  const retryable = ['network', 'server', 'rate_limited'].includes(code)
   await markFailed(
     operation.op_id,
     result.detail || result.code || 'Synchronization failed',
@@ -262,6 +271,12 @@ async function pushRestOperation(operation) {
     return api.put(
       `${attachmentPath}/opt-outs/${encodeURIComponent(meta.participant_id || operation.entity_id)}`,
       { body: { opted_out: Boolean(operation.payload?.opted_out) } },
+    )
+  }
+  if (operation.entity_type === 'attachment_link') {
+    return api.patch(
+      `${groupPath}/attachments/${encodeURIComponent(operation.entity_id)}`,
+      { body: { expense_id: operation.payload?.expense_id ?? null } },
     )
   }
   throw new Error(`Unsupported REST operation ${operation.entity_type}`)
@@ -589,7 +604,7 @@ export async function pullChanges() {
   if (!isOnline()) return { applied: 0 }
   const scope = await currentScope()
   const groups = await db.groups.toArray()
-  const groupIds = groups.map((group) => group.id)
+  const groupIds = groups.filter((g) => !g.list_only).map((group) => group.id)
   if (!groupIds.length) return { applied: 0 }
 
   const startCursor = await readCursor(scope)
@@ -764,12 +779,26 @@ export async function runSync(options = {}) {
     // must not let a scope refresh prune the group whose claim is still in the
     // outbox.
     if (pushed.errors === 0) await reconcileGroupScope()
-    const { count, conflicts } = await refreshCounters()
+    const { count, failed, conflicts } = await refreshCounters()
+    const currentStatus = getSyncStatus()
+    const hasError = pushed.errors > 0 || failed > 0 || currentStatus.phase === 'error'
+    let phase = 'idle'
+    let lastError = null
+    if (conflicts) {
+      phase = 'conflict'
+    } else if (hasError) {
+      phase = 'error'
+      lastError = currentStatus.lastError
+      if (!lastError && failed > 0) {
+        const failedOp = await db.outbox.where('status').equals('failed').first()
+        lastError = failedOp?.last_error || 'Synchronization failed'
+      }
+    }
     setSyncStatus({
-      phase: conflicts ? 'conflict' : 'idle',
+      phase,
       pending: count,
       conflicts,
-      lastError: null,
+      lastError,
       lastSyncedAt: nowIso(),
       online: true,
     })
@@ -941,12 +970,15 @@ export async function resolveConflict(conflictId, strategy) {
 
   if (strategy === 'server') {
     if (server) {
-      await applySyncChange({
-        entity_type: conflict.entity_type,
-        entity_id: conflict.entity_id,
-        op_type: 'update',
-        snapshot: server,
-      })
+      await applySyncChange(
+        {
+          entity_type: conflict.entity_type,
+          entity_id: conflict.entity_id,
+          op_type: 'update',
+          snapshot: server,
+        },
+        { fromPush: true },
+      )
       const table =
         conflict.entity_type === 'participant'
           ? db.participants
@@ -960,7 +992,13 @@ export async function resolveConflict(conflictId, strategy) {
     return
   }
 
-  if (strategy === 'mine') {
+  const serverDeletedExpense =
+    strategy === 'mine' &&
+    conflict.entity_type === 'expense' &&
+    conflict.op_type !== 'delete' &&
+    server?.deleted_at != null
+
+  if (strategy === 'mine' && !serverDeletedExpense) {
     const baseVersion = Number(server?.version ?? conflict.server_version ?? 0)
     const timestamp = nowIso()
     const table =
@@ -1027,6 +1065,30 @@ export async function resolveConflict(conflictId, strategy) {
     const timestamp = nowIso()
     // The pull after a conflict has already replaced the local row with the
     // server snapshot, so the user's edit lives in the stored operation payload.
+    const localPaidFor = await db.paidFor.where('expense_id').equals(conflict.entity_id).toArray()
+    let rawPaidFor = conflict.payload?.paid_for
+    if (!rawPaidFor) {
+      if (localPaidFor && localPaidFor.length > 0) {
+        rawPaidFor = localPaidFor
+      } else if (conflict.server_entity?.paid_for && conflict.server_entity.paid_for.length > 0) {
+        rawPaidFor = conflict.server_entity.paid_for
+      } else {
+        rawPaidFor = []
+      }
+    }
+    const paidForList = rawPaidFor.map((row) => {
+      const item = {
+        participant_id: row.participant_id,
+        shares: Number(row.shares ?? 1),
+      }
+      if (row.amount !== undefined && row.amount !== null) {
+        item.amount = Number(row.amount)
+      }
+      if (row.percentage !== undefined && row.percentage !== null) {
+        item.percentage = Number(row.percentage)
+      }
+      return item
+    })
     const payload = {
       expense_date: conflict.payload?.expense_date ?? local.expense_date,
       title: conflict.payload?.title ?? local.title,
@@ -1040,11 +1102,7 @@ export async function resolveConflict(conflictId, strategy) {
       split_mode: conflict.payload?.split_mode || local.split_mode || 'EVENLY',
       notes: conflict.payload?.notes ?? local.notes ?? null,
       recurrence_rule: conflict.payload?.recurrence_rule || local.recurrence_rule || 'NONE',
-      paid_for:
-        conflict.payload?.paid_for ??
-        (await db.paidFor.where('expense_id').equals(conflict.entity_id).toArray()).map(
-          (row) => ({ participant_id: row.participant_id, shares: row.shares }),
-        ),
+      paid_for: paidForList,
     }
     await db.transaction('rw', [db.expenses, db.paidFor, db.outbox], async () => {
       await db.expenses.put({
@@ -1053,7 +1111,7 @@ export async function resolveConflict(conflictId, strategy) {
         ...payload,
         created_at: timestamp,
         updated_at: timestamp,
-        version: 0,
+        version: 1,
         deleted_at: null,
         pending: true,
       })
@@ -1088,33 +1146,94 @@ export async function discardFailed() {
   const groups = new Set()
   const removedGroups = new Set()
   for (const row of rows) {
-    if (row.op_type !== 'create') {
-      if (row.group_id) groups.add(row.group_id)
-      continue
-    }
-    if (row.entity_type === 'group') {
-      removedGroups.add(row.group_id)
-      await deleteLocalGroup(row.group_id)
-      continue
-    }
     if (row.group_id) groups.add(row.group_id)
-    if (row.entity_type === 'expense') {
-      await db.expenses.delete(row.entity_id)
-      await db.paidFor.where('expense_id').equals(row.entity_id).delete()
-      await db.attachments.where('expense_id').equals(row.entity_id).delete()
-    } else if (row.entity_type === 'participant') {
-      await db.participants.delete(row.entity_id)
-    } else if (row.entity_type === 'attachment_item') {
-      await db.attachmentItems.delete(row.entity_id)
-      await db.attachmentPortions.where('item_id').equals(row.entity_id).delete()
-    } else if (row.entity_type === 'attachment_opt_out') {
-      const id = `${row.meta?.attachment_id}:${row.entity_id}`
-      await db.attachmentOptOuts.delete(id)
-    } else if (row.entity_type === 'attachment_upload') {
-      await db.attachments.delete(row.entity_id)
-      await db.attachmentItems.where('attachment_id').equals(row.entity_id).delete()
-      await db.attachmentOptOuts.where('attachment_id').equals(row.entity_id).delete()
-      if (row.meta?.blob_id) await db.blobs.delete(row.meta.blob_id)
+    if (row.op_type === 'create') {
+      if (row.entity_type === 'group') {
+        removedGroups.add(row.group_id)
+        await deleteLocalGroup(row.group_id)
+        continue
+      }
+      if (row.entity_type === 'expense') {
+        await db.expenses.delete(row.entity_id)
+        await db.paidFor.where('expense_id').equals(row.entity_id).delete()
+        await db.attachments.where('expense_id').equals(row.entity_id).delete()
+      } else if (row.entity_type === 'participant') {
+        await db.participants.delete(row.entity_id)
+      } else if (row.entity_type === 'attachment_item') {
+        await db.attachmentItems.delete(row.entity_id)
+        await db.attachmentPortions.where('item_id').equals(row.entity_id).delete()
+      } else if (row.entity_type === 'attachment_opt_out') {
+        const id = `${row.meta?.attachment_id}:${row.entity_id}`
+        await db.attachmentOptOuts.delete(id)
+      } else if (row.entity_type === 'attachment_upload') {
+        await db.attachments.delete(row.entity_id)
+        await db.attachmentItems.where('attachment_id').equals(row.entity_id).delete()
+        await db.attachmentOptOuts.where('attachment_id').equals(row.entity_id).delete()
+        if (row.meta?.blob_id) await db.blobs.delete(row.meta.blob_id)
+      }
+    } else {
+      // update or delete
+      if (row.entity_type === 'expense') {
+        if (row.prior_snapshot) {
+          const { paid_for, ...expenseData } = row.prior_snapshot
+          await db.expenses.put({
+            ...expenseData,
+            pending: false,
+          })
+          if (Array.isArray(paid_for)) {
+            await db.paidFor.where('expense_id').equals(row.entity_id).delete()
+            if (paid_for.length) {
+              await db.paidFor.bulkPut(
+                paid_for.map((p) => ({ ...p, expense_id: row.entity_id })),
+              )
+            }
+          }
+        } else if (row.op_type === 'delete') {
+          await db.expenses
+            .update(row.entity_id, {
+              deleted_at: null,
+              version: row.base_version || 1,
+              pending: false,
+            })
+            .catch(() => 0)
+        } else {
+          await db.expenses.update(row.entity_id, { pending: false }).catch(() => 0)
+        }
+      } else if (row.entity_type === 'participant') {
+        if (row.prior_snapshot) {
+          await db.participants.put({
+            ...row.prior_snapshot,
+            pending: false,
+          })
+        } else if (row.op_type === 'delete') {
+          await db.participants
+            .update(row.entity_id, {
+              deleted_at: null,
+              version: row.base_version || 1,
+              pending: false,
+            })
+            .catch(() => 0)
+        } else {
+          await db.participants.update(row.entity_id, { pending: false }).catch(() => 0)
+        }
+      } else if (row.entity_type === 'group') {
+        if (row.prior_snapshot) {
+          await db.groups.put({
+            ...row.prior_snapshot,
+            pending: false,
+          })
+        } else if (row.op_type === 'delete') {
+          await db.groups
+            .update(row.entity_id, {
+              deleted_at: null,
+              version: row.base_version || 1,
+              pending: false,
+            })
+            .catch(() => 0)
+        } else {
+          await db.groups.update(row.entity_id, { pending: false }).catch(() => 0)
+        }
+      }
     }
   }
   await discardFailedOperations()

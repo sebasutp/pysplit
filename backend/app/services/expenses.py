@@ -867,22 +867,6 @@ def materialize_due_recurring_expenses(
                 )
             )
 
-            # Recurrence is materialized server-side, so the new frame must
-            # also be visible to clients that only consume the change feed.
-            session.flush()
-            snapshot = expense_to_read(session, new_expense).model_dump(mode="json")
-            session.add(
-                SyncChange(
-                    group_id=new_expense.group_id,
-                    entity_type="expense",
-                    entity_id=new_expense.id,
-                    op_type="create",
-                    payload_json=json.dumps(snapshot, sort_keys=True, separators=(",", ":")),
-                    user_id=None,
-                    changed_at=moment,
-                )
-            )
-
             result = session.execute(
                 update(RecurringExpenseLink)
                 .where(
@@ -900,6 +884,37 @@ def materialize_due_recurring_expenses(
                 # batch so the next read retries from the current links.
                 session.rollback()
                 return 0
+
+            session.flush()
+            current_snapshot = expense_to_read(session, current).model_dump(mode="json")
+            session.add(
+                SyncChange(
+                    group_id=current.group_id,
+                    entity_type="expense",
+                    entity_id=current.id,
+                    op_type="update",
+                    payload_json=json.dumps(
+                        current_snapshot, sort_keys=True, separators=(",", ":")
+                    ),
+                    user_id=None,
+                    changed_at=moment,
+                )
+            )
+
+            # Recurrence is materialized server-side, so the new frame must
+            # also be visible to clients that only consume the change feed.
+            snapshot = expense_to_read(session, new_expense).model_dump(mode="json")
+            session.add(
+                SyncChange(
+                    group_id=new_expense.group_id,
+                    entity_type="expense",
+                    entity_id=new_expense.id,
+                    op_type="create",
+                    payload_json=json.dumps(snapshot, sort_keys=True, separators=(",", ":")),
+                    user_id=None,
+                    changed_at=moment,
+                )
+            )
 
             created += 1
             link_id = new_link.id

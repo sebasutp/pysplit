@@ -50,6 +50,7 @@ export function outboxRow(operation) {
     meta: operation.meta || {},
     created_at: nowIso(),
     updated_at: nowIso(),
+    prior_snapshot: operation.prior_snapshot ?? null,
   }
 }
 

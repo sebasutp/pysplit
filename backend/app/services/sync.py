@@ -823,6 +823,165 @@ def _append_change(
     return int(row.seq)
 
 
+def group_snapshot(
+    session: Session,
+    group: Group,
+    *,
+    user_id: str | None = None,
+) -> dict[str, Any]:
+    return _group_snapshot(session, group, user_id=user_id)
+
+
+def participant_snapshot(participant: Participant) -> dict[str, Any]:
+    return _participant_snapshot(participant)
+
+
+def expense_snapshot(session: Session, expense: Expense) -> dict[str, Any]:
+    return _expense_snapshot(session, expense)
+
+
+def record_change(
+    session: Session,
+    *,
+    group_id: str,
+    entity_type: str,
+    entity_id: str,
+    op_type: str,
+    snapshot: dict[str, Any],
+    user_id: str | None = None,
+    now: datetime | None = None,
+) -> int:
+    change = _Change(
+        group_id=group_id,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        op_type=op_type,
+        snapshot=snapshot,
+    )
+    return _append_change(
+        session,
+        change=change,
+        user_id=user_id,
+        now=now or utc_now(),
+    )
+
+
+def record_expense_change(
+    session: Session,
+    *,
+    group_id: str,
+    expense_id: str,
+    op_type: str,
+    snapshot: dict[str, Any] | None = None,
+    now: datetime | None = None,
+) -> int | None:
+    if snapshot is None:
+        expense = session.get(Expense, expense_id)
+        if expense is None:
+            return None
+        snapshot = _expense_snapshot(session, expense)
+    return record_change(
+        session,
+        group_id=group_id,
+        entity_type="expense",
+        entity_id=expense_id,
+        op_type=op_type,
+        snapshot=snapshot,
+        now=now,
+    )
+
+
+def record_group_change(
+    session: Session,
+    *,
+    group_id: str,
+    op_type: str,
+    user_id: str | None = None,
+    snapshot: dict[str, Any] | None = None,
+    now: datetime | None = None,
+) -> int | None:
+    if snapshot is None:
+        group = session.get(Group, group_id)
+        if group is None:
+            return None
+        snapshot = _group_snapshot(session, group, user_id=user_id)
+    return record_change(
+        session,
+        group_id=group_id,
+        entity_type="group",
+        entity_id=group_id,
+        op_type=op_type,
+        snapshot=snapshot,
+        user_id=user_id,
+        now=now,
+    )
+
+
+def record_participant_change(
+    session: Session,
+    *,
+    group_id: str,
+    participant_id: str,
+    op_type: str,
+    user_id: str | None = None,
+    snapshot: dict[str, Any] | None = None,
+    now: datetime | None = None,
+) -> int | None:
+    if snapshot is None:
+        participant = session.get(Participant, participant_id)
+        if participant is None:
+            return None
+        snapshot = _participant_snapshot(participant)
+        if op_type == "delete":
+            snapshot["version"] = int(snapshot.get("version", 1)) + 1
+            snapshot["deleted_at"] = iso_z(now or utc_now())
+    elif op_type == "delete" and not snapshot.get("deleted_at"):
+        snapshot["version"] = int(snapshot.get("version", 1)) + 1
+        snapshot["deleted_at"] = iso_z(now or utc_now())
+    return record_change(
+        session,
+        group_id=group_id,
+        entity_type="participant",
+        entity_id=participant_id,
+        op_type=op_type,
+        snapshot=snapshot,
+        user_id=user_id,
+        now=now,
+    )
+
+
+def record_user_group_change(
+    session: Session,
+    *,
+    group_id: str,
+    user_id: str,
+    op_type: str,
+    snapshot: dict[str, Any] | None = None,
+    now: datetime | None = None,
+) -> int | None:
+    if snapshot is None:
+        membership = session.get(UserGroup, (user_id, group_id))
+        if membership is None:
+            return None
+        snapshot = _membership_snapshot(membership)
+        if op_type == "delete":
+            snapshot["version"] = int(snapshot.get("version", 1)) + 1
+            snapshot["deleted_at"] = iso_z(now or utc_now())
+    elif op_type == "delete" and not snapshot.get("deleted_at"):
+        snapshot["version"] = int(snapshot.get("version", 1)) + 1
+        snapshot["deleted_at"] = iso_z(now or utc_now())
+    return record_change(
+        session,
+        group_id=group_id,
+        entity_type="user_group",
+        entity_id=group_id,
+        op_type=op_type,
+        snapshot=snapshot,
+        user_id=user_id,
+        now=now,
+    )
+
+
 def _entity_latest_seq(session: Session, entity_type: str, entity_id: str) -> int | None:
     row = session.exec(
         select(SyncChange)
@@ -1211,16 +1370,19 @@ def pull_changes(
     )
     has_more = len(rows) > payload.limit
     visible = rows[: payload.limit]
-    changes = [
-        SyncChangeRead(
-            seq=int(row.seq or 0),
-            entity_type=row.entity_type,
-            entity_id=row.entity_id,
-            op_type=row.op_type,
-            snapshot=json.loads(row.payload_json) if row.payload_json else None,
+    changes: list[SyncChangeRead] = []
+    for row in visible:
+        snapshot = json.loads(row.payload_json) if row.payload_json else None
+        changes.append(
+            SyncChangeRead(
+                seq=int(row.seq or 0),
+                entity_type=row.entity_type,
+                entity_id=row.entity_id,
+                op_type=row.op_type,
+                version=snapshot.get("version") if isinstance(snapshot, dict) else None,
+                snapshot=snapshot,
+            )
         )
-        for row in visible
-    ]
     cursor = int(visible[-1].seq or 0) if visible else payload.cursor
     return SyncPullResponse(changes=changes, cursor=cursor, has_more=has_more)
 

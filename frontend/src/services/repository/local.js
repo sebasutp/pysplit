@@ -1166,102 +1166,183 @@ const groups = {
       const operations = []
       const nextParticipants = []
 
-      if (Object.keys(fields).length) {
-        operations.push({
-          op_id: newId('op'),
-          group_id: groupId,
-          entity_type: 'group',
-          entity_id: groupId,
-          op_type: 'update',
-          base_version: Number(group.version || 0),
-          payload: fields,
-        })
-      }
-
-      if (participants) {
-        const seen = new Set()
-        for (const [index, participant] of participants.entries()) {
-          const current = participant.id ? existing.find((row) => row.id === participant.id) : null
-          if (participant.id && current) {
-            seen.add(participant.id)
-            const changed = current.name !== participant.name
-            nextParticipants.push({
-              ...current,
-              name: participant.name,
-              ...(changed
-                ? {
-                    updated_at: timestamp,
-                    version: Number(current.version || 0) + 1,
-                  }
-                : {}),
-              pending: Boolean(current.pending) || changed,
-            })
-            if (changed) {
-              operations.push({
-                op_id: newId('op'),
-                group_id: groupId,
-                entity_type: 'participant',
-                entity_id: participant.id,
-                op_type: 'update',
-                base_version: Number(current.version || 0),
-                payload: { name: participant.name },
-              })
-            }
-          } else {
-            const participantId = participant.id || newId('par')
-            seen.add(participantId)
-            const created = {
-              id: participantId,
-              name: participant.name,
-              group_id: groupId,
-              updated_at: timestamp,
-              version: 1,
-              deleted_at: null,
-              position: index,
-              pending: true,
-            }
-            nextParticipants.push(created)
-            operations.push({
-              op_id: newId('op'),
-              group_id: groupId,
-              entity_type: 'participant',
-              entity_id: participantId,
-              op_type: 'create',
-              payload: { name: participant.name },
-            })
-          }
-        }
-        for (const current of existing) {
-          if (seen.has(current.id)) continue
-          nextParticipants.push({
-            ...current,
-            deleted_at: timestamp,
-            updated_at: timestamp,
-            version: Number(current.version || 0) + 1,
-            pending: true,
-          })
-          operations.push({
-            op_id: newId('op'),
-            group_id: groupId,
-            entity_type: 'participant',
-            entity_id: current.id,
-            op_type: 'delete',
-            base_version: Number(current.version || 0),
-            payload: {},
-          })
-        }
-      }
-
       await db.transaction(
         'rw',
         [db.groups, db.participants, db.outbox],
         async () => {
+          if (participants) {
+            const seen = new Set()
+            for (const [index, participant] of participants.entries()) {
+              const current = participant.id ? existing.find((row) => row.id === participant.id) : null
+              if (participant.id && current) {
+                seen.add(participant.id)
+                const changed = current.name !== participant.name
+                let participantVersion = Number(current.version || 0)
+                if (changed) {
+                  const existingOp = await db.outbox
+                    .where('entity_id')
+                    .equals(participant.id)
+                    .filter(
+                      (op) =>
+                        op.group_id === groupId &&
+                        op.entity_type === 'participant' &&
+                        op.status === 'pending',
+                    )
+                    .first()
+
+                  if (existingOp && existingOp.op_type === 'create') {
+                    const mergedPayload = { ...existingOp.payload, name: participant.name }
+                    await db.outbox
+                      .where('op_id')
+                      .equals(existingOp.op_id)
+                      .modify({ payload: mergedPayload, updated_at: timestamp })
+                    participantVersion = 1
+                  } else if (existingOp && existingOp.op_type === 'update') {
+                    const mergedPayload = { ...existingOp.payload, name: participant.name }
+                    await db.outbox
+                      .where('op_id')
+                      .equals(existingOp.op_id)
+                      .modify({ payload: mergedPayload, updated_at: timestamp })
+                    participantVersion = Number(existingOp.base_version || 1) + 1
+                  } else {
+                    operations.push({
+                      op_id: newId('op'),
+                      group_id: groupId,
+                      entity_type: 'participant',
+                      entity_id: participant.id,
+                      op_type: 'update',
+                      base_version: Number(current.version || 0),
+                      payload: { name: participant.name },
+                      prior_snapshot: { ...current },
+                    })
+                    participantVersion = Number(current.version || 0) + 1
+                  }
+                }
+                nextParticipants.push({
+                  ...current,
+                  name: participant.name,
+                  ...(changed
+                    ? {
+                        updated_at: timestamp,
+                        version: participantVersion,
+                      }
+                    : {}),
+                  pending: Boolean(current.pending) || changed,
+                })
+              } else {
+                const participantId = participant.id || newId('par')
+                seen.add(participantId)
+                const created = {
+                  id: participantId,
+                  name: participant.name,
+                  group_id: groupId,
+                  updated_at: timestamp,
+                  version: 1,
+                  deleted_at: null,
+                  position: index,
+                  pending: true,
+                }
+                nextParticipants.push(created)
+                operations.push({
+                  op_id: newId('op'),
+                  group_id: groupId,
+                  entity_type: 'participant',
+                  entity_id: participantId,
+                  op_type: 'create',
+                  payload: { name: participant.name },
+                })
+              }
+            }
+            for (const current of existing) {
+              if (seen.has(current.id)) continue
+              const existingOp = await db.outbox
+                .where('entity_id')
+                .equals(current.id)
+                .filter(
+                  (op) =>
+                    op.group_id === groupId &&
+                    op.entity_type === 'participant' &&
+                    op.status === 'pending',
+                )
+                .first()
+
+              if (existingOp && existingOp.op_type === 'create') {
+                await db.outbox.delete(existingOp.seq)
+              } else {
+                let baseVersion = Number(current.version || 0)
+                let effectivePriorSnapshot = { ...current }
+                if (existingOp && existingOp.op_type === 'update') {
+                  baseVersion = existingOp.base_version ?? baseVersion
+                  effectivePriorSnapshot = existingOp.prior_snapshot ?? effectivePriorSnapshot
+                  await db.outbox.delete(existingOp.seq)
+                }
+                nextParticipants.push({
+                  ...current,
+                  deleted_at: timestamp,
+                  updated_at: timestamp,
+                  version: baseVersion + 1,
+                  pending: true,
+                })
+                operations.push({
+                  op_id: newId('op'),
+                  group_id: groupId,
+                  entity_type: 'participant',
+                  entity_id: current.id,
+                  op_type: 'delete',
+                  base_version: baseVersion,
+                  payload: {},
+                  prior_snapshot: effectivePriorSnapshot,
+                })
+              }
+            }
+          }
+
+          let groupVersion = Number(group.version || 0) + (Object.keys(fields).length ? 1 : 0)
+          if (Object.keys(fields).length) {
+            const existingGroupOp = await db.outbox
+              .where('entity_id')
+              .equals(groupId)
+              .filter(
+                (op) =>
+                  op.group_id === groupId &&
+                  op.entity_type === 'group' &&
+                  op.status === 'pending',
+              )
+              .first()
+
+            if (existingGroupOp && existingGroupOp.op_type === 'create') {
+              const mergedPayload = { ...existingGroupOp.payload, ...fields }
+              await db.outbox
+                .where('op_id')
+                .equals(existingGroupOp.op_id)
+                .modify({ payload: mergedPayload, updated_at: timestamp })
+              groupVersion = 1
+            } else if (existingGroupOp && existingGroupOp.op_type === 'update') {
+              const mergedPayload = { ...existingGroupOp.payload, ...fields }
+              await db.outbox
+                .where('op_id')
+                .equals(existingGroupOp.op_id)
+                .modify({ payload: mergedPayload, updated_at: timestamp })
+              groupVersion = Number(existingGroupOp.base_version || 1) + 1
+            } else {
+              operations.push({
+                op_id: newId('op'),
+                group_id: groupId,
+                entity_type: 'group',
+                entity_id: groupId,
+                op_type: 'update',
+                base_version: Number(group.version || 0),
+                payload: fields,
+                prior_snapshot: { ...group },
+              })
+            }
+          }
           await db.groups.put({
             ...group,
             ...fields,
             participants: undefined,
             updated_at: timestamp,
-            version: Number(group.version || 0) + (Object.keys(fields).length ? 1 : 0),
+            version: groupVersion,
             pending: true,
           })
           if (participants) {
@@ -1507,18 +1588,55 @@ const participants = {
         if (!current) {
           throw new RepositoryError('Participant not found', { code: 'not_found', status: 404 })
         }
-        participant = { ...current, name: input.name, updated_at: timestamp, version: Number(current.version || 0) + 1 }
+        const priorSnapshot = { ...current }
+        const participantId = input.id
         await db.transaction('rw', [db.participants, db.outbox], async () => {
-          await db.participants.put({ ...participant, pending: true })
-          await enqueue({
-            op_id: newId('op'),
-            group_id: groupId,
-            entity_type: 'participant',
-            entity_id: participant.id,
-            op_type: 'update',
-            base_version: Number(current.version || 0),
-            payload: { name: input.name },
-          })
+          const existingOp = await db.outbox
+            .where('entity_id')
+            .equals(participantId)
+            .filter(
+              (op) =>
+                op.group_id === groupId &&
+                op.entity_type === 'participant' &&
+                op.status === 'pending',
+            )
+            .first()
+
+          let version = Number(current.version || 0) + 1
+          if (existingOp && existingOp.op_type === 'create') {
+            const mergedPayload = { ...existingOp.payload, name: input.name }
+            await db.outbox
+              .where('op_id')
+              .equals(existingOp.op_id)
+              .modify({ payload: mergedPayload, updated_at: timestamp })
+            version = 1
+          } else if (existingOp && existingOp.op_type === 'update') {
+            const mergedPayload = { ...existingOp.payload, name: input.name }
+            await db.outbox
+              .where('op_id')
+              .equals(existingOp.op_id)
+              .modify({ payload: mergedPayload, updated_at: timestamp })
+            version = Number(existingOp.base_version || 1) + 1
+          } else {
+            await enqueue({
+              op_id: newId('op'),
+              group_id: groupId,
+              entity_type: 'participant',
+              entity_id: participantId,
+              op_type: 'update',
+              base_version: Number(current.version || 0),
+              payload: { name: input.name },
+              prior_snapshot: priorSnapshot,
+            })
+          }
+          participant = {
+            ...current,
+            name: input.name,
+            updated_at: timestamp,
+            version,
+            pending: true,
+          }
+          await db.participants.put(participant)
         })
       } else {
         const id = newId('par')
@@ -1556,7 +1674,32 @@ const participants = {
         throw new RepositoryError('Participant not found', { code: 'not_found', status: 404 })
       }
       const timestamp = nowIso()
+      const priorSnapshot = { ...participant }
       await db.transaction('rw', [db.participants, db.outbox], async () => {
+        const existingOp = await db.outbox
+          .where('entity_id')
+          .equals(id)
+          .filter(
+            (op) =>
+              op.group_id === groupId &&
+              op.entity_type === 'participant' &&
+              op.status === 'pending',
+          )
+          .first()
+
+        if (existingOp && existingOp.op_type === 'create') {
+          await db.outbox.delete(existingOp.seq)
+          await db.participants.delete(id)
+          return
+        }
+
+        let baseVersion = Number(participant.version || 0)
+        let effectivePriorSnapshot = priorSnapshot
+        if (existingOp && existingOp.op_type === 'update') {
+          baseVersion = existingOp.base_version ?? baseVersion
+          effectivePriorSnapshot = existingOp.prior_snapshot ?? priorSnapshot
+          await db.outbox.delete(existingOp.seq)
+        }
         await db.participants.put({
           ...participant,
           deleted_at: timestamp,
@@ -1570,8 +1713,9 @@ const participants = {
           entity_type: 'participant',
           entity_id: id,
           op_type: 'delete',
-          base_version: Number(participant.version || 0),
+          base_version: baseVersion,
           payload: {},
+          prior_snapshot: effectivePriorSnapshot,
         })
       })
       await flushGroup(groupId)
@@ -1765,6 +1909,11 @@ const expenses = {
       const baseVersion = Number(
         input.base_version ?? options.base_version ?? current.version ?? 0,
       )
+      const currentPaidFor = await db.paidFor.where('expense_id').equals(expenseId).toArray()
+      const priorSnapshot = {
+        ...current,
+        paid_for: currentPaidFor.map((r) => ({ ...r })),
+      }
       const next = {
         ...current,
         ...payload,
@@ -1777,6 +1926,45 @@ const expenses = {
         pending: true,
       }
       await db.transaction('rw', [db.expenses, db.paidFor, db.outbox], async () => {
+        const existingOp = await db.outbox
+          .where('entity_id')
+          .equals(expenseId)
+          .filter(
+            (op) =>
+              op.group_id === groupId &&
+              op.entity_type === 'expense' &&
+              op.status === 'pending',
+          )
+          .first()
+
+        if (existingOp && existingOp.op_type === 'create') {
+          const mergedPayload = { ...existingOp.payload, ...payload }
+          if (payload.paid_for) mergedPayload.paid_for = payload.paid_for
+          await db.outbox
+            .where('op_id')
+            .equals(existingOp.op_id)
+            .modify({ payload: mergedPayload, updated_at: timestamp })
+          next.version = 1
+        } else if (existingOp && existingOp.op_type === 'update') {
+          const mergedPayload = { ...existingOp.payload, ...payload }
+          if (payload.paid_for) mergedPayload.paid_for = payload.paid_for
+          await db.outbox
+            .where('op_id')
+            .equals(existingOp.op_id)
+            .modify({ payload: mergedPayload, updated_at: timestamp })
+          next.version = Number(existingOp.base_version || 1) + 1
+        } else {
+          await enqueue({
+            op_id: newId('op'),
+            group_id: groupId,
+            entity_type: 'expense',
+            entity_id: expenseId,
+            op_type: 'update',
+            base_version: baseVersion,
+            payload,
+            prior_snapshot: priorSnapshot,
+          })
+        }
         await db.expenses.put(next)
         if (paidFor) {
           await db.paidFor.where('expense_id').equals(expenseId).delete()
@@ -1784,15 +1972,6 @@ const expenses = {
             await db.paidFor.bulkPut(paidFor.map((row) => ({ ...row, expense_id: expenseId })))
           }
         }
-        await enqueue({
-          op_id: newId('op'),
-          group_id: groupId,
-          entity_type: 'expense',
-          entity_id: expenseId,
-          op_type: 'update',
-          base_version: baseVersion,
-          payload,
-        })
       })
       await flushGroup(groupId)
       return readExpense((await db.expenses.get(expenseId)) || next)
@@ -1808,24 +1987,76 @@ const expenses = {
       }
       const timestamp = nowIso()
       const baseVersion = Number(options.base_version ?? current.version ?? 0)
-      await db.transaction('rw', [db.expenses, db.outbox], async () => {
-        await db.expenses.put({
-          ...current,
-          deleted_at: timestamp,
-          updated_at: timestamp,
-          version: Number(current.version || 0) + 1,
-          pending: true,
-        })
-        await enqueue({
-          op_id: newId('op'),
-          group_id: groupId,
-          entity_type: 'expense',
-          entity_id: expenseId,
-          op_type: 'delete',
-          base_version: baseVersion,
-          payload: {},
-        })
-      })
+      const currentPaidFor = await db.paidFor.where('expense_id').equals(expenseId).toArray()
+      const priorSnapshot = {
+        ...current,
+        paid_for: currentPaidFor.map((r) => ({ ...r })),
+      }
+      await db.transaction(
+        'rw',
+        [db.expenses, db.paidFor, db.outbox, db.attachments, db.blobs],
+        async () => {
+          await db.paidFor.where('expense_id').equals(expenseId).delete()
+
+          const blobOps = await db.outbox
+            .where('group_id')
+            .equals(groupId)
+            .filter((op) => op.transport === 'blob' && op.payload?.expense_id === expenseId)
+            .toArray()
+          for (const op of blobOps) {
+            await db.outbox.delete(op.seq)
+            if (op.entity_id) await db.attachments.delete(op.entity_id)
+            if (op.meta?.blob_id) await db.blobs.delete(op.meta.blob_id)
+          }
+          const attRows = await db.attachments.where('expense_id').equals(expenseId).toArray()
+          for (const att of attRows) {
+            await db.attachments.delete(att.id)
+          }
+
+          const existingOp = await db.outbox
+            .where('entity_id')
+            .equals(expenseId)
+            .filter(
+              (op) =>
+                op.group_id === groupId &&
+                op.entity_type === 'expense' &&
+                op.status === 'pending',
+            )
+            .first()
+
+          if (existingOp && existingOp.op_type === 'create') {
+            await db.outbox.delete(existingOp.seq)
+            await db.expenses.delete(expenseId)
+            return
+          }
+
+          let effectiveBaseVersion = baseVersion
+          let effectivePriorSnapshot = priorSnapshot
+          if (existingOp && existingOp.op_type === 'update') {
+            effectiveBaseVersion = existingOp.base_version ?? baseVersion
+            effectivePriorSnapshot = existingOp.prior_snapshot ?? priorSnapshot
+            await db.outbox.delete(existingOp.seq)
+          }
+
+          await db.expenses.put({
+            ...current,
+            deleted_at: timestamp,
+            updated_at: timestamp,
+            version: Number(current.version || 0) + 1,
+            pending: true,
+          })
+          await enqueue({
+            op_id: newId('op'),
+            group_id: groupId,
+            entity_type: 'expense',
+            entity_id: expenseId,
+            op_type: 'delete',
+            base_version: effectiveBaseVersion,
+            payload: {},
+            prior_snapshot: effectivePriorSnapshot,
+          })
+        },
+      )
       await flushGroup(groupId)
     })
   },
@@ -2374,11 +2605,40 @@ const attachments = {
   },
   async link(groupId, attachmentId, expenseId, options = {}) {
     return run(async () => {
-      if (!isOnline()) {
-        throw new RepositoryError('Linking an attachment requires a connection', {
-          code: 'offline_unsupported',
-        })
+      checkAbort(options)
+      await requireGroup(groupId)
+      const existingUploadOp = await db.outbox
+        .where('entity_id')
+        .equals(attachmentId)
+        .and((op) => op.transport === 'blob')
+        .first()
+
+      const current = await db.attachments.get(attachmentId)
+      const updated = {
+        ...(current || { id: attachmentId, group_id: groupId }),
+        expense_id: expenseId,
       }
+      await db.attachments.put(updated)
+
+      if (existingUploadOp) {
+        const payload = { ...existingUploadOp.payload, expense_id: expenseId }
+        await db.outbox.where('op_id').equals(existingUploadOp.op_id).modify({ payload })
+        return updated
+      }
+
+      if (!isOnline()) {
+        await enqueue({
+          op_id: newId('op'),
+          group_id: groupId,
+          entity_type: 'attachment_link',
+          entity_id: attachmentId,
+          op_type: 'update',
+          transport: 'rest',
+          payload: { expense_id: expenseId },
+        })
+        return updated
+      }
+
       const result = await onlineRepository.attachments.update(
         groupId,
         attachmentId,

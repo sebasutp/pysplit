@@ -7000,6 +7000,17 @@
             "type": "string",
             "title": "Op Type"
           },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
           "snapshot": {
             "anyOf": [
               {

@@ -74,6 +74,7 @@ class SyncChangeRead(BaseModel):
     entity_type: str
     entity_id: str
     op_type: str
+    version: int | None = None
     snapshot: dict[str, Any] | None = None
 
 
