@@ -8,10 +8,12 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.gzip import GZipMiddleware
 
 from app.api import (
     activities,
@@ -31,6 +33,7 @@ from app.api.errors import service_error
 from app.core.config import Settings, get_settings
 from app.core.logging import RequestContextMiddleware, configure_logging
 from app.core.observability import init_sentry
+from app.core.static import SecurityHeadersMiddleware, SPAStaticFiles
 from app.services.errors import ServiceError
 from app.storage import close_storage
 
@@ -87,6 +90,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["Authorization", "Content-Type", "X-CSRF-Token", "X-Request-ID"],
     )
 
+    # The production container has no reverse proxy in front of it, so the
+    # application owns response security headers and compression.
+    app.add_middleware(SecurityHeadersMiddleware, api_prefix=api_prefix)
+    app.add_middleware(GZipMiddleware, minimum_size=1024)
+
     # Added last so Starlette makes it the outermost middleware. It then wraps
     # CORS as well, giving preflight and rejected-origin responses a request id.
     app.add_middleware(RequestContextMiddleware, settings=settings)
@@ -105,6 +113,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(attachments.router, prefix=settings.api_prefix)
     app.include_router(attachments.ai_router, prefix=settings.api_prefix)
     app.include_router(sync.router, prefix=settings.api_prefix)
+
+    # Mounted last: all registered API routes win, and the SPA handler is the
+    # fallback for everything else. Development leaves the setting unset and
+    # lets Vite serve the frontend.
+    if settings.frontend_dist_dir:
+        dist_dir = Path(settings.frontend_dist_dir)
+        if not dist_dir.is_dir():
+            raise RuntimeError(f"FRONTEND_DIST_DIR does not exist: {dist_dir}")
+        app.mount(
+            "/",
+            SPAStaticFiles(directory=dist_dir, api_prefix=api_prefix),
+            name="frontend",
+        )
 
     return app
 

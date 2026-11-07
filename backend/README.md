@@ -150,20 +150,26 @@ cannot read the API host's CSRF cookie.
 ```
 
 
-## Production
+## Production serving
 
-The deployable stack is the repository-root `compose.yaml` with
-`Dockerfile.api` and `Dockerfile.web`. Create the production environment from
-`.env.production.example` (not the development `.env.example`), set `BASE_URL`
-and a unique `JWT_SECRET`, then run:
+Deployment packaging (container images, Compose, process supervision) is left
+to the operator. The application is ready for a single-process deployment: set
+`BASE_URL` and a unique `JWT_SECRET`, run `alembic upgrade head`, then start one
+Uvicorn worker against SQLite.
+
+To serve the compiled SPA from the same process, build the frontend and point
+`FRONTEND_DIST_DIR` at the output:
 
 ```bash
-docker compose build && docker compose up -d
+cd ../frontend && npm run build
+cd ../backend
+FRONTEND_DIST_DIR=../frontend/dist PYTHONPATH=. .venv/bin/uvicorn \
+  app.main:app --host 0.0.0.0 --port 8000 --workers 1 --no-proxy-headers
 ```
 
-The API runs Alembic before Uvicorn and uses one worker against SQLite in
-`/data`. See `docs/runbook-cutover.md` for the cutover and rollback procedure,
-and `docs/performance.md` for the measured budgets.
+The API namespace stays dynamic; other extensionless paths fall back to
+`index.html`. Use one worker because SQLite has a single writer. See
+`docs/performance.md` for the measured budgets.
 
 Operational scripts:
 

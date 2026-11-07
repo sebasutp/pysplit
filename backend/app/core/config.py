@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = False
     api_prefix: str = "/api"
+    # Optional compiled SPA directory. Development leaves it unset and uses
+    # Vite; the production image points it at the copied frontend build.
+    frontend_dist_dir: str | None = None
 
     # --- Logging and observability ---------------------------------------
     # ``json`` emits one structured object per line for container log
@@ -57,7 +60,7 @@ class Settings(BaseSettings):
     sentry_dsn: str | None = None
     sentry_traces_sample_rate: float = 0.0
 
-    # SQLite by default. The dev launcher and Docker override this with an
+    # SQLite by default. The dev launcher and deployments override this with an
     # absolute path so no database is written next to the source tree.
     database_url: str = "sqlite:///./data/dev/pysplit.db"
     # Wait this long for a writer lock before SQLite returns ``database is
@@ -360,6 +363,7 @@ class Settings(BaseSettings):
         "ai_model_category_extract",
         "openai_model_category_extract",
         "sentry_dsn",
+        "frontend_dist_dir",
         mode="before",
     )
     @classmethod
@@ -390,6 +394,13 @@ class Settings(BaseSettings):
         if not cleaned:
             raise ValueError("upload_dir must not be empty")
         return cleaned
+
+    @field_validator("frontend_dist_dir")
+    @classmethod
+    def _normalise_frontend_dist_dir(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        return value.strip().rstrip("/") or None
 
     @model_validator(mode="after")
     def _require_production_secret(self) -> Settings:
