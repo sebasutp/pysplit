@@ -188,9 +188,8 @@ shows an error and the API logs the provider error with the attachment id
 - `./dev` turns on `ENABLE_RECEIPT_AI`, `ENABLE_CATEGORY_EXTRACT`, mock login
   and the local upload directory by default. Attachments themselves are never
   feature-gated.
-- Production keeps the AI flags off unless you set them explicitly, as in
-  `.env.production.example`. Use a real key from a secret manager and keep
-  `AI_MOCK` and `ENABLE_MOCK_LOGIN` off.
+- Production keeps the AI flags off unless you set them explicitly. Use a real
+  key from a secret manager and keep `AI_MOCK` and `ENABLE_MOCK_LOGIN` off.
 - The API logs its resolved receipt-AI configuration at startup:
   `Receipt AI enabled: provider=… model=… response_format=…`.
 - Every real extraction attempt is a paid model call. `RECEIPT_MAX_ATTEMPTS`
@@ -211,6 +210,21 @@ shows an error and the API logs the provider error with the attachment id
 2. **Expense first**: create the expense, open it, attach an image, and click
    “Scan with AI”. The “Assign items” screen opens, and it is also reachable from
    the attachment list and next to “Advanced splitting options”.
+
+## Serve the app from the backend only
+
+Build the SPA, then start the backend with the build directory configured:
+
+```bash
+make build
+PYTHONPATH=backend FRONTEND_DIST_DIR=frontend/dist \
+  backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+The backend serves the SPA for non-API paths and keeps `/api/*` dynamic. Use
+your normal database, upload, and auth environment from `.env.example`; in
+production, `JWT_SECRET` and `BASE_URL` are required. Leave `FRONTEND_DIST_DIR`
+unset for the usual Vite development setup.
 
 ## Tests and checks
 
