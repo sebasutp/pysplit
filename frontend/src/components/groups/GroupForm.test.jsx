@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
+import '../../services/i18n'
 import { GroupForm } from './GroupForm'
 
 const initial = {

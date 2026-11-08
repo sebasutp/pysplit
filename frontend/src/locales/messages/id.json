@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grup"
+    "groups": "Grup",
+    "adminDashboard": "Dasbor Admin",
+    "language": "Bahasa",
+    "signIn": "Masuk",
+    "signOut": "Keluar",
+    "userMenu": "Menu pengguna"
   },
   "Footer": {
     "madeIn": "Dibuat di Zurich, Swiss 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Bulan lalu",
       "earlierThisYear": "Awal tahun ini",
       "lastYear": "Tahun lalu",
-      "older": "Lebih tua"
-    }
+      "older": "Lebih tua",
+      "today": "Hari ini",
+      "week": "Awal minggu ini",
+      "month": "Awal bulan ini",
+      "year": "Awal tahun ini"
+    },
+    "clearSearch": "Jelas",
+    "exportError": "Tidak dapat mengekspor biaya",
+    "filterFrom": "Dari",
+    "filterTo": "Untuk",
+    "loadMore": "Muat lebih banyak",
+    "loading": "Memuat pengeluaran…",
+    "loadingMore": "Memuat…",
+    "search": "Cari pengeluaran",
+    "showingCount": "Menampilkan {{shown}} dari {{total}} pengeluaran."
   },
   "ExpenseCard": {
     "paidBy": "Dibayar oleh <strong>{paidBy}</strong> untuk <paidFor></paidFor>",
     "everyone": "semua orang",
     "receivedBy": "Diterima oleh <strong>{paidBy}</strong> untuk <paidFor></paidFor>",
     "yourBalance": "Saldo Anda:",
-    "notInvolved": "Anda tidak terlibat"
+    "notInvolved": "Anda tidak terlibat",
+    "paidByPlain": "Dibayar oleh {{paidBy}} untuk {{paidFor}}",
+    "receivedByPlain": "Diterima oleh {{paidBy}} untuk {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Grup saya",
@@ -60,11 +80,11 @@
       "orAsk": "atau minta teman untuk mengirimi Anda tautan ke situs yang sudah ada."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Total saldo Anda",
+      "description": "Saldo gabungan Anda di semua grup Anda.",
+      "owedToYou": "Anda berhutang",
+      "youOwe": "Anda berhutang",
+      "settledUp": "Anda semua sudah menetap di grup Anda."
     },
     "recent": "Grup terbaru",
     "starred": "Grup berbintang",
@@ -83,7 +103,7 @@
       "title": "Tambahkan grup melalui URL",
       "description": "Jika suatu grup dibagikan kepada Anda, Anda dapat menempelkan URL-nya di sini untuk menambahkannya ke daftar Anda.",
       "error": "Ups, kami tidak dapat menemukan grup dari URL yang Anda berikan…",
-      "urlMode": "Enter URL",
+      "urlMode": "Masukkan URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Grup ini tidak dapat ditemukan.",
       "link": "Buka grup yang baru saja dikunjungi"
-    }
+    },
+    "moreOptions": "Opsi lainnya",
+    "participants": "peserta",
+    "star": "Grup bintang",
+    "unstar": "Hapus bintang grup"
   },
   "GroupForm": {
     "title": "Informasi grup",
@@ -129,7 +153,10 @@
       "add": "Tambahkan peserta",
       "John": "John",
       "Jane": "Janet",
-      "Jack": "Jacksen"
+      "Jack": "Jacksen",
+      "cannotRemove": "Peserta ini merupakan bagian dari pengeluaran dan tidak dapat dikeluarkan.",
+      "indexLabel": "Peserta #{{index}}",
+      "remove": "Hapus peserta {{index}}"
     },
     "Settings": {
       "title": "Pengaturan lokal",
@@ -145,7 +172,8 @@
       "create": "Buat",
       "creating": "Membuat…",
       "cancel": "Batalkan"
-    }
+    },
+    "saveError": "Tidak dapat menyimpan grup."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "Untuk menetapkan mata uang yang berbeda per pengeluaran dan mengonversi jumlahnya, pilih mata uang non-kustom untuk grup tersebut.",
     "originalAmountField": {
       "label": "Jumlah untuk dikonversi",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Jumlah yang akan ditransfer",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "Menyimpan…",
     "cancel": "Batalkan",
     "reimbursement": "Reimburse",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Alokasikan item tanda terima",
+    "conflict": "Biaya ini diubah oleh orang lain. Muat ulang halaman dan coba lagi.",
+    "conflictTitle": "Biaya berubah di tempat lain",
+    "deleteError": "Tidak dapat menghapus biaya.",
+    "pendingReceiptTotal": "Tanda terima yang dipindai saat offline sudah siap.",
+    "pendingReceiptTotalApply": "Gunakan total yang dipindai",
+    "pendingReceiptTotalDismiss": "Singkirkan",
+    "saveError": "Tidak dapat menghemat biaya."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Terjadi kesalahan saat mengunggah dokumen. Silakan coba lagi nanti atau pilih file lain.",
       "retry": "Ulangi"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Mengantri. Tanda terima akan dipindai setelah Anda terhubung kembali.",
+    "offline": "Pemindaian dilanjutkan saat Anda online.",
+    "scanFailed": "AI tidak dapat membaca tanda terima ini. Periksa konfigurasi AI server dan coba lagi.",
+    "scanning": "Memindai…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Item baris tanda terima",
+    "backToExpense": "Kembali ke biaya",
+    "merchant": "Nama toko",
+    "printedTotal": "Total tercetak di struk",
+    "noReceipt": "Belum ada tanda terima yang dikaitkan dengan pengeluaran ini.",
+    "empty": "Belum ada item. Tambahkan satu untuk mulai membelah.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Tidak dapat menyimpan kembalian Anda",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Tambahkan barang",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Tambahkan barang",
+      "nameLabel": "Nama",
+      "quantityLabel": "Kuantitas",
+      "amountLabel": "Jumlah",
+      "sharedLabel": "Bersama (biaya seluruh tagihan)",
+      "add": "Tambahkan",
+      "cancel": "Batalkan"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} dari {total}",
+      "remaining": "{quantity} tersisa",
+      "assign": "Alokasikan",
+      "edit": "Sunting",
+      "delete": "Hapus",
+      "removePortion": "Hapus pembagian yang dialokasikan",
+      "editTitle": "Sunting barang",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Simpan",
+      "cancel": "Batalkan",
+      "deleteConfirm": "Hapus item ini?",
+      "deleteDescription": "Tindakan ini akan menghapus item dan tugasnya."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Belum ditetapkan",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Dibagikan",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Tetapkan item",
+      "description": "Pilih siapa yang membayar “{name}”.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Bagi secara merata",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Perpecahan khusus",
+      "customHint": "Masukkan jumlah dalam satuan untuk setiap target.",
+      "shared": "Dibagikan",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Kuantitas yang ditetapkan melebihi kuantitas item.",
+      "confirm": "Alokasikan",
+      "cancel": "Batalkan"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Dibagikan",
+      "unassigned": "Belum ditetapkan",
+      "optOut": "Membagikan item yang belum ditetapkan",
+      "reconciles": "Seimbang",
+      "offBy": "Selisih {amount}",
+      "itemsTotal": "Total item penerimaan",
+      "apply": "Terapkan ke pengeluaran",
+      "allOptedOut": "Semua orang memilih tidak ikut, namun beberapa item masih belum ditetapkan.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Nilai kuitansi berbeda · Ajukan permohonan lagi"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Biaya diperbarui",
+      "description": "Item tanda terima diterapkan pada biaya."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Tidak dapat menerapkan tanda terima"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Perbarui biayanya?",
+      "description": "Total pengeluaran berbeda dengan total item penerimaan. Penerapannya akan menimpa jumlah pengeluaran dan pembagiannya.",
+      "total": "jumlah {current} → {new}",
+      "cancel": "Batalkan",
+      "confirm": "Terapkan"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Pemindaian dalam antrean",
+    "scanPendingDescription": "Gambar disimpan di perangkat ini dan akan dipindai saat Anda kembali online.",
+    "offlineQueue": "Anda sedang luring. Lampirkan foto sekarang dan foto akan dipindai setelah Anda terhubung kembali.",
+    "disabled": "Pemisahan cerdas tidak diaktifkan di server ini. Pemindaian tanda terima adalah fitur online saja.",
+    "extracted": "Tanda terima dipindai",
+    "extractedDescription": "Tetapkan item yang diekstraksi di bawah ini.",
+    "loading": "Memuat tanda terima…",
+    "optOutTitle": "Tidak ikut serta",
+    "scanError": "Tanda terima tidak dapat dipindai.",
+    "scanUnavailable": "Periksa konfigurasi AI server dan coba lagi.",
+    "scanning": "Memindai tanda terima…",
+    "upload": "Unggah foto tanda terima"
   },
   "Balances": {
     "title": "Saldo",
@@ -415,20 +462,22 @@
       "description": "Berikut adalah saran untuk reimburse yang optimal antara peserta.",
       "noImbursements": "Sepertinya grup Anda tidak memerlukan reimburse apa pun 😁",
       "owes": "<strong>{from}</strong> berutang <strong>{to}</strong>",
-      "markAsPaid": "Tandai sebagai telah dibayar"
-    }
+      "markAsPaid": "Tandai sebagai telah dibayar",
+      "owesPlain": "{{from}} berhutang {{to}}"
+    },
+    "loading": "Memuat saldo…"
   },
   "Stats": {
     "title": "Statistik",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Sepanjang waktu",
+      "thisMonth": "Bulan ini",
+      "last30": "30 hari terakhir",
+      "thisYear": "Tahun ini",
+      "custom": "Rentang khusus",
+      "from": "Dari",
+      "to": "Untuk"
     },
     "Totals": {
       "title": "Total",
@@ -440,50 +489,53 @@
       "yourShare": "Total bagian Anda"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Ringkasan",
+      "description": "Angka-angka penting untuk periode yang dipilih.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Pengeluaran",
+      "averageExpense": "Biaya rata-rata",
+      "largestExpense": "Pengeluaran terbesar",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Menghabiskan waktu",
+      "description": "Total pengeluaran kelompok per bulan. Pilih bulan untuk melihat pengeluarannya.",
+      "empty": "Belum ada biaya.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Pengeluaran di bulan ini untuk periode yang dipilih.",
+      "detailsEmpty": "Tidak ada pengeluaran di bulan ini.",
+      "showExpensesPlain": "Tampilkan pengeluaran untuk {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Pengeluaran menurut peserta",
+      "description": "Berapa jumlah yang dibayarkan masing-masing peserta dan bagian biayanya.",
+      "empty": "Belum ada biaya.",
+      "participant": "Peserta",
+      "paid": "Dibayar",
       "count": "Count",
-      "share": "Share"
+      "share": "Bagikan"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Pengeluaran berdasarkan kategori",
+      "description": "Jumlah total yang dibelanjakan di setiap kategori. Pilih kategori untuk melihat pengeluarannya.",
+      "empty": "Belum ada biaya.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Pengeluaran dalam kategori ini untuk periode yang dipilih.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Tampilkan pengeluaran untuk {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Biaya berulang",
+      "description": "Perkiraan biaya pengeluaran berulang aktif grup.",
+      "estimatedMonthly": "Perkiraan biaya bulanan",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Memuat statistik…"
   },
   "Activity": {
     "title": "Aktivitas",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Awal tahun ini",
       "lastYear": "Tahun lalu",
       "older": "Lebih lama"
-    }
+    },
+    "loadMore": "Muat lebih banyak",
+    "loading": "Memuat aktivitas…",
+    "unknown": "Aktivitas tidak diketahui"
   },
   "Information": {
     "title": "Informasi",
@@ -512,20 +567,25 @@
     "empty": "Belum ada informasi grup."
   },
   "Settings": {
-    "title": "Pengaturan"
+    "title": "Pengaturan",
+    "saved": "Grup diperbarui",
+    "savedDescription": "Perubahan Anda telah disimpan."
   },
   "Share": {
     "title": "Bagikan",
     "description": "Agar peserta lain dapat melihat grup dan menambahkan pengeluaran, bagikan URL-nya dengan mereka.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Salin tautan",
+    "shareLink": "Bagikan tautan",
     "warning": "Peringatan!",
     "warningHelp": "Setiap orang yang memiliki URL grup akan dapat melihat dan mengedit pengeluaran. Bagikan dengan hati-hati!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Bagikan",
+    "copy": "Salin tautan",
+    "url": "Tautan grup"
   },
   "SchemaErrors": {
     "min1": "Masukkan setidaknya satu karakter.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Pengeluaran harus dibayarkan untuk setidaknya satu peserta.",
     "noZeroShares": "Semua porsi harus lebih tinggi dari 0.",
     "amountSum": "Total harus sama dengan jumlah pengeluaran.",
-    "percentageSum": "Total persentase harus sama dengan 100."
+    "percentageSum": "Total persentase harus sama dengan 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Cari kategori...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Pembaruan tersedia",
+    "updateDescription": "Versi baru pysplit telah tersedia.",
+    "reload": "Muat ulang",
+    "updating": "Memperbarui…",
+    "offlineReady": "Siap bekerja offline",
+    "offlineReadyDescription": "Shell aplikasi di-cache. Buka grup sekali saat online untuk menyimpan datanya.",
+    "dismiss": "Tutup",
+    "install": "Instal aplikasi",
+    "refreshApp": "Segarkan aplikasi",
+    "refreshAppHint": "Hapus file cache dan muat ulang versi terbaru. Data yang Anda simpan tetap ada di perangkat ini."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Dasbor Administrasi",
+    "description": "Kelola peran pengguna, izin akses platform, dan pantau metrik sistem.",
+    "totalGroups": "Jumlah Grup",
+    "totalExpenses": "Jumlah Biaya",
+    "registeredUsers": "Pengguna Terdaftar",
+    "userManagement": "Manajemen Pengguna & Tingkat Izin",
+    "accessDenied": "Akses Ditolak",
+    "accessDeniedDescription": "Dasbor Administrasi dibatasi untuk pengguna di tingkat Administrator.",
+    "delete": "Hapus",
+    "deleteError": "Tidak dapat menghapus",
+    "email": "Surel",
+    "expenses": "biaya",
+    "groupDeleted": "Grup dihapus",
+    "groupManagement": "Grup",
+    "groupManagementDescription": "Hapus grup dan periksa penggunaan.",
+    "groups": "kelompok",
+    "loadMoreGroups": "Muat lebih banyak grup",
+    "loadMoreUsers": "Muat lebih banyak pengguna",
+    "loading": "Memuat dasbor…",
+    "loadingMore": "Memuat…",
+    "participants": "peserta",
+    "preauthorize": "Pra-otorisasi pengguna",
+    "preauthorizeAction": "Pra-otorisasi",
+    "preauthorizeError": "Tidak dapat melakukan praotorisasi pada pengguna",
+    "preauthorized": "Pra-otorisasi pengguna",
+    "returnToGroups": "Kembali ke Grup Saya",
+    "searchGroups": "Grup pencarian",
+    "searchUsers": "Cari pengguna",
+    "signInDescription": "Dasbor administrasi memerlukan akun admin.",
+    "signInTitle": "Diperlukan masuk",
+    "tier": "Tingkat",
+    "tierError": "Tidak dapat memperbarui tingkat",
+    "tierFor": "Tingkat untuk",
+    "tierUpdated": "Tingkat diperbarui",
+    "userDeleted": "Pengguna dihapus",
+    "userTier": "Tingkatan"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Penyimpanan luring",
+    "loading": "Memeriksa perangkat ini…",
+    "unsupported": "Browser ini tidak dapat melaporkan status penyimpanan.",
+    "usage": "{{used}} dari {{quota}} digunakan",
+    "unknown": "tidak diketahui",
+    "persisted": "Penyimpanan bersifat persisten di perangkat ini.",
+    "notPersisted": "Browser dapat mengeluarkan data offline jika ruang perangkat hampir habis.",
+    "keep": "Simpan data di perangkat ini",
+    "refresh": "Muat ulang",
+    "critical": "Penyimpanan hampir penuh. Ekspor cadangan sekarang, lalu hapus grup yang tidak digunakan.",
+    "warning": "Penyimpanan semakin penuh. Cadangan disarankan."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Sinkronisasi tertunda",
+    "expense": "Menunggu sinkronisasi"
+  },
+  "Attachments": {
+    "assignItems": "Alokasikan item tanda terima",
+    "extractedItems": "Item yang diekstraksi AI",
+    "help": "Gambar dikompres sebelum diunggah. PDF disimpan sebagai lampiran dan dibuka di tab baru.",
+    "open": "Buka",
+    "openInNewTab": "Buka di tab baru",
+    "pdfPreviewUnavailable": "Pratinjau PDF terbuka di tab terpisah.",
+    "pending": "Pengunggahan tertunda",
+    "preview": "Pratinjau",
+    "previewAction": "Pratinjau",
+    "previewNamed": "Pratinjau {{name}}",
+    "receipt": "Struk toko",
+    "saveToAssignItems": "Simpan pengeluarannya terlebih dahulu, lalu tugaskan item-item tersebut kepada peserta.",
+    "scanComplete": "Tanda terima dipindai",
+    "scanCompleteDescription": "Tetapkan item yang diekstraksi ke peserta.",
+    "scanError": "Tanda terima tidak dapat dipindai",
+    "scanWithAi": "Pindai dengan AI",
+    "scanning": "Memindai…",
+    "view": "Lihat lampiran",
+    "attachment": "Lampiran",
+    "onlyImagesPdf": "Hanya gambar dan file PDF yang didukung."
+  },
+  "Backup": {
+    "downloaded": "Cadangan diunduh.",
+    "export": "Ekspor cadangan",
+    "failed": "Pencadangan gagal.",
+    "restore": "Pulihkan cadangan",
+    "restoreFailed": "Pemulihan gagal.",
+    "restoreLabel": "Pulihkan file cadangan",
+    "restored": "Cadangan dipulihkan. Memuat ulang…"
+  },
+  "Common": {
+    "addGroup": "Tambahkan grup",
+    "close": "Close",
+    "closeDialog": "Tutup dialog",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Tutup pemberitahuan",
+    "error": "Ada yang tidak beres",
+    "expenseNotFound": "Biaya tidak ditemukan",
+    "loading": "Memuat…",
+    "menu": "Tidak bisa",
+    "retry": "Ulangi",
+    "select": "Pilih…",
+    "unknown": "tidak diketahui",
+    "user": "Pengguna"
+  },
+  "CreateGroup": {
+    "approvalContact": "Membuat grup pengeluaran baru memerlukan otorisasi dari administrator. Silakan hubungi administrator instans Anda untuk mempromosikan akun Anda ke tingkat Pembuat Grup.",
+    "approvalDescription": "Akun Anda saat ini berada di tingkat Sinkronisasi Pengguna. Anda dapat berpartisipasi dalam grup mana pun yang dibagikan dengan Anda dan menyinkronkannya di semua perangkat Anda.",
+    "approvalTitle": "Pembuatan Grup Membutuhkan Persetujuan",
+    "authRequiredDescription": "Untuk membuat grup pengeluaran baru, silakan masuk dengan akun eksternal. Peserta grup yang diundang akan tetap dapat bergabung tanpa hambatan melalui tautan grup Anda tanpa harus masuk.",
+    "authRequiredTitle": "Diperlukan Otentikasi",
+    "returnToGroups": "Kembali ke Grup Saya",
+    "signIn": "Masuk ke Buat Grup"
+  },
+  "GroupTabs": {
+    "Expenses": "Pengeluaran",
+    "Balances": "Saldo",
+    "Information": "Informasi",
+    "Stats": "Statistik",
+    "Activity": "Aktivitas",
+    "Settings": "Pengaturan",
+    "label": "Bagian grup"
+  },
+  "Login": {
+    "title": "Masuk ke Split",
+    "description": "Masuk dengan akun eksternal untuk mengaktifkan sinkronisasi grup lintas perangkat.",
+    "google": "Lanjutkan dengan Google",
+    "github": "Lanjutkan dengan GitHub",
+    "noProviders": "Tidak ada penyedia OAuth yang dikonfigurasi. Setel AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET untuk mengaktifkan masuk."
+  },
+  "NotFound": {
+    "title": "Halaman tidak ditemukan",
+    "description": "Periksa URL-nya dan coba lagi.",
+    "groupTitle": "Grup ini tidak dapat ditemukan.",
+    "groupDescription": "Periksa URL atau minta tautan undangan baru."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline — perubahan tertunda: {{count}}",
+    "offlineSaved": "Offline — menampilkan data yang disimpan",
+    "syncing": "Menyinkronkan…",
+    "error": "Kesalahan sinkronisasi: {{error}}",
+    "retryToContinue": "coba lagi untuk melanjutkan",
+    "conflicts": "Konflik yang perlu ditinjau: {{count}}",
+    "failed": "Perubahan yang tidak dapat disinkronkan: {{count}}",
+    "pending": "Perubahan yang tertunda: {{count}}",
+    "retryFailed": "Coba lagi perubahan yang gagal",
+    "discardFailed": "Buang perubahan yang gagal",
+    "resolveConflicts": "Selesaikan konflik",
+    "syncNow": "Sinkronkan sekarang",
+    "dialogTitle": "Selesaikan konflik",
+    "dialogDescription": "Pengeditan ini mengubah catatan yang sama di perangkat lain. Pilih apa yang ingin disimpan.",
+    "noConflicts": "Tidak ada konflik yang harus diselesaikan.",
+    "serverVersion": "Versi server {{version}} · pengeditan lokal disimpan dalam antrian konflik",
+    "keepMine": "Pertahankan versi saya",
+    "useServer": "Gunakan server",
+    "duplicate": "Gandakan seperti baru"
+  },
+  "Theme": {
+    "toggle": "Beralih tema",
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem"
   }
 }

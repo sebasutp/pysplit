@@ -1,6 +1,6 @@
 {
   "receipt_response": {
-    "amount": 48.5,
+    "amount": 76.0,
     "categoryId": "0",
     "date": "{{today}}",
     "title": "Mock Trattoria receipt"
@@ -9,9 +9,15 @@
     "merchant": "Mock Trattoria",
     "date": "{{today}}",
     "currencyCode": "USD",
-    "total": 48.5,
+    "total": 76.0,
     "categoryId": "0",
     "items": [
+      {
+        "name": "Margherita Pizza",
+        "quantity": 1,
+        "unitPrice": 14.0,
+        "amount": 14.0
+      },
       {
         "name": "Margherita Pizza",
         "quantity": 1,
@@ -29,6 +35,12 @@
         "quantity": 2,
         "unitPrice": 3.0,
         "amount": 6.0
+      },
+      {
+        "name": "Beer",
+        "quantity": 3,
+        "unitPrice": 4.5,
+        "amount": 13.5
       },
       {
         "name": "Tiramisu",

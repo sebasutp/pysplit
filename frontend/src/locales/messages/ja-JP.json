@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "グループ"
+    "groups": "グループ",
+    "adminDashboard": "管理者ダッシュボード",
+    "language": "言語",
+    "signIn": "サインイン",
+    "signOut": "サインアウト",
+    "userMenu": "ユーザーメニュー"
   },
   "Footer": {
     "madeIn": "スイス・チューリッヒで製作 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "先月",
       "earlierThisYear": "今年初め",
       "lastYear": "昨年",
-      "older": "それ以前"
-    }
+      "older": "それ以前",
+      "today": "今日",
+      "week": "今週初め",
+      "month": "今月初め",
+      "year": "今年初め"
+    },
+    "clearSearch": "クリア",
+    "exportError": "経費をエクスポートできませんでした",
+    "filterFrom": "開始",
+    "filterTo": "終了",
+    "loadMore": "さらにロードする",
+    "loading": "経費を読み込み中…",
+    "loadingMore": "読み込み中…",
+    "search": "経費を検索",
+    "showingCount": "{{total}} の経費のうち {{shown}} を表示しています。"
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong>が<paidFor></paidFor>のために支払いました",
     "everyone": "全員",
     "receivedBy": "<strong>{paidBy}</strong>が<paidFor></paidFor>のために受け取りました",
     "yourBalance": "あなたの残高:",
-    "notInvolved": "あなたは関係していません"
+    "notInvolved": "あなたは関係していません",
+    "paidByPlain": "{{paidBy}} によって {{paidFor}} に対して支払われました",
+    "receivedByPlain": "{{paidBy}} が{{paidFor}} に対して受け取りました"
   },
   "Groups": {
     "myGroups": "マイグループ",
@@ -60,11 +80,11 @@
       "orAsk": "または友達に既存のグループへのリンクを送ってもらいましょう。"
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "あなたの合計残高",
+      "description": "すべてのグループを合わせたあなたの残高です。",
+      "owedToYou": "受け取る金額",
+      "youOwe": "支払う金額",
+      "settledUp": "すべてのグループで精算済みです。"
     },
     "recent": "最近のグループ",
     "starred": "スター付きグループ",
@@ -83,7 +103,7 @@
       "title": "URLでグループを追加",
       "description": "グループが共有された場合、そのURLをここに貼り付けてリストに追加できます。",
       "error": "あら、提供されたURLからグループを見つけることができませんでした…",
-      "urlMode": "Enter URL",
+      "urlMode": "URLを入力してください",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "このグループは存在しません。",
       "link": "最近訪れたグループへ移動"
-    }
+    },
+    "moreOptions": "その他のオプション",
+    "participants": "参加者",
+    "star": "スターグループ",
+    "unstar": "グループのスターを外す"
   },
   "GroupForm": {
     "title": "グループ情報",
@@ -129,7 +153,10 @@
       "add": "参加者を追加",
       "John": "一郎",
       "Jane": "花子",
-      "Jack": "太郎"
+      "Jack": "太郎",
+      "cannotRemove": "この参加者は経費の一部であるため、削除できません。",
+      "indexLabel": "参加者 #{{index}}",
+      "remove": "参加者を削除 {{index}}"
     },
     "Settings": {
       "title": "ローカル設定",
@@ -145,7 +172,8 @@
       "create": "作成",
       "creating": "作成中…",
       "cancel": "キャンセル"
-    }
+    },
+    "saveError": "グループを保存できませんでした。"
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "支出ごとに異なる通貨を設定して金額を換算するには、グループの通貨をカスタム以外の通貨に設定してください。",
     "originalAmountField": {
       "label": "換算する金額",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "送金する金額",
+      "repaymentDescription": "上の金額から換算した金額です。残高を清算するのは上の金額です。"
     },
     "conversionRateField": {
       "useApi": "Frankfurterのレートを使用する",
@@ -274,7 +302,15 @@
     "saving": "保存中…",
     "cancel": "キャンセル",
     "reimbursement": "払い戻し",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "レシート品目の割り当て",
+    "conflict": "この経費は他の人によって変更されました。ページをリロードして、もう一度お試しください。",
+    "conflictTitle": "経費が別の場所で変更されました",
+    "deleteError": "経費を削除できませんでした。",
+    "pendingReceiptTotal": "オフライン中にスキャンしたレシートが準備完了です。",
+    "pendingReceiptTotalApply": "スキャンされた合計を使用する",
+    "pendingReceiptTotalDismiss": "解雇する",
+    "saveError": "経費を節約できませんでした。"
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "書類のアップロード中に何か問題が発生しました。後で再試行するか、別のファイルを選択してください。",
       "retry": "再試行"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "待機中。再接続後にレシートがスキャンされます。",
+    "offline": "オンラインになるとスキャンが再開されます。",
+    "scanFailed": "AIはこのレシートを読み取ることができませんでした。サーバー AI 構成を確認して、再試行してください。",
+    "scanning": "スキャン中…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "レシートの品目",
+    "backToExpense": "経費に戻る",
+    "merchant": "店名",
+    "printedTotal": "レシートの印字合計",
+    "noReceipt": "この経費に関連付けられた領収書はまだありません。",
+    "empty": "まだアイテムはありません。 1 つ追加して分割を開始します。",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "変更を保存できませんでした",
+      "description": "レシートを再読み込みしました。もう一度お試しください。"
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "アイテムの追加",
+    "quantitySummary": "{count} · {quantity} 個",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "アイテムの追加",
+      "nameLabel": "名前",
+      "quantityLabel": "数量",
+      "amountLabel": "金額",
+      "sharedLabel": "共用（全額請求）",
+      "add": "追加",
+      "cancel": "キャンセル"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{assigned}/{total}",
+      "remaining": "残り {quantity}",
+      "assign": "割り当てる",
+      "edit": "編集",
+      "delete": "削除",
+      "removePortion": "割り当て分を削除",
+      "editTitle": "項目を編集する",
+      "nameLabel": "名前",
+      "quantityLabel": "数量",
+      "amountLabel": "金額",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "deleteConfirm": "この項目を削除しますか?",
+      "deleteDescription": "これにより、項目とその割り当てが削除されます。"
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "未割り当て",
+      "unassignedHint": "まだ誰にも割り当てられていません",
+      "shared": "共有",
+      "sharedHint": "全員で均等に分割",
+      "participantHint": "{name} に割り当てられた品目"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "項目の割り当て",
+      "description": "「{name}」の料金を支払う人を選択してください。",
+      "whole": "品目全体を割り当てる",
+      "everyone": "全員（共有）",
+      "even": "均等に分割する",
+      "evenHint": "分割する参加者を選択してください。",
+      "custom": "カスタム分割",
+      "customHint": "各ターゲットの数量を単位で入力します。",
+      "shared": "共有",
+      "selectParticipant": "参加者を選択",
+      "exceeds": "割り当てられた数量が品目の数量を超えています。",
+      "confirm": "割り当てる",
+      "cancel": "キャンセル"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "自分の分",
+      "shared": "共有",
+      "unassigned": "未割り当て",
+      "optOut": "未割り当ての品目を共有する",
+      "reconciles": "一致",
+      "offBy": "差額 {amount}",
+      "itemsTotal": "レシート品目の合計",
+      "apply": "経費に適用",
+      "allOptedOut": "全員がオプトアウトしましたが、一部の項目はまだ割り当てられていません。",
+      "negativeShare": "合計が負になると、誰かの負担額がマイナスになります。適用する前に品目を調整してください。",
+      "divergent": "領収書の金額が異なります・再度お申し込みください"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "経費が更新されました",
+      "description": "領収書明細が経費に充当されました。"
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "領収書を適用できませんでした"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "経費を更新しますか?",
+      "description": "経費合計は領収書の合計とは異なります。申請すると経費金額とその分割が上書きされます。",
+      "total": "合計 {current} → {new}",
+      "cancel": "キャンセル",
+      "confirm": "適用"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "スキャンがキューに入れられました",
+    "scanPendingDescription": "画像はこのデバイスに保存され、オンラインに戻ったときにスキャンされます。",
+    "offlineQueue": "あなたはオフラインです。今すぐ写真を添付すると、再接続後にスキャンされます。",
+    "disabled": "このサーバーではスマート スプリットが有効になっていません。レシートのスキャンはオンラインのみの機能です。",
+    "extracted": "レシートをスキャンしました",
+    "extractedDescription": "抽出した項目を以下に割り当てます。",
+    "loading": "レシートを読み込んでいます…",
+    "optOutTitle": "オプトアウト",
+    "scanError": "レシートをスキャンできませんでした。",
+    "scanUnavailable": "サーバー AI 構成を確認して、再試行してください。",
+    "scanning": "レシートをスキャン中…",
+    "upload": "領収書の写真をアップロードする"
   },
   "Balances": {
     "title": "残高",
@@ -415,20 +462,22 @@
       "description": "参加者間の最適化された払い戻しの提案です。",
       "noImbursements": "グループに払い戻しが必要ないようです 😁",
       "owes": "<strong>{from}</strong>は<strong>{to}</strong>に借りがあります",
-      "markAsPaid": "支払い済みとしてマーク"
-    }
+      "markAsPaid": "支払い済みとしてマーク",
+      "owesPlain": "{{from}} は {{to}} に借りがあります"
+    },
+    "loading": "ロードバランス…"
   },
   "Stats": {
     "title": "統計",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "期間",
+      "all": "全期間",
+      "thisMonth": "今月",
+      "last30": "過去30日間",
+      "thisYear": "今年",
+      "custom": "カスタム",
+      "from": "開始",
+      "to": "終了"
     },
     "Totals": {
       "title": "合計",
@@ -440,50 +489,53 @@
       "yourShare": "あなたの総シェア"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "概要",
+      "description": "選択した期間の主要な数値。",
+      "empty": "まだ支出はありません。",
+      "expenseCount": "支出件数",
+      "averageExpense": "平均支出",
+      "largestExpense": "最高額の支出",
+      "activeSpan": "対象期間"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "期間ごとの支出",
+      "description": "グループの月別の合計支出。",
+      "empty": "まだ支出はありません。",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "選択した期間の今月の支出。",
+      "detailsEmpty": "今月は出費はありません。",
+      "showExpensesPlain": "{{month}} の経費を表示"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "参加者ごとの支出",
+      "description": "各参加者が支払った金額と支出の負担分。",
+      "empty": "まだ支出はありません。",
+      "participant": "参加者",
+      "paid": "支払額",
+      "count": "件数",
+      "share": "負担分"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "カテゴリーごとの支出",
+      "description": "各カテゴリーの合計支出額。",
+      "empty": "まだ支出はありません。",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "選択した期間のこのカテゴリの費用。",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "{{category}} の経費を表示"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "定期的な支出",
+      "description": "グループの有効な定期的支出の推定費用。",
+      "estimatedMonthly": "推定月額",
+      "estimatedYearly": "年間 {amount}",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, other {毎日の支出 #件}}",
+        "WEEKLY": "{count, plural, other {毎週の支出 #件}}",
+        "MONTHLY": "{count, plural, other {毎月の支出 #件}}"
       }
-    }
+    },
+    "loading": "統計を読み込んでいます…"
   },
   "Activity": {
     "title": "アクティビティ",
@@ -504,7 +556,10 @@
       "earlierThisYear": "今年初め",
       "lastYear": "昨年",
       "older": "それ以前"
-    }
+    },
+    "loadMore": "さらにロードする",
+    "loading": "アクティビティを読み込み中…",
+    "unknown": "不明なアクティビティ"
   },
   "Information": {
     "title": "情報",
@@ -512,20 +567,25 @@
     "empty": "まだグループ情報がありません。"
   },
   "Settings": {
-    "title": "設定"
+    "title": "設定",
+    "saved": "グループが更新されました",
+    "savedDescription": "変更が保存されました。"
   },
   "Share": {
     "title": "共有",
     "description": "他の参加者がグループを見て支出を追加できるように、グループのURLを共有してください。",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "リンクをコピー",
+    "shareLink": "リンクを共有",
     "warning": "警告！",
     "warningHelp": "グループURLを持つすべての人が支出を閲覧および編集できるようになります。注意して共有してください！",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "負担分",
+    "copy": "リンクをコピー",
+    "url": "グループリンク"
   },
   "SchemaErrors": {
     "min1": "少なくとも1文字入力してください。",
@@ -543,7 +603,10 @@
     "paidForMin1": "支出は少なくとも1人の参加者のために支払われている必要があります。",
     "noZeroShares": "すべてのシェアは0より大きくなければなりません。",
     "amountSum": "金額の合計は支出金額と一致する必要があります。",
-    "percentageSum": "パーセンテージの合計は100である必要があります。"
+    "percentageSum": "パーセンテージの合計は100である必要があります。",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "カテゴリーを検索...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "アップデートが利用可能です",
+    "updateDescription": "新しいバージョンの pysplit が利用可能です。",
+    "reload": "再読み込み",
+    "updating": "更新中…",
+    "offlineReady": "オフラインで作業する準備ができています",
+    "offlineReadyDescription": "アプリケーション シェルはキャッシュされます。オンライン中にグループを 1 回開くと、そのデータが保持されます。",
+    "dismiss": "閉じる",
+    "install": "アプリをインストールする",
+    "refreshApp": "アプリを更新する",
+    "refreshAppHint": "キャッシュされたファイルをクリアし、最新バージョンを再ロードします。保存したデータはこのデバイスに残ります。"
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "管理ダッシュボード",
+    "description": "ユーザーの役割、プラットフォームのアクセス許可を管理し、システム メトリクスを監視します。",
+    "totalGroups": "グループの合計",
+    "totalExpenses": "総経費",
+    "registeredUsers": "登録ユーザー",
+    "userManagement": "ユーザー管理と権限の階層",
+    "accessDenied": "アクセスが拒否されました",
+    "accessDeniedDescription": "管理ダッシュボードは、管理者層のユーザーに制限されています。",
+    "delete": "削除",
+    "deleteError": "削除できませんでした",
+    "email": "電子メール",
+    "expenses": "経費",
+    "groupDeleted": "グループが削除されました",
+    "groupManagement": "グループ",
+    "groupManagementDescription": "グループを削除し、使用状況を検査します。",
+    "groups": "グループ",
+    "loadMoreGroups": "グループをさらに読み込む",
+    "loadMoreUsers": "ユーザーをさらに読み込む",
+    "loading": "ダッシュボードを読み込み中…",
+    "loadingMore": "読み込み中…",
+    "participants": "参加者",
+    "preauthorize": "ユーザーを事前に認証する",
+    "preauthorizeAction": "事前承認",
+    "preauthorizeError": "ユーザーを事前認証できませんでした",
+    "preauthorized": "ユーザーが事前に承認済み",
+    "returnToGroups": "私のグループに戻る",
+    "searchGroups": "グループを検索",
+    "searchUsers": "ユーザーを検索する",
+    "signInDescription": "管理ダッシュボードには管理者アカウントが必要です。",
+    "signInTitle": "サインインが必要です",
+    "tier": "階層",
+    "tierError": "階層を更新できませんでした",
+    "tierFor": "の階層",
+    "tierUpdated": "階層が更新されました",
+    "userDeleted": "ユーザーが削除されました",
+    "userTier": "階層"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "オフラインストレージ",
+    "loading": "このデバイスをチェックしています…",
+    "unsupported": "このブラウザはストレージのステータスを報告できません。",
+    "usage": "{{used}} / {{quota}} 使用中",
+    "unknown": "不明",
+    "persisted": "ストレージはこのデバイス上に永続的です。",
+    "notPersisted": "デバイスの空き容量が不足すると、ブラウザによってオフライン データが削除される場合があります。",
+    "keep": "このデバイスにデータを保存します",
+    "refresh": "更新",
+    "critical": "ストレージがほぼ満杯です。今すぐバックアップをエクスポートしてから、未使用のグループを削除してください。",
+    "warning": "ストレージがいっぱいになりつつあります。バックアップをお勧めします。"
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "同期保留中",
+    "expense": "同期待ち"
+  },
+  "Attachments": {
+    "assignItems": "レシート品目の割り当て",
+    "extractedItems": "AIが抽出した項目",
+    "help": "画像はアップロード前に圧縮されます。 PDF は添付ファイルとして保持され、新しいタブで開きます。",
+    "open": "開く",
+    "openInNewTab": "新しいタブで開く",
+    "pdfPreviewUnavailable": "PDF プレビューが別のタブで開きます。",
+    "pending": "アップロード保留中",
+    "preview": "プレビュー",
+    "previewAction": "プレビュー",
+    "previewNamed": "プレビュー {{name}}",
+    "receipt": "レシート",
+    "saveToAssignItems": "これらの品目を参加者に割り当てるには、経費を保存してください。",
+    "scanComplete": "レシートをスキャンしました",
+    "scanCompleteDescription": "抽出したアイテムを参加者に割り当てます。",
+    "scanError": "レシートをスキャンできませんでした",
+    "scanWithAi": "AIでスキャン",
+    "scanning": "スキャン中…",
+    "view": "添付ファイルを表示する",
+    "attachment": "添付ファイル",
+    "onlyImagesPdf": "画像と PDF ファイルのみがサポートされています。"
+  },
+  "Backup": {
+    "downloaded": "バックアップがダウンロードされました。",
+    "export": "バックアップのエクスポート",
+    "failed": "バックアップに失敗しました。",
+    "restore": "バックアップを復元する",
+    "restoreFailed": "復元に失敗しました。",
+    "restoreLabel": "バックアップファイルを復元する",
+    "restored": "バックアップが復元されました。リロード中…"
+  },
+  "Common": {
+    "addGroup": "グループを追加",
+    "close": "閉じる",
+    "closeDialog": "ダイアログを閉じる",
+    "dismiss": "閉じる",
+    "dismissNotification": "通知を閉じる",
+    "error": "何か問題が発生しました",
+    "expenseNotFound": "経費が見つかりません",
+    "loading": "読み込み中…",
+    "menu": "メニュー",
+    "retry": "再試行",
+    "select": "選択してください…",
+    "unknown": "不明",
+    "user": "ユーザー"
+  },
+  "CreateGroup": {
+    "approvalContact": "新しい経費グループを作成するには、管理者からの承認が必要です。インスタンス管理者に問い合わせて、アカウントを Group Creator レベルに昇格させてください。",
+    "approvalDescription": "あなたのアカウントは現在、同期ユーザー層にあります。自分と共有されているグループに参加し、すべてのデバイス間で同期することができます。",
+    "approvalTitle": "グループの作成には承認が必要です",
+    "authRequiredDescription": "新しい経費グループを作成するには、外部アカウントでサインインしてください。招待されたグループ参加者は、サインインせずにグループ リンク経由でスムーズに参加できます。",
+    "authRequiredTitle": "認証が必要です",
+    "returnToGroups": "私のグループに戻る",
+    "signIn": "サインインしてグループを作成する"
+  },
+  "GroupTabs": {
+    "Expenses": "支出",
+    "Balances": "残高",
+    "Information": "情報",
+    "Stats": "統計",
+    "Activity": "アクティビティ",
+    "Settings": "設定",
+    "label": "グループセクション"
+  },
+  "Login": {
+    "title": "Splitにサインインする",
+    "description": "外部アカウントでサインインして、デバイス間のグループ同期を有効にします。",
+    "google": "Google を続ける",
+    "github": "GitHub を続ける",
+    "noProviders": "OAuth プロバイダーが構成されていません。 AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET を設定してサインインを有効にします。"
+  },
+  "NotFound": {
+    "title": "ページが見つかりません",
+    "description": "URL を確認して、再試行してください。",
+    "groupTitle": "このグループは存在しません。",
+    "groupDescription": "URL を確認するか、新しい招待リンクを要求してください。"
+  },
+  "SyncStatus": {
+    "offlinePending": "オフライン — 保留中の変更: {{count}}",
+    "offlineSaved": "オフライン — 保存されたデータを表示",
+    "syncing": "同期中…",
+    "error": "同期エラー: {{error}}",
+    "retryToContinue": "続行するには再試行してください",
+    "conflicts": "レビューが必要な競合: {{count}}",
+    "failed": "同期できなかった変更: {{count}}",
+    "pending": "保留中の変更: {{count}}",
+    "retryFailed": "失敗した変更を再試行",
+    "discardFailed": "失敗した変更を破棄",
+    "resolveConflicts": "競合を解決する",
+    "syncNow": "今すぐ同期する",
+    "dialogTitle": "競合を解決する",
+    "dialogDescription": "これらの編集により、別のデバイス上の同じレコードが変更されました。残しておくものを選択してください。",
+    "noConflicts": "解決する必要のある競合はありません。",
+    "serverVersion": "サーバー バージョン {{version}} · ローカル編集は競合キューに保持されます",
+    "keepMine": "自分の変更を保持",
+    "useServer": "サーバーを使用する",
+    "duplicate": "新規として複製"
+  },
+  "Theme": {
+    "toggle": "テーマの切り替え",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
   }
 }

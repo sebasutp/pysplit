@@ -102,12 +102,12 @@ function initialFingerprint(initial) {
 }
 
 const ERROR_LABELS = /** @type {Record<string, string>} */ ({
-  min2: 'Must contain at least 2 characters.',
-  max50: 'Must contain at most 50 characters.',
-  min1: 'This field is required.',
-  max5: 'Must contain at most 5 characters.',
-  length3: 'Use a three-letter currency code.',
-  duplicateParticipantName: 'Participant names must be unique.',
+  min2: 'SchemaErrors.min2',
+  max50: 'SchemaErrors.max50',
+  min1: 'SchemaErrors.min1',
+  max5: 'SchemaErrors.max5',
+  length3: 'SchemaErrors.length3',
+  duplicateParticipantName: 'SchemaErrors.duplicateParticipantName',
 })
 
 /**
@@ -173,7 +173,8 @@ export function GroupForm({
       const next = {}
       for (const issue of parsed.error.issues) {
         const key = issue.path.join('.') || 'form'
-        next[key] = ERROR_LABELS[/** @type {string} */ (issue.message)] || issue.message
+        const label = ERROR_LABELS[/** @type {string} */ (issue.message)]
+        next[key] = label ? t(label) : issue.message
       }
       setErrors(next)
       return
@@ -186,7 +187,7 @@ export function GroupForm({
       const detail =
         error && typeof error === 'object' && 'detail' in error
           ? String(/** @type {{detail: unknown}} */ (error).detail)
-          : 'Could not save the group.'
+          : t('GroupForm.saveError', 'Could not save the group.')
       setSubmitError(detail)
     } finally {
       setPending(false)
@@ -290,7 +291,9 @@ export function GroupForm({
               <li key={participant.id || index}>
                 <div className="flex gap-2">
                   <label className="sr-only" htmlFor={`participant-${index}`}>
-                    Participant #{index + 1}
+                    {t('GroupForm.Participants.indexLabel', 'Participant #{{index}}', {
+                      index: index + 1,
+                    })}
                   </label>
                   <Input
                     id={`participant-${index}`}
@@ -304,7 +307,11 @@ export function GroupForm({
                     variant="ghost"
                     size="icon"
                     className="text-destructive"
-                    aria-label={`Remove participant ${index + 1}`}
+                    aria-label={t(
+                      'GroupForm.Participants.remove',
+                      'Remove participant {{index}}',
+                      { index: index + 1 },
+                    )}
                     title={
                       participant.id && lockedParticipantIds.includes(participant.id)
                         ? t(

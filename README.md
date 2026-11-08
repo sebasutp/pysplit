@@ -258,12 +258,27 @@ npm run test:coverage
 Other useful commands:
 
 ```bash
-make lint        # Ruff + oxlint, including format check
+make lint        # Ruff + oxlint, including format check; also i18n-sync-check
 make typecheck   # TypeScript checking for the JS frontend
 make build       # Production frontend build into frontend/dist
 make parity      # Check parity against the committed reference inventory
 make test-coverage  # Frontend coverage with enforced thresholds
+make i18n-keys      # Fail when source uses a key missing from en-US
+make i18n-coverage  # Gate used-key translation coverage against the baseline
+make i18n-sync-check  # Verify catalogues match the vendored upstream snapshot
+make i18n          # Run i18n-keys, i18n-coverage and i18n-sync-check
 make clean       # Remove caches, coverage and build output
+```
+
+The locale catalogues are merged from the vendored upstream snapshot in
+`frontend/locales-upstream/`. `make i18n-sync-check` is offline and uses
+`--prefer-app`, so reviewed app translations are preserved and only English
+placeholders or missing keys are filled from upstream. Refresh the snapshot
+using the steps in `frontend/locales-upstream/README.md`. For a stricter
+translation audit, run:
+
+```bash
+python3 scripts/check_i18n_coverage.py --strict
 ```
 
 CI (`.github/workflows/ci.yml`) runs these checks, the parity and architecture

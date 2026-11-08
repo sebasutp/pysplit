@@ -9,10 +9,15 @@
     }
   },
   "Header": {
-    "groups": "群组"
+    "groups": "群组",
+    "adminDashboard": "管理仪表板",
+    "language": "语言",
+    "signIn": "登录",
+    "signOut": "退出",
+    "userMenu": "用户菜单"
   },
   "Footer": {
-    "madeIn": "Made in Zurich, Switzerland 🇨🇭",
+    "madeIn": "瑞士苏黎世制造🇨🇭",
     "builtBy": "由 <author>Sebastien Castiel</author> 以及 <source>社区贡献者们</source> 共同构建"
   },
   "Expenses": {
@@ -39,15 +44,30 @@
       "lastMonth": "上个月",
       "earlierThisYear": "本年早些时候",
       "lastYear": "去年",
-      "older": "更早"
-    }
+      "older": "更早",
+      "today": "今天",
+      "week": "这周早些时候",
+      "month": "本月早些时候",
+      "year": "本年早些时候"
+    },
+    "clearSearch": "清除",
+    "exportError": "无法导出费用",
+    "filterFrom": "开始",
+    "filterTo": "结束",
+    "loadMore": "加载更多",
+    "loading": "正在加载支出…",
+    "loadingMore": "加载中...",
+    "search": "搜索支出",
+    "showingCount": "显示 {{total}} 费用中的 {{shown}}。"
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong> 为 <paidFor></paidFor> 支付。",
     "everyone": "所有人",
     "receivedBy": "<strong>{paidBy}</strong> 为 <paidFor></paidFor> 接收。",
     "yourBalance": "你的余额：",
-    "notInvolved": "您无需支付"
+    "notInvolved": "您无需支付",
+    "paidByPlain": "由{{paidBy}}支付{{paidFor}}",
+    "receivedByPlain": "{{paidBy}} 收到 {{paidFor}}"
   },
   "Groups": {
     "myGroups": "我的群组",
@@ -60,11 +80,11 @@
       "orAsk": "或者让你的朋友发给你现有群组的链接。"
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "你的总余额",
+      "description": "你在所有群组中的合计余额。",
+      "owedToYou": "应收",
+      "youOwe": "应付",
+      "settledUp": "你在所有群组中均已结清。"
     },
     "recent": "最近的群组",
     "starred": "已收藏的群组",
@@ -83,7 +103,7 @@
       "title": "使用URL添加一个群组",
       "description": "如果你被分享了一个群组，你可以将群组的URL粘贴到这里以添加这个群组。",
       "error": "哎呀，我们没办法根据你的URL找到相应的群组……",
-      "urlMode": "Enter URL",
+      "urlMode": "输入网址",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "该群组不存在。",
       "link": "跳转到最近访问过的群组"
-    }
+    },
+    "moreOptions": "更多选择",
+    "participants": "参与者",
+    "star": "明星组",
+    "unstar": "取消星标组"
   },
   "GroupForm": {
     "title": "群组信息",
@@ -129,7 +153,10 @@
       "add": "添加群组成员",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "该参与者属于费用的一部分，无法删除。",
+      "indexLabel": "参与者#{{index}}",
+      "remove": "删除参与者{{index}}"
     },
     "Settings": {
       "title": "本地设定",
@@ -145,7 +172,8 @@
       "create": "创建",
       "creating": "创建中",
       "cancel": "取消"
-    }
+    },
+    "saveError": "无法保存该组。"
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "如需按支出单独设置货币并换算金额，请先将群组货币设为非自定义货币。",
     "originalAmountField": {
       "label": "需要转换的金额",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "需要转账的金额",
+      "repaymentDescription": "由上方金额换算而来；结清余额的是上方的金额。"
     },
     "conversionRateField": {
       "useApi": "使用Frankfurter提供的汇率",
@@ -274,7 +302,15 @@
     "saving": "保存中……",
     "cancel": "取消",
     "reimbursement": "报销",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "分配收据项目",
+    "conflict": "这笔费用被别人改变了。重新加载页面并重试。",
+    "conflictTitle": "其他地方的费用发生变化",
+    "deleteError": "无法删除费用。",
+    "pendingReceiptTotal": "离线扫描的收据已准备就绪。",
+    "pendingReceiptTotalApply": "使用扫描总计",
+    "pendingReceiptTotalDismiss": "解雇",
+    "saveError": "无法节省开支。"
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "上传文档时发生了一些错误。请稍后重试或更换文件。",
       "retry": "重试"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "排队。重新连接后将扫描收据。",
+    "offline": "当您在线时，扫描将继续。",
+    "scanFailed": "AI 无法读取此收据。检查服务器 AI 配置并重试。",
+    "scanning": "正在扫描..."
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "收据行项目",
+    "backToExpense": "回到费用",
+    "merchant": "店铺名称",
+    "printedTotal": "收据上打印的总计",
+    "noReceipt": "目前还没有与此费用相关的收据。",
+    "empty": "还没有商品。加一开始分裂。",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "无法保存您的更改",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "添加项目",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "添加项目",
+      "nameLabel": "名称",
+      "quantityLabel": "数量",
+      "amountLabel": "金额",
+      "sharedLabel": "共享（全额账单费用）",
+      "add": "添加",
+      "cancel": "取消"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} 于 {total}",
+      "remaining": "剩余 {quantity}",
+      "assign": "分配",
+      "edit": "编辑",
+      "delete": "删除",
+      "removePortion": "删除分配的份额",
+      "editTitle": "编辑项目",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "保存",
+      "cancel": "取消",
+      "deleteConfirm": "删除此项目？",
+      "deleteDescription": "这将删除该项目及其分配。"
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "未分配",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "共享",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "分配项目",
+      "description": "选择谁支付“{name}”。",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "均匀分割",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "定制分体",
+      "customHint": "输入每个目标的数量（以单位为单位）。",
+      "shared": "共享",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "分配的数量超过了项目的数量。",
+      "confirm": "分配",
+      "cancel": "取消"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "共享",
+      "unassigned": "未分配",
+      "optOut": "分摊未分配项目",
+      "reconciles": "一致",
+      "offBy": "差额 {amount}",
+      "itemsTotal": "收据项目总数",
+      "apply": "应用到支出",
+      "allOptedOut": "每个人都选择退出，但有些项目仍未分配。",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "收据金额不同 · 重新申请"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "费用更新",
+      "description": "收据项目已应用于费用。"
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "无法应用收据"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "更新费用？",
+      "description": "费用总额与收款项目总额不同。申请将覆盖费用金额及其分割。",
+      "total": "总计 {current} → {new}",
+      "cancel": "取消",
+      "confirm": "应用"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "扫描已排队",
+    "scanPendingDescription": "图像保存在此设备上，并在您重新上线时进行扫描。",
+    "offlineQueue": "您已离线。现在附上照片，重新连接后将对其进行扫描。",
+    "disabled": "此服务器上未启用智能拆分。收据扫描是一项仅限在线功能。",
+    "extracted": "收据扫描",
+    "extractedDescription": "分配下面提取的项目。",
+    "loading": "正在加载收据...",
+    "optOutTitle": "选择退出",
+    "scanError": "无法扫描收据。",
+    "scanUnavailable": "检查服务器 AI 配置并重试。",
+    "scanning": "扫描收据...",
+    "upload": "上传收据照片"
   },
   "Balances": {
     "title": "余额",
@@ -415,20 +462,22 @@
       "description": "这里是优化群组成员之间报销的建议。",
       "noImbursements": "看起来你的群组不需要任何报销😁",
       "owes": "<strong>{from}</strong> 欠 <strong>{to}</strong>",
-      "markAsPaid": "标记为已支付"
-    }
+      "markAsPaid": "标记为已支付",
+      "owesPlain": "{{from}}欠{{to}}"
+    },
+    "loading": "负载平衡..."
   },
   "Stats": {
     "title": "统计",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "时间段",
+      "all": "全部时间",
+      "thisMonth": "本月",
+      "last30": "最近 30 天",
+      "thisYear": "今年",
+      "custom": "自定义范围",
+      "from": "开始",
+      "to": "结束"
     },
     "Totals": {
       "title": "总计",
@@ -440,50 +489,53 @@
       "yourShare": "你的总计份额"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "概览",
+      "description": "所选时间段的关键数据。",
+      "empty": "还没有任何支出。",
+      "expenseCount": "支出笔数",
+      "averageExpense": "平均支出",
+      "largestExpense": "最大支出",
+      "activeSpan": "活跃时间段"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "支出趋势",
+      "description": "群组每月的总支出。",
+      "empty": "还没有任何支出。",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "本月所选期间的费用。",
+      "detailsEmpty": "这个月没有任何开支。",
+      "showExpensesPlain": "显示{{month}}的费用"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "按参与者统计支出",
+      "description": "每位参与者支付的金额及其分摊份额。",
+      "empty": "还没有任何支出。",
+      "participant": "参与者",
+      "paid": "已支付",
+      "count": "笔数",
+      "share": "分摊"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "按类别统计支出",
+      "description": "每个类别的支出总额。",
+      "empty": "还没有任何支出。",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "所选期间此类别的费用。",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "显示{{category}}的费用"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "周期性支出",
+      "description": "群组活跃周期性支出的预估费用。",
+      "estimatedMonthly": "预计每月费用",
+      "estimatedYearly": "每年 {amount}",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, other {# 笔每日支出}}",
+        "WEEKLY": "{count, plural, other {# 笔每周支出}}",
+        "MONTHLY": "{count, plural, other {# 笔每月支出}}"
       }
-    }
+    },
+    "loading": "正在加载统计数据..."
   },
   "Activity": {
     "title": "活动",
@@ -504,7 +556,10 @@
       "earlierThisYear": "这年早些时候",
       "lastYear": "上年",
       "older": "更早"
-    }
+    },
+    "loadMore": "加载更多",
+    "loading": "正在加载活动...",
+    "unknown": "未知活动"
   },
   "Information": {
     "title": "信息",
@@ -512,20 +567,25 @@
     "empty": "当前没有群组信息。"
   },
   "Settings": {
-    "title": "设定"
+    "title": "设定",
+    "saved": "群组已更新",
+    "savedDescription": "您的更改已保存。"
   },
   "Share": {
     "title": "分享",
     "description": "请将此URL分享给其他群组成员，以使其可以查看群组并添加消费。",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "复制链接",
+    "shareLink": "分享链接",
     "warning": "警告！",
     "warningHelp": "任何持有群组URL的个体都有能够查看并编辑消费。请谨慎分享！",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "分摊",
+    "copy": "复制链接",
+    "url": "群组链接"
   },
   "SchemaErrors": {
     "min1": "输入至少1个字符。",
@@ -543,7 +603,10 @@
     "paidForMin1": "这项消费必须支付给至少1名群组成员。",
     "noZeroShares": "所有份额必须大于0。",
     "amountSum": "金额之和必须等于消费的金额。",
-    "percentageSum": "百分比之和必须等于100。"
+    "percentageSum": "百分比之和必须等于100。",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "搜寻类别……",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "有可用更新",
+    "updateDescription": "新版本的 pysplit 现已推出。",
+    "reload": "重新加载",
+    "updating": "正在更新…",
+    "offlineReady": "准备离线工作",
+    "offlineReadyDescription": "应用程序外壳被缓存。在线时打开一次群组即可保留其数据。",
+    "dismiss": "关闭",
+    "install": "安装应用程序",
+    "refreshApp": "刷新应用程序",
+    "refreshAppHint": "清除缓存文件并重新加载最新版本。您保存的数据保留在此设备上。"
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "管理仪表板",
+    "description": "管理用户角色、平台访问权限并监控系统指标。",
+    "totalGroups": "总组数",
+    "totalExpenses": "总费用",
+    "registeredUsers": "注册用户",
+    "userManagement": "用户管理和权限级别",
+    "accessDenied": "访问被拒绝",
+    "accessDeniedDescription": "管理仪表板仅限管理员级别的用户使用。",
+    "delete": "删除",
+    "deleteError": "无法删除",
+    "email": "电子邮件",
+    "expenses": "开支",
+    "groupDeleted": "群组已删除",
+    "groupManagement": "群组",
+    "groupManagementDescription": "删除组并检查使用情况。",
+    "groups": "团体",
+    "loadMoreGroups": "加载更多组",
+    "loadMoreUsers": "加载更多用户",
+    "loading": "正在加载仪表板...",
+    "loadingMore": "加载中...",
+    "participants": "参与者",
+    "preauthorize": "预授权用户",
+    "preauthorizeAction": "预授权",
+    "preauthorizeError": "无法预授权用户",
+    "preauthorized": "用户预授权",
+    "returnToGroups": "返回我的群组",
+    "searchGroups": "搜索群组",
+    "searchUsers": "搜索用户",
+    "signInDescription": "管理仪表板需要管理员帐户。",
+    "signInTitle": "需要登录",
+    "tier": "等级",
+    "tierError": "无法更新层级",
+    "tierFor": "等级为",
+    "tierUpdated": "等级已更新",
+    "userDeleted": "用户已删除",
+    "userTier": "层级"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "离线存储",
+    "loading": "正在检查该设备...",
+    "unsupported": "此浏览器无法报告存储状态。",
+    "usage": "使用了 {{quota}} 的 {{used}}",
+    "unknown": "未知",
+    "persisted": "存储在此设备上是持久的。",
+    "notPersisted": "如果设备空间不足，浏览器可能会清除离线数据。",
+    "keep": "在此设备上保留数据",
+    "refresh": "刷新",
+    "critical": "存储空间几乎已满。立即导出备份，然后删除未使用的组。",
+    "warning": "存储即将满。建议进行备份。"
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "待同步",
+    "expense": "等待同步"
+  },
+  "Attachments": {
+    "assignItems": "分配收据项目",
+    "extractedItems": "AI提取物品",
+    "help": "图片在上传前会被压缩。 PDF 作为附件保存并在新选项卡中打开。",
+    "open": "打开",
+    "openInNewTab": "在新选项卡中打开",
+    "pdfPreviewUnavailable": "PDF 预览在单独的选项卡中打开。",
+    "pending": "待上传",
+    "preview": "预览",
+    "previewAction": "预览",
+    "previewNamed": "预览{{name}}",
+    "receipt": "商店收据",
+    "saveToAssignItems": "保存支出后即可将这些项目分配给参与者。",
+    "scanComplete": "收据扫描",
+    "scanCompleteDescription": "将提取的项目分配给参与者。",
+    "scanError": "收据无法扫描",
+    "scanWithAi": "人工智能扫描",
+    "scanning": "正在扫描...",
+    "view": "查看附件",
+    "attachment": "附件",
+    "onlyImagesPdf": "仅支持图像和 PDF 文件。"
+  },
+  "Backup": {
+    "downloaded": "备份已下载。",
+    "export": "导出备份",
+    "failed": "备份失败。",
+    "restore": "恢复备份",
+    "restoreFailed": "恢复失败。",
+    "restoreLabel": "恢复备份文件",
+    "restored": "备份已恢复。正在重新加载..."
+  },
+  "Common": {
+    "addGroup": "添加群组",
+    "close": "Close",
+    "closeDialog": "关闭对话框",
+    "dismiss": "Dismiss",
+    "dismissNotification": "关闭通知",
+    "error": "出了点问题",
+    "expenseNotFound": "未找到费用",
+    "loading": "加载中...",
+    "menu": "菜单",
+    "retry": "重试",
+    "select": "选择…",
+    "unknown": "未知",
+    "user": "用户"
+  },
+  "CreateGroup": {
+    "approvalContact": "创建新的费用组需要管理员授权。请联系您的实例管理员，将您的帐户升级为群组创建者级别。",
+    "approvalDescription": "您的帐户当前位于同步用户层。您可以参加与您共享的任何群组，并在您的所有设备上同步它们。",
+    "approvalTitle": "创建群组需要批准",
+    "authRequiredDescription": "要创建新的费用组，请使用外部帐户登录。受邀的群组参与者仍然可以通过您的群组链接轻松加入，无需登录。",
+    "authRequiredTitle": "需要身份验证",
+    "returnToGroups": "返回我的群组",
+    "signIn": "登录创建群组"
+  },
+  "GroupTabs": {
+    "Expenses": "消费",
+    "Balances": "余额",
+    "Information": "信息",
+    "Stats": "统计",
+    "Activity": "活动",
+    "Settings": "设定",
+    "label": "小组部分"
+  },
+  "Login": {
+    "title": "登录到斯普利特",
+    "description": "使用外部帐户登录以启用跨设备组同步。",
+    "google": "继续使用谷歌",
+    "github": "继续使用 GitHub",
+    "noProviders": "未配置 OAuth 提供程序。设置 AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET 以启用登录。"
+  },
+  "NotFound": {
+    "title": "找不到页面",
+    "description": "检查 URL 并重试。",
+    "groupTitle": "该群组不存在。",
+    "groupDescription": "检查 URL 或请求新的邀请链接。"
+  },
+  "SyncStatus": {
+    "offlinePending": "离线 — 待更改：{{count}}",
+    "offlineSaved": "离线 — 显示保存的数据",
+    "syncing": "正在同步...",
+    "error": "同步错误：{{error}}",
+    "retryToContinue": "重试继续",
+    "conflicts": "需要审查的冲突：{{count}}",
+    "failed": "无法同步的更改：{{count}}",
+    "pending": "待定更改：{{count}}",
+    "retryFailed": "重试失败的更改",
+    "discardFailed": "丢弃失败的更改",
+    "resolveConflicts": "解决冲突",
+    "syncNow": "立即同步",
+    "dialogTitle": "解决冲突",
+    "dialogDescription": "这些编辑更改了另一台设备上的相同记录。选择要保留的内容。",
+    "noConflicts": "没有冲突需要解决。",
+    "serverVersion": "服务器版本{{version}}·本地编辑保留在冲突队列中",
+    "keepMine": "保留我的版本",
+    "useServer": "使用服务器",
+    "duplicate": "复制为新的"
+  },
+  "Theme": {
+    "toggle": "切换主题",
+    "light": "浅色",
+    "dark": "深色",
+    "system": "系统"
   }
 }

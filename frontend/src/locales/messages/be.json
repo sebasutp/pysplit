@@ -9,25 +9,30 @@
     }
   },
   "Header": {
-    "groups": "Групы"
+    "groups": "Групы",
+    "adminDashboard": "Прыборная панэль адміністратара",
+    "language": "мова",
+    "signIn": "Увайдзіце ў сістэму",
+    "signOut": "Выйсці",
+    "userMenu": "Меню карыстальніка"
   },
   "Footer": {
-    "madeIn": "Made in Zurich, Switzerland 🇨🇭",
+    "madeIn": "Зроблена ў Цюрыху, Швейцарыя 🇨🇭",
     "builtBy": "Built by <author>Sebastien Castiel</author> and <source>contributors</source>"
   },
   "Expenses": {
-    "title": "Expenses",
-    "description": "Here are the expenses that you created for your group.",
-    "create": "Create expense",
-    "createFirst": "Create the first one",
-    "noExpenses": "Your group doesn’t contain any expense yet.",
+    "title": "Выдаткі",
+    "description": "Вось выдаткі, якія вы стварылі для сваёй групы.",
+    "create": "Стварыце выдаткі",
+    "createFirst": "Стварыце першы",
+    "noExpenses": "У вашай групе пакуль няма выдаткаў.",
     "export": "Экспартаваць",
     "exportJson": "Экспартаваць у JSON",
     "exportCsv": "Экспартаваць у CSV",
-    "searchPlaceholder": "Search for an expense…",
+    "searchPlaceholder": "Шукаць выдаткі…",
     "ActiveUserModal": {
       "title": "Хто вы?",
-      "description": "Tell us which participant you are to let us customize how the information is displayed.",
+      "description": "Скажыце нам, які вы ўдзельнік, каб мы маглі наладзіць, як адлюстроўваецца інфармацыя.",
       "nobody": "Я не хачу нікога выбіраць",
       "save": "Захаваць змены",
       "footer": "Гэту наладу можна змяніць пазней у наладах групы."
@@ -39,15 +44,30 @@
       "lastMonth": "У мінулым месяцы",
       "earlierThisYear": "Раней у гэтым годзе",
       "lastYear": "Летась",
-      "older": "Старэйшыя"
-    }
+      "older": "Старэйшыя",
+      "today": "Сёння",
+      "week": "Раней на гэтым тыдні",
+      "month": "Раней у гэтым месяцы",
+      "year": "Раней у гэтым годзе"
+    },
+    "clearSearch": "Ясна",
+    "exportError": "Не атрымалася экспартаваць выдаткі",
+    "filterFrom": "Ад",
+    "filterTo": "каб",
+    "loadMore": "Загрузіць больш",
+    "loading": "Загрузка выдаткаў…",
+    "loadingMore": "Загрузка...",
+    "search": "Пошук выдаткаў",
+    "showingCount": "Паказаны выдаткі {{shown}} з {{total}}."
   },
   "ExpenseCard": {
     "paidBy": "Paid by <strong>{paidBy}</strong> for <paidFor></paidFor>",
-    "everyone": "усе",
+    "everyone": "усіх",
     "receivedBy": "Received by <strong>{paidBy}</strong> for <paidFor></paidFor>",
     "yourBalance": "Ваш баланс:",
-    "notInvolved": "Вы не ўдзельнічаеце"
+    "notInvolved": "Вы не ўдзельнічаеце",
+    "paidByPlain": "Аплачана {{paidBy}} за {{paidFor}}",
+    "receivedByPlain": "Атрымана {{paidBy}} для {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Мае групы",
@@ -55,35 +75,35 @@
     "createGroup": "Create group",
     "loadingRecent": "Загрузка апошніх груп…",
     "NoRecent": {
-      "description": "You have not visited any group recently.",
-      "create": "Create one",
-      "orAsk": "or ask a friend to send you the link to an existing one."
+      "description": "Вы не наведвалі ніводнай групы ў апошні час.",
+      "create": "Стварыце адзін",
+      "orAsk": "або папрасіце сябра даслаць вам спасылку на існуючы."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Ваш агульны баланс",
+      "description": "Ваш агульны баланс ва ўсіх вашых групах.",
+      "owedToYou": "Вам павінны",
+      "youOwe": "Вы павінны",
+      "settledUp": "Вы ўсе размеркаваны па групах."
     },
-    "recent": "Recent groups",
-    "starred": "Starred groups",
-    "archived": "Archived groups",
-    "archive": "Archive group",
-    "unarchive": "Unarchive group",
-    "removeRecent": "Remove from recent groups",
+    "recent": "Апошнія групы",
+    "starred": "Групы з зоркамі",
+    "archived": "Архіўныя групы",
+    "archive": "Архіўная група",
+    "unarchive": "Разархіваваць групу",
+    "removeRecent": "Выдаліць з апошніх груп",
     "RecentRemovedToast": {
-      "title": "Group has been removed",
-      "description": "The group was removed from your recent groups list.",
+      "title": "Група выдалена",
+      "description": "Група была выдалена з вашага спісу апошніх груп.",
       "undoAlt": "Undo group removal",
       "undo": "Undo"
     },
     "AddByURL": {
       "button": "Дадаць па URL",
       "title": "Дадаць групу па URL",
-      "description": "If a group was shared with you, you can paste its URL here to add it to your list.",
-      "error": "Oops, we are not able to find the group from the URL you provided…",
-      "urlMode": "Enter URL",
+      "description": "Калі група была абагулена з вамі, вы можаце ўставіць яе URL сюды, каб дадаць яе ў свой спіс.",
+      "error": "На жаль, мы не можам знайсці групу па ўказаным вамі URL...",
+      "urlMode": "Увядзіце URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,18 +117,22 @@
     "NotFound": {
       "text": "Такой групы не існуе.",
       "link": "Go to recently visited groups"
-    }
+    },
+    "moreOptions": "Больш варыянтаў",
+    "participants": "удзельнікаў",
+    "star": "Зорная група",
+    "unstar": "Зняць зорачку з групы"
   },
   "GroupForm": {
     "title": "Інфармацыя пра групу",
     "NameField": {
       "label": "Назва групы",
-      "placeholder": "Summer vacations",
+      "placeholder": "Летнія канікулы",
       "description": "Увядзіце назву для вашай групы."
     },
     "InformationField": {
       "label": "Інфармацыя пра групу",
-      "placeholder": "What information is relevant to group participants?"
+      "placeholder": "Якая інфармацыя актуальная для ўдзельнікаў групы?"
     },
     "CurrencyField": {
       "label": "Сімвал валюты",
@@ -117,7 +141,7 @@
     },
     "CurrencyCodeField": {
       "label": "Асноўная валюта",
-      "createDescription": "All amounts and balances will be in this currency.",
+      "createDescription": "Усе сумы і рэшткі будуць у гэтай валюце.",
       "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
       "customOption": "Карыстальніцкая"
     },
@@ -129,7 +153,10 @@
       "add": "Дадаць удзельніка",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "Гэты ўдзельнік з'яўляецца часткай выдаткаў і не можа быць выдалены.",
+      "indexLabel": "Удзельнік №{{index}}",
+      "remove": "Выдаліць удзельніка {{index}}"
     },
     "Settings": {
       "title": "Лакальныя налады",
@@ -145,19 +172,20 @@
       "create": "Стварыць",
       "creating": "Стварэнне…",
       "cancel": "Скасаваць"
-    }
+    },
+    "saveError": "Не ўдалося захаваць групу."
   },
   "ExpenseForm": {
     "Income": {
-      "create": "Create income",
-      "edit": "Edit income",
+      "create": "Стварыць прыбытак",
+      "edit": "Рэдагаваць даход",
       "TitleField": {
-        "label": "Income title",
+        "label": "Назва даходу",
         "placeholder": "Monday evening restaurant",
         "description": "Enter a description for the income."
       },
       "DateField": {
-        "label": "Income date",
+        "label": "Дата даходу",
         "description": "Enter the date the income was received."
       },
       "currencyField": {
@@ -166,7 +194,7 @@
       },
       "categoryFieldDescription": "Select the income category.",
       "paidByField": {
-        "label": "Received by",
+        "label": "Атрымана",
         "description": "Select the participant who received the income."
       },
       "paidFor": {
@@ -177,29 +205,29 @@
       "attachDescription": "See and attach receipts to the income."
     },
     "Expense": {
-      "create": "Create expense",
-      "edit": "Edit expense",
+      "create": "Стварыце выдаткі",
+      "edit": "Рэдагаваць выдаткі",
       "TitleField": {
-        "label": "Expense title",
-        "placeholder": "Monday evening restaurant",
+        "label": "Назва выдаткаў",
+        "placeholder": "Рэстаран вечарам панядзелка",
         "description": "Enter a description for the expense."
       },
       "DateField": {
-        "label": "Expense date",
+        "label": "Дата выдаткаў",
         "description": "Enter the date the expense was paid."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Валюта выдаткаў",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Select the expense category.",
       "paidByField": {
-        "label": "Paid by",
+        "label": "Аплачана",
         "placeholder": "Select a participant",
         "description": "Select the participant who paid the expense."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Рэцыдыў выдаткаў",
         "description": "Select how often the expense should repeat.",
         "none": "Ніколі",
         "daily": "Штодзённа",
@@ -219,7 +247,7 @@
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
       "label": "Сума для канвертацыі",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Сума для пераводу",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -230,7 +258,7 @@
     "conversionRateState": {
       "loading": "Атрыманне курсаў абмену…",
       "success": "Атрыманы курс абмену:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Нам не ўдалося атрымаць апошнія тарыфы.",
       "staleRate": "Using rate:",
       "noRate": "Увядзіце свой курс абмену ніжэй.",
       "currencyNotFound": "У Frankfurter няма курсу гэтай валюты на дадзены момант.",
@@ -240,7 +268,7 @@
       "customRate": "Выкарыстанне свайго курсу абмену"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "Гэта кампенсацыя"
     },
     "categoryField": {
       "label": "Катэгорыя"
@@ -251,30 +279,38 @@
     "selectNone": "Выбраць нікога",
     "selectAll": "Выбраць усіх",
     "shares": "частка(і)",
-    "advancedOptions": "Advanced splitting options…",
+    "advancedOptions": "Пашыраныя параметры падзелу…",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "Спліт рэжым",
+      "evenly": "Раўнамерна",
+      "byShares": "Нераўнамерна – Па долях",
+      "byPercentage": "Нераўнамерна - у працэнтах",
+      "byAmount": "Нераўнамерна - Па колькасці",
+      "saveAsDefault": "Захаваць як параметры падзелу па змаўчанні"
     },
     "DeletePopup": {
       "label": "Выдаліць",
-      "title": "Delete this expense?",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
+      "title": "Выдаліць гэты выдатак?",
+      "description": "Вы сапраўды хочаце выдаліць гэтыя выдаткі? Гэта дзеянне незваротнае.",
       "yes": "Выдаліць",
       "cancel": "Скасаваць"
     },
-    "attachDocuments": "Attach documents",
+    "attachDocuments": "Прыкласці дакументы",
     "create": "Стварыць",
     "creating": "Стварэнне…",
     "save": "Захаваць",
     "saving": "Захаванне…",
     "cancel": "Скасаваць",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "reimbursement": "Кампенсацыя",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Размяркуйце элементы квітанцыі",
+    "conflict": "Гэты расход быў зменены кімсьці іншым. Перазагрузіце старонку і паўтарыце спробу.",
+    "conflictTitle": "Кошт зменены ў іншым месцы",
+    "deleteError": "Не атрымалася выдаліць выдаткі.",
+    "pendingReceiptTotal": "Квітанцыя, адсканіраваная ў пазасеткавым рэжыме, гатовая.",
+    "pendingReceiptTotalApply": "Выкарыстоўвайце адсканіраваную суму",
+    "pendingReceiptTotalDismiss": "Звольніць",
+    "saveError": "Не ўдалося зэканоміць."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "Памылка пры загрузцы дакумента",
+      "description": "Пры загрузцы дакумента здарылася нешта не так. Паўтарыце спробу пазней або выберыце іншы файл.",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "Стварыце выдаткі з квітанцыі",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -309,191 +345,207 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "Памылка пры загрузцы дакумента",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "У чарзе. Квітанцыя будзе адсканіравана пасля паўторнага падключэння.",
+    "offline": "Сканіраванне аднаўляецца, калі вы ў сетцы.",
+    "scanFailed": "AI не змог прачытаць гэту квітанцыю. Праверце канфігурацыю AI сервера і паўтарыце спробу.",
+    "scanning": "Сканаванне..."
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Пазыцыі квітанцый",
+    "backToExpense": "Вернемся да выдаткаў",
+    "merchant": "Назва крамы",
+    "printedTotal": "Усяго надрукавана на квітанцыі",
+    "noReceipt": "Ніякая квітанцыя пакуль не звязана з гэтымі выдаткамі.",
+    "empty": "Тавараў пакуль няма. Каб пачаць дзяленне, дадайце адзін.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Не ўдалося захаваць змены",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Дадаць прадмет",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Дадаць прадмет",
+      "nameLabel": "Імя",
+      "quantityLabel": "Колькасць",
+      "amountLabel": "Сума",
+      "sharedLabel": "Агульны (плата за ўвесь рахунак)",
+      "add": "Дадаць",
+      "cancel": "Скасаваць"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} з {total}",
+      "remaining": "Засталося {quantity}",
+      "assign": "Вылучыць",
+      "edit": "Рэдагаваць",
+      "delete": "Выдаліць",
+      "removePortion": "Выдаліць выдзеленую долю",
+      "editTitle": "Рэдагаваць элемент",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Захаваць",
+      "cancel": "Скасаваць",
+      "deleteConfirm": "Выдаліць гэты элемент?",
+      "deleteDescription": "Гэта выдаляе элемент і яго прызначэнне."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Непрызначаны",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Агульны",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Прызначыць пункт",
+      "description": "Выберыце, хто плаціць за «{name}».",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Раўнамерна падзяліць",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Індывідуальны падзел",
+      "customHint": "Увядзіце колькасць у адзінках для кожнай мэты.",
+      "shared": "Агульны",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Прызначаная колькасць перавышае колькасць тавару.",
+      "confirm": "Вылучыць",
+      "cancel": "Скасаваць"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Агульны",
+      "unassigned": "Непрызначаны",
+      "optOut": "Абагульвае непрызначаныя элементы",
+      "reconciles": "Ураўнаважаны",
+      "offBy": "Розніца {amount}",
+      "itemsTotal": "Агульная колькасць элементаў квітанцыі",
+      "apply": "Прымяніць да выдаткаў",
+      "allOptedOut": "Усе адмовіліся, але некаторыя элементы ўсё яшчэ не прызначаны.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Значэнні квітанцый адрозніваюцца · Падаць заяўку яшчэ раз"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Выдаткі абноўлены",
+      "description": "Пазыцыі паступлення былі аднесены на расход."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Не ўдалося прымяніць квітанцыю"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Абнавіць выдаткі?",
+      "description": "Агульная сума выдаткаў адрозніваецца ад агульнай сумы артыкулаў паступлення. Пры падачы заяўкі сума выдаткаў і яе падзел будуць перазапісаны.",
+      "total": "усяго {current} → {new}",
+      "cancel": "Скасаваць",
+      "confirm": "Прымяніць"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Сканаванне ў чарзе",
+    "scanPendingDescription": "Выява захавана на гэтай прыладзе і будзе адсканіравана, калі вы зноў падключыцеся да інтэрнэту.",
+    "offlineQueue": "Вы па-за сеткай. Далучыце фота зараз, і яно будзе адсканіравана пасля паўторнага падключэння.",
+    "disabled": "Smart split не ўключаны на гэтым серверы. Функцыя сканавання квітанцый даступная толькі ў Інтэрнэце.",
+    "extracted": "Квітанцыя адсканаваная",
+    "extractedDescription": "Прызначце вынятыя элементы ніжэй.",
+    "loading": "Загрузка квітанцыі…",
+    "optOutTitle": "Адмова",
+    "scanError": "Не ўдалося адсканіраваць квітанцыю.",
+    "scanUnavailable": "Праверце канфігурацыю AI сервера і паўтарыце спробу.",
+    "scanning": "Сканіраванне квітанцыі…",
+    "upload": "Загрузіць фота квітанцыі"
   },
   "Balances": {
     "title": "Балансы",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "description": "Гэта сума, якую заплаціў або атрымаў аплату кожны ўдзельнік.",
     "Reimbursements": {
-      "title": "Suggested reimbursements",
-      "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "title": "Прапанаваныя кампенсацыі",
+      "description": "Вось прапановы па аптымізацыі кампенсацыі паміж удзельнікамі.",
+      "noImbursements": "Здаецца, вашай групе не патрэбна кампенсацыя 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "Пазначыць як аплачанае",
+      "owesPlain": "{{from}} абавязаны {{to}}"
+    },
+    "loading": "Загрузка балансаў…"
   },
   "Stats": {
     "title": "Статыстыка",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Увесь час",
+      "thisMonth": "Гэты месяц",
+      "last30": "Апошнія 30 дзён",
+      "thisYear": "Гэты год",
+      "custom": "Індывідуальны дыяпазон",
+      "from": "Ад",
+      "to": "каб"
     },
     "Totals": {
-      "title": "Totals",
-      "description": "Spending summary of the entire group.",
-      "groupSpendings": "Total group spendings",
+      "title": "Выніковыя вынікі",
+      "description": "Зводка выдаткаў ўсёй групы.",
+      "groupSpendings": "Агульныя выдаткі групы",
       "groupEarnings": "Total group earnings",
-      "yourSpendings": "Your total spendings",
+      "yourSpendings": "Вашы агульныя выдаткі",
       "yourEarnings": "Your total earnings",
-      "yourShare": "Your total share"
+      "yourShare": "Ваша агульная доля"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Рэзюмэ",
+      "description": "Асноўныя паказчыкі за абраны перыяд.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Выдаткі",
+      "averageExpense": "Сярэдні расход",
+      "largestExpense": "Самыя вялікія выдаткі",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Выдаткі з цягам часу",
+      "description": "Агульныя выдаткі групы ў месяц. Выберыце месяц, каб убачыць яго выдаткі.",
+      "empty": "Выдаткаў пакуль няма.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Выдаткі ў гэтым месяцы за выбраны перыяд.",
+      "detailsEmpty": "Выдаткаў у гэтым месяцы няма.",
+      "showExpensesPlain": "Паказаць выдаткі на {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Расходы па ўдзельнікам",
+      "description": "Колькі заплаціў кожны ўдзельнік і іх доля ў выдатках.",
+      "empty": "Выдаткаў пакуль няма.",
+      "participant": "Удзельнік",
+      "paid": "Платна",
       "count": "Count",
-      "share": "Share"
+      "share": "Абагуліць"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Расходы па катэгорыях",
+      "description": "Агульная сума, выдаткаваная ў кожнай катэгорыі. Выберыце катэгорыю, каб убачыць яе выдаткі.",
+      "empty": "Выдаткаў пакуль няма.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Выдаткі гэтай катэгорыі за выбраны перыяд.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Паказаць выдаткі на {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Перыядычныя выдаткі",
+      "description": "Прыблізны кошт актыўных перыядычных выдаткаў групы.",
+      "estimatedMonthly": "Прыблізны штомесячны кошт",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Загрузка статыстыкі..."
   },
   "Activity": {
     "title": "Актыўнасць",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
+    "description": "Агляд усёй дзейнасці ў гэтай групе.",
+    "noActivity": "У вашай групе яшчэ няма актыўнасці.",
     "someone": "Хтосьці",
     "settingsModified": "Налады групы былі зменены карыстальнікам <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "expenseCreated": "Выдаткі <em>{expense}</em> створаны <strong>{participant}</strong>.",
+    "expenseUpdated": "Выдаткі <em>{expense}</em> абноўлены <strong>{participant}</strong>.",
+    "expenseDeleted": "Выдатак <em>{expense}</em> выдалены <strong>{participant}</strong>.",
     "Groups": {
       "today": "Сёння",
       "yesterday": "Учора",
@@ -504,19 +556,24 @@
       "earlierThisYear": "Раней у гэтым годзе",
       "lastYear": "Летась",
       "older": "Старэйшае"
-    }
+    },
+    "loadMore": "Загрузіць больш",
+    "loading": "Загрузка дзейнасці...",
+    "unknown": "Невядомая дзейнасць"
   },
   "Information": {
     "title": "Інфармацыя",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
+    "description": "Выкарыстоўвайце гэтае месца, каб дадаць любую інфармацыю, якая можа мець дачыненне да ўдзельнікаў групы.",
     "empty": "Інфармацыі пра групу пакуль няма."
   },
   "Settings": {
-    "title": "Налады"
+    "title": "Налады",
+    "saved": "Група абноўлена",
+    "savedDescription": "Вашы змены былі захаваны."
   },
   "Share": {
     "title": "Абагуліць",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "description": "Каб іншыя ўдзельнікі маглі бачыць групу і дадаваць выдаткі, падзяліцеся з імі яе URL.",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Увага!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Абагуліць",
+    "copy": "Скапіраваць спасылку",
+    "url": "Спасылка на групу"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -542,8 +602,11 @@
     "paidByRequired": "Вы павінны выбраць ўдзельніка.",
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
-    "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "amountSum": "Сума сум павінна раўняцца суме выдаткаў.",
+    "percentageSum": "Сума працэнтаў павінна быць роўная 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Пошук катэгорый...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Абнаўленне даступна",
+    "updateDescription": "Даступная новая версія pysplit.",
+    "reload": "Перазагрузіць",
+    "updating": "Ідзе абнаўленне…",
+    "offlineReady": "Гатовы да працы ў аўтаномным рэжыме",
+    "offlineReadyDescription": "Абалонка прыкладання кэшуецца. Адкрыйце групу адзін раз у інтэрнэце, каб захаваць яе даныя.",
+    "dismiss": "Закрыць",
+    "install": "Усталяваць праграму",
+    "refreshApp": "Абнавіць праграму",
+    "refreshAppHint": "Ачысціце кэшаваныя файлы і перазагрузіце апошнюю версію. Вашы захаваныя даныя застаюцца на гэтай прыладзе."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Панэль кіравання",
+    "description": "Кіруйце ролямі карыстальнікаў, дазволамі доступу да платформы і кантралюйце сістэмныя паказчыкі.",
+    "totalGroups": "Усяго груп",
+    "totalExpenses": "Агульныя выдаткі",
+    "registeredUsers": "Зарэгістраваныя карыстальнікі",
+    "userManagement": "Кіраванне карыстальнікамі і ўзроўні дазволаў",
+    "accessDenied": "Доступ забаронены",
+    "accessDeniedDescription": "Прыборная панэль адміністравання абмежаваная для карыстальнікаў узроўню адміністратара.",
+    "delete": "Выдаліць",
+    "deleteError": "Не атрымалася выдаліць",
+    "email": "Электронная пошта",
+    "expenses": "выдаткі",
+    "groupDeleted": "Група выдалена",
+    "groupManagement": "Групы",
+    "groupManagementDescription": "Выдаліце групы і праверце выкарыстанне.",
+    "groups": "групы",
+    "loadMoreGroups": "Загрузіць больш груп",
+    "loadMoreUsers": "Загрузіце больш карыстальнікаў",
+    "loading": "Загрузка прыборнай панэлі...",
+    "loadingMore": "Загрузка...",
+    "participants": "удзельнікаў",
+    "preauthorize": "Папярэдняя аўтарызацыя карыстальніка",
+    "preauthorizeAction": "Папярэдняя аўтарызацыя",
+    "preauthorizeError": "Не атрымалася папярэдне аўтарызаваць карыстальніка",
+    "preauthorized": "Карыстальнік папярэдне аўтарызаваны",
+    "returnToGroups": "Вярнуцца да Маіх груп",
+    "searchGroups": "Пошук груп",
+    "searchUsers": "Пошук карыстальнікаў",
+    "signInDescription": "Панэль кіравання патрабуе ўліковага запісу адміністратара.",
+    "signInTitle": "Патрабуецца ўваход",
+    "tier": "Ярус",
+    "tierError": "Не ўдалося абнавіць узровень",
+    "tierFor": "Ярус для",
+    "tierUpdated": "Узровень абноўлены",
+    "userDeleted": "Карыстальнік выдалены",
+    "userTier": "Ярусы"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Аўтаномнае сховішча",
+    "loading": "Ідзе праверка гэтай прылады…",
+    "unsupported": "Гэты браўзер не можа паведаміць пра стан захоўвання.",
+    "usage": "{{used}} з {{quota}} выкарыстоўваецца",
+    "unknown": "невядома",
+    "persisted": "Сховішча на гэтай прыладзе пастаяннае.",
+    "notPersisted": "Браўзер можа выдаліць пазасеткавыя даныя, калі на прыладзе не хапае месца.",
+    "keep": "Захоўвайце даныя на гэтай прыладзе",
+    "refresh": "Абнавіць",
+    "critical": "Сховішча амаль запоўнена. Экспартуйце рэзервовую копію зараз, а затым выдаліце ​​невыкарыстоўваныя групы.",
+    "warning": "Сховішча запаўняецца. Рэкамендуецца зрабіць рэзервовую копію."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Чакаецца сінхранізацыя",
+    "expense": "Чакае сінхранізацыі"
+  },
+  "Attachments": {
+    "assignItems": "Размяркуйце элементы квітанцыі",
+    "extractedItems": "AI здабывае прадметы",
+    "help": "Выявы сціскаюцца перад загрузкай. PDF-файлы захоўваюцца як далучэнні і адкрываюцца ў новай укладцы.",
+    "open": "Адкрыць",
+    "openInNewTab": "Адкрыць у новай укладцы",
+    "pdfPreviewUnavailable": "Папярэдні прагляд PDF адкрываецца ў асобнай укладцы.",
+    "pending": "Чакаецца загрузка",
+    "preview": "Папярэдні прагляд",
+    "previewAction": "Папярэдні прагляд",
+    "previewNamed": "Папярэдні прагляд {{name}}",
+    "receipt": "Крамны чэк",
+    "saveToAssignItems": "Спачатку захавайце выдаткі, а затым прызначце гэтыя прадметы ўдзельнікам.",
+    "scanComplete": "Квітанцыя адсканаваная",
+    "scanCompleteDescription": "Прызначце вынятыя прадметы ўдзельнікам.",
+    "scanError": "Не ўдалося адсканіраваць квітанцыю",
+    "scanWithAi": "Сканаванне з дапамогай штучнага інтэлекту",
+    "scanning": "Сканаванне...",
+    "view": "Прагляд укладанняў",
+    "attachment": "Укладанне файла",
+    "onlyImagesPdf": "Падтрымліваюцца толькі выявы і файлы PDF."
+  },
+  "Backup": {
+    "downloaded": "Рэзервовая копія спампавана.",
+    "export": "Экспарт рэзервовай копіі",
+    "failed": "Збой рэзервовага капіравання.",
+    "restore": "Аднавіць рэзервовую копію",
+    "restoreFailed": "Не атрымалася аднавіць.",
+    "restoreLabel": "Аднавіць файл рэзервовай копіі",
+    "restored": "Рэзервовая копія адноўлена. Перазагрузка…"
+  },
+  "Common": {
+    "addGroup": "Дадаць групу",
+    "close": "Close",
+    "closeDialog": "Зачыніць дыялог",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Адхіліць апавяшчэнне",
+    "error": "Нешта пайшло не так",
+    "expenseNotFound": "Кошт не знойдзены",
+    "loading": "Загрузка...",
+    "menu": "Меню",
+    "retry": "Паўтарыць",
+    "select": "Выберыце…",
+    "unknown": "невядома",
+    "user": "Карыстальнік"
+  },
+  "CreateGroup": {
+    "approvalContact": "Стварэнне новых груп расходаў патрабуе аўтарызацыі ад адміністратара. Калі ласка, звярніцеся да адміністратара асобніка, каб павысіць ваш уліковы запіс да ўзроўню стваральніка групы.",
+    "approvalDescription": "Зараз ваш уліковы запіс знаходзіцца на ўзроўні карыстальніка сінхранізацыі. Вы можаце ўдзельнічаць у любых абагуленых з вамі групах і сінхранізаваць іх на ўсіх сваіх прыладах.",
+    "approvalTitle": "Стварэнне групы патрабуе адабрэння",
+    "authRequiredDescription": "Каб стварыць новыя групы выдаткаў, увайдзіце са знешнім уліковым запісам. Запрошаныя ўдзельнікі групы па-ранейшаму змогуць без праблем далучыцца па спасылцы вашай групы без уваходу.",
+    "authRequiredTitle": "Патрабуецца аўтэнтыфікацыя",
+    "returnToGroups": "Вярнуцца да Маіх груп",
+    "signIn": "Увайдзіце, каб стварыць групу"
+  },
+  "GroupTabs": {
+    "Expenses": "Выдаткі",
+    "Balances": "Балансы",
+    "Information": "Інфармацыя",
+    "Stats": "Статыстыка",
+    "Activity": "Актыўнасць",
+    "Settings": "Налады",
+    "label": "Групавыя раздзелы"
+  },
+  "Login": {
+    "title": "Увайдзіце ў Splitit",
+    "description": "Увайдзіце са знешнім уліковым запісам, каб уключыць групавую сінхранізацыю паміж прыладамі.",
+    "google": "Працягнуць з Google",
+    "github": "Працягвайце з GitHub",
+    "noProviders": "Пастаўшчыкі OAuth не настроены. Усталюйце AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET, каб уключыць уваход."
+  },
+  "NotFound": {
+    "title": "Старонка не знойдзена",
+    "description": "Праверце URL і паўтарыце спробу.",
+    "groupTitle": "Такой групы не існуе.",
+    "groupDescription": "Праверце URL або папрасіце новую спасылку для запрашэння."
+  },
+  "SyncStatus": {
+    "offlinePending": "Па-за сеткай — чакаюцца змены: {{count}}",
+    "offlineSaved": "Offline — паказ захаваных даных",
+    "syncing": "Сінхранізацыя…",
+    "error": "Памылка сінхранізацыі: {{error}}",
+    "retryToContinue": "паспрабуйце працягнуць",
+    "conflicts": "Канфлікты, якія патрабуюць разгляду: {{count}}",
+    "failed": "Змены, якія не ўдалося сінхранізаваць: {{count}}",
+    "pending": "Змены ў чаканні: {{count}}",
+    "retryFailed": "Паўтарыць няўдалыя змены",
+    "discardFailed": "Адхіліць няўдалыя змены",
+    "resolveConflicts": "Вырашайце канфлікты",
+    "syncNow": "Сінхранізаваць зараз",
+    "dialogTitle": "Вырашайце канфлікты",
+    "dialogDescription": "Гэтыя праўкі змянілі тыя ж запісы на іншай прыладзе. Выберыце, што захаваць.",
+    "noConflicts": "Няма канфліктаў для вырашэння.",
+    "serverVersion": "Версія сервера {{version}} · лакальнае рэдагаванне захоўваецца ў чарзе канфліктаў",
+    "keepMine": "Пакінуць маю версію",
+    "useServer": "Выкарыстоўвайце сервер",
+    "duplicate": "Дублікат як новы"
+  },
+  "Theme": {
+    "toggle": "Пераключыць тэму",
+    "light": "Светлая",
+    "dark": "Цёмная",
+    "system": "Сістэма"
   }
 }

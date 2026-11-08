@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Groups"
+    "groups": "Groups",
+    "adminDashboard": "Admin dashboard",
+    "language": "Language",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "userMenu": "User menu"
   },
   "Footer": {
     "madeIn": "Made in Zurich, Switzerland 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Last month",
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
-      "older": "Older"
-    }
+      "older": "Older",
+      "today": "Today",
+      "week": "Earlier this week",
+      "month": "Earlier this month",
+      "year": "Earlier this year"
+    },
+    "clearSearch": "Clear",
+    "exportError": "Could not export the expenses",
+    "filterFrom": "From",
+    "filterTo": "To",
+    "loadMore": "Load more",
+    "loading": "Loading expenses…",
+    "loadingMore": "Loading…",
+    "search": "Search expenses",
+    "showingCount": "Showing {{shown}} of {{total}} expenses."
   },
   "ExpenseCard": {
     "paidBy": "Paid by <strong>{paidBy}</strong> for <paidFor></paidFor>",
     "everyone": "everyone",
     "receivedBy": "Received by <strong>{paidBy}</strong> for <paidFor></paidFor>",
     "yourBalance": "Your balance:",
-    "notInvolved": "You are not involved"
+    "notInvolved": "You are not involved",
+    "paidByPlain": "Paid by {{paidBy}} for {{paidFor}}",
+    "receivedByPlain": "Received by {{paidBy}} for {{paidFor}}"
   },
   "Groups": {
     "myGroups": "My groups",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "This group does not exist.",
       "link": "Go to recently visited groups"
-    }
+    },
+    "moreOptions": "More options",
+    "participants": "participants",
+    "star": "Star group",
+    "unstar": "Unstar group"
   },
   "GroupForm": {
     "title": "Group information",
@@ -129,7 +153,10 @@
       "add": "Add participant",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "This participant is part of an expense and cannot be removed.",
+      "indexLabel": "Participant #{{index}}",
+      "remove": "Remove participant {{index}}"
     },
     "Settings": {
       "title": "Local settings",
@@ -145,7 +172,8 @@
       "create": "Create",
       "creating": "Creating…",
       "cancel": "Cancel"
-    }
+    },
+    "saveError": "Could not save the group."
   },
   "ExpenseForm": {
     "Income": {
@@ -274,7 +302,15 @@
     "saving": "Saving…",
     "cancel": "Cancel",
     "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Assign items",
+    "conflict": "This expense was changed by someone else. Reload the page and try again.",
+    "conflictTitle": "Expense changed elsewhere",
+    "deleteError": "Could not delete the expense.",
+    "pendingReceiptTotal": "A receipt scanned while offline is ready.",
+    "pendingReceiptTotalApply": "Use scanned total",
+    "pendingReceiptTotalDismiss": "Dismiss",
+    "saveError": "Could not save the expense."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -314,7 +350,9 @@
       "retry": "Retry"
     },
     "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "offline": "Scanning resumes when you are online.",
+    "scanFailed": "The AI could not read this receipt. Check the server AI configuration and try again.",
+    "scanning": "Scanning…"
   },
   "ReceiptItems": {
     "title": "Receipt items",
@@ -405,7 +443,16 @@
     },
     "scanPending": "Scan queued",
     "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect.",
+    "disabled": "Smart split is not enabled on this server. Receipt scanning is an online-only feature.",
+    "extracted": "Receipt scanned",
+    "extractedDescription": "Assign the extracted items below.",
+    "loading": "Loading receipt…",
+    "optOutTitle": "Opt-outs",
+    "scanError": "The receipt could not be scanned.",
+    "scanUnavailable": "Check the server AI configuration and try again.",
+    "scanning": "Scanning receipt…",
+    "upload": "Upload a receipt photo"
   },
   "Balances": {
     "title": "Balances",
@@ -415,8 +462,10 @@
       "description": "Here are suggestions for optimized reimbursements between participants.",
       "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "Mark as paid",
+      "owesPlain": "{{from}} owes {{to}}"
+    },
+    "loading": "Loading balances…"
   },
   "Stats": {
     "title": "Stats",
@@ -454,7 +503,8 @@
       "empty": "There are no expenses yet.",
       "showExpenses": "Show expenses for {month}",
       "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsEmpty": "There are no expenses in this month.",
+      "showExpensesPlain": "Show expenses for {{month}}"
     },
     "ByParticipant": {
       "title": "Spending by participant",
@@ -471,7 +521,8 @@
       "empty": "There are no expenses yet.",
       "showExpenses": "Show expenses for {category}",
       "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Show expenses for {{category}}"
     },
     "Recurring": {
       "title": "Recurring expenses",
@@ -483,7 +534,8 @@
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Loading statistics…"
   },
   "Activity": {
     "title": "Activity",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
       "older": "Older"
-    }
+    },
+    "loadMore": "Load more",
+    "loading": "Loading activity…",
+    "unknown": "Unknown activity"
   },
   "Information": {
     "title": "Information",
@@ -512,7 +567,9 @@
     "empty": "No group information yet."
   },
   "Settings": {
-    "title": "Settings"
+    "title": "Settings",
+    "saved": "Group updated",
+    "savedDescription": "Your changes have been saved."
   },
   "Share": {
     "title": "Share",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Share",
+    "copy": "Copy link",
+    "url": "Group link"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -543,7 +603,10 @@
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
     "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "percentageSum": "Sum of percentages must equal 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Search category...",
@@ -635,7 +698,9 @@
     "offlineReady": "Ready to work offline",
     "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
     "dismiss": "Dismiss",
-    "install": "Install app"
+    "install": "Install app",
+    "refreshApp": "Refresh app",
+    "refreshAppHint": "Clear cached files and reload the latest version. Your saved data stays on this device."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -651,7 +716,37 @@
     "totalGroups": "Total Groups",
     "totalExpenses": "Total Expenses",
     "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "userManagement": "User Management & Permission Tiers",
+    "accessDenied": "Access Denied",
+    "accessDeniedDescription": "The Administration Dashboard is restricted to users in the Administrator tier.",
+    "delete": "Delete",
+    "deleteError": "Could not delete",
+    "email": "Email",
+    "expenses": "expenses",
+    "groupDeleted": "Group deleted",
+    "groupManagement": "Groups",
+    "groupManagementDescription": "Delete groups and inspect usage.",
+    "groups": "groups",
+    "loadMoreGroups": "Load more groups",
+    "loadMoreUsers": "Load more users",
+    "loading": "Loading dashboard…",
+    "loadingMore": "Loading…",
+    "participants": "participants",
+    "preauthorize": "Pre-authorize a user",
+    "preauthorizeAction": "Pre-authorize",
+    "preauthorizeError": "Could not pre-authorize the user",
+    "preauthorized": "User pre-authorized",
+    "returnToGroups": "Return to My Groups",
+    "searchGroups": "Search groups",
+    "searchUsers": "Search users",
+    "signInDescription": "The administration dashboard requires an admin account.",
+    "signInTitle": "Sign in required",
+    "tier": "Tier",
+    "tierError": "Could not update the tier",
+    "tierFor": "Tier for",
+    "tierUpdated": "Tier updated",
+    "userDeleted": "User deleted",
+    "userTier": "Tiers"
   },
   "Storage": {
     "title": "Offline storage",
@@ -667,6 +762,111 @@
     "warning": "Storage is getting full. A backup is recommended."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Pending sync",
+    "expense": "Pending sync"
+  },
+  "Attachments": {
+    "assignItems": "Assign items",
+    "extractedItems": "AI extracted items",
+    "help": "Images are compressed before upload. PDFs are kept as attachments and open in a new tab.",
+    "open": "Open",
+    "openInNewTab": "Open in a new tab",
+    "pdfPreviewUnavailable": "PDF previews open in a separate tab.",
+    "pending": "Pending upload",
+    "preview": "Preview",
+    "previewAction": "Preview",
+    "previewNamed": "Preview {{name}}",
+    "receipt": "Receipt",
+    "saveToAssignItems": "Save the expense to assign these items to participants.",
+    "scanComplete": "Receipt scanned",
+    "scanCompleteDescription": "Assign the extracted items to participants.",
+    "scanError": "The receipt could not be scanned",
+    "scanWithAi": "Scan with AI",
+    "scanning": "Scanning…",
+    "view": "View attachments",
+    "attachment": "Attachment",
+    "onlyImagesPdf": "Only images and PDF files are supported."
+  },
+  "Backup": {
+    "downloaded": "Backup downloaded.",
+    "export": "Export backup",
+    "failed": "Backup failed.",
+    "restore": "Restore backup",
+    "restoreFailed": "Restore failed.",
+    "restoreLabel": "Restore backup file",
+    "restored": "Backup restored. Reloading…"
+  },
+  "Common": {
+    "addGroup": "Add group",
+    "close": "Close",
+    "closeDialog": "Close dialog",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Dismiss notification",
+    "error": "Something went wrong",
+    "expenseNotFound": "Expense not found",
+    "loading": "Loading…",
+    "menu": "Menu",
+    "retry": "Retry",
+    "select": "Select…",
+    "unknown": "unknown",
+    "user": "User"
+  },
+  "CreateGroup": {
+    "approvalContact": "Creating new expense groups requires authorization from an administrator. Please contact your instance administrator to promote your account to the Group Creator tier.",
+    "approvalDescription": "Your account is currently in the Sync User tier. You can participate in any groups shared with you and sync them across all your devices.",
+    "approvalTitle": "Group Creation Requires Approval",
+    "authRequiredDescription": "To create new expense groups, please sign in with an external account. Invited group participants will still be able to join friction-free via your group link without signing in.",
+    "authRequiredTitle": "Authentication Required",
+    "returnToGroups": "Return to My Groups",
+    "signIn": "Sign in to Create Group"
+  },
+  "GroupTabs": {
+    "Expenses": "Expenses",
+    "Balances": "Balances",
+    "Information": "Information",
+    "Stats": "Stats",
+    "Activity": "Activity",
+    "Settings": "Settings",
+    "label": "Group sections"
+  },
+  "Login": {
+    "title": "Sign in to Spliit",
+    "description": "Sign in with an external account to enable cross-device group synchronization.",
+    "google": "Continue with Google",
+    "github": "Continue with GitHub",
+    "noProviders": "No OAuth providers are configured. Set AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET to enable sign-in."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "Check the URL and try again.",
+    "groupTitle": "This group does not exist.",
+    "groupDescription": "Check the URL or ask for a new invitation link."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline — pending changes: {{count}}",
+    "offlineSaved": "Offline — showing saved data",
+    "syncing": "Syncing…",
+    "error": "Sync error: {{error}}",
+    "retryToContinue": "retry to continue",
+    "conflicts": "Conflicts needing review: {{count}}",
+    "failed": "Changes that could not be synced: {{count}}",
+    "pending": "Pending changes: {{count}}",
+    "retryFailed": "Retry failed changes",
+    "discardFailed": "Discard failed changes",
+    "resolveConflicts": "Resolve conflicts",
+    "syncNow": "Sync now",
+    "dialogTitle": "Resolve conflicts",
+    "dialogDescription": "These edits changed the same records on another device. Choose what to keep.",
+    "noConflicts": "No conflicts to resolve.",
+    "serverVersion": "Server version {{version}} · local edit kept in the conflict queue",
+    "keepMine": "Keep mine",
+    "useServer": "Use server",
+    "duplicate": "Duplicate as new"
+  },
+  "Theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }

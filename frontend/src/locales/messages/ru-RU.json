@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Группы"
+    "groups": "Группы",
+    "adminDashboard": "Панель администратора",
+    "language": "Язык",
+    "signIn": "Войти",
+    "signOut": "Выйти",
+    "userMenu": "Меню пользователя"
   },
   "Footer": {
     "madeIn": "Сделано в Цюрихе, Швейцария 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "В прошлом месяце",
       "earlierThisYear": "Ранее в этом году",
       "lastYear": "В прошлом году",
-      "older": "Очень давно"
-    }
+      "older": "Очень давно",
+      "today": "Сегодня",
+      "week": "Ранее на этой неделе",
+      "month": "Ранее в этом месяце",
+      "year": "Ранее в этом году"
+    },
+    "clearSearch": "Очистить",
+    "exportError": "Не удалось экспортировать расходы",
+    "filterFrom": "С",
+    "filterTo": "По",
+    "loadMore": "Загрузить больше",
+    "loading": "Загрузка расходов…",
+    "loadingMore": "Загрузка…",
+    "search": "Поиск расходов",
+    "showingCount": "Показаны {{shown}} из {{total}} расходов."
   },
   "ExpenseCard": {
     "paidBy": "Потратил <strong>{paidBy}</strong> за <paidFor></paidFor>",
-    "everyone": "все",
+    "everyone": "всех",
     "receivedBy": "Получил <strong>{paidBy}</strong> за <paidFor></paidFor>",
     "yourBalance": "Изменение баланса участника:",
-    "notInvolved": "Вы не вовлечены"
+    "notInvolved": "Вы не вовлечены",
+    "paidByPlain": "Оплачено {{paidBy}} за {{paidFor}}",
+    "receivedByPlain": "Получено {{paidBy}} для {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Мои группы",
@@ -60,11 +80,11 @@
       "orAsk": "или попросить вашего друга отправить вам ссылку на существующую."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Ваш общий баланс",
+      "description": "Ваш суммарный баланс по всем группам.",
+      "owedToYou": "Вам должны",
+      "youOwe": "Вы должны",
+      "settledUp": "Во всех ваших группах всё рассчитано."
     },
     "recent": "Недавние группы",
     "starred": "Избранные",
@@ -83,7 +103,7 @@
       "title": "Добавить группу по URL",
       "description": "Если с вами поделились ссылкой на группу, вставьте ее сюда, чтобы добавить ее в ваш список.",
       "error": "К сожалению, мы не смогли найти группу по этому URL.",
-      "urlMode": "Enter URL",
+      "urlMode": "Введите URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Этой группы не существует.",
       "link": "Перейти к списку недавних групп"
-    }
+    },
+    "moreOptions": "Больше возможностей",
+    "participants": "участники",
+    "star": "Звездная группа",
+    "unstar": "Снять пометку с группы"
   },
   "GroupForm": {
     "title": "Сведения о группе",
@@ -129,7 +153,10 @@
       "add": "Добавить участника",
       "John": "Александр",
       "Jane": "Михаил",
-      "Jack": "Иван"
+      "Jack": "Иван",
+      "cannotRemove": "Этот участник является частью расходов и не может быть удален.",
+      "indexLabel": "Участник №{{index}}",
+      "remove": "Удалить участника {{index}}"
     },
     "Settings": {
       "title": "Локальные настройки",
@@ -145,7 +172,8 @@
       "create": "Создать",
       "creating": "Создание…",
       "cancel": "Отмена"
-    }
+    },
+    "saveError": "Не удалось сохранить группу."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Чтобы задать другую валюту для расхода и конвертировать суммы, выберите непользовательскую валюту для группы.",
     "originalAmountField": {
       "label": "Сумма к конвертации",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Сумма к переводу",
+      "repaymentDescription": "Пересчитано из указанной выше суммы, которая и погашает долг."
     },
     "conversionRateField": {
       "useApi": "Использовать курсы обмена из Frankfurter",
@@ -274,7 +302,15 @@
     "saving": "Сохранение…",
     "cancel": "Отмена",
     "reimbursement": "Возмещение",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Распределить позиции чека",
+    "conflict": "Этот расход был изменен кем-то другим. Перезагрузите страницу и повторите попытку.",
+    "conflictTitle": "Расход изменился в другом месте",
+    "deleteError": "Не удалось удалить расход.",
+    "pendingReceiptTotal": "Квитанция, отсканированная в автономном режиме, готова.",
+    "pendingReceiptTotalApply": "Использовать отсканированное общее количество",
+    "pendingReceiptTotalDismiss": "Уволить",
+    "saveError": "Не удалось сэкономить."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "При загрузке документа что-то пошло не так. Пожалуйста, повторите позднее или попробуйте загрузить другой файл.",
       "retry": "Повторить"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "В очереди. Квитанция будет отсканирована после повторного подключения.",
+    "offline": "Сканирование возобновляется, когда вы находитесь в сети.",
+    "scanFailed": "ИИ не смог прочитать эту квитанцию. Проверьте конфигурацию AI сервера и повторите попытку.",
+    "scanning": "Сканирование…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Позиции чека",
+    "backToExpense": "Вернуться к расходам",
+    "merchant": "Название магазина",
+    "printedTotal": "Итого, напечатанное в чеке",
+    "noReceipt": "К этому расходу пока не привязана квитанция.",
+    "empty": "Товаров пока нет. Добавьте один, чтобы начать разделение.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Не удалось сохранить изменения.",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Добавить элемент",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Добавить элемент",
+      "nameLabel": "Имя",
+      "quantityLabel": "Количество",
+      "amountLabel": "Сумма",
+      "sharedLabel": "Общий (оплата всего счета)",
+      "add": "Добавить",
+      "cancel": "Отмена"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} из {total}",
+      "remaining": "Осталось: {quantity}",
+      "assign": "Выделить",
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "removePortion": "Удалить выделенную долю",
+      "editTitle": "Редактировать элемент",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Сохранить",
+      "cancel": "Отмена",
+      "deleteConfirm": "Удалить этот элемент?",
+      "deleteDescription": "При этом элемент и его назначения будут удалены."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Неназначенный",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Общий",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Назначить элемент",
+      "description": "Выберите, кто платит за «{name}».",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Разделить поровну",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Пользовательское разделение",
+      "customHint": "Введите количества в единицах для каждой цели.",
+      "shared": "Общий",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Назначенное количество превышает количество позиции.",
+      "confirm": "Выделить",
+      "cancel": "Отмена"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Общий",
+      "unassigned": "Неназначенный",
+      "optOut": "Делит нераспределённые позиции",
+      "reconciles": "Совпадает",
+      "offBy": "Расхождение: {amount}",
+      "itemsTotal": "Всего позиций чека",
+      "apply": "Применить к расходу",
+      "allOptedOut": "Все отказались от участия, но некоторые элементы все еще не назначены.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Значения квитанций отличаются · Подать заявку еще раз"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Расход обновлен",
+      "description": "Приходные статьи были отнесены к расходам."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Не удалось применить квитанцию"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Обновить расходы?",
+      "description": "Сумма расходов отличается от суммы приходных статей. При применении будет перезаписана сумма расходов и ее разделение.",
+      "total": "всего {current} → {new}",
+      "cancel": "Отмена",
+      "confirm": "Применить"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Сканирование поставлено в очередь",
+    "scanPendingDescription": "Изображение сохраняется на этом устройстве и будет отсканировано, когда вы вернетесь в Интернет.",
+    "offlineQueue": "Вы не в сети. Прикрепите фотографию сейчас, и она будет отсканирована после повторного подключения.",
+    "disabled": "Смарт-разделение не включено на этом сервере. Сканирование квитанций доступно только в режиме онлайн.",
+    "extracted": "Квитанция отсканирована",
+    "extractedDescription": "Назначьте извлеченные элементы ниже.",
+    "loading": "Загрузка квитанции…",
+    "optOutTitle": "Отказ от участия",
+    "scanError": "Квитанцию невозможно отсканировать.",
+    "scanUnavailable": "Проверьте конфигурацию AI сервера и повторите попытку.",
+    "scanning": "Сканирование квитанции…",
+    "upload": "Загрузите фото чека"
   },
   "Balances": {
     "title": "Балансы",
@@ -415,20 +462,22 @@
       "description": "Вот список задолженностей между участниками.",
       "noImbursements": "Похоже, все в расчете 😁",
       "owes": "<strong>{from}</strong> должен <strong>{to}</strong>",
-      "markAsPaid": "Пометить оплаченным"
-    }
+      "markAsPaid": "Пометить оплаченным",
+      "owesPlain": "{{from}} должен {{to}}"
+    },
+    "loading": "Загрузка балансов…"
   },
   "Stats": {
     "title": "Статистика",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Период",
+      "all": "За всё время",
+      "thisMonth": "Этот месяц",
+      "last30": "Последние 30 дней",
+      "thisYear": "Этот год",
+      "custom": "Произвольный период",
+      "from": "С",
+      "to": "По"
     },
     "Totals": {
       "title": "Итоговые суммы",
@@ -440,50 +489,53 @@
       "yourShare": "Ваша суммарная доля"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Сводка",
+      "description": "Ключевые показатели за выбранный период.",
+      "empty": "Расходов пока нет.",
+      "expenseCount": "Расходы",
+      "averageExpense": "Средний расход",
+      "largestExpense": "Самый крупный расход",
+      "activeSpan": "Активный период"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "title": "Расходы по времени",
+      "description": "Общие расходы группы по месяцам. Выберите месяц, чтобы увидеть его расходы.",
+      "empty": "Расходов пока нет.",
+      "showExpenses": "Показать расходы за {month}",
+      "detailsDescription": "Расходы за этот месяц в выбранном периоде.",
+      "detailsEmpty": "В этом месяце нет расходов.",
+      "showExpensesPlain": "Показать расходы для {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "Расходы по участникам",
+      "description": "Сколько заплатил каждый участник и его доля в расходах.",
+      "empty": "Расходов пока нет.",
+      "participant": "Участник",
+      "paid": "Оплачено",
+      "count": "Количество",
+      "share": "Доля"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "title": "Расходы по категориям",
+      "description": "Общая сумма расходов по каждой категории. Выберите категорию, чтобы увидеть её расходы.",
+      "empty": "Расходов пока нет.",
+      "showExpenses": "Показать расходы категории «{category}»",
+      "detailsDescription": "Расходы в этой категории за выбранный период.",
+      "detailsEmpty": "В этой категории нет расходов.",
+      "showExpensesPlain": "Показать расходы для {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Регулярные расходы",
+      "description": "Ориентировочная стоимость активных регулярных расходов группы.",
+      "estimatedMonthly": "Ориентировочные месячные расходы",
+      "estimatedYearly": "{amount} в год",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# ежедневный расход} few {# ежедневных расхода} many {# ежедневных расходов} other {# ежедневных расхода}}",
+        "WEEKLY": "{count, plural, one {# еженедельный расход} few {# еженедельных расхода} many {# еженедельных расходов} other {# еженедельных расхода}}",
+        "MONTHLY": "{count, plural, one {# ежемесячный расход} few {# ежемесячных расхода} many {# ежемесячных расходов} other {# ежемесячных расхода}}"
       }
-    }
+    },
+    "loading": "Загрузка статистики…"
   },
   "Activity": {
     "title": "Активность",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Ранее в этом году",
       "lastYear": "В прошлом году",
       "older": "Очень давно"
-    }
+    },
+    "loadMore": "Загрузить больше",
+    "loading": "Загрузка активности…",
+    "unknown": "Неизвестная активность"
   },
   "Information": {
     "title": "Информация",
@@ -512,20 +567,25 @@
     "empty": "Информации нет."
   },
   "Settings": {
-    "title": "Настройки"
+    "title": "Настройки",
+    "saved": "Группа обновлена",
+    "savedDescription": "Ваши изменения сохранены."
   },
   "Share": {
     "title": "Поделиться",
     "description": "Чтобы другие участники получили доступ к этой группе и смогли добавлять расходы, отправьте им этот URL.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Копировать ссылку",
+    "shareLink": "Поделиться ссылкой",
     "warning": "Внимание!",
     "warningHelp": "Любой человек с доступом к этой ссылке сможет просматривать и редактировать расходы. Будьте осторожны!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Доля",
+    "copy": "Копировать ссылку",
+    "url": "Ссылка на группу"
   },
   "SchemaErrors": {
     "min1": "Введите как минимум один символ.",
@@ -543,7 +603,10 @@
     "paidForMin1": "За этот расход должен заплатить как минимум один участник.",
     "noZeroShares": "Все доли должны быть больше 0.",
     "amountSum": "Сумма расхода должна быть равна сумме значений, распределенных между участниками.",
-    "percentageSum": "Сумма процентов должна быть равна 100."
+    "percentageSum": "Сумма процентов должна быть равна 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Поиск категорий...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Доступно обновление",
+    "updateDescription": "Доступна новая версия pysplit.",
+    "reload": "Обновить",
+    "updating": "Обновление…",
+    "offlineReady": "Готов работать офлайн",
+    "offlineReadyDescription": "Оболочка приложения кэшируется. Откройте группу один раз, находясь в сети, чтобы сохранить ее данные.",
+    "dismiss": "Закрыть",
+    "install": "Установить приложение",
+    "refreshApp": "Обновить приложение",
+    "refreshAppHint": "Очистите кэшированные файлы и перезагрузите последнюю версию. Ваши сохраненные данные останутся на этом устройстве."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Панель администрирования",
+    "description": "Управляйте ролями пользователей, разрешениями на доступ к платформе и отслеживайте системные показатели.",
+    "totalGroups": "Всего групп",
+    "totalExpenses": "Общие расходы",
+    "registeredUsers": "Зарегистрированные пользователи",
+    "userManagement": "Управление пользователями и уровни разрешений",
+    "accessDenied": "Доступ запрещен",
+    "accessDeniedDescription": "Панель администрирования доступна только пользователям уровня администратора.",
+    "delete": "Удалить",
+    "deleteError": "Не удалось удалить",
+    "email": "электронная почта",
+    "expenses": "расходы",
+    "groupDeleted": "Группа удалена",
+    "groupManagement": "Группы",
+    "groupManagementDescription": "Удалите группы и проверьте использование.",
+    "groups": "группы",
+    "loadMoreGroups": "Загрузить больше групп",
+    "loadMoreUsers": "Загрузить больше пользователей",
+    "loading": "Загрузка панели управления…",
+    "loadingMore": "Загрузка…",
+    "participants": "участники",
+    "preauthorize": "Предварительная авторизация пользователя",
+    "preauthorizeAction": "Предварительная авторизация",
+    "preauthorizeError": "Не удалось предварительно авторизовать пользователя",
+    "preauthorized": "Пользователь предварительно авторизован",
+    "returnToGroups": "Вернуться в мои группы",
+    "searchGroups": "Поисковые группы",
+    "searchUsers": "Поиск пользователей",
+    "signInDescription": "Для панели администрирования требуется учетная запись администратора.",
+    "signInTitle": "Требуется вход",
+    "tier": "Уровень",
+    "tierError": "Не удалось обновить уровень",
+    "tierFor": "Уровень для",
+    "tierUpdated": "Уровень обновлен",
+    "userDeleted": "Пользователь удален",
+    "userTier": "Уровни"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Автономное хранилище",
+    "loading": "Проверка этого устройства…",
+    "unsupported": "Этот браузер не может сообщать о состоянии хранилища.",
+    "usage": "{{used}} из {{quota}} использовано",
+    "unknown": "неизвестно",
+    "persisted": "На этом устройстве хранилище постоянное.",
+    "notPersisted": "Браузер может удалить автономные данные, если на устройстве недостаточно места.",
+    "keep": "Хранить данные на этом устройстве",
+    "refresh": "Обновить",
+    "critical": "Хранилище почти заполнено. Экспортируйте резервную копию сейчас, а затем удалите неиспользуемые группы.",
+    "warning": "Хранилище заполняется. Рекомендуется создать резервную копию."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Ожидает синхронизации",
+    "expense": "Ожидает синхронизации"
+  },
+  "Attachments": {
+    "assignItems": "Распределить позиции чека",
+    "extractedItems": "предметы, извлеченные ИИ",
+    "help": "Изображения сжимаются перед загрузкой. PDF-файлы сохраняются в виде вложений и открываются в новой вкладке.",
+    "open": "Открыть",
+    "openInNewTab": "Открыть в новой вкладке",
+    "pdfPreviewUnavailable": "Превью PDF открываются в отдельной вкладке.",
+    "pending": "Ожидает загрузки",
+    "preview": "Предварительный просмотр",
+    "previewAction": "Предварительный просмотр",
+    "previewNamed": "Предварительный просмотр {{name}}",
+    "receipt": "Квитанция магазина",
+    "saveToAssignItems": "Сохраните расход, чтобы распределить эти позиции между участниками.",
+    "scanComplete": "Квитанция отсканирована",
+    "scanCompleteDescription": "Раздайте извлеченные элементы участникам.",
+    "scanError": "Квитанцию невозможно отсканировать",
+    "scanWithAi": "Сканирование с помощью ИИ",
+    "scanning": "Сканирование…",
+    "view": "Просмотр вложений",
+    "attachment": "Вложение",
+    "onlyImagesPdf": "Поддерживаются только изображения и файлы PDF."
+  },
+  "Backup": {
+    "downloaded": "Бэкап скачан.",
+    "export": "Экспортировать резервную копию",
+    "failed": "Резервное копирование не удалось.",
+    "restore": "Восстановить резервную копию",
+    "restoreFailed": "Восстановление не удалось.",
+    "restoreLabel": "Восстановить файл резервной копии",
+    "restored": "Резервная копия восстановлена. Перезагрузка…"
+  },
+  "Common": {
+    "addGroup": "Добавить группу",
+    "close": "Close",
+    "closeDialog": "Закрыть диалог",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Закрыть уведомление",
+    "error": "Что-то пошло не так",
+    "expenseNotFound": "Расход не найден",
+    "loading": "Загрузка…",
+    "menu": "Меню",
+    "retry": "Повторить",
+    "select": "Выберите…",
+    "unknown": "неизвестно",
+    "user": "Пользователь"
+  },
+  "CreateGroup": {
+    "approvalContact": "Для создания новых групп расходов требуется авторизация администратора. Обратитесь к администратору своего экземпляра, чтобы повысить уровень вашей учетной записи до уровня «Создатель группы».",
+    "approvalDescription": "Ваша учетная запись в настоящее время находится на уровне пользователя синхронизации. Вы можете участвовать в любых группах, которыми вам поделились, и синхронизировать их на всех своих устройствах.",
+    "approvalTitle": "Создание группы требует одобрения",
+    "authRequiredDescription": "Чтобы создать новые группы расходов, войдите под внешним аккаунтом. Приглашенные участники группы по-прежнему смогут беспрепятственно присоединиться по ссылке вашей группы без входа в систему.",
+    "authRequiredTitle": "Требуется аутентификация",
+    "returnToGroups": "Вернуться в мои группы",
+    "signIn": "Войдите, чтобы создать группу"
+  },
+  "GroupTabs": {
+    "Expenses": "Расходы",
+    "Balances": "Балансы",
+    "Information": "Информация",
+    "Stats": "Статистика",
+    "Activity": "Активность",
+    "Settings": "Настройки",
+    "label": "Разделы группы"
+  },
+  "Login": {
+    "title": "Войдите в Сплит",
+    "description": "Войдите под внешней учетной записью, чтобы включить групповую синхронизацию между устройствами.",
+    "google": "Продолжить с Google",
+    "github": "Продолжить с GitHub",
+    "noProviders": "Поставщики OAuth не настроены. Установите AUTH_GOOGLE_ID/AUTH_GOOGLE_SECRET, чтобы включить вход."
+  },
+  "NotFound": {
+    "title": "Страница не найдена",
+    "description": "Проверьте URL-адрес и повторите попытку.",
+    "groupTitle": "Этой группы не существует.",
+    "groupDescription": "Проверьте URL-адрес или запросите новую ссылку для приглашения."
+  },
+  "SyncStatus": {
+    "offlinePending": "Не в сети — ожидаются изменения: {{count}}",
+    "offlineSaved": "Оффлайн — показ сохраненных данных",
+    "syncing": "Синхронизация…",
+    "error": "Ошибка синхронизации: {{error}}",
+    "retryToContinue": "повторите попытку, чтобы продолжить",
+    "conflicts": "Конфликты, требующие рассмотрения: {{count}}",
+    "failed": "Изменения, которые не удалось синхронизировать: {{count}}",
+    "pending": "Ожидаемые изменения: {{count}}",
+    "retryFailed": "Повторить неудачные изменения",
+    "discardFailed": "Отменить неудачные изменения",
+    "resolveConflicts": "Разрешение конфликтов",
+    "syncNow": "Синхронизировать сейчас",
+    "dialogTitle": "Разрешение конфликтов",
+    "dialogDescription": "Эти правки изменили те же записи на другом устройстве. Выберите, что оставить.",
+    "noConflicts": "Никаких конфликтов, требующих разрешения.",
+    "serverVersion": "Версия сервера {{version}} · локальное редактирование сохраняется в очереди конфликтов.",
+    "keepMine": "Оставить мою версию",
+    "useServer": "Использовать сервер",
+    "duplicate": "Дублировать как новый"
+  },
+  "Theme": {
+    "toggle": "Переключить тему",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Система"
   }
 }

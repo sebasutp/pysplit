@@ -6,11 +6,13 @@
 
 import { useEffect, useId } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 /**
  * @param {{open: boolean, onOpenChange?: (open: boolean) => void, children: React.ReactNode}} props
  */
 export function Dialog({ open, onOpenChange, children }) {
+  const { t } = useTranslation()
   useEffect(() => {
     if (!open) return undefined
     /** @param {KeyboardEvent} event */
@@ -27,7 +29,7 @@ export function Dialog({ open, onOpenChange, children }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
-        aria-label="Close dialog"
+        aria-label={t('Common.closeDialog', 'Close dialog')}
         className="absolute inset-0 bg-black/50"
         onClick={() => onOpenChange?.(false)}
       />

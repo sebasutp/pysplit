@@ -15,6 +15,7 @@ import { useToast } from '../../hooks/useToast'
 import { repository } from '../../services/repository'
 import { prepareUpload } from '../../utils/attachments'
 import { formatCurrency, getCurrencyFromGroup, majorUnits, parseAmount } from '../../utils/currency'
+import { getItemDestinations } from '../../utils/domain/receipt-split'
 import { Button } from '../../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../components/ui/Dialog'
@@ -22,25 +23,61 @@ import { FormField } from '../../components/ui/Form'
 import { Input } from '../../components/ui/Input'
 
 /**
+ * Convert a user-entered quantity in units to integer thousandths.
+ *
+ * @param {string|number|null|undefined} value
+ * @returns {number}
+ */
+function unitsToMilli(value) {
+  const number = Number(String(value ?? '').replace(',', '.'))
+  if (!Number.isFinite(number) || number <= 0) return 0
+  return Math.round(number * 1000)
+}
+
+/**
+ * Format integer thousandths as a plain unit string without float artifacts.
+ *
+ * @param {number} milli
+ * @returns {string}
+ */
+function formatUnits(milli) {
+  return String(milli / 1000)
+}
+
+/**
+ * Build the editable dialog state, prefilled from the item's stored portions.
+ *
  * @param {any} item
  * @param {{id: string, name: string}[]} participants
+ * @returns {{item: any, quantities: Record<string, string>, shared: string}}
  */
-function assignmentOf(item, participants) {
-  const portions = item.portions || []
-  if (!portions.length) return { key: 'unassigned', label: 'Unassigned' }
-  if (portions.some((/** @type {any} */ portion) => portion.target === 'SHARED')) {
-    return { key: 'shared', label: 'Shared' }
+function initialAssignDialog(item, participants) {
+  /** @type {Record<string, string>} */
+  const quantities = {}
+  /** @type {Record<string, number>} */
+  const totals = {}
+  for (const participant of participants) quantities[participant.id] = ''
+  let sharedMilli = 0
+  for (const portion of item.portions || []) {
+    const milli = Number(portion.quantity_milli) || 0
+    if (milli <= 0) continue
+    if (portion.target === 'PARTICIPANT') {
+      if (portion.participant_id && portion.participant_id in quantities) {
+        totals[portion.participant_id] = (totals[portion.participant_id] || 0) + milli
+      }
+    } else {
+      sharedMilli += milli
+    }
   }
-  const ids = portions
-    .filter((/** @type {any} */ portion) => portion.target === 'PARTICIPANT')
-    .map((/** @type {any} */ portion) => portion.participant_id)
-  const names = ids
-    .map(
-      (/** @type {string} */ id) =>
-        participants.find((participant) => participant.id === id)?.name || id,
-    )
-    .join(', ')
-  return { key: ids[0] || 'unassigned', label: names || 'Unassigned' }
+  for (const [participantId, milli] of Object.entries(totals)) {
+    if (milli > 0) quantities[participantId] = formatUnits(milli)
+  }
+  let shared = sharedMilli > 0 ? formatUnits(sharedMilli) : ''
+  // The whole-item flag only applies before any portions exist.
+  if ((item.portions || []).length === 0 && item.is_shared) {
+    shared = formatUnits(item.quantity_milli)
+  }
+  return { item, quantities, shared }
 }
 
 export function ReceiptItemsPage() {
@@ -71,7 +108,7 @@ export function ReceiptItemsPage() {
     ),
   )
   const [assignDialog, setAssignDialog] = useState(
-    /** @type {null|{item: any, selected: string[]}} */ (null),
+    /** @type {null|{item: any, quantities: Record<string, string>, shared: string}} */ (null),
   )
   const [deleteItem, setDeleteItem] = useState(/** @type {any|null} */ (null))
 
@@ -129,17 +166,52 @@ export function ReceiptItemsPage() {
     [],
   )
 
-  const grouped = useMemo(() => {
-    const sections = new Map()
+  const sections = useMemo(() => {
+    const participantIds = participants.map((/** @type {any} */ participant) => participant.id)
+    /**
+     * @type {{key: string, label: string, entries: {item: any, destination: any, showActions: boolean}[]}[]}
+     */
+    const ordered = [
+      {
+        key: 'unassigned',
+        label: t('ReceiptItems.sections.unassigned', 'Unassigned'),
+        entries: [],
+      },
+      {
+        key: 'shared',
+        label: t('ReceiptItems.sections.shared', 'Shared'),
+        entries: [],
+      },
+      ...participants.map((/** @type {any} */ participant) => ({
+        key: `participant:${participant.id}`,
+        label: participant.name,
+        entries: /** @type {{item: any, destination: any, showActions: boolean}[]} */ ([]),
+      })),
+    ]
+    const byKey = new Map(ordered.map((section) => [section.key, section]))
     for (const item of state?.items || []) {
-      const assignment = assignmentOf(item, participants)
-      if (!sections.has(assignment.key)) {
-        sections.set(assignment.key, { key: assignment.key, label: assignment.label, items: [] })
+      for (const destination of getItemDestinations(item, participantIds)) {
+        const key =
+          destination.target === 'PARTICIPANT'
+            ? `participant:${destination.participantId}`
+            : destination.target.toLowerCase()
+        const section = byKey.get(key)
+        if (!section) continue
+        section.entries.push({ item, destination, showActions: false })
       }
-      sections.get(assignment.key).items.push(item)
     }
-    return [...sections.values()]
-  }, [state, participants])
+    // Whole-item actions appear once, on the first destination in section order.
+    const seen = new Set()
+    for (const section of ordered) {
+      for (const entry of section.entries) {
+        if (!seen.has(entry.item.id)) {
+          seen.add(entry.item.id)
+          entry.showActions = true
+        }
+      }
+    }
+    return ordered.filter((section) => section.entries.length)
+  }, [state, participants, t])
 
   /** @param {React.ChangeEvent<HTMLInputElement>} event */
   async function handleUpload(event) {
@@ -237,7 +309,7 @@ export function ReceiptItemsPage() {
     const payload = {
       name: itemDialog.name.trim(),
       quantity_milli: Math.max(1, Math.round(Number(itemDialog.quantity || 1) * 1000)),
-      amount: parseAmount(itemDialog.amount),
+      amount: parseAmount(itemDialog.amount, currency.code, locale),
       is_shared: itemDialog.shared,
     }
     try {
@@ -262,28 +334,24 @@ export function ReceiptItemsPage() {
 
   async function assignItem() {
     if (!assignDialog || !state?.attachment) return
-    const { item, selected } = assignDialog
-    try {
-      let portions
-      if (selected.includes('__shared__')) {
-        portions = [{ target: 'SHARED', participant_id: null, quantity_milli: item.quantity_milli }]
-      } else if (selected.length === 1) {
-        portions = [
-          {
-            target: 'PARTICIPANT',
-            participant_id: selected[0],
-            quantity_milli: item.quantity_milli,
-          },
-        ]
-      } else {
-        const base = Math.floor(item.quantity_milli / selected.length)
-        const remainder = item.quantity_milli - base * selected.length
-        portions = selected.map((participantId, index) => ({
+    const { item, quantities, shared } = assignDialog
+    const portions = []
+    for (const participant of participants) {
+      const quantityMilli = unitsToMilli(quantities[participant.id] ?? '')
+      if (quantityMilli > 0) {
+        portions.push({
           target: 'PARTICIPANT',
-          participant_id: participantId,
-          quantity_milli: base + (index === 0 ? remainder : 0),
-        }))
+          participant_id: participant.id,
+          quantity_milli: quantityMilli,
+        })
       }
+    }
+    const sharedMilli = unitsToMilli(shared)
+    if (sharedMilli > 0) {
+      portions.push({ target: 'SHARED', participant_id: null, quantity_milli: sharedMilli })
+    }
+    if (!portions.length) return
+    try {
       const next = await repository.attachments.setPortions(
         group.id,
         state.attachment.id,
@@ -298,6 +366,56 @@ export function ReceiptItemsPage() {
         description: caught instanceof Error ? caught.message : undefined,
       })
     }
+  }
+
+  async function clearItemPortions() {
+    if (!assignDialog || !state?.attachment) return
+    try {
+      const next = await repository.attachments.setPortions(
+        group.id,
+        state.attachment.id,
+        assignDialog.item.id,
+        [],
+      )
+      setState(next)
+      setAssignDialog(null)
+    } catch (caught) {
+      toast({
+        title: t('ReceiptItems.saveError.title', 'Couldn’t save your change'),
+        description: caught instanceof Error ? caught.message : undefined,
+      })
+    }
+  }
+
+  /** @param {string} participantId @param {string} value */
+  function setAssignQuantity(participantId, value) {
+    setAssignDialog((/** @type {any} */ current) =>
+      current
+        ? { ...current, quantities: { ...current.quantities, [participantId]: value } }
+        : current,
+    )
+  }
+
+  function splitEvenly() {
+    setAssignDialog((/** @type {any} */ current) => {
+      if (!current) return current
+      const total = Number(current.item.quantity_milli) || 0
+      const active = participants.filter(
+        (/** @type {any} */ participant) =>
+          unitsToMilli(current.quantities[participant.id] ?? '') > 0,
+      )
+      const targets = active.length ? active : participants
+      if (!targets.length) return current
+      const base = Math.floor(total / targets.length)
+      const remainder = total - base * targets.length
+      /** @type {Record<string, string>} */
+      const quantities = {}
+      for (const participant of participants) quantities[participant.id] = ''
+      targets.forEach((/** @type {any} */ participant, /** @type {number} */ index) => {
+        quantities[participant.id] = formatUnits(base + (index < remainder ? 1 : 0))
+      })
+      return { ...current, quantities, shared: '' }
+    })
   }
 
   async function removeItem() {
@@ -377,7 +495,7 @@ export function ReceiptItemsPage() {
 
   if (loading) return <LoadingState label={t('ReceiptItems.loading', 'Loading receipt…')} />
   if (error) return <ErrorState detail={error.detail || error.message} onRetry={() => void reload()} />
-  if (!expense) return <ErrorState title="Expense not found" />
+  if (!expense) return <ErrorState title={t('Common.expenseNotFound', 'Expense not found')} />
 
   if (!features.receipt_ai) {
     return (
@@ -445,6 +563,13 @@ export function ReceiptItemsPage() {
   const split = state.split
   const diverged = expense.amount !== (split?.items_total ?? expense.amount)
   const receipt = state.attachment
+  const assignedMilli = assignDialog
+    ? Object.values(assignDialog.quantities).reduce(
+        (/** @type {number} */ sum, /** @type {string} */ value) => sum + unitsToMilli(value),
+        0,
+      ) + unitsToMilli(assignDialog.shared)
+    : 0
+  const exceeds = assignDialog ? assignedMilli > assignDialog.item.quantity_milli : false
 
   return (
     <section className="flex flex-col gap-4">
@@ -504,7 +629,7 @@ export function ReceiptItemsPage() {
 
       {state.items?.length ? (
         <div className="flex flex-col gap-4">
-          {grouped.map((section) => (
+          {sections.map((section) => (
             <Card key={section.key}>
               <CardHeader>
                 <CardTitle className="text-base">
@@ -513,59 +638,82 @@ export function ReceiptItemsPage() {
               </CardHeader>
               <CardContent>
                 <ul className="flex flex-col divide-y divide-border">
-                  {section.items.map((/** @type {any} */ item) => (
-                    <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                  {section.entries.map((/** @type {{item: any, destination: any, showActions: boolean}} */ entry) => {
+                    const { item, destination, showActions } = entry
+                    const quantityContext =
+                      destination.target === 'UNASSIGNED'
+                        ? `${section.label}, ${formatUnits(destination.quantityMilli)} left`
+                        : `${section.label}, ${formatUnits(destination.quantityMilli)} of ${formatUnits(item.quantity_milli)}`
+                    const itemNumber = Number(item.position)
+                    const itemSuffix = Number.isFinite(itemNumber)
+                      ? ` (item ${itemNumber + 1})`
+                      : ''
+                    return (
+                    <li
+                      key={`${item.id}:${section.key}`}
+                      className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm"
+                    >
                       <div>
                         <p className="font-medium">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {t('ReceiptItems.item.quantity', '{{assigned}} of {{total}}', {
-                            assigned: (item.portions || []).reduce(
-                              (/** @type {number} */ sum, /** @type {any} */ portion) =>
-                                sum + (portion.quantity_milli || 0),
-                              0,
-                            ) / 1000,
-                            total: item.quantity_milli / 1000,
-                          })}
+                          {destination.target === 'UNASSIGNED'
+                            ? t('ReceiptItems.item.remaining', '{{quantity}} left', {
+                                quantity: formatUnits(destination.quantityMilli),
+                              })
+                            : t('ReceiptItems.item.quantity', '{{assigned}} of {{total}}', {
+                                assigned: formatUnits(destination.quantityMilli),
+                                total: formatUnits(item.quantity_milli),
+                              })}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold tabular-nums">
-                          {formatCurrency(currency, item.amount, locale)}
+                          {formatCurrency(currency, destination.amount, locale)}
                         </span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setAssignDialog({ item, selected: [] })}
-                        >
-                          {t('ReceiptItems.item.assign', 'Assign')}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            setItemDialog({
-                              mode: 'edit',
-                              item,
-                              name: item.name,
-                              quantity: String(item.quantity_milli / 1000),
-                              amount: majorUnits(item.amount),
-                              shared: item.is_shared,
-                            })
-                          }
-                        >
-                          {t('ReceiptItems.item.edit', 'Edit')}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive"
-                          onClick={() => setDeleteItem(item)}
-                        >
-                          {t('ReceiptItems.item.delete', 'Delete')}
-                        </Button>
+                        {showActions ? (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={`${t('ReceiptItems.item.assign', 'Assign')} ${item.name} for ${quantityContext}${itemSuffix}`}
+                              onClick={() =>
+                                setAssignDialog(initialAssignDialog(item, participants))
+                              }
+                            >
+                              {t('ReceiptItems.item.assign', 'Assign')}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              aria-label={`${t('ReceiptItems.item.edit', 'Edit')} ${item.name} for ${quantityContext}${itemSuffix}`}
+                              onClick={() =>
+                                setItemDialog({
+                                  mode: 'edit',
+                                  item,
+                                  name: item.name,
+                                  quantity: String(item.quantity_milli / 1000),
+                                  amount: majorUnits(item.amount, currency.code),
+                                  shared: item.is_shared,
+                                })
+                              }
+                            >
+                              {t('ReceiptItems.item.edit', 'Edit')}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive"
+                              aria-label={`${t('ReceiptItems.item.delete', 'Delete')} ${item.name} for ${quantityContext}${itemSuffix}`}
+                              onClick={() => setDeleteItem(item)}
+                            >
+                              {t('ReceiptItems.item.delete', 'Delete')}
+                            </Button>
+                          </>
+                        ) : null}
                       </div>
                     </li>
-                  ))}
+                    )
+                  })}
                 </ul>
               </CardContent>
             </Card>
@@ -692,43 +840,83 @@ export function ReceiptItemsPage() {
             </DialogDescription>
           </DialogHeader>
           {assignDialog ? (
-            <div className="mt-3 flex flex-col gap-2">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={assignDialog.selected.includes('__shared__')}
-                  onChange={(event) =>
-                    setAssignDialog({
-                      ...assignDialog,
-                      selected: event.target.checked ? ['__shared__'] : [],
-                    })
-                  }
-                />
-                {t('ReceiptItems.assign.everyone', 'Everyone (shared)')}
-              </label>
+            <div className="mt-3 flex flex-col gap-3">
+              <p className="text-sm font-medium">
+                {t('ReceiptItems.assign.custom', 'Custom split')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'ReceiptItems.assign.customHint',
+                  'Enter quantities in units for each target.',
+                )}
+              </p>
               {participants.map((/** @type {any} */ participant) => (
-                <label key={participant.id} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    disabled={assignDialog.selected.includes('__shared__')}
-                    checked={assignDialog.selected.includes(participant.id)}
-                    onChange={(event) =>
-                      setAssignDialog({
-                        ...assignDialog,
-                        selected: event.target.checked
-                          ? [...assignDialog.selected.filter((id) => id !== '__shared__'), participant.id]
-                          : assignDialog.selected.filter((id) => id !== participant.id),
-                      })
-                    }
+                <label
+                  key={participant.id}
+                  className="flex items-center justify-between gap-3 text-sm"
+                >
+                  <span>{participant.name}</span>
+                  <Input
+                    aria-label={participant.name}
+                    className="w-24"
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step="any"
+                    value={assignDialog.quantities[participant.id] ?? ''}
+                    onChange={(event) => setAssignQuantity(participant.id, event.target.value)}
                   />
-                  {participant.name}
                 </label>
               ))}
-              <div className="flex justify-end gap-2">
+              <label className="flex items-center justify-between gap-3 text-sm">
+                <span>{t('ReceiptItems.assign.shared', 'Shared')}</span>
+                <Input
+                  aria-label={t('ReceiptItems.assign.shared', 'Shared')}
+                  className="w-24"
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step="any"
+                  value={assignDialog.shared}
+                  onChange={(event) =>
+                    setAssignDialog({ ...assignDialog, shared: event.target.value })
+                  }
+                />
+              </label>
+              <p className="text-sm" data-testid="assign-summary">
+                {t('ReceiptItems.item.quantity', '{{assigned}} of {{total}}', {
+                  assigned: formatUnits(assignedMilli),
+                  total: formatUnits(assignDialog.item.quantity_milli),
+                })}
+              </p>
+              {exceeds ? (
+                <p role="alert" className="text-sm text-destructive">
+                  {t(
+                    'ReceiptItems.assign.exceeds',
+                    'The assigned quantity exceeds the item quantity.',
+                  )}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap justify-end gap-2">
+                {assignDialog.item.portions?.length || assignDialog.item.is_shared ? (
+                  <Button
+                    variant="ghost"
+                    className="text-destructive"
+                    onClick={() => void clearItemPortions()}
+                  >
+                    {t('ReceiptItems.item.removePortion', 'Remove portion')}
+                  </Button>
+                ) : null}
+                <Button variant="outline" onClick={splitEvenly}>
+                  {t('ReceiptItems.assign.even', 'Split evenly')}
+                </Button>
                 <Button variant="ghost" onClick={() => setAssignDialog(null)}>
                   {t('ReceiptItems.assign.cancel', 'Cancel')}
                 </Button>
-                <Button onClick={() => void assignItem()} disabled={!assignDialog.selected.length}>
+                <Button
+                  onClick={() => void assignItem()}
+                  disabled={assignedMilli <= 0 || exceeds}
+                >
                   {t('ReceiptItems.assign.confirm', 'Assign')}
                 </Button>
               </div>
@@ -791,3 +979,4 @@ export function ReceiptItemsPage() {
     </section>
   )
 }
+

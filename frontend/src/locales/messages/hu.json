@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Csoportok"
+    "groups": "Csoportok",
+    "adminDashboard": "Rendszergazdai irányítópult",
+    "language": "Nyelv",
+    "signIn": "Jelentkezzen be",
+    "signOut": "Jelentkezzen ki",
+    "userMenu": "Felhasználói menü"
   },
   "Footer": {
     "madeIn": "Készült Zürichben, Svájcban 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Múlt hónapban",
       "earlierThisYear": "Korábban az évben",
       "lastYear": "Tavaly",
-      "older": "Régebben"
-    }
+      "older": "Régebben",
+      "today": "Ma",
+      "week": "Korábban a héten",
+      "month": "Korábban a hónapban",
+      "year": "Korábban az évben"
+    },
+    "clearSearch": "Világos",
+    "exportError": "Nem sikerült exportálni a költségeket",
+    "filterFrom": "-tól",
+    "filterTo": "Eddig",
+    "loadMore": "Töltsön be többet",
+    "loading": "Költségek betöltése…",
+    "loadingMore": "Betöltés…",
+    "search": "Költségek keresése",
+    "showingCount": "{{shown}} a {{total}} kiadásból."
   },
   "ExpenseCard": {
     "paidBy": "Fizette: <strong>{paidBy}</strong>, nekik: <paidFor></paidFor>",
-    "everyone": "mindenki",
+    "everyone": "mindenkiért",
     "receivedBy": "Fogadta: <strong>{paidBy}</strong>, nekik: <paidFor></paidFor>",
     "yourBalance": "Egyenleged:",
-    "notInvolved": "Nem vagy érintett"
+    "notInvolved": "Nem vagy érintett",
+    "paidByPlain": "Fizette {{paidBy}} a {{paidFor}}ért",
+    "receivedByPlain": "{{paidBy}} fogadta a {{paidFor}} számára"
   },
   "Groups": {
     "myGroups": "Saját csoportok",
@@ -60,11 +80,11 @@
       "orAsk": "vagy kérd meg egy barátod, hogy küldje el egy létezőnek a linkjét."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "A teljes egyenleged",
+      "description": "Az összes csoport egyenlege.",
+      "owedToYou": "tartozol",
+      "youOwe": "tartozol",
+      "settledUp": "Mindannyian elhelyezkedtek a csoportokban."
     },
     "recent": "Legutóbbi csoportok",
     "starred": "Csillaggal megjelölt csoportok",
@@ -83,7 +103,7 @@
       "title": "Adj hozzá csoportot URL alapján",
       "description": "Ha egy csoport meg lett veled osztva, másold be az URL-jét ide, hogy hozzá add a listádhoz.",
       "error": "Hoppá, nem találunk csoportot az URL alapján, amit megadtál…",
-      "urlMode": "Enter URL",
+      "urlMode": "Írja be az URL-t",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Ez a csoport nem létezik.",
       "link": "Irány a legutóbb megtekintett csoportok"
-    }
+    },
+    "moreOptions": "További lehetőségek",
+    "participants": "résztvevők",
+    "star": "Sztárcsoport",
+    "unstar": "Csillag eltávolítása csoport"
   },
   "GroupForm": {
     "title": "Csoport információ",
@@ -129,7 +153,10 @@
       "add": "Résztvevő hozzáadása",
       "John": "Aladár",
       "Jane": "Béla",
-      "Jack": "Cecília"
+      "Jack": "Cecília",
+      "cannotRemove": "Ez a résztvevő egy költség részét képezi, és nem távolítható el.",
+      "indexLabel": "Résztvevő #{{index}}",
+      "remove": "Résztvevő eltávolítása {{index}}"
     },
     "Settings": {
       "title": "Helyi beállítások",
@@ -145,7 +172,8 @@
       "create": "Létrehozás",
       "creating": "Létrehozás…",
       "cancel": "Mégse"
-    }
+    },
+    "saveError": "Nem sikerült menteni a csoportot."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "Kiadásonként eltérő pénznem beállításához és az összegek átváltásához válassz egy nem egyéni pénznemet a csoporthoz.",
     "originalAmountField": {
       "label": "Átváltandó összeg",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Átutalandó összeg",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "Mentés…",
     "cancel": "Mégse",
     "reimbursement": "Költségtérítés",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Nyugtatételek kiosztása",
+    "conflict": "Ezt a költséget valaki más módosította. Töltse be újra az oldalt, és próbálja újra.",
+    "conflictTitle": "A költségek máshol változtak",
+    "deleteError": "Nem sikerült törölni a költséget.",
+    "pendingReceiptTotal": "Az offline állapotban beolvasott nyugta készen áll.",
+    "pendingReceiptTotalApply": "Használja a beolvasott összeget",
+    "pendingReceiptTotalDismiss": "Elvetés",
+    "saveError": "Nem sikerült megtakarítani a költséget."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Valami hiba történt a dokumentum feltöltésekor. Kérjük próbáld újra később vagy válassz egy másik fájlt.",
       "retry": "Próbáld újra"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Sorban. A nyugtát az újracsatlakozás után szkenneljük.",
+    "offline": "A szkennelés akkor folytatódik, amikor Ön online állapotban van.",
+    "scanFailed": "Az AI nem tudta elolvasni ezt a nyugtát. Ellenőrizze a szerver AI konfigurációját, és próbálja újra.",
+    "scanning": "Szkennelés…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Nyugta sorok",
+    "backToExpense": "Vissza a költségekhez",
+    "merchant": "Az üzlet neve",
+    "printedTotal": "A nyugtára nyomtatva összesen",
+    "noReceipt": "Ehhez a kiadáshoz még nem kapcsolódik nyugta.",
+    "empty": "Még nincsenek tételek. Adjon hozzá egyet a felosztás megkezdéséhez.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Nem sikerült menteni a módosítást",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Elem hozzáadása",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Elem hozzáadása",
+      "nameLabel": "Név",
+      "quantityLabel": "Mennyiség",
+      "amountLabel": "Összeg",
+      "sharedLabel": "Megosztott (a teljes számla díja)",
+      "add": "Hozzáadás",
+      "cancel": "Mégse"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} / {total}",
+      "remaining": "{quantity} maradt",
+      "assign": "Kiosztani",
+      "edit": "Szerkesztés",
+      "delete": "Törlés",
+      "removePortion": "Kiosztott megosztás eltávolítása",
+      "editTitle": "Elem szerkesztése",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Mentés",
+      "cancel": "Mégse",
+      "deleteConfirm": "Törli ezt az elemet?",
+      "deleteDescription": "Ezzel eltávolítja az elemet és hozzárendeléseit."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Nincs hozzárendelve",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Megosztva",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Elem hozzárendelése",
+      "description": "Válassza ki, hogy ki fizet a „{name}”-ért.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Egyenletesen elosztva",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Egyedi felosztás",
+      "customHint": "Adja meg a mennyiségeket egységben minden célhoz.",
+      "shared": "Megosztva",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "A hozzárendelt mennyiség meghaladja a cikk mennyiségét.",
+      "confirm": "Kiosztani",
+      "cancel": "Mégse"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Megosztva",
+      "unassigned": "Nincs hozzárendelve",
+      "optOut": "Megosztja a hozzá nem rendelt elemeket",
+      "reconciles": "Kiegyensúlyozott",
+      "offBy": "{amount} különbség",
+      "itemsTotal": "Átvételi tételek összesen",
+      "apply": "Alkalmazás a költségre",
+      "allOptedOut": "Mindenki leiratkozott, de néhány elem még mindig nincs hozzárendelve.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "A nyugta értékek eltérőek · Alkalmazza újra"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Költség frissítve",
+      "description": "A bizonylattételeket a kiadáshoz alkalmaztuk."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Nem sikerült alkalmazni a nyugtát"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Frissíti a kiadást?",
+      "description": "A kiadások végösszege eltér a bizonylattételek összegétől. Az alkalmazás felülírja a költség összegét és annak felosztását.",
+      "total": "összesen {current} → {new}",
+      "cancel": "Mégse",
+      "confirm": "Alkalmaz"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Beolvasás sorban",
+    "scanPendingDescription": "A kép mentésre kerül erre az eszközre, és a rendszer beszkenneli, amikor újra online lesz.",
+    "offlineQueue": "Ön offline állapotban van. Csatolja a fényképet most, és az újracsatlakozás után beolvassa.",
+    "disabled": "Az intelligens felosztás nincs engedélyezve ezen a szerveren. A nyugtaszkennelés csak online szolgáltatás.",
+    "extracted": "A nyugta beolvasva",
+    "extractedDescription": "Rendelje hozzá a kivont elemeket alább.",
+    "loading": "Nyugta betöltése…",
+    "optOutTitle": "Leiratkozás",
+    "scanError": "A nyugta nem szkennelhető.",
+    "scanUnavailable": "Ellenőrizze a szerver AI konfigurációját, és próbálja újra.",
+    "scanning": "Nyugta szkennelése…",
+    "upload": "Nyugtafotó feltöltése"
   },
   "Balances": {
     "title": "Egyenlegek",
@@ -415,20 +462,22 @@
       "description": "Íme néhány javaslat a résztvevők közötti optimális kifizetésekre.",
       "noImbursements": "Úgy tűnik, a csoportodnak nincs szüksége költségtérítésre 😁",
       "owes": "<strong>{from}</strong> tartozik neki: <strong>{to}</strong>",
-      "markAsPaid": "Megjelölés kifizetettként"
-    }
+      "markAsPaid": "Megjelölés kifizetettként",
+      "owesPlain": "{{from}} tartozik {{to}}"
+    },
+    "loading": "Egyenlegek betöltése…"
   },
   "Stats": {
     "title": "Statisztika",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Minden alkalommal",
+      "thisMonth": "Ebben a hónapban",
+      "last30": "Az elmúlt 30 nap",
+      "thisYear": "Idén",
+      "custom": "Egyedi tartomány",
+      "from": "-tól",
+      "to": "Eddig"
     },
     "Totals": {
       "title": "Összegzés",
@@ -440,50 +489,53 @@
       "yourShare": "Te részesedésed"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Összegzés",
+      "description": "A kiválasztott időszak kulcsszámai.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Kiadások",
+      "averageExpense": "Átlagos költség",
+      "largestExpense": "A legnagyobb kiadás",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Költések idővel",
+      "description": "A csoport összköltsége havonta. Válassza ki a hónapot a kiadások megtekintéséhez.",
+      "empty": "Még nincsenek kiadások.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Kiadások ebben a hónapban a kiválasztott időszakra vonatkozóan.",
+      "detailsEmpty": "Ebben a hónapban nincsenek kiadások.",
+      "showExpensesPlain": "{{month}} kiadásainak megjelenítése"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "A résztvevők költése",
+      "description": "Mennyit fizettek az egyes résztvevők, és a rájuk eső részt a költségekből.",
+      "empty": "Még nincsenek kiadások.",
+      "participant": "Résztvevő",
+      "paid": "Fizetett",
       "count": "Count",
-      "share": "Share"
+      "share": "Megosztás"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Költések kategóriánként",
+      "description": "Az egyes kategóriákban elköltött teljes összeg. Válasszon ki egy kategóriát a költségek megtekintéséhez.",
+      "empty": "Még nincsenek kiadások.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Költségek ebben a kategóriában a kiválasztott időszakban.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "{{category}} kiadásainak megjelenítése"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Ismétlődő kiadások",
+      "description": "A csoport aktív ismétlődő költségeinek becsült költsége.",
+      "estimatedMonthly": "Becsült havi költség",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Statisztikák betöltése…"
   },
   "Activity": {
     "title": "Történések",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Korábban az évben",
       "lastYear": "Tavaly",
       "older": "Régebben"
-    }
+    },
+    "loadMore": "Töltsön be többet",
+    "loading": "Tevékenység betöltése…",
+    "unknown": "Ismeretlen tevékenység"
   },
   "Information": {
     "title": "Információ",
@@ -512,7 +567,9 @@
     "empty": "Még nincsenek információk a csoportról."
   },
   "Settings": {
-    "title": "Beállítások"
+    "title": "Beállítások",
+    "saved": "Csoport frissítve",
+    "savedDescription": "A változtatásokat elmentettük."
   },
   "Share": {
     "title": "Megosztás",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Megosztás",
+    "copy": "Link másolása",
+    "url": "Csoport linkje"
   },
   "SchemaErrors": {
     "min1": "Adj meg legalább egy karaktert.",
@@ -543,7 +603,10 @@
     "paidForMin1": "A kiadáshoz legalább egy résztvevőt ki kell jelölj.",
     "noZeroShares": "Összes résznek nagyobbnak kell lennie, mint 0.",
     "amountSum": "Az összegek összegének egyenlőnek kell lennie a kiadás összegével.",
-    "percentageSum": "A százalékok összegének egyenlőnek kell lennie 100-zal."
+    "percentageSum": "A százalékok összegének egyenlőnek kell lennie 100-zal.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Keresés kategóriák közt...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Frissítés elérhető",
+    "updateDescription": "Megjelent a pysplit új verziója.",
+    "reload": "Újratöltés",
+    "updating": "Frissítés…",
+    "offlineReady": "Készen áll az offline munkára",
+    "offlineReadyDescription": "Az alkalmazás shell gyorsítótárban van. Nyisson meg egy csoportot egyszer online állapotban, hogy megőrizze adatait.",
+    "dismiss": "Bezárás",
+    "install": "Telepítse az alkalmazást",
+    "refreshApp": "Frissítse az alkalmazást",
+    "refreshAppHint": "Törölje a gyorsítótárazott fájlokat, és töltse be újra a legújabb verziót. A mentett adatai ezen az eszközön maradnak."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Adminisztrációs irányítópult",
+    "description": "Kezelheti a felhasználói szerepköröket, a platform-hozzáférési engedélyeket és figyelheti a rendszermutatókat.",
+    "totalGroups": "Összes csoport",
+    "totalExpenses": "Összes kiadás",
+    "registeredUsers": "Regisztrált felhasználók",
+    "userManagement": "Felhasználókezelési és engedélyszintek",
+    "accessDenied": "Hozzáférés megtagadva",
+    "accessDeniedDescription": "Az adminisztrációs irányítópult a rendszergazdai szint felhasználóira korlátozódik.",
+    "delete": "Törlés",
+    "deleteError": "Nem sikerült törölni",
+    "email": "E-mail",
+    "expenses": "kiadások",
+    "groupDeleted": "Csoport törölve",
+    "groupManagement": "Csoportok",
+    "groupManagementDescription": "Csoportok törlése és a használat ellenőrzése.",
+    "groups": "csoportok",
+    "loadMoreGroups": "További csoportok betöltése",
+    "loadMoreUsers": "További felhasználók betöltése",
+    "loading": "Irányítópult betöltése…",
+    "loadingMore": "Betöltés…",
+    "participants": "résztvevők",
+    "preauthorize": "Felhasználó előzetes engedélyezése",
+    "preauthorizeAction": "Előzetes engedélyezés",
+    "preauthorizeError": "Nem sikerült előzetesen engedélyezni a felhasználót",
+    "preauthorized": "Felhasználó előzetesen engedélyezett",
+    "returnToGroups": "Vissza a Saját csoportokhoz",
+    "searchGroups": "Csoportok keresése",
+    "searchUsers": "Felhasználók keresése",
+    "signInDescription": "Az adminisztrációs irányítópulthoz rendszergazdai fiók szükséges.",
+    "signInTitle": "Bejelentkezés szükséges",
+    "tier": "Szint",
+    "tierError": "Nem sikerült frissíteni a szintet",
+    "tierFor": "Szint beállítása ehhez:",
+    "tierUpdated": "A szint frissítve",
+    "userDeleted": "Felhasználó törölve",
+    "userTier": "Szintek"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Offline tárhely",
+    "loading": "Az eszköz ellenőrzése…",
+    "unsupported": "Ez a böngésző nem tud jelentést küldeni a tárolási állapotról.",
+    "usage": "{{used}} / {{quota}} használt",
+    "unknown": "ismeretlen",
+    "persisted": "A tárhely állandó ezen az eszközön.",
+    "notPersisted": "A böngésző kiürítheti az offline adatokat, ha az eszközben kevés a hely.",
+    "keep": "Adatok megőrzése ezen az eszközön",
+    "refresh": "Frissítés",
+    "critical": "A tárhely majdnem megtelt. Exportáljon most egy biztonsági másolatot, majd távolítsa el a nem használt csoportokat.",
+    "warning": "A tárhely kezd megtelni. Biztonsági másolat készítése javasolt."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Függőben lévő szinkronizálás",
+    "expense": "Szinkronizálásra vár"
+  },
+  "Attachments": {
+    "assignItems": "Nyugtatételek kiosztása",
+    "extractedItems": "AI kinyert elemek",
+    "help": "A képeket feltöltés előtt tömörítjük. A PDF-fájlokat a rendszer mellékletként tárolja, és új lapon nyílik meg.",
+    "open": "Megnyitás",
+    "openInNewTab": "Nyissa meg egy új lapon",
+    "pdfPreviewUnavailable": "A PDF előnézetek külön lapon nyílnak meg.",
+    "pending": "Feltöltés függőben",
+    "preview": "Előnézet",
+    "previewAction": "Előnézet",
+    "previewNamed": "Előnézet {{name}}",
+    "receipt": "Bolti nyugta",
+    "saveToAssignItems": "Először mentse el a költséget, majd rendelje hozzá ezeket a tételeket a résztvevőkhöz.",
+    "scanComplete": "A nyugta beolvasva",
+    "scanCompleteDescription": "Rendelje hozzá a kibontott elemeket a résztvevőkhöz.",
+    "scanError": "A nyugta nem szkennelhető",
+    "scanWithAi": "Szkennelés AI-val",
+    "scanning": "Szkennelés…",
+    "view": "Mellékletek megtekintése",
+    "attachment": "Melléklet",
+    "onlyImagesPdf": "Csak a képek és a PDF-fájlok támogatottak."
+  },
+  "Backup": {
+    "downloaded": "Biztonsági másolat letöltve.",
+    "export": "Biztonsági másolat exportálása",
+    "failed": "A biztonsági mentés nem sikerült.",
+    "restore": "Biztonsági másolat visszaállítása",
+    "restoreFailed": "A visszaállítás nem sikerült.",
+    "restoreLabel": "Biztonsági másolat visszaállítása",
+    "restored": "A biztonsági mentés visszaállítva. Újratöltés…"
+  },
+  "Common": {
+    "addGroup": "Csoport hozzáadása lehetőségre",
+    "close": "Close",
+    "closeDialog": "Párbeszéd bezárása",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Értesítés elvetése",
+    "error": "Valami elromlott",
+    "expenseNotFound": "Költség nem található",
+    "loading": "Betöltés…",
+    "menu": "Menü",
+    "retry": "Újra",
+    "select": "Válasszon…",
+    "unknown": "ismeretlen",
+    "user": "Felhasználó"
+  },
+  "CreateGroup": {
+    "approvalContact": "Új költségcsoportok létrehozásához rendszergazdai engedély szükséges. Kérjük, forduljon a példány rendszergazdájához, hogy előléptesse fiókját a Group Creator szintre.",
+    "approvalDescription": "Fiókja jelenleg a Felhasználó szinkronizálási szintjén van. Bármilyen, Önnel megosztott csoportban részt vehet, és szinkronizálhatja azokat az összes eszközén.",
+    "approvalTitle": "A csoport létrehozásához jóváhagyás szükséges",
+    "authRequiredDescription": "Új költségcsoportok létrehozásához jelentkezzen be egy külső fiókkal. A meghívott csoporttagok továbbra is súrlódásmentesen csatlakozhatnak a csoportlinken keresztül, bejelentkezés nélkül.",
+    "authRequiredTitle": "Hitelesítés szükséges",
+    "returnToGroups": "Vissza a Saját csoportokhoz",
+    "signIn": "Jelentkezzen be a Csoport létrehozásához"
+  },
+  "GroupTabs": {
+    "Expenses": "Kiadások",
+    "Balances": "Egyenlegek",
+    "Information": "Információ",
+    "Stats": "Statisztika",
+    "Activity": "Történések",
+    "Settings": "Beállítások",
+    "label": "Csoportos szakaszok"
+  },
+  "Login": {
+    "title": "Jelentkezzen be a Spliit-be",
+    "description": "Jelentkezzen be egy külső fiókkal az eszközök közötti csoportszinkronizálás engedélyezéséhez.",
+    "google": "Folytassa a Google-lal",
+    "github": "Folytassa a GitHubbal",
+    "noProviders": "Nincs OAuth-szolgáltató konfigurálva. Állítsa be az AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET értéket a bejelentkezés engedélyezéséhez."
+  },
+  "NotFound": {
+    "title": "Az oldal nem található",
+    "description": "Ellenőrizze az URL-t, és próbálja újra.",
+    "groupTitle": "Ez a csoport nem létezik.",
+    "groupDescription": "Ellenőrizze az URL-t, vagy kérjen új meghívólinket."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline – függőben lévő változtatások: {{count}}",
+    "offlineSaved": "Offline – a mentett adatok megjelenítése",
+    "syncing": "Szinkronizálás…",
+    "error": "Szinkronizálási hiba: {{error}}",
+    "retryToContinue": "próbálja újra a folytatást",
+    "conflicts": "Ellenőrzést igénylő ütközések: {{count}}",
+    "failed": "Nem szinkronizálható módosítások: {{count}}",
+    "pending": "Függőben lévő változtatások: {{count}}",
+    "retryFailed": "Sikertelen módosítások újrapróbálása",
+    "discardFailed": "Sikertelen módosítások elvetése",
+    "resolveConflicts": "Konfliktusok megoldása",
+    "syncNow": "Szinkronizálás most",
+    "dialogTitle": "Konfliktusok megoldása",
+    "dialogDescription": "Ezek a módosítások megváltoztatták ugyanazokat a rekordokat egy másik eszközön. Válassza ki, mit tartson meg.",
+    "noConflicts": "Nincsenek megoldandó konfliktusok.",
+    "serverVersion": "Szerververzió {{version}} · helyi szerkesztés az ütközési sorban marad",
+    "keepMine": "Saját verzióm megtartása",
+    "useServer": "Szerver használata",
+    "duplicate": "Második újként"
+  },
+  "Theme": {
+    "toggle": "Téma váltása",
+    "light": "Világos",
+    "dark": "Sötét",
+    "system": "Rendszer"
   }
 }

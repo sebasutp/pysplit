@@ -155,12 +155,21 @@ describe('list-only group bootstrap', () => {
       const id = decodeURIComponent(String(path).split('group_id=')[1])
       return Promise.resolve(snapshot(id))
     })
+    const refresh = vi.fn()
+    window.addEventListener('pysplit:refresh', refresh)
 
-    await prefetchGroups(ids)
+    try {
+      await prefetchGroups(ids)
+    } finally {
+      window.removeEventListener('pysplit:refresh', refresh)
+    }
 
     expect(get).toHaveBeenCalledTimes(7)
     for (const id of ids) {
       expect(await db.groups.get(id)).toMatchObject({ list_only: false })
     }
+    // Prefetch must not ask the groups page to reload: that creates a
+    // sync -> prefetch -> refresh -> sync loop on the groups screen.
+    expect(refresh).not.toHaveBeenCalled()
   })
 })

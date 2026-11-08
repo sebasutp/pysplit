@@ -76,12 +76,13 @@ export function participantNames(paidFor, participants) {
 /**
  * @param {PaidFor[]|undefined} paidFor
  * @param {Participant[]} participants
+ * @param {string} [everyoneLabel]
  * @returns {string}
  */
-export function paidForLabel(paidFor, participants) {
+export function paidForLabel(paidFor, participants, everyoneLabel = 'everyone') {
   const names = participantNames(paidFor, participants)
   if (!names.length) return ''
-  if (names.length === participants.length) return 'everyone'
+  if (names.length === participants.length) return everyoneLabel
   return names.join(', ')
 }
 

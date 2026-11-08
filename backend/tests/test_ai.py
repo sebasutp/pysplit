@@ -571,10 +571,15 @@ def test_mock_ai_fixtures_parse_with_real_parsers():
     assert items["total"] == sum(item["amount"] for item in items["items"]) + sum(
         charge["amount"] for charge in items["charges"]
     )
+    assert fixtures["receipt_response"]["amount"] == items["total"]
     parsed = parse_receipt_items_response(json.dumps(items))
     assert parsed is not None
     assert parsed["merchant"] == "Mock Trattoria"
-    assert len(parsed["items"]) == 5
+    assert len(parsed["items"]) == 7
+
+    names = [item["name"] for item in parsed["items"]]
+    assert len(names) != len(set(names))
+    assert any(item["quantity"] > 1 for item in parsed["items"])
 
 
 def test_mock_ai_client_returns_fixture_without_network():
@@ -716,9 +721,7 @@ def test_receipt_extraction_accepts_markdown_fences_and_snake_case():
     assert parsed["merchant"] == "Zurich Bistro"
     assert parsed["currency_code"] == "CHF"
     assert parsed["category_id"] == "4"
-    assert parsed["items"] == [
-        {"name": "Rösti", "quantity": 1, "unit_price": 23.5, "amount": 23.5}
-    ]
+    assert parsed["items"] == [{"name": "Rösti", "quantity": 1, "unit_price": 23.5, "amount": 23.5}]
     assert parsed["charges"] == []
 
 

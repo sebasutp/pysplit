@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "समूहहरू"
+    "groups": "समूहहरू",
+    "adminDashboard": "प्रशासक ड्यासबोर्ड",
+    "language": "भाषा",
+    "signIn": "साइन इन गर्नुहोस्",
+    "signOut": "साइन आउट गर्नुहोस्",
+    "userMenu": "प्रयोगकर्ता मेनु"
   },
   "Footer": {
     "madeIn": "जुरिच, स्विजरल्याण्डमा बनाइएको 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "गत महिना",
       "earlierThisYear": "यस वर्षको सुरुमा",
       "lastYear": "गत वर्ष",
-      "older": "पुराना"
-    }
+      "older": "पुराना",
+      "today": "आज",
+      "week": "यस हप्ताको सुरुमा",
+      "month": "यस महिनाको सुरुमा",
+      "year": "यस वर्षको सुरुमा"
+    },
+    "clearSearch": "खाली गर्नुहोस्",
+    "exportError": "खर्च निकासी गर्न सकिएन",
+    "filterFrom": "बाट",
+    "filterTo": "को",
+    "loadMore": "थप लोड गर्नुहोस्",
+    "loading": "खर्चहरू लोड गर्दै…",
+    "loadingMore": "लोड हुँदै...",
+    "search": "खर्च खोज्नुहोस्",
+    "showingCount": "{{shown}} को {{total}} खर्चहरू देखाउँदै।"
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong> द्वारा <paidFor></paidFor> का लागि भुक्तानी गरिएको",
     "everyone": "सबै जना",
     "receivedBy": "<strong>{paidBy}</strong> ले <paidFor></paidFor> का लागि प्राप्त गरेको",
     "yourBalance": "तपाईंको ब्यालेन्स:",
-    "notInvolved": "तपाईं यसमा संलग्न हुनुहुन्न"
+    "notInvolved": "तपाईं यसमा संलग्न हुनुहुन्न",
+    "paidByPlain": "{{paidFor}} को लागि {{paidBy}} द्वारा भुक्तान गरियो",
+    "receivedByPlain": "{{paidFor}} को लागि {{paidBy}} द्वारा प्राप्त"
   },
   "Groups": {
     "myGroups": "मेरो समूहहरू",
@@ -60,11 +80,11 @@
       "orAsk": "वा कुनै साथीलाई पहिले नै रहेको समूहको लिंक पठाउन भन्नुहोस्।"
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "तपाईंको कुल ब्यालेन्स",
+      "description": "तपाईंको सबै समूहहरूमा तपाईंको संयुक्त ब्यालेन्स।",
+      "owedToYou": "तपाईं ऋणी हुनुहुन्छ",
+      "youOwe": "तपाईं ऋणी हुनुहुन्छ",
+      "settledUp": "तपाईं सबै आफ्नो समूहमा बसोबास गरिएको छ।"
     },
     "recent": "हालका समूहहरू",
     "starred": "तारांकित समूहहरू",
@@ -83,7 +103,7 @@
       "title": "URL मार्फत समूह थप्नुहोस्",
       "description": "यदि कुनै समूह तपाईंसँग साझा गरिएको छ भने, तपाईं यसलाई आफ्नो सूचीमा थप्न यहाँ यसको URL राख्न सक्नुहुन्छ।",
       "error": "ओहो, तपाईंले दिएको URL बाट हामी समूह फेला पार्न सकिरहेका छैनौँ…",
-      "urlMode": "Enter URL",
+      "urlMode": "URL प्रविष्ट गर्नुहोस्",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "यो समूह अस्तित्वमा छैन।",
       "link": "हालै भ्रमण गरिएका समूहहरूमा जानुहोस्"
-    }
+    },
+    "moreOptions": "थप विकल्पहरू",
+    "participants": "सहभागीहरू",
+    "star": "तारा समूह",
+    "unstar": "समूहबाट तारा हटाउनुहोस्"
   },
   "GroupForm": {
     "title": "समूह जानकारी",
@@ -129,7 +153,10 @@
       "add": "सहभागी थप्नुहोस्",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "यो सहभागी खर्चको अंश हो र हटाउन सकिँदैन।",
+      "indexLabel": "सहभागी #{{index}}",
+      "remove": "सहभागी हटाउनुहोस् {{index}}"
     },
     "Settings": {
       "title": "स्थानीय सेटिङहरू",
@@ -142,22 +169,23 @@
       },
       "save": "सुरक्षित गर्नुहोस्",
       "saving": "Saving…",
-      "create": "Create",
-      "creating": "Creating…",
-      "cancel": "Cancel"
-    }
+      "create": "सिर्जना गर्नुहोस्",
+      "creating": "सिर्जना गर्दै...",
+      "cancel": "रद्द गर्नुहोस्"
+    },
+    "saveError": "समूह बचत गर्न सकेन।"
   },
   "ExpenseForm": {
     "Income": {
-      "create": "Create income",
-      "edit": "Edit income",
+      "create": "आय सिर्जना गर्नुहोस्",
+      "edit": "आय सम्पादन गर्नुहोस्",
       "TitleField": {
-        "label": "Income title",
+        "label": "आय शीर्षक",
         "placeholder": "Monday evening restaurant",
         "description": "Enter a description for the income."
       },
       "DateField": {
-        "label": "Income date",
+        "label": "आय मिति",
         "description": "Enter the date the income was received."
       },
       "currencyField": {
@@ -166,7 +194,7 @@
       },
       "categoryFieldDescription": "Select the income category.",
       "paidByField": {
-        "label": "Received by",
+        "label": "द्वारा प्राप्त",
         "description": "Select the participant who received the income."
       },
       "paidFor": {
@@ -177,104 +205,112 @@
       "attachDescription": "See and attach receipts to the income."
     },
     "Expense": {
-      "create": "Create expense",
-      "edit": "Edit expense",
+      "create": "खर्च सिर्जना गर्नुहोस्",
+      "edit": "खर्च सम्पादन गर्नुहोस्",
       "TitleField": {
-        "label": "Expense title",
-        "placeholder": "Monday evening restaurant",
+        "label": "खर्च शीर्षक",
+        "placeholder": "सोमबार साँझ रेस्टुरेन्ट",
         "description": "Enter a description for the expense."
       },
       "DateField": {
-        "label": "Expense date",
+        "label": "खर्च मिति",
         "description": "Enter the date the expense was paid."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "खर्च मुद्रा",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Select the expense category.",
       "paidByField": {
-        "label": "Paid by",
+        "label": "द्वारा भुक्तान गरियो",
         "placeholder": "Select a participant",
         "description": "Select the participant who paid the expense."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "व्यय पुनरावृत्ति",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "कुनै पनि होइन",
+        "daily": "दैनिक",
+        "weekly": "साप्ताहिक",
+        "monthly": "मासिक"
       },
       "paidFor": {
-        "title": "Paid for",
+        "title": "लागि भुक्तान गरियो",
         "description": "Select who the expense was paid for."
       },
       "splitModeDescription": "Select how to split the expense.",
       "attachDescription": "See and attach receipts to the expense."
     },
     "amountField": {
-      "label": "Amount"
+      "label": "रकम"
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "रूपान्तरण गर्न को लागी रकम",
+      "repaymentLabel": "स्थानान्तरण गर्न को लागी रकम",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "Frankfurter बाट दरहरू प्रयोग गर्नुहोस्",
+      "useCustom": "अनुकूलन दर प्रयोग गर्नुहोस्",
+      "label": "विनिमय दर"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "विनिमय दर प्राप्त गर्दै...",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "उफ्, हामीले सबैभन्दा हालको दरहरू प्राप्त गर्न सकेनौं।",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "तल एक अनुकूलन दर प्रविष्ट गर्नुहोस्।",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "रिफ्रेस गर्नुहोस्",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "यो एक प्रतिपूर्ति हो"
     },
     "categoryField": {
-      "label": "Category"
+      "label": "श्रेणी"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "नोटहरू"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "कुनै पनि चयन गर्नुहोस्",
+    "selectAll": "सबै चयन गर्नुहोस्",
+    "shares": "शेयर(हरू)",
+    "advancedOptions": "उन्नत विभाजन विकल्पहरू...",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "विभाजन मोड",
+      "evenly": "समान रूपमा",
+      "byShares": "असमान - शेयर द्वारा",
+      "byPercentage": "असमान - प्रतिशत द्वारा",
+      "byAmount": "असमान - रकम द्वारा",
+      "saveAsDefault": "पूर्वनिर्धारित विभाजन विकल्पहरूको रूपमा बचत गर्नुहोस्"
     },
     "DeletePopup": {
-      "label": "Delete",
-      "title": "Delete this expense?",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
-      "yes": "Yes",
-      "cancel": "Cancel"
+      "label": "मेट्नुहोस्",
+      "title": "यो खर्च मेट्ने हो?",
+      "description": "के तपाई साँच्चै यो खर्च मेटाउन चाहनुहुन्छ? यो कार्य अपरिवर्तनीय छ।",
+      "yes": "हो",
+      "cancel": "रद्द गर्नुहोस्"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "attachDocuments": "कागजातहरू संलग्न गर्नुहोस्",
+    "create": "सिर्जना गर्नुहोस्",
+    "creating": "सिर्जना गर्दै...",
+    "save": "सुरक्षित गर्नुहोस्",
+    "saving": "बचत गर्दै...",
+    "cancel": "रद्द गर्नुहोस्",
+    "reimbursement": "प्रतिपूर्ति",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "रसिद वस्तुहरू आवंटित गर्नुहोस्",
+    "conflict": "यो खर्च अरू कसैले परिवर्तन गरेको थियो। पृष्ठ पुन: लोड गर्नुहोस् र पुन: प्रयास गर्नुहोस्।",
+    "conflictTitle": "खर्च अन्यत्र परिवर्तन भयो",
+    "deleteError": "खर्च हटाउन सकिएन।",
+    "pendingReceiptTotal": "अफलाइन तयार हुँदा स्क्यान गरिएको रसिद।",
+    "pendingReceiptTotalApply": "स्क्यान गरिएको कुल प्रयोग गर्नुहोस्",
+    "pendingReceiptTotalDismiss": "खारेज गर्नुहोस्",
+    "saveError": "खर्च जोगाउन सकिएन ।"
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "कागजात अपलोड गर्दा त्रुटि",
+      "description": "कागजात अपलोड गर्दा केहि गलत भयो। कृपया पछि पुन: प्रयास गर्नुहोस् वा फरक फाइल चयन गर्नुहोस्।",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "रसिदबाट खर्च सिर्जना गर्नुहोस्",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -309,191 +345,207 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "कागजात अपलोड गर्दा त्रुटि",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "लामबद्ध। तपाईंले पुन: जडान गरेपछि रसिद स्क्यान गरिनेछ।",
+    "offline": "तपाईं अनलाइन हुँदा स्क्यानिङ सुचारु हुन्छ।",
+    "scanFailed": "AI ले यो रसिद पढ्न सकेन। सर्भर AI कन्फिगरेसन जाँच गर्नुहोस् र पुन: प्रयास गर्नुहोस्।",
+    "scanning": "स्क्यान गर्दै..."
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "रसिद लाइन वस्तुहरू",
+    "backToExpense": "खर्च मा फर्कनुहोस्",
+    "merchant": "स्टोरको नाम",
+    "printedTotal": "रसिदमा छापिएको कुल",
+    "noReceipt": "यस खर्चसँग कुनै रसिद अझै जोडिएको छैन।",
+    "empty": "अहिलेसम्म कुनै वस्तुहरू छैनन्। विभाजन सुरु गर्न एउटा थप्नुहोस्।",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "तपाईंको परिवर्तन सुरक्षित गर्न सकिएन",
+      "description": "तपाईंले फेरि प्रयास गर्न सक्नुहुन्छ भनेर हामीले रसिद पुन: लोड गरेका छौं।"
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "वस्तु थप्नुहोस्",
+    "quantitySummary": "{count} · {quantity} इकाइहरू",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "वस्तु थप्नुहोस्",
+      "nameLabel": "नाम",
+      "quantityLabel": "मात्रा",
+      "amountLabel": "रकम",
+      "sharedLabel": "साझा (पूरै बिल शुल्क)",
+      "add": "थप्नुहोस्",
+      "cancel": "रद्द गर्नुहोस्"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{total} को {assigned}",
+      "remaining": "{quantity} बाँकी",
+      "assign": "आवंटन गर्नुहोस्",
+      "edit": "सम्पादन गर्नुहोस्",
+      "delete": "मेट्नुहोस्",
+      "removePortion": "आवंटित शेयर हटाउनुहोस्",
+      "editTitle": "वस्तु सम्पादन गर्नुहोस्",
+      "nameLabel": "नाम",
+      "quantityLabel": "मात्रा",
+      "amountLabel": "रकम",
+      "save": "सुरक्षित गर्नुहोस्",
+      "cancel": "रद्द गर्नुहोस्",
+      "deleteConfirm": "यो वस्तु मेट्ने हो?",
+      "deleteDescription": "यसले वस्तु र यसका कार्यहरू हटाउँछ।"
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "तोकिएको छैन",
+      "unassignedHint": "अझै कसैलाई तोकिएको छैन",
+      "shared": "साझेदारी गरिएको",
+      "sharedHint": "सबैबीच समान रूपमा विभाजित",
+      "participantHint": "{name} लाई तोकिएका वस्तुहरू"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "वस्तु तोक्नुहोस्",
+      "description": "\"{name}\" को लागि भुक्तान गर्ने छनौट गर्नुहोस्।",
+      "whole": "पूरै वस्तु तोक्नुहोस्",
+      "everyone": "सबै (साझा)",
+      "even": "समान रूपमा विभाजित गर्नुहोस्",
+      "evenHint": "विभाजन गर्ने सहभागीहरू छान्नुहोस्।",
+      "custom": "अनुकूलन विभाजन",
+      "customHint": "प्रत्येक लक्ष्यको लागि एकाइहरूमा मात्रा प्रविष्ट गर्नुहोस्।",
+      "shared": "साझेदारी गरिएको",
+      "selectParticipant": "सहभागी छान्नुहोस्",
+      "exceeds": "तोकिएको मात्राले वस्तुको मात्राभन्दा बढी छ।",
+      "confirm": "आवंटन गर्नुहोस्",
+      "cancel": "रद्द गर्नुहोस्"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "आफ्नो",
+      "shared": "साझेदारी गरिएको",
+      "unassigned": "तोकिएको छैन",
+      "optOut": "असाइन नगरिएका वस्तुहरू साझा गर्दछ",
+      "reconciles": "सन्तुलित",
+      "offBy": "{amount} भिन्नता",
+      "itemsTotal": "रसिद वस्तुहरूको कुल",
+      "apply": "खर्चमा लागू गर्नुहोस्",
+      "allOptedOut": "सबैले अप्ट आउट गरे, तर केही वस्तुहरू अझै पनि तोकिएका छैनन्।",
+      "negativeShare": "ऋणात्मक कुलले कसैलाई शून्यभन्दा कम तिर्नुपर्ने बनाउँछ। लागू गर्नु अघि वस्तुहरू समायोजन गर्नुहोस्।",
+      "divergent": "रसिद मानहरू फरक छन् · फेरि आवेदन दिनुहोस्"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "खर्च अपडेट गरियो",
+      "description": "रसिद वस्तुहरू खर्चमा लागू गरियो।"
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "रसिद लागू गर्न सकिएन"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "खर्च अपडेट गर्ने?",
+      "description": "कुल खर्च रसीद वस्तुहरू भन्दा फरक छ। आवेदन गर्दा खर्च रकम र यसको विभाजन अधिलेखन हुनेछ।",
+      "total": "कुल {current} → {new}",
+      "cancel": "रद्द गर्नुहोस्",
+      "confirm": "लागू गर्नुहोस्"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "स्क्यान पङ्क्तिबद्ध",
+    "scanPendingDescription": "छवि यस यन्त्रमा सुरक्षित गरिएको छ र तपाईं अनलाइन भएपछि स्क्यान गरिनेछ।",
+    "offlineQueue": "तपाईं अफलाइन हुनुहुन्छ। अहिले फोटो संलग्न गर्नुहोस् र तपाईंले पुन: जडान गरेपछि यसलाई स्क्यान गरिनेछ।",
+    "disabled": "यस सर्भरमा स्मार्ट विभाजन सक्षम गरिएको छैन। रसिद स्क्यानिङ एक अनलाइन-मात्र सुविधा हो।",
+    "extracted": "रसिद स्क्यान गरियो",
+    "extractedDescription": "तल निकालिएका वस्तुहरू असाइन गर्नुहोस्।",
+    "loading": "रसिद लोड गर्दै...",
+    "optOutTitle": "अप्ट-आउटहरू",
+    "scanError": "रसिद स्क्यान गर्न सकिएन।",
+    "scanUnavailable": "सर्भर AI कन्फिगरेसन जाँच गर्नुहोस् र पुन: प्रयास गर्नुहोस्।",
+    "scanning": "रसिद स्क्यान गर्दै...",
+    "upload": "रसिद फोटो अपलोड गर्नुहोस्"
   },
   "Balances": {
-    "title": "Balances",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "title": "सन्तुलन",
+    "description": "यो प्रत्येक सहभागीले भुक्तान गरेको वा भुक्तान गरिएको रकम हो।",
     "Reimbursements": {
-      "title": "Suggested reimbursements",
-      "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "title": "सुझाव गरिएको प्रतिपूर्ति",
+      "description": "यहाँ सहभागीहरू बीच अनुकूलित प्रतिपूर्तिको लागि सुझावहरू छन्।",
+      "noImbursements": "यस्तो देखिन्छ कि तपाईंको समूहलाई कुनै प्रतिपूर्ति आवश्यक छैन 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "भुक्तान गरिएको रूपमा चिन्ह लगाउनुहोस्",
+      "owesPlain": "{{from}} ऋण {{to}}"
+    },
+    "loading": "ब्यालेन्स लोड गर्दै..."
   },
   "Stats": {
-    "title": "Stats",
+    "title": "तथ्याङ्क",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "सबै समय",
+      "thisMonth": "यो महिना",
+      "last30": "पछिल्लो 30 दिन",
+      "thisYear": "यो वर्ष",
+      "custom": "अनुकूलन दायरा",
+      "from": "बाट",
+      "to": "को"
     },
     "Totals": {
-      "title": "Totals",
-      "description": "Spending summary of the entire group.",
-      "groupSpendings": "Total group spendings",
+      "title": "कुल",
+      "description": "सम्पूर्ण समूहको खर्च सारांश।",
+      "groupSpendings": "कुल समूह खर्च",
       "groupEarnings": "Total group earnings",
-      "yourSpendings": "Your total spendings",
+      "yourSpendings": "तपाईंको कुल खर्च",
       "yourEarnings": "Your total earnings",
-      "yourShare": "Your total share"
+      "yourShare": "तपाईको कुल शेयर"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "सारांश",
+      "description": "चयन गरिएको अवधिको लागि प्रमुख तथ्याङ्कहरू।",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "खर्चहरू",
+      "averageExpense": "औसत खर्च",
+      "largestExpense": "सबैभन्दा ठूलो खर्च",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "समयसँगै खर्च हुन्छ",
+      "description": "प्रति महिना कुल समूह खर्च। यसको खर्च हेर्न एक महिना छान्नुहोस्।",
+      "empty": "अहिलेसम्म कुनै खर्च छैन।",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "चयन गरिएको अवधिको लागि यस महिनामा खर्चहरू।",
+      "detailsEmpty": "यो महिनामा कुनै खर्च छैन।",
+      "showExpensesPlain": "{{month}} को लागि खर्च देखाउनुहोस्"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "सहभागी द्वारा खर्च",
+      "description": "प्रत्येक सहभागीले कति तिर्यो र खर्चको उनीहरूको अंश।",
+      "empty": "अहिलेसम्म कुनै खर्च छैन।",
+      "participant": "सहभागी",
+      "paid": "भुक्तान गरियो",
       "count": "Count",
-      "share": "Share"
+      "share": "सेयर गर्नुहोस्"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "वर्ग अनुसार खर्च",
+      "description": "प्रत्येक वर्गमा खर्च गरिएको कुल रकम। यसको खर्च हेर्न को लागी एक कोटी चयन गर्नुहोस्।",
+      "empty": "अहिलेसम्म कुनै खर्च छैन।",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "चयन गरिएको अवधिको लागि यस कोटीमा खर्चहरू।",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "{{category}} को लागि खर्च देखाउनुहोस्"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "आवर्ती खर्च",
+      "description": "समूहको सक्रिय आवर्ती खर्चको अनुमानित लागत।",
+      "estimatedMonthly": "अनुमानित मासिक लागत",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "तथ्याङ्क लोड गर्दै..."
   },
   "Activity": {
-    "title": "Activity",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
-    "someone": "Someone",
-    "settingsModified": "Group settings were modified by <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "title": "गतिविधि",
+    "description": "यस समूहका सबै गतिविधिहरूको अवलोकन।",
+    "noActivity": "तपाईंको समूहमा अझै कुनै गतिविधि छैन।",
+    "someone": "कोही",
+    "settingsModified": "समूह सेटिङहरू <strong>{participant}</strong> द्वारा परिमार्जन गरिएको थियो।",
+    "expenseCreated": "खर्च <em>{expense}</em> <strong>{participant}</strong> द्वारा सिर्जना गरिएको।",
+    "expenseUpdated": "खर्च <em>{expense}</em> <strong>{participant}</strong> द्वारा अद्यावधिक गरियो।",
+    "expenseDeleted": "खर्च <em>{expense}</em> <strong>{participant}</strong> द्वारा मेटाइयो।",
     "Groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -504,19 +556,24 @@
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
       "older": "Older"
-    }
+    },
+    "loadMore": "थप लोड गर्नुहोस्",
+    "loading": "गतिविधि लोड गर्दै...",
+    "unknown": "अज्ञात गतिविधि"
   },
   "Information": {
-    "title": "Information",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
-    "empty": "No group information yet."
+    "title": "जानकारी",
+    "description": "समूह सहभागीहरूसँग सान्दर्भिक हुन सक्ने कुनै पनि जानकारी थप्न यो ठाउँ प्रयोग गर्नुहोस्।",
+    "empty": "अहिलेसम्म कुनै समूहको जानकारी छैन।"
   },
   "Settings": {
-    "title": "Settings"
+    "title": "सेटिङहरू",
+    "saved": "समूह अपडेट गरियो",
+    "savedDescription": "तपाईंका परिवर्तनहरू सुरक्षित गरिएका छन्।"
   },
   "Share": {
-    "title": "Share",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "title": "सेयर गर्नुहोस्",
+    "description": "अन्य सहभागीहरूले समूह हेर्न र खर्चहरू थप्नको लागि, तिनीहरूसँग यसको URL साझा गर्नुहोस्।",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Warning!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "सेयर गर्नुहोस्",
+    "copy": "लिङ्क प्रतिलिपि गर्नुहोस्",
+    "url": "समूह लिङ्क"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -542,8 +602,11 @@
     "paidByRequired": "You must select a participant.",
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
-    "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "amountSum": "रकमको योगफल खर्च रकम बराबर हुनुपर्छ।",
+    "percentageSum": "प्रतिशतको योगफल १०० बराबर हुनुपर्छ।",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Search category...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "अपडेट उपलब्ध छ",
+    "updateDescription": "pysplit को नयाँ संस्करण उपलब्ध छ।",
+    "reload": "पुन: लोड गर्नुहोस्",
+    "updating": "अद्यावधिक गर्दै...",
+    "offlineReady": "अफलाइन काम गर्न तयार छ",
+    "offlineReadyDescription": "अनुप्रयोग शेल क्यास गरिएको छ। कुनै समूहको डाटा राख्नको लागि अनलाइन हुँदा एक पटक खोल्नुहोस्।",
+    "dismiss": "बन्द गर्नुहोस्",
+    "install": "एप स्थापना गर्नुहोस्",
+    "refreshApp": "एप रिफ्रेस गर्नुहोस्",
+    "refreshAppHint": "क्यास गरिएका फाइलहरू खाली गर्नुहोस् र नवीनतम संस्करण पुन: लोड गर्नुहोस्। तपाईंको बचत गरिएको डाटा यो यन्त्रमा रहन्छ।"
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "प्रशासन ड्यासबोर्ड",
+    "description": "प्रयोगकर्ता भूमिकाहरू, प्लेटफर्म पहुँच अनुमतिहरू, र प्रणाली मेट्रिक्स निगरानी गर्नुहोस्।",
+    "totalGroups": "कुल समूहहरू",
+    "totalExpenses": "कुल खर्च",
+    "registeredUsers": "दर्ता भएका प्रयोगकर्ताहरू",
+    "userManagement": "प्रयोगकर्ता व्यवस्थापन र अनुमति स्तरहरू",
+    "accessDenied": "पहुँच अस्वीकार गरियो",
+    "accessDeniedDescription": "प्रशासन ड्यासबोर्ड प्रशासक तहका प्रयोगकर्ताहरूमा सीमित छ।",
+    "delete": "मेट्नुहोस्",
+    "deleteError": "मेटाउन सकिएन",
+    "email": "इमेल",
+    "expenses": "खर्च",
+    "groupDeleted": "समूह मेटाइयो",
+    "groupManagement": "समूहहरू",
+    "groupManagementDescription": "समूहहरू मेटाउनुहोस् र प्रयोगको निरीक्षण गर्नुहोस्।",
+    "groups": "समूहहरू",
+    "loadMoreGroups": "थप समूहहरू लोड गर्नुहोस्",
+    "loadMoreUsers": "थप प्रयोगकर्ताहरू लोड गर्नुहोस्",
+    "loading": "ड्यासबोर्ड लोड गर्दै...",
+    "loadingMore": "लोड हुँदै...",
+    "participants": "सहभागीहरू",
+    "preauthorize": "प्रयोगकर्तालाई पूर्व-अधिकृत गर्नुहोस्",
+    "preauthorizeAction": "पूर्व-अधिकृत",
+    "preauthorizeError": "प्रयोगकर्तालाई पूर्व-अधिकृत गर्न सकिएन",
+    "preauthorized": "प्रयोगकर्ता पूर्व-अधिकृत",
+    "returnToGroups": "मेरो समूह मा फर्कनुहोस्",
+    "searchGroups": "समूहहरू खोज्नुहोस्",
+    "searchUsers": "प्रयोगकर्ताहरू खोज्नुहोस्",
+    "signInDescription": "प्रशासन ड्यासबोर्डलाई प्रशासक खाता चाहिन्छ।",
+    "signInTitle": "साइन इन आवश्यक छ",
+    "tier": "टियर",
+    "tierError": "तह अपडेट गर्न सकिएन",
+    "tierFor": "को लागि तह",
+    "tierUpdated": "स्तर अद्यावधिक गरियो",
+    "userDeleted": "प्रयोगकर्ता मेटाइयो",
+    "userTier": "तहहरू"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "अफलाइन भण्डारण",
+    "loading": "यो यन्त्र जाँच गर्दै...",
+    "unsupported": "यो ब्राउजरले भण्डारण स्थिति रिपोर्ट गर्न सक्दैन।",
+    "usage": "{{quota}} मध्ये {{used}} प्रयोग भयो",
+    "unknown": "अज्ञात",
+    "persisted": "यस यन्त्रमा भण्डारण स्थिर छ।",
+    "notPersisted": "यदि यन्त्र कम ठाउँमा चल्छ भने ब्राउजरले अफलाइन डेटा हटाउन सक्छ।",
+    "keep": "यस यन्त्रमा डाटा राख्नुहोस्",
+    "refresh": "रिफ्रेस गर्नुहोस्",
+    "critical": "भण्डारण लगभग भरिएको छ। अहिले ब्याकअप निर्यात गर्नुहोस्, त्यसपछि प्रयोग नगरिएका समूहहरू हटाउनुहोस्।",
+    "warning": "भण्डारण भरिँदै छ। ब्याकअप सिफारिस गरिन्छ।"
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "विचाराधीन सिंक",
+    "expense": "सिङ्क बाँकी"
+  },
+  "Attachments": {
+    "assignItems": "रसिद वस्तुहरू आवंटित गर्नुहोस्",
+    "extractedItems": "एआई निकालिएका वस्तुहरू",
+    "help": "छविहरू अपलोड गर्नु अघि संकुचित छन्। PDF हरू एट्याचमेन्टका रूपमा राखिन्छन् र नयाँ ट्याबमा खोलिन्छन्।",
+    "open": "खोल्नुहोस्",
+    "openInNewTab": "नयाँ ट्याबमा खोल्नुहोस्",
+    "pdfPreviewUnavailable": "PDF पूर्वावलोकनहरू छुट्टै ट्याबमा खुल्छन्।",
+    "pending": "पेन्डिङ अपलोड",
+    "preview": "पूर्वावलोकन",
+    "previewAction": "पूर्वावलोकन",
+    "previewNamed": "पूर्वावलोकन {{name}}",
+    "receipt": "स्टोर रसिद",
+    "saveToAssignItems": "पहिले खर्च सुरक्षित गर्नुहोस्, त्यसपछि सहभागीहरूलाई यी वस्तुहरू असाइन गर्नुहोस्।",
+    "scanComplete": "रसिद स्क्यान गरियो",
+    "scanCompleteDescription": "निकालिएका वस्तुहरू सहभागीहरूलाई असाइन गर्नुहोस्।",
+    "scanError": "रसिद स्क्यान गर्न सकिएन",
+    "scanWithAi": "AI को साथ स्क्यान गर्नुहोस्",
+    "scanning": "स्क्यान गर्दै...",
+    "view": "संलग्नहरू हेर्नुहोस्",
+    "attachment": "संलग्नक",
+    "onlyImagesPdf": "केवल छविहरू र PDF फाइलहरू समर्थित छन्।"
+  },
+  "Backup": {
+    "downloaded": "ब्याकअप डाउनलोड गरियो।",
+    "export": "ब्याकअप निर्यात गर्नुहोस्",
+    "failed": "ब्याकअप असफल भयो।",
+    "restore": "ब्याकअप रिस्टोर गर्नुहोस्",
+    "restoreFailed": "पुनर्स्थापना असफल भयो।",
+    "restoreLabel": "ब्याकअप फाइल रिस्टोर गर्नुहोस्",
+    "restored": "ब्याकअप पुनर्स्थापित गरियो। पुन: लोड गर्दै..."
+  },
+  "Common": {
+    "addGroup": "समूह थप्नुहोस्",
+    "close": "बन्द गर्नुहोस्",
+    "closeDialog": "संवाद बन्द गर्नुहोस्",
+    "dismiss": "खारेज गर्नुहोस्",
+    "dismissNotification": "सूचना खारेज गर्नुहोस्",
+    "error": "केही गडबड भयो",
+    "expenseNotFound": "खर्च भेटिएन",
+    "loading": "लोड हुँदै...",
+    "menu": "मेनु",
+    "retry": "पुन: प्रयास गर्नुहोस्",
+    "select": "चयन गर्नुहोस्...",
+    "unknown": "अज्ञात",
+    "user": "प्रयोगकर्ता"
+  },
+  "CreateGroup": {
+    "approvalContact": "नयाँ खर्च समूहहरू सिर्जना गर्न प्रशासकबाट प्राधिकरण चाहिन्छ। आफ्नो खातालाई समूह सिर्जनाकर्ता तहमा बढावा दिनको लागि कृपया आफ्नो उदाहरण प्रशासकलाई सम्पर्क गर्नुहोस्।",
+    "approvalDescription": "तपाईको खाता हाल सिंक प्रयोगकर्ता टियरमा छ। तपाइँ तपाइँसँग साझेदारी गरिएका कुनै पनि समूहहरूमा भाग लिन सक्नुहुन्छ र तपाइँका सबै उपकरणहरूमा सिंक गर्न सक्नुहुन्छ।",
+    "approvalTitle": "समूह निर्माणलाई स्वीकृति चाहिन्छ",
+    "authRequiredDescription": "नयाँ खर्च समूहहरू सिर्जना गर्न, कृपया बाह्य खाताको साथ साइन इन गर्नुहोस्। आमन्त्रित समूह सहभागीहरू अझै पनि साइन इन नगरी तपाईंको समूह लिङ्क मार्फत घर्षण-मुक्त सामेल हुन सक्षम हुनेछन्।",
+    "authRequiredTitle": "प्रमाणीकरण आवश्यक छ",
+    "returnToGroups": "मेरो समूह मा फर्कनुहोस्",
+    "signIn": "समूह सिर्जना गर्न साइन इन गर्नुहोस्"
+  },
+  "GroupTabs": {
+    "Expenses": "खर्चहरू",
+    "Balances": "सन्तुलन",
+    "Information": "जानकारी",
+    "Stats": "तथ्याङ्क",
+    "Activity": "गतिविधि",
+    "Settings": "सेटिङहरू",
+    "label": "समूह खण्डहरू"
+  },
+  "Login": {
+    "title": "Spliit मा साइन इन गर्नुहोस्",
+    "description": "क्रस-यन्त्र समूह समक्रमण सक्षम गर्न बाह्य खाताको साथ साइन इन गर्नुहोस्।",
+    "google": "Google को साथ जारी राख्नुहोस्",
+    "github": "GitHub को साथ जारी राख्नुहोस्",
+    "noProviders": "कुनै पनि OAuth प्रदायकहरू कन्फिगर गरिएको छैन। साइन इन सक्षम गर्न AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET सेट गर्नुहोस्।"
+  },
+  "NotFound": {
+    "title": "पृष्ठ फेला परेन",
+    "description": "URL जाँच गर्नुहोस् र फेरि प्रयास गर्नुहोस्।",
+    "groupTitle": "यो समूह अस्तित्वमा छैन।",
+    "groupDescription": "URL जाँच गर्नुहोस् वा नयाँ निमन्त्रणा लिङ्कको लागि सोध्नुहोस्।"
+  },
+  "SyncStatus": {
+    "offlinePending": "अफलाइन — विचाराधीन परिवर्तनहरू: {{count}}",
+    "offlineSaved": "अफलाइन - बचत गरिएको डाटा देखाउँदै",
+    "syncing": "सिंक गर्दै...",
+    "error": "सिंक त्रुटि: {{error}}",
+    "retryToContinue": "जारी राख्न पुन: प्रयास गर्नुहोस्",
+    "conflicts": "द्वन्द्वहरू समीक्षा आवश्यक छ: {{count}}",
+    "failed": "सिंक गर्न नसकिने परिवर्तनहरू: {{count}}",
+    "pending": "विचाराधीन परिवर्तनहरू: {{count}}",
+    "retryFailed": "असफल परिवर्तनहरू पुन: प्रयास गर्नुहोस्",
+    "discardFailed": "असफल परिवर्तनहरू खारेज गर्नुहोस्",
+    "resolveConflicts": "विवादहरू समाधान गर्नुहोस्",
+    "syncNow": "अहिले सिंक गर्नुहोस्",
+    "dialogTitle": "विवादहरू समाधान गर्नुहोस्",
+    "dialogDescription": "यी सम्पादनहरूले अर्को यन्त्रमा उही रेकर्डहरू परिवर्तन गरे। के राख्ने छनौट गर्नुहोस्।",
+    "noConflicts": "समाधान गर्न कुनै विवाद छैन।",
+    "serverVersion": "सर्भर संस्करण {{version}} · स्थानीय सम्पादन द्वन्द्व लाममा राखिएको छ",
+    "keepMine": "मेरो संस्करण राख्नुहोस्",
+    "useServer": "सर्भर प्रयोग गर्नुहोस्",
+    "duplicate": "नयाँको रूपमा नक्कल गर्नुहोस्"
+  },
+  "Theme": {
+    "toggle": "थिम टगल गर्नुहोस्",
+    "light": "उज्यालो",
+    "dark": "अँध्यारो",
+    "system": "प्रणाली"
   }
 }

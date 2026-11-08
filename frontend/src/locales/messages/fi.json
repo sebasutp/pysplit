@@ -9,10 +9,15 @@
     }
   },
   "Header": {
-    "groups": "Ryhmät"
+    "groups": "Ryhmät",
+    "adminDashboard": "Järjestelmänvalvojan hallintapaneeli",
+    "language": "Kieli",
+    "signIn": "Kirjaudu sisään",
+    "signOut": "Kirjaudu ulos",
+    "userMenu": "Käyttäjävalikko"
   },
   "Footer": {
-    "madeIn": "Made in Zurich, Switzerland 🇨🇭",
+    "madeIn": "Valmistettu Zürichissä, Sveitsissä 🇨🇭",
     "builtBy": "Tekijät: <author>Sebastien Castiel</author> ja <source>muut osallistujat</source>"
   },
   "Expenses": {
@@ -21,7 +26,7 @@
     "create": "Lisää kulu",
     "createFirst": "Lisää ensimmäinen kulu",
     "noExpenses": "Ryhmälläsi ei ole vielä yhtään kulua.",
-    "export": "Export",
+    "export": "Vie",
     "exportJson": "Vie JSON-tiedostoon",
     "exportCsv": "Vie CSV-tiedostoon",
     "searchPlaceholder": "Etsi kulua…",
@@ -39,15 +44,30 @@
       "lastMonth": "Viime kuussa",
       "earlierThisYear": "Aikaisemmin tänä vuonna",
       "lastYear": "Viime vuonna",
-      "older": "Vanhemmat"
-    }
+      "older": "Vanhemmat",
+      "today": "Tänään",
+      "week": "Tällä viikolla",
+      "month": "Aikaisemmin tässä kuussa",
+      "year": "Aikaisemmin tänä vuonna"
+    },
+    "clearSearch": "Selkeä",
+    "exportError": "Kuluja ei voitu viedä",
+    "filterFrom": "Alkaen",
+    "filterTo": "Vastaanottaja",
+    "loadMore": "Lataa lisää",
+    "loading": "Ladataan kuluja…",
+    "loadingMore": "Ladataan…",
+    "search": "Hae kuluja",
+    "showingCount": "Näytetään {{shown}} / {{total}} kuluista."
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong> maksoi {forCount, plural, =1 {henkilön} other {henkilöiden}} <paidFor></paidFor> puolesta",
-    "everyone": "everyone",
+    "everyone": "kaikki",
     "receivedBy": "<strong>{paidBy}</strong> sai rahaa {forCount, plural, =1 {henkilön} other {henkilöiden}} <paidFor></paidFor> puolesta",
     "yourBalance": "Saldosi:",
-    "notInvolved": "You are not involved"
+    "notInvolved": "You are not involved",
+    "paidByPlain": "Maksaja {{paidBy}} kohteelle {{paidFor}}",
+    "receivedByPlain": "Vastaanottanut {{paidBy}} kohteelle {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Omat ryhmät",
@@ -60,11 +80,11 @@
       "orAsk": "tai pyydä ystävää lähettämään linkki olemassaolevaan ryhmään."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Kokonaissaldosi",
+      "description": "Yhdistetty saldosi kaikissa ryhmissäsi.",
+      "owedToYou": "Olet velkaa",
+      "youOwe": "Olet velkaa",
+      "settledUp": "Olette kaikki asettuneet ryhmiinne."
     },
     "recent": "Äskettäiset",
     "starred": "Suosikit",
@@ -83,7 +103,7 @@
       "title": "Lisää ryhmä URL-osoitteella",
       "description": "Jos ryhmä on jaettu sinulle, voit lisätä sen listaasi liittämällä URL-osoitteen tähän.",
       "error": "Hups, emme löytäneet ryhmää antamastasi URL-osoitteesta…",
-      "urlMode": "Enter URL",
+      "urlMode": "Anna URL-osoite",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Tätä ryhmää ei löydy.",
       "link": "Siirry äskettäisiin ryhmiin"
-    }
+    },
+    "moreOptions": "Lisää vaihtoehtoja",
+    "participants": "osallistujia",
+    "star": "Tähtiryhmä",
+    "unstar": "Poista tähti ryhmästä"
   },
   "GroupForm": {
     "title": "Ryhmän tiedot",
@@ -116,8 +140,8 @@
       "description": "Näytetään rahasummien yhteydessä."
     },
     "CurrencyCodeField": {
-      "label": "Main currency",
-      "createDescription": "All amounts and balances will be in this currency.",
+      "label": "Päävaluutta",
+      "createDescription": "Kaikki summat ja saldot ovat tässä valuutassa.",
       "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
       "customOption": "Custom"
     },
@@ -129,7 +153,10 @@
       "add": "Lisää osallistuja",
       "John": "Antti",
       "Jane": "Laura",
-      "Jack": "Jussi"
+      "Jack": "Jussi",
+      "cannotRemove": "Tämä osallistuja on osa kuluja, eikä sitä voi poistaa.",
+      "indexLabel": "Osallistuja #{{index}}",
+      "remove": "Poista osallistuja {{index}}"
     },
     "Settings": {
       "title": "Paikalliset asetukset",
@@ -145,7 +172,8 @@
       "create": "Luo ryhmä",
       "creating": "Luodaan…",
       "cancel": "Peruuta"
-    }
+    },
+    "saveError": "Ryhmää ei voitu tallentaa."
   },
   "ExpenseForm": {
     "Income": {
@@ -189,7 +217,7 @@
         "description": "Valitse päivä jolloin kulu maksettiin."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Kustannusvaluutta",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Valitse kulukategoria.",
@@ -199,12 +227,12 @@
         "description": "Valitse kuka maksoi kulun."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Kustannusten toistuminen",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "Ei kukaan",
+        "daily": "Päivittäin",
+        "weekly": "viikoittain",
+        "monthly": "Kuukausittain"
       },
       "paidFor": {
         "title": "Kulun jakaminen",
@@ -218,25 +246,25 @@
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "Muunnettava määrä",
+      "repaymentLabel": "Siirrettävä summa",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "Käytä Frankfurterin hinnat",
+      "useCustom": "Käytä mukautettua hintaa",
+      "label": "Valuuttakurssi"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "Haetaan valuuttakursseja…",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Hups, viimeisimpiä hintoja ei saatu.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "Anna mukautettu hinta alle.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Päivitä",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
@@ -274,7 +302,15 @@
     "saving": "Tallennetaan…",
     "cancel": "Peruuta",
     "reimbursement": "Velanmaksu",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Kohdista kuittikohteet",
+    "conflict": "Joku muu muutti tämän kulun. Lataa sivu uudelleen ja yritä uudelleen.",
+    "conflictTitle": "Kulut muutettu muualla",
+    "deleteError": "Kulua ei voitu poistaa.",
+    "pendingReceiptTotal": "Offline-tilassa skannattu kuitti on valmis.",
+    "pendingReceiptTotalApply": "Käytä skannattua kokonaismäärää",
+    "pendingReceiptTotalDismiss": "Hylkää",
+    "saveError": "Kuluja ei voitu säästää."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -309,103 +345,114 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "Virhe tiedostoa ladattaessa",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Jonossa. Kuitti skannataan, kun muodostat yhteyden uudelleen.",
+    "offline": "Skannaus jatkuu, kun olet online-tilassa.",
+    "scanFailed": "Tekoäly ei voinut lukea tätä kuittia. Tarkista palvelimen AI-kokoonpano ja yritä uudelleen.",
+    "scanning": "Skannataan…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Kuitin rivikohdat",
+    "backToExpense": "Takaisin kuluihin",
+    "merchant": "Kaupan nimi",
+    "printedTotal": "Kuittiin painettu summa",
+    "noReceipt": "Kuittia ei ole vielä yhdistetty tähän kuluun.",
+    "empty": "Ei kohteita vielä. Lisää yksi aloittaaksesi jakamisen.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Muutostasi ei voitu tallentaa",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Lisää kohde",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Lisää kohde",
+      "nameLabel": "Nimi",
+      "quantityLabel": "Määrä",
+      "amountLabel": "Summa",
+      "sharedLabel": "Jaettu (koko laskun veloitus)",
+      "add": "Lisää",
+      "cancel": "Peruuta"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} / {total}",
+      "remaining": "{quantity} jäljellä",
+      "assign": "jakaa",
+      "edit": "Muokkaa",
+      "delete": "Poista",
+      "removePortion": "Poista varattu osuus",
+      "editTitle": "Muokkaa kohdetta",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Tallenna",
+      "cancel": "Peruuta",
+      "deleteConfirm": "Poistetaanko tämä kohde?",
+      "deleteDescription": "Tämä poistaa kohteen ja sen määritykset."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Ei määritetty",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Jaettu",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Määritä kohde",
+      "description": "Valitse, kuka maksaa \"{name}\".",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Jaa tasaisesti",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Mukautettu jako",
+      "customHint": "Syötä määrät yksikköinä jokaiselle tavoitteelle.",
+      "shared": "Jaettu",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Annettu määrä ylittää nimikkeen määrän.",
+      "confirm": "jakaa",
+      "cancel": "Peruuta"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Jaettu",
+      "unassigned": "Ei määritetty",
+      "optOut": "Jakaa määrittämättömät kohteet",
+      "reconciles": "Tasapainoinen",
+      "offBy": "Ero {amount}",
+      "itemsTotal": "Kuittikohteet yhteensä",
+      "apply": "Käytä kuluun",
+      "allOptedOut": "Kaikki poistuivat käytöstä, mutta jotkin kohteet ovat edelleen määrittämättömiä.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Kuitin arvot vaihtelevat · Käytä uudelleen"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Kulu päivitetty",
+      "description": "Kuittierät liitettiin kuluihin."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Kuittia ei voitu käyttää"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Päivitetään kuluja?",
+      "description": "Kustannussumma eroaa kuittierien yhteissummasta. Hakeminen korvaa kulusumman ja sen jaon.",
+      "total": "yhteensä {current} → {new}",
+      "cancel": "Peruuta",
+      "confirm": "Käytä"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Skannaus jonossa",
+    "scanPendingDescription": "Kuva tallennetaan tälle laitteelle ja se skannataan, kun olet taas online-tilassa.",
+    "offlineQueue": "Olet offline-tilassa. Liitä valokuva nyt, niin se skannataan, kun yhdistät uudelleen.",
+    "disabled": "Älykäs jako ei ole käytössä tällä palvelimella. Kuitin skannaus on vain online-toiminto.",
+    "extracted": "Kuitti skannattu",
+    "extractedDescription": "Määritä poimitut kohteet alla.",
+    "loading": "Ladataan kuittia…",
+    "optOutTitle": "Opt-out",
+    "scanError": "Kuittia ei voitu skannata.",
+    "scanUnavailable": "Tarkista palvelimen AI-kokoonpano ja yritä uudelleen.",
+    "scanning": "Skannataan kuittia…",
+    "upload": "Lataa kuittikuva"
   },
   "Balances": {
     "title": "Saldo",
@@ -415,20 +462,22 @@
       "description": "Optimoitu ehdotus kuka maksaa kenellekin.",
       "noImbursements": "Näyttää siltä, että kaikki ovat sujut 😁",
       "owes": "<strong>{from}</strong> maksaa henkilölle <strong>{to}</strong>",
-      "markAsPaid": "Merkitse maksetuksi"
-    }
+      "markAsPaid": "Merkitse maksetuksi",
+      "owesPlain": "{{from}} velkaa {{to}}"
+    },
+    "loading": "Ladataan saldoja…"
   },
   "Stats": {
     "title": "Tilastot",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Koko ajan",
+      "thisMonth": "Tämä kuukausi",
+      "last30": "Viimeiset 30 päivää",
+      "thisYear": "Tänä vuonna",
+      "custom": "Mukautettu valikoima",
+      "from": "Alkaen",
+      "to": "Vastaanottaja"
     },
     "Totals": {
       "title": "Yhteenveto",
@@ -440,50 +489,53 @@
       "yourShare": "Osuutesi"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Yhteenveto",
+      "description": "Valitun ajanjakson tunnusluvut.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Kulut",
+      "averageExpense": "Keskimääräiset kulut",
+      "largestExpense": "Suurin kulu",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Kulutus ajan myötä",
+      "description": "Ryhmän kokonaiskulutus kuukaudessa. Valitse kuukausi nähdäksesi sen kulut.",
+      "empty": "Vielä ei ole kuluja.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Kulut tässä kuussa valitulta ajanjaksolta.",
+      "detailsEmpty": "Tässä kuussa ei ole kuluja.",
+      "showExpensesPlain": "Näytä kulut kohteelle {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Kulutus osallistujan mukaan",
+      "description": "Kuinka paljon kukin osallistuja maksoi ja heidän osuutensa kuluista.",
+      "empty": "Vielä ei ole kuluja.",
+      "participant": "Osallistuja",
+      "paid": "Maksettu",
       "count": "Count",
-      "share": "Share"
+      "share": "Jaa"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Kulutus luokittain",
+      "description": "Kussakin luokassa käytetty kokonaissumma. Valitse luokka nähdäksesi sen kulut.",
+      "empty": "Vielä ei ole kuluja.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Kulut tässä luokassa valitulla ajanjaksolla.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Näytä kulut kohteelle {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Toistuvat kulut",
+      "description": "Arvioidut kustannukset konsernin aktiivisista toistuvista kuluista.",
+      "estimatedMonthly": "Arvioidut kuukausikustannukset",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Ladataan tilastoja…"
   },
   "Activity": {
     "title": "Tapahtumat",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Tänä vuonna",
       "lastYear": "Viime vuonna",
       "older": "Vanhemmat"
-    }
+    },
+    "loadMore": "Lataa lisää",
+    "loading": "Ladataan toimintaa…",
+    "unknown": "Tuntematon toiminta"
   },
   "Information": {
     "title": "Tiedot",
@@ -512,20 +567,25 @@
     "empty": "Ryhmätietoja ei vielä ole."
   },
   "Settings": {
-    "title": "Asetukset"
+    "title": "Asetukset",
+    "saved": "Ryhmä päivitetty",
+    "savedDescription": "Muutokset on tallennettu."
   },
   "Share": {
     "title": "Jaa",
     "description": "Jaa ryhmän URL muille jäsenille, jotta he voivat nähdä sen ja lisätä kuluja.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Kopioi linkki",
+    "shareLink": "Jaa linkki",
     "warning": "Varoitus!",
     "warningHelp": "Tällä URLilla kuka tahansa pääsee näkemään ja muokkaamaan kuluja. Jaa harkiten!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Jaa",
+    "copy": "Kopioi linkki",
+    "url": "Ryhmän linkki"
   },
   "SchemaErrors": {
     "min1": "Syötä vähintään yksi merkki.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Valitse vähintään yksi osallistuja.",
     "noZeroShares": "Jokaisen osuuden täytyy olla suurempi kuin 0.",
     "amountSum": "Osuuksien summan täytyy vastata kulun summaa.",
-    "percentageSum": "Prosenttiosuuksien summan täytyy olla 100."
+    "percentageSum": "Prosenttiosuuksien summan täytyy olla 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Etsi kategoriaa...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Päivitys saatavilla",
+    "updateDescription": "Pysplitistä on saatavilla uusi versio.",
+    "reload": "Lataa uudelleen",
+    "updating": "Päivitetään…",
+    "offlineReady": "Valmis työskentelemään offline-tilassa",
+    "offlineReadyDescription": "Sovelluskuori on välimuistissa. Avaa ryhmä kerran ollessasi online-tilassa säilyttääksesi sen tiedot.",
+    "dismiss": "Sulje",
+    "install": "Asenna sovellus",
+    "refreshApp": "Päivitä sovellus",
+    "refreshAppHint": "Tyhjennä välimuistissa olevat tiedostot ja lataa uusin versio. Tallennetut tietosi pysyvät tällä laitteella."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Hallinnon hallintapaneeli",
+    "description": "Hallitse käyttäjien rooleja, käyttöympäristön käyttöoikeuksia ja valvo järjestelmämittareita.",
+    "totalGroups": "Ryhmät yhteensä",
+    "totalExpenses": "Kokonaiskulut",
+    "registeredUsers": "Rekisteröityneet käyttäjät",
+    "userManagement": "Käyttäjien hallinta ja käyttöoikeustasot",
+    "accessDenied": "Pääsy kielletty",
+    "accessDeniedDescription": "Hallintahallintapaneeli on rajoitettu järjestelmänvalvojatason käyttäjille.",
+    "delete": "Poista",
+    "deleteError": "Ei voitu poistaa",
+    "email": "Sähköposti",
+    "expenses": "kulut",
+    "groupDeleted": "Ryhmä poistettu",
+    "groupManagement": "Ryhmät",
+    "groupManagementDescription": "Poista ryhmät ja tarkista käyttö.",
+    "groups": "ryhmiä",
+    "loadMoreGroups": "Lataa lisää ryhmiä",
+    "loadMoreUsers": "Lataa lisää käyttäjiä",
+    "loading": "Ladataan hallintapaneelia…",
+    "loadingMore": "Ladataan…",
+    "participants": "osallistujia",
+    "preauthorize": "Valtuuta käyttäjä etukäteen",
+    "preauthorizeAction": "Valtuuta etukäteen",
+    "preauthorizeError": "Käyttäjälle ei voitu antaa ennakkovaltuutusta",
+    "preauthorized": "Käyttäjälle ennalta valtuutettu",
+    "returnToGroups": "Palaa Omiin ryhmiin",
+    "searchGroups": "Etsi ryhmiä",
+    "searchUsers": "Etsi käyttäjiä",
+    "signInDescription": "Hallintahallintapaneeli vaatii järjestelmänvalvojan tilin.",
+    "signInTitle": "Kirjautuminen vaaditaan",
+    "tier": "Taso",
+    "tierError": "Tasoa ei voitu päivittää",
+    "tierFor": "Taso varten",
+    "tierUpdated": "Taso päivitetty",
+    "userDeleted": "Käyttäjä poistettu",
+    "userTier": "Tasot"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Offline-tallennustila",
+    "loading": "Tarkistetaan tätä laitetta…",
+    "unsupported": "Tämä selain ei voi raportoida tallennustilan tilaa.",
+    "usage": "{{used}} / {{quota}} käytetty",
+    "unknown": "tuntematon",
+    "persisted": "Tallennustila on jatkuvaa tällä laitteella.",
+    "notPersisted": "Selain voi poistaa offline-tiedot, jos laitteen tila on vähissä.",
+    "keep": "Säilytä tiedot tällä laitteella",
+    "refresh": "Päivitä",
+    "critical": "Varasto on melkein täynnä. Vie varmuuskopio nyt ja poista sitten käyttämättömät ryhmät.",
+    "warning": "Tallennus alkaa olla täynnä. Varmuuskopiointi on suositeltavaa."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Odottaa synkronointia",
+    "expense": "Synkronointi odottaa"
+  },
+  "Attachments": {
+    "assignItems": "Kohdista kuittikohteet",
+    "extractedItems": "AI poimitut kohteet",
+    "help": "Kuvat pakataan ennen latausta. PDF-tiedostot säilytetään liitteinä ja avautuvat uudelle välilehdelle.",
+    "open": "Avaa",
+    "openInNewTab": "Avaa uudessa välilehdessä",
+    "pdfPreviewUnavailable": "PDF-esikatselut avautuvat erilliselle välilehdelle.",
+    "pending": "Odottaa latausta",
+    "preview": "Esikatselu",
+    "previewAction": "Esikatselu",
+    "previewNamed": "Esikatselu {{name}}",
+    "receipt": "Myymäläkuitti",
+    "saveToAssignItems": "Tallenna ensin kulut ja määritä sitten nämä kohteet osallistujille.",
+    "scanComplete": "Kuitti skannattu",
+    "scanCompleteDescription": "Määritä poimitut kohteet osallistujille.",
+    "scanError": "Kuittia ei voitu skannata",
+    "scanWithAi": "Skannaa AI:lla",
+    "scanning": "Skannataan…",
+    "view": "Näytä liitteet",
+    "attachment": "Liite",
+    "onlyImagesPdf": "Vain kuvia ja PDF-tiedostoja tuetaan."
+  },
+  "Backup": {
+    "downloaded": "Varmuuskopio ladattu.",
+    "export": "Vie varmuuskopio",
+    "failed": "Varmuuskopiointi epäonnistui.",
+    "restore": "Palauta varmuuskopio",
+    "restoreFailed": "Palautus epäonnistui.",
+    "restoreLabel": "Palauta varmuuskopiotiedosto",
+    "restored": "Varmuuskopio palautettu. Ladataan uudelleen…"
+  },
+  "Common": {
+    "addGroup": "Lisää ryhmä",
+    "close": "Close",
+    "closeDialog": "Sulje valintaikkuna",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Hylkää ilmoitus",
+    "error": "Jotain meni pieleen",
+    "expenseNotFound": "Kulua ei löytynyt",
+    "loading": "Ladataan…",
+    "menu": "Valikko",
+    "retry": "Yritä uudelleen",
+    "select": "Valitse…",
+    "unknown": "tuntematon",
+    "user": "Käyttäjä"
+  },
+  "CreateGroup": {
+    "approvalContact": "Uusien kuluryhmien luominen vaatii järjestelmänvalvojan valtuutuksen. Ota yhteyttä ilmentymän järjestelmänvalvojaasi, jos haluat nostaa tilisi Group Creator -tasolle.",
+    "approvalDescription": "Tilisi on tällä hetkellä Sync User -tasolla. Voit osallistua mihin tahansa kanssasi jaettuun ryhmään ja synkronoida ne kaikkien laitteidesi välillä.",
+    "approvalTitle": "Ryhmän luominen vaatii hyväksynnän",
+    "authRequiredDescription": "Jos haluat luoda uusia kuluryhmiä, kirjaudu sisään ulkoisella tilillä. Kutsutut ryhmän osallistujat voivat silti liittyä kitkattomasti ryhmäsi linkin kautta ilman sisäänkirjautumista.",
+    "authRequiredTitle": "Todennus vaaditaan",
+    "returnToGroups": "Palaa Omiin ryhmiin",
+    "signIn": "Kirjaudu sisään Luo ryhmä"
+  },
+  "GroupTabs": {
+    "Expenses": "Kulut",
+    "Balances": "Saldo",
+    "Information": "Tiedot",
+    "Stats": "Tilastot",
+    "Activity": "Tapahtumat",
+    "Settings": "Asetukset",
+    "label": "Ryhmän osiot"
+  },
+  "Login": {
+    "title": "Kirjaudu sisään Spliitiin",
+    "description": "Ota laitteiden välinen ryhmäsynkronointi käyttöön kirjautumalla sisään ulkoisella tilillä.",
+    "google": "Jatka Googlella",
+    "github": "Jatka GitHubilla",
+    "noProviders": "OAuth-palveluntarjoajia ei ole määritetty. Ota sisäänkirjautuminen käyttöön määrittämällä AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET."
+  },
+  "NotFound": {
+    "title": "Sivua ei löydy",
+    "description": "Tarkista URL-osoite ja yritä uudelleen.",
+    "groupTitle": "Tätä ryhmää ei löydy.",
+    "groupDescription": "Tarkista URL-osoite tai pyydä uutta kutsulinkkiä."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline – odottavat muutokset: {{count}}",
+    "offlineSaved": "Offline – näyttää tallennetut tiedot",
+    "syncing": "Synkronoidaan…",
+    "error": "Synkronointivirhe: {{error}}",
+    "retryToContinue": "yritä uudelleen jatkaaksesi",
+    "conflicts": "Tarkistamista vaativat ristiriidat: {{count}}",
+    "failed": "Muutokset, joita ei voitu synkronoida: {{count}}",
+    "pending": "Odottavat muutokset: {{count}}",
+    "retryFailed": "Yritä epäonnistuneita muutoksia uudelleen",
+    "discardFailed": "Hylkää epäonnistuneet muutokset",
+    "resolveConflicts": "Ratkaise konfliktit",
+    "syncNow": "Synkronoi nyt",
+    "dialogTitle": "Ratkaise konfliktit",
+    "dialogDescription": "Nämä muutokset muuttivat samoja tietueita toisessa laitteessa. Valitse mitä haluat säilyttää.",
+    "noConflicts": "Ei konflikteja ratkaistavaksi.",
+    "serverVersion": "Palvelimen versio {{version}} · paikallinen muokkaus säilytetään ristiriitajonossa",
+    "keepMine": "Säilytä oma versioni",
+    "useServer": "Käytä palvelinta",
+    "duplicate": "Kopioi kuin uusi"
+  },
+  "Theme": {
+    "toggle": "Vaihda teema",
+    "light": "Vaalea",
+    "dark": "Tumma",
+    "system": "Järjestelmä"
   }
 }

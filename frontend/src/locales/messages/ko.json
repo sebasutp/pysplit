@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "그룹"
+    "groups": "그룹",
+    "adminDashboard": "관리 대시보드",
+    "language": "언어",
+    "signIn": "로그인",
+    "signOut": "로그아웃",
+    "userMenu": "사용자 메뉴"
   },
   "Footer": {
     "madeIn": "스위스 취리히에서 제작 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "지난달",
       "earlierThisYear": "올해 초",
       "lastYear": "작년",
-      "older": "이전"
-    }
+      "older": "이전",
+      "today": "오늘",
+      "week": "이번주 초",
+      "month": "이번달 초",
+      "year": "올해 초"
+    },
+    "clearSearch": "지우기",
+    "exportError": "비용을 내보낼 수 없습니다.",
+    "filterFrom": "시작",
+    "filterTo": "종료",
+    "loadMore": "더 로드하기",
+    "loading": "비용 로드 중…",
+    "loadingMore": "로드 중…",
+    "search": "비용 검색",
+    "showingCount": "{{total}} 비용 중 {{shown}}를 표시합니다."
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong>가 <paidFor></paidFor>를 위해 결제함",
     "everyone": "모두",
     "receivedBy": "문서 업로드 중 오류가 발생했습니다. 다시 시도해보세요.",
     "yourBalance": "내 잔액:",
-    "notInvolved": "당신은 관련이 없어요"
+    "notInvolved": "당신은 관련이 없어요",
+    "paidByPlain": "{{paidFor}}에 대해 {{paidBy}}에서 지불함",
+    "receivedByPlain": "{{paidFor}}에 대해 {{paidBy}}에서 수신함"
   },
   "Groups": {
     "myGroups": "내 그룹",
@@ -60,11 +80,11 @@
       "orAsk": "또는 친구에게 기존 그룹 링크를 보내 달라고 요청하세요."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "전체 잔액",
+      "description": "모든 그룹을 합한 잔액입니다.",
+      "owedToYou": "받을 금액",
+      "youOwe": "보낼 금액",
+      "settledUp": "모든 그룹에서 정산이 완료되었습니다."
     },
     "recent": "최근 그룹",
     "starred": "즐겨찾기 그룹",
@@ -76,14 +96,14 @@
       "title": "그룹이 삭제되었습니다",
       "description": "그룹이 최신 그룹 목록에서 삭제되었습니다.",
       "undoAlt": "그룹 삭제 취소",
-      "undo": "Undo"
+      "undo": "실행 취소"
     },
     "AddByURL": {
       "button": "URL로 불러오기",
       "title": "URL로 그룹 불러오기",
       "description": "이미 공유받은 그룹이 있다면, 여기에 URL을 붙여넣어 추가하세요.",
       "error": "헉, 입력하신 URL에서 그룹을 찾을 수 없네요…",
-      "urlMode": "Enter URL",
+      "urlMode": "URL을 입력하세요",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "그룹이 존재하지 않습니다.",
       "link": "최근에 방문한 그룹 보기"
-    }
+    },
+    "moreOptions": "추가 옵션",
+    "participants": "참가자",
+    "star": "스타그룹",
+    "unstar": "그룹 별표 해제"
   },
   "GroupForm": {
     "title": "그룹 정보",
@@ -119,20 +143,23 @@
       "label": "기본 통화",
       "createDescription": "금액, 잔액 전부 이 통화로 표시돼요.",
       "editDescription": "모든 금액이랑 잔액은 이 통화로 보여요. 통화를 바꿔도 이미 입력한 지출은 바뀌지 않아요. 단, (예: 미국 달러에서 일본 엔으로 바꿀 때처럼) 통화의 소수점 단위가 다를 경우에는 예외가 있을 수 있어요.",
-      "customOption": "Custom"
+      "customOption": "사용자 지정"
     },
     "Participants": {
       "title": "참여자",
       "description": "참가자 이름을 하나씩 입력해 주세요.",
       "protectedParticipant": "이 참가자는 지출에 참여 중이라서 지울 수 없어요.",
-      "new": "New",
+      "new": "새로 추가",
       "add": "참가자 추가하기",
       "John": "민수",
       "Jane": "수영",
-      "Jack": "길동"
+      "Jack": "길동",
+      "cannotRemove": "이 참가자는 비용의 일부이므로 제거할 수 없습니다.",
+      "indexLabel": "참가자 번호{{index}}",
+      "remove": "참가자 삭제 {{index}}"
     },
     "Settings": {
-      "title": "Local settings",
+      "title": "로컬 설정",
       "description": "이 설정들은 기기별로 저장되며, 사용자 경험을 맞춤화하는 데 사용돼요.",
       "ActiveUserField": {
         "label": "활성 사용자",
@@ -142,39 +169,40 @@
       },
       "save": "저장",
       "saving": "저장중…",
-      "create": "Create",
+      "create": "만들기",
       "creating": "만드는 중…",
       "cancel": "취소"
-    }
+    },
+    "saveError": "그룹을 저장할 수 없습니다."
   },
   "ExpenseForm": {
     "Income": {
-      "create": "Create income",
-      "edit": "Edit income",
+      "create": "수입 추가",
+      "edit": "수입 편집",
       "TitleField": {
-        "label": "Income title",
+        "label": "수입 제목",
         "placeholder": "월요일 저녁 식사",
-        "description": "Enter a description for the income."
+        "description": "수입에 대한 설명을 입력하세요."
       },
       "DateField": {
-        "label": "Income date",
-        "description": "Enter the date the income was received."
+        "label": "수입 날짜",
+        "description": "수입을 받은 날짜를 입력하세요."
       },
       "currencyField": {
-        "label": "Currency of income",
-        "description": "The currency in which the income was received."
+        "label": "수입 통화",
+        "description": "수입을 받은 통화입니다."
       },
-      "categoryFieldDescription": "Select the income category.",
+      "categoryFieldDescription": "수입 카테고리를 선택하세요.",
       "paidByField": {
-        "label": "Received by",
-        "description": "Select the participant who received the income."
+        "label": "받은 사람",
+        "description": "수입을 받은 참가자를 선택하세요."
       },
       "paidFor": {
-        "title": "Received for",
-        "description": "Select who the income was received for."
+        "title": "받은 대상",
+        "description": "수입을 누구를 위해 받았는지 선택하세요."
       },
-      "splitModeDescription": "Select how to split the income.",
-      "attachDescription": "See and attach receipts to the income."
+      "splitModeDescription": "수입을 나누는 방법을 선택하세요.",
+      "attachDescription": "수입에 영수증을 확인하고 첨부하세요."
     },
     "Expense": {
       "create": "지출 추가하기",
@@ -201,7 +229,7 @@
       "recurrenceRule": {
         "label": "지출 반복 설정",
         "description": "지출 반복 주기를 선택해 주세요.",
-        "none": "None",
+        "none": "없음",
         "daily": "매일",
         "weekly": "매주",
         "monthly": "매달"
@@ -211,15 +239,15 @@
         "description": "비용 부담자들을 선택해 주세요."
       },
       "splitModeDescription": "지출을 어떻게 나눌지 선택해 주세요.",
-      "attachDescription": "See and attach receipts to the expense."
+      "attachDescription": "지출에 영수증을 확인하고 첨부하세요."
     },
     "amountField": {
       "label": "금액"
     },
-    "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
+    "conversionUnavailable": "지출마다 다른 통화를 설정하고 금액을 환산하려면, 그룹에 사용자 지정이 아닌 통화를 선택하세요.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "환산할 금액",
+      "repaymentLabel": "이체할 금액",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -248,10 +276,10 @@
     "notesField": {
       "label": "메모"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "전체 해제",
+    "selectAll": "전체 선택",
+    "shares": "몫",
+    "advancedOptions": "고급 분할 옵션…",
     "SplitModeField": {
       "label": "분할 방식",
       "evenly": "똑같이 나누기",
@@ -261,20 +289,28 @@
       "saveAsDefault": "기본 분할 방식으로 저장하기"
     },
     "DeletePopup": {
-      "label": "Delete",
-      "title": "Delete this expense?",
+      "label": "삭제",
+      "title": "이 지출을 삭제할까요?",
       "description": "정말 이 지출을 삭제할까요? 한 번 삭제하면 되돌릴 수 없어요.",
       "yes": "네",
       "cancel": "취소"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
+    "attachDocuments": "문서 첨부",
+    "create": "만들기",
+    "creating": "만드는 중…",
+    "save": "저장",
+    "saving": "저장 중…",
     "cancel": "취소",
     "reimbursement": "정산",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "영수증 항목 할당",
+    "conflict": "이 비용은 다른 사람에 의해 변경되었습니다. 페이지를 새로고침하고 다시 시도하세요.",
+    "conflictTitle": "다른 곳에서 비용이 변경됨",
+    "deleteError": "비용을 삭제할 수 없습니다.",
+    "pendingReceiptTotal": "오프라인 상태에서 스캔한 영수증이 준비되었습니다.",
+    "pendingReceiptTotalApply": "스캔한 합계 사용",
+    "pendingReceiptTotalDismiss": "닫기",
+    "saveError": "비용을 절약할 수 없었습니다."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -284,7 +320,7 @@
     "ErrorToast": {
       "title": "문서 업로드 중 오류가 발생했어요",
       "description": "문서 업로드 중 오류가 발생했습니다. 나중에 다시 시도하거나 다른 파일을 선택해 주세요.",
-      "retry": "Retry"
+      "retry": "다시 시도"
     },
     "queued": "Pending upload",
     "open": "Open"
@@ -292,7 +328,7 @@
   "CreateFromReceipt": {
     "Dialog": {
       "triggerTitle": "영수증으로 지출 추가하기",
-      "title": "Create from receipt",
+      "title": "영수증으로 만들기",
       "description": "영수증 사진으로 지출 내역을 자동으로 불러와요.",
       "body": "영수증 사진을 업로드하면, 가능하면 지출 정보를 스캔해서 추출해 드려요.",
       "selectImage": "사진 선택하기…",
@@ -303,7 +339,7 @@
       "editNext": "다음 단계에서 지출 정보를 수정할 수 있습니다.",
       "continue": "계속하기"
     },
-    "unknown": "Unknown",
+    "unknown": "알 수 없음",
     "TooBigToast": {
       "title": "파일이 너무 커요",
       "description": "업로드 가능한 최대 파일 크기: {maxSize}, 현재 파일 크기: {size}입니다."
@@ -311,185 +347,201 @@
     "ErrorToast": {
       "title": "문서 업로드 중 오류가 발생했어요",
       "description": "문서 업로드 중 오류가 발생했습니다. 나중에 다시 시도하거나 다른 파일을 선택해 주세요.",
-      "retry": "Retry"
+      "retry": "다시 시도"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "대기 중입니다. 다시 연결한 후 영수증을 스캔합니다.",
+    "offline": "온라인 상태가 되면 스캔이 다시 시작됩니다.",
+    "scanFailed": "AI가 이 영수증을 읽을 수 없습니다. 서버 AI 구성을 확인하고 다시 시도하세요.",
+    "scanning": "스캔 중…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "영수증 품목",
+    "backToExpense": "비용으로 돌아가기",
+    "merchant": "매장명",
+    "printedTotal": "영수증에 인쇄된 총액",
+    "noReceipt": "아직 이 비용에 연결된 영수증이 없습니다.",
+    "empty": "아직 항목이 없습니다. 분할을 시작하려면 하나를 추가하세요.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "변경사항을 저장할 수 없습니다.",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "항목 추가",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "항목 추가",
+      "nameLabel": "이름",
+      "quantityLabel": "수량",
+      "amountLabel": "금액",
+      "sharedLabel": "공유(전체 청구액)",
+      "add": "추가",
+      "cancel": "취소"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{total} 중 {assigned}",
+      "remaining": "{quantity} 남음",
+      "assign": "할당하다",
+      "edit": "편집",
+      "delete": "삭제",
+      "removePortion": "할당된 공유 제거",
+      "editTitle": "항목 수정",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "저장",
+      "cancel": "취소",
+      "deleteConfirm": "이 항목을 삭제하시겠습니까?",
+      "deleteDescription": "그러면 항목과 해당 할당이 제거됩니다."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "할당되지 않음",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "공유됨",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "항목 할당",
+      "description": "“{name}” 비용을 지불할 사람을 선택하세요.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "균등하게 분할",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "맞춤 분할",
+      "customHint": "각 대상에 대한 수량을 단위로 입력합니다.",
+      "shared": "공유됨",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "할당된 수량이 품목 수량을 초과합니다.",
+      "confirm": "할당하다",
+      "cancel": "취소"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "공유됨",
+      "unassigned": "할당되지 않음",
+      "optOut": "할당되지 않은 항목을 공유합니다",
+      "reconciles": "균형 잡힘",
+      "offBy": "{amount} 차이",
+      "itemsTotal": "영수증 항목 합계",
+      "apply": "비용에 적용",
+      "allOptedOut": "모두가 선택 해제했지만 일부 항목은 아직 할당되지 않았습니다.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "영수증 값이 다름 · 다시 적용"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "비용이 업데이트되었습니다.",
+      "description": "영수증 항목이 비용에 반영되었습니다."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "영수증을 적용할 수 없습니다."
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "비용을 업데이트하시겠습니까?",
+      "description": "비용 총액은 영수증 항목 총액과 다릅니다. 신청하면 비용 금액과 분할 금액을 덮어쓰게 됩니다.",
+      "total": "합계 {current} → {new}",
+      "cancel": "취소",
+      "confirm": "적용"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "스캔 대기 중",
+    "scanPendingDescription": "이미지는 이 장치에 저장되며 다시 온라인 상태가 되면 스캔됩니다.",
+    "offlineQueue": "귀하는 오프라인 상태입니다. 지금 사진을 첨부하면 다시 연결한 후 스캔됩니다.",
+    "disabled": "이 서버에서는 스마트 분할이 활성화되지 않았습니다. 영수증 스캔은 온라인 전용 기능입니다.",
+    "extracted": "영수증 스캔됨",
+    "extractedDescription": "아래에서 추출된 항목을 할당합니다.",
+    "loading": "영수증 로드 중…",
+    "optOutTitle": "옵트아웃",
+    "scanError": "영수증을 스캔할 수 없습니다.",
+    "scanUnavailable": "서버 AI 구성을 확인하고 다시 시도하세요.",
+    "scanning": "영수증 스캔 중…",
+    "upload": "영수증 사진 업로드"
   },
   "Balances": {
     "title": "잔액",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "description": "각 참가자가 지불했거나 받은 금액입니다.",
     "Reimbursements": {
       "title": "추천 정산 방법",
       "description": "참가자 간에 가장 좋은 정산 방안을 알려드려요.",
       "noImbursements": "그룹에선 따로 정산할 게 없네요 😁",
       "owes": "<strong>{from}</strong>가 <strong>{to}</strong>에게 돈을 내야 해요",
-      "markAsPaid": "지불 완료로 표시하기"
-    }
+      "markAsPaid": "지불 완료로 표시하기",
+      "owesPlain": "{{from}} 빚 {{to}}"
+    },
+    "loading": "잔액 로드 중…"
   },
   "Stats": {
     "title": "현황",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "기간",
+      "all": "전체 기간",
+      "thisMonth": "이번 달",
+      "last30": "지난 30일",
+      "thisYear": "올해",
+      "custom": "사용자 지정",
+      "from": "시작",
+      "to": "종료"
     },
     "Totals": {
       "title": "전체 합계",
       "description": "그룹 전체 지출 요약 입니다.",
       "groupSpendings": "그룹 총 지출액",
-      "groupEarnings": "Total group earnings",
+      "groupEarnings": "그룹 총수입",
       "yourSpendings": "나의 총 지출",
-      "yourEarnings": "Your total earnings",
+      "yourEarnings": "내 총수입",
       "yourShare": "나의 총 부담금"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "요약",
+      "description": "선택한 기간의 주요 수치.",
+      "empty": "아직 지출이 없습니다.",
+      "expenseCount": "지출 건수",
+      "averageExpense": "평균 지출",
+      "largestExpense": "최대 지출",
+      "activeSpan": "활동 기간"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "기간별 지출",
+      "description": "그룹의 월별 총 지출.",
+      "empty": "아직 지출이 없습니다.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "선택한 기간에 대한 이번 달의 비용입니다.",
+      "detailsEmpty": "이번 달에는 지출이 없습니다.",
+      "showExpensesPlain": "{{month}} 비용 표시"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "참가자별 지출",
+      "description": "각 참가자가 지불한 금액과 지출 부담.",
+      "empty": "아직 지출이 없습니다.",
+      "participant": "참가자",
+      "paid": "지불액",
+      "count": "건수",
+      "share": "부담액"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "카테고리별 지출",
+      "description": "각 카테고리의 총 지출액.",
+      "empty": "아직 지출이 없습니다.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "선택한 기간 동안 이 범주에 속하는 비용입니다.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "{{category}} 비용 표시"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "반복 지출",
+      "description": "그룹의 활성 반복 지출의 예상 비용.",
+      "estimatedMonthly": "예상 월 비용",
+      "estimatedYearly": "연 {amount}",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, other {매일 지출 #건}}",
+        "WEEKLY": "{count, plural, other {매주 지출 #건}}",
+        "MONTHLY": "{count, plural, other {매월 지출 #건}}"
       }
-    }
+    },
+    "loading": "통계 로드 중…"
   },
   "Activity": {
     "title": "활동 내역",
     "description": "이 그룹의 모든 활동 개요예요.",
     "noActivity": "아직 그룹에 활동 내역이 없어요.",
-    "someone": "Someone",
+    "someone": "누군가",
     "settingsModified": "<strong>{participant}</strong>가 그룹 설정을 수정했어요.",
     "expenseCreated": "<strong>{participant}</strong>가 <em>{expense}</em> 지출 내역을 추가했어요.",
     "expenseUpdated": "<strong>{participant}</strong>가 <em>{expense}</em> 지출을 수정했어요.",
@@ -504,34 +556,42 @@
       "earlierThisYear": "올해 초",
       "lastYear": "작년",
       "older": "이전"
-    }
+    },
+    "loadMore": "더 로드하기",
+    "loading": "활동 로드 중…",
+    "unknown": "알 수 없는 활동"
   },
   "Information": {
     "title": "정보",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
+    "description": "그룹 참가자에게 관련될 수 있는 정보를 여기에 추가하세요.",
     "empty": "아직 그룹 정보가 없어요."
   },
   "Settings": {
-    "title": "설정"
+    "title": "설정",
+    "saved": "그룹이 업데이트되었습니다.",
+    "savedDescription": "변경사항이 저장되었습니다."
   },
   "Share": {
     "title": "공유하기",
     "description": "다른 참가자들이 그룹을 보고 지출을 추가할 수 있도록 URL을 공유해 주세요.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "링크 복사",
+    "shareLink": "링크 공유",
     "warning": "경고!",
     "warningHelp": "그룹 URL을 가진 사람은 누구나 지출 내역을 보고 수정할 수 있어요. 조심해서 공유하세요!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "부담액",
+    "copy": "링크 복사",
+    "url": "그룹 링크"
   },
   "SchemaErrors": {
     "min1": "최소 한 글자 이상 입력해 주세요.",
     "min2": "최소 두 글자 이상 입력해 주세요.",
-    "max5": "Enter at most five characters.",
-    "max50": "Enter at most 50 characters.",
+    "max5": "최대 5자까지 입력하세요.",
+    "max50": "최대 50자까지 입력하세요.",
     "duplicateParticipantName": "이미 같은 이름을 가진 참가자가 있어요.",
     "titleRequired": "제목을 입력해 주세요.",
     "invalidNumber": "잘못된 숫자입니다.",
@@ -540,10 +600,13 @@
     "amountTenMillion": "금액은 10,000,000보다 작아야 해요.",
     "ratePositive": "환율은 0보다 커야 해요.",
     "paidByRequired": "참가자를 선택해 주세요.",
-    "paidForMin1": "",
+    "paidForMin1": "비용은 최소 한 명의 참가자가 부담해야 합니다.",
     "noZeroShares": "각 몫은 0보다 커야 합니다.",
     "amountSum": "금액 합계가 지출 금액과 같아야 해요.",
-    "percentageSum": "퍼센트 합이 100이 되어야 합니다."
+    "percentageSum": "퍼센트 합이 100이 되어야 합니다.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "카테고리 선택...",
@@ -551,7 +614,7 @@
     "Uncategorized": {
       "heading": "카테고리 없음",
       "General": "일반",
-      "Payment": "Payment"
+      "Payment": "결제"
     },
     "Entertainment": {
       "heading": "엔터테인먼트",
@@ -578,7 +641,7 @@
       "Mortgage": "주택 담보 대출",
       "Pets": "반려동물",
       "Rent": "임대료 / 월세",
-      "Services": "Services"
+      "Services": "서비스"
     },
     "Life": {
       "heading": "생활",
@@ -618,7 +681,7 @@
     "search": "통화 선택하기...",
     "noCurrency": "통화를 찾을 수 없어요.",
     "custom": {
-      "heading": "Custom"
+      "heading": "사용자 지정"
     },
     "common": {
       "heading": "가장 많이 쓰이는"
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "업데이트 사용 가능",
+    "updateDescription": "pysplit의 새 버전을 사용할 수 있습니다.",
+    "reload": "새로고침",
+    "updating": "업데이트 중…",
+    "offlineReady": "오프라인 작업 준비",
+    "offlineReadyDescription": "애플리케이션 셸이 캐시됩니다. 데이터를 유지하려면 온라인 상태에서 그룹을 한 번 엽니다.",
+    "dismiss": "닫기",
+    "install": "앱 설치",
+    "refreshApp": "앱 새로고침",
+    "refreshAppHint": "캐시된 파일을 지우고 최신 버전을 다시 로드하세요. 저장된 데이터는 이 기기에 유지됩니다."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "관리 대시보드",
+    "description": "사용자 역할, 플랫폼 액세스 권한을 관리하고 시스템 지표를 모니터링합니다.",
+    "totalGroups": "총 그룹",
+    "totalExpenses": "총 비용",
+    "registeredUsers": "등록된 사용자",
+    "userManagement": "사용자 관리 및 권한 계층",
+    "accessDenied": "액세스가 거부되었습니다.",
+    "accessDeniedDescription": "관리 대시보드는 관리자 계층의 사용자만 사용할 수 있습니다.",
+    "delete": "삭제",
+    "deleteError": "삭제할 수 없습니다.",
+    "email": "이메일",
+    "expenses": "비용",
+    "groupDeleted": "그룹이 삭제되었습니다.",
+    "groupManagement": "그룹",
+    "groupManagementDescription": "그룹을 삭제하고 사용량을 검사합니다.",
+    "groups": "그룹",
+    "loadMoreGroups": "더 많은 그룹 로드",
+    "loadMoreUsers": "더 많은 사용자 로드",
+    "loading": "대시보드 로드 중…",
+    "loadingMore": "로드 중…",
+    "participants": "참가자",
+    "preauthorize": "사용자 사전 승인",
+    "preauthorizeAction": "사전 승인",
+    "preauthorizeError": "사용자를 사전 승인할 수 없습니다.",
+    "preauthorized": "사용자가 사전 승인됨",
+    "returnToGroups": "내 그룹으로 돌아가기",
+    "searchGroups": "그룹 검색",
+    "searchUsers": "사용자 검색",
+    "signInDescription": "관리 대시보드에는 관리자 계정이 필요합니다.",
+    "signInTitle": "로그인이 필요합니다",
+    "tier": "계층",
+    "tierError": "등급을 업데이트할 수 없습니다.",
+    "tierFor": "등급",
+    "tierUpdated": "등급이 업데이트되었습니다.",
+    "userDeleted": "사용자가 삭제되었습니다.",
+    "userTier": "계층"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "오프라인 저장",
+    "loading": "이 기기를 확인하는 중…",
+    "unsupported": "이 브라우저는 저장 상태를 보고할 수 없습니다.",
+    "usage": "{{quota}} 중 {{used}} 사용됨",
+    "unknown": "알 수 없음",
+    "persisted": "저장소는 이 기기에 영구적으로 저장됩니다.",
+    "notPersisted": "장치의 공간이 부족하면 브라우저에서 오프라인 데이터를 제거할 수 있습니다.",
+    "keep": "이 기기에 데이터를 보관하세요",
+    "refresh": "다시 불러오기",
+    "critical": "저장공간이 거의 가득 찼습니다. 지금 백업을 내보낸 다음 사용하지 않는 그룹을 제거하세요.",
+    "warning": "저장용량이 가득 찼습니다. 백업을 권장합니다."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "동기화 대기 중",
+    "expense": "동기화 대기 중"
+  },
+  "Attachments": {
+    "assignItems": "영수증 항목 할당",
+    "extractedItems": "AI 추출 아이템",
+    "help": "이미지는 업로드하기 전에 압축됩니다. PDF는 첨부 파일로 보관되며 새 탭에서 열립니다.",
+    "open": "열기",
+    "openInNewTab": "새 탭에서 열기",
+    "pdfPreviewUnavailable": "PDF 미리보기는 별도의 탭에서 열립니다.",
+    "pending": "업로드 대기 중",
+    "preview": "미리보기",
+    "previewAction": "미리보기",
+    "previewNamed": "미리보기 {{name}}",
+    "receipt": "매장 영수증",
+    "saveToAssignItems": "먼저 비용을 저장한 다음 해당 항목을 참가자에게 할당하십시오.",
+    "scanComplete": "영수증 스캔됨",
+    "scanCompleteDescription": "추출된 항목을 참가자에게 할당합니다.",
+    "scanError": "영수증을 스캔할 수 없습니다.",
+    "scanWithAi": "AI로 스캔",
+    "scanning": "스캔 중…",
+    "view": "첨부파일 보기",
+    "attachment": "첨부파일",
+    "onlyImagesPdf": "이미지와 PDF 파일만 지원됩니다."
+  },
+  "Backup": {
+    "downloaded": "백업이 다운로드되었습니다.",
+    "export": "백업 내보내기",
+    "failed": "백업에 실패했습니다.",
+    "restore": "백업 복원",
+    "restoreFailed": "복원에 실패했습니다.",
+    "restoreLabel": "백업 파일 복원",
+    "restored": "백업이 복원되었습니다. 새로고침 중…"
+  },
+  "Common": {
+    "addGroup": "그룹 추가",
+    "close": "Close",
+    "closeDialog": "대화상자 닫기",
+    "dismiss": "Dismiss",
+    "dismissNotification": "알림 닫기",
+    "error": "문제가 발생했습니다.",
+    "expenseNotFound": "비용을 찾을 수 없습니다.",
+    "loading": "로드 중…",
+    "menu": "메뉴",
+    "retry": "다시 시도",
+    "select": "선택…",
+    "unknown": "알 수 없음",
+    "user": "사용자"
+  },
+  "CreateGroup": {
+    "approvalContact": "새로운 비용 그룹을 생성하려면 관리자의 승인이 필요합니다. 귀하의 계정을 Group Creator 계층으로 승격시키려면 인스턴스 관리자에게 문의하십시오.",
+    "approvalDescription": "귀하의 계정은 현재 사용자 동기화 계층에 있습니다. 귀하는 귀하와 공유된 모든 그룹에 참여하고 모든 장치에서 이를 동기화할 수 있습니다.",
+    "approvalTitle": "그룹 생성에는 승인이 필요합니다.",
+    "authRequiredDescription": "새로운 비용 그룹을 생성하려면 외부 계정으로 로그인하세요. 초대된 그룹 참가자는 로그인하지 않고도 그룹 링크를 통해 원활하게 참여할 수 있습니다.",
+    "authRequiredTitle": "인증 필요",
+    "returnToGroups": "내 그룹으로 돌아가기",
+    "signIn": "그룹을 만들려면 로그인하세요"
+  },
+  "GroupTabs": {
+    "Expenses": "지출",
+    "Balances": "잔액",
+    "Information": "정보",
+    "Stats": "현황",
+    "Activity": "활동 내역",
+    "Settings": "설정",
+    "label": "그룹 섹션"
+  },
+  "Login": {
+    "title": "스플릿에 로그인",
+    "description": "장치 간 그룹 동기화를 활성화하려면 외부 계정으로 로그인하세요.",
+    "google": "Google로 계속하기",
+    "github": "GitHub로 계속하기",
+    "noProviders": "OAuth 공급자가 구성되지 않았습니다. 로그인을 활성화하려면 AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET를 설정하세요."
+  },
+  "NotFound": {
+    "title": "페이지를 찾을 수 없습니다",
+    "description": "URL을 확인하고 다시 시도하세요.",
+    "groupTitle": "그룹이 존재하지 않습니다.",
+    "groupDescription": "URL을 확인하거나 새 초대 링크를 요청하세요."
+  },
+  "SyncStatus": {
+    "offlinePending": "오프라인 — 보류 중인 변경 사항: {{count}}",
+    "offlineSaved": "오프라인 — 저장된 데이터 표시",
+    "syncing": "동기화 중…",
+    "error": "동기화 오류: {{error}}",
+    "retryToContinue": "계속해서 다시 시도하세요",
+    "conflicts": "검토가 필요한 충돌: {{count}}",
+    "failed": "동기화할 수 없는 변경사항: {{count}}",
+    "pending": "보류 중인 변경사항: {{count}}",
+    "retryFailed": "실패한 변경 사항 다시 시도",
+    "discardFailed": "실패한 변경 사항 삭제",
+    "resolveConflicts": "갈등 해결",
+    "syncNow": "지금 동기화",
+    "dialogTitle": "갈등 해결",
+    "dialogDescription": "이러한 편집으로 인해 다른 장치의 동일한 기록이 변경되었습니다. 유지할 항목을 선택하세요.",
+    "noConflicts": "해결해야 할 충돌이 없습니다.",
+    "serverVersion": "서버 버전 {{version}} · 로컬 편집이 충돌 대기열에 보관됨",
+    "keepMine": "내 버전 유지",
+    "useServer": "서버 사용",
+    "duplicate": "새 것으로 복제"
+  },
+  "Theme": {
+    "toggle": "테마 전환",
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
   }
 }

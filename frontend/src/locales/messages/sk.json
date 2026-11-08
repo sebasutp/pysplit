@@ -1,7 +1,7 @@
 {
   "Homepage": {
     "title": "Zdieľajte <strong>výdavky</strong> s <strong>priateľmi a rodinou</strong>",
-    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "metaTitle": "Spliit · Zdielaj výdavky medzi kamarátmi alebo rodinou",
     "description": "Vitajte vo vašej novej inštancii <strong>Spliit</strong>!",
     "button": {
       "groups": "Prejsť na skupiny",
@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Skupiny"
+    "groups": "Skupiny",
+    "adminDashboard": "Panel správcu",
+    "language": "Jazyk",
+    "signIn": "Prihláste sa",
+    "signOut": "Odhláste sa",
+    "userMenu": "Používateľské menu"
   },
   "Footer": {
     "madeIn": "Vyrobené v Zürichu, Švajčiarsku 🇨🇭",
@@ -21,7 +26,7 @@
     "create": "Vytvoriť výdavok",
     "createFirst": "Vytvorte prvý",
     "noExpenses": "V skupine sa aktuálne nenachádzajú žiadne výdavky.",
-    "export": "Export",
+    "export": "Exportovať",
     "exportJson": "Exportovať do JSON",
     "exportCsv": "Exportovať do CSV",
     "searchPlaceholder": "Vyhľadaj výdavok…",
@@ -39,20 +44,35 @@
       "lastMonth": "Minulý mesiac",
       "earlierThisYear": "Začiatkom tohto roka",
       "lastYear": "Minulý rok",
-      "older": "Staršie"
-    }
+      "older": "Staršie",
+      "today": "Dnes",
+      "week": "Začiatkom tohto týždňa",
+      "month": "Začiatkom tohto mesiaca",
+      "year": "Začiatkom tohto roka"
+    },
+    "clearSearch": "Jasné",
+    "exportError": "Výdavky sa nepodarilo exportovať",
+    "filterFrom": "Od",
+    "filterTo": "Komu",
+    "loadMore": "Načítať viac",
+    "loading": "Načítavajú sa výdavky…",
+    "loadingMore": "Načítava sa...",
+    "search": "Hľadať výdavky",
+    "showingCount": "Zobrazuje sa {{shown}} z {{total}} výdavkov."
   },
   "ExpenseCard": {
     "paidBy": "Zaplatil <strong>{paidBy}</strong> za <paidFor></paidFor>",
-    "everyone": "všetci",
+    "everyone": "všetkých",
     "receivedBy": "Prijaté od <strong>{paidBy}</strong> pre <paidFor></paidFor>",
     "yourBalance": "Tvoj zostatok:",
-    "notInvolved": "Nie si účastníkom tejto platby."
+    "notInvolved": "Nie je to tvoja vec",
+    "paidByPlain": "Zaplatené {{paidBy}} za {{paidFor}}",
+    "receivedByPlain": "Prijaté {{paidBy}} za {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Moje skupiny",
     "create": "Vytvor",
-    "createGroup": "Create group",
+    "createGroup": "Vytvor skupinu",
     "loadingRecent": "Načítavanie posledných skupín…",
     "NoRecent": {
       "description": "V poslednej dobe ste nenavštívili žiadnu skupinu.",
@@ -60,11 +80,11 @@
       "orAsk": "môžete tiež požiadať priateľa, aby vám poslal existujúci odkaz."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Tvoj celkový zostatok",
+      "description": "Celkový zostatok vo všetkých tvojích skupinách.",
+      "owedToYou": "Máš nárok na",
+      "youOwe": "Máš dlh",
+      "settledUp": "Všetci ste už rozdelení do svojich skupín."
     },
     "recent": "Posledne vytvorené skupiny",
     "starred": "Skupiny označené hviezdičkou",
@@ -83,198 +103,214 @@
       "title": "Pridať skupinu podľa URL",
       "description": "Ak vám bola zdieľaná nejaká skupina, môžete sem vložiť jej URL adresu a pridať ju do svojho zoznamu.",
       "error": "Ups, na základe zadaného URL sme skupinu nenašli…",
-      "urlMode": "Enter URL",
-      "qrMode": "Scan QR",
+      "urlMode": "Zadaj URL",
+      "qrMode": "Oskenuj QR",
       "scanner": {
-        "startCamera": "Start Camera",
-        "stopScanning": "Stop Scanning",
-        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
-        "noCamera": "No camera found on this device.",
-        "cameraError": "Failed to start camera. Please try again.",
-        "permissionError": "Unable to access camera. Please check permissions."
+        "startCamera": "Zapni kameru",
+        "stopScanning": "Zastav skenovanie",
+        "permissionDenied": "Povoľte prístup k fotoaparátu na skenovanie QR kódov.",
+        "noCamera": "Na tomto zariadení nebola nájdená žiadna kamera.",
+        "cameraError": "Nepodarilo sa spustiť kameru. Skúste to prosím znova.",
+        "permissionError": "Nie je možné získať prístup k fotoaparátu. Skontrolujte oprávnenia."
       }
     },
     "NotFound": {
       "text": "Táto skupina neexistuje.",
       "link": "Prejsť na nedávno navštívené skupiny"
-    }
+    },
+    "moreOptions": "Viac možností",
+    "participants": "účastníkov",
+    "star": "Skupina hviezd",
+    "unstar": "Zrušiť hviezdičku skupiny"
   },
   "GroupForm": {
     "title": "Informácie o skupine",
     "NameField": {
       "label": "Názov skupiny",
-      "placeholder": "Summer vacations",
-      "description": "Enter a name for your group."
+      "placeholder": "Letné prázdniny",
+      "description": "Zadajte názov tvojej skupiny."
     },
     "InformationField": {
-      "label": "Group information",
-      "placeholder": "What information is relevant to group participants?"
+      "label": "Informácie o skupine",
+      "placeholder": "Aké informácie sú dôležité pre účastníkov skupiny?"
     },
     "CurrencyField": {
-      "label": "Currency symbol",
+      "label": "Symbol meny",
       "placeholder": "$, €, £…",
-      "description": "We’ll use it to display amounts."
+      "description": "Použijeme to na zobrazenie súm."
     },
     "CurrencyCodeField": {
-      "label": "Main currency",
-      "createDescription": "All amounts and balances will be in this currency.",
-      "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
-      "customOption": "Custom"
+      "label": "Hlanvá mena",
+      "createDescription": "Všetky sumy a zostatky budú uvedené v tejto mene.",
+      "editDescription": "Všetky sumy a zostatky budú uvedené v tejto mene. Zmena tejto meny NEPOVEDIE k prepočtu už zadaných výdavkov, s výnimkou prípadov, keď má daná mena iné „drobné jednotky“ ako aktuálna mena (napr. pri prechode z amerického dolára na japonský jen)",
+      "customOption": "Vlastné"
     },
     "Participants": {
-      "title": "Participants",
-      "description": "Enter the name for each participant.",
-      "protectedParticipant": "This participant is part of expenses, and can not be removed.",
-      "new": "New",
-      "add": "Add participant",
-      "John": "John",
-      "Jane": "Jane",
-      "Jack": "Jack"
+      "title": "Účastníci",
+      "description": "Zadajte meno každého účastníka.",
+      "protectedParticipant": "Tento účastník je zahrnutý v nákladoch a nemožno ho odstrániť.",
+      "new": "Nový",
+      "add": "Pridať účastníka",
+      "John": "Ján",
+      "Jane": "Jolana",
+      "Jack": "Rudolf",
+      "cannotRemove": "Tento účastník je súčasťou nákladov a nemožno ho odstrániť.",
+      "indexLabel": "Účastník #{{index}}",
+      "remove": "Odstrániť účastníka {{index}}"
     },
     "Settings": {
-      "title": "Local settings",
-      "description": "These settings are set per-device, and are used to customize your experience.",
+      "title": "Miestne nastavenia",
+      "description": "Tieto nastavenia sa konfigurujú pre každé zariadenie zvlášť a slúžia na prispôsobenie používateľského prostredia.",
       "ActiveUserField": {
-        "label": "Active user",
-        "placeholder": "Select a participant",
-        "none": "None",
-        "description": "User used as default for paying expenses."
+        "label": "Aktívny používateľ",
+        "placeholder": "Vyber účastníka",
+        "none": "Nikto",
+        "description": "Používateľ nastavený ako predvolený pre úhradu výdavkov."
       },
-      "save": "Save",
-      "saving": "Saving…",
-      "create": "Create",
-      "creating": "Creating…",
-      "cancel": "Cancel"
-    }
+      "save": "Ulož",
+      "saving": "Ukladám…",
+      "create": "Vytvor",
+      "creating": "Vytváram…",
+      "cancel": "Zruš"
+    },
+    "saveError": "Skupinu sa nepodarilo uložiť."
   },
   "ExpenseForm": {
     "Income": {
-      "create": "Create income",
-      "edit": "Edit income",
+      "create": "Vytvor príjem",
+      "edit": "Edituj príjem",
       "TitleField": {
-        "label": "Income title",
-        "placeholder": "Monday evening restaurant",
-        "description": "Enter a description for the income."
+        "label": "Názov príjmu",
+        "placeholder": "Reštaurácia pondelok večer",
+        "description": "Zadajte popis príjmu."
       },
       "DateField": {
-        "label": "Income date",
-        "description": "Enter the date the income was received."
+        "label": "Dátum príjmu",
+        "description": "Zadajte dátum, kedy bol príjem prijatý."
       },
       "currencyField": {
-        "label": "Currency of income",
-        "description": "The currency in which the income was received."
+        "label": "Mena prijmu",
+        "description": "Mena, v ktorej bol príjem prijatý."
       },
-      "categoryFieldDescription": "Select the income category.",
+      "categoryFieldDescription": "Vyberte kategóriu príjmu.",
       "paidByField": {
-        "label": "Received by",
-        "description": "Select the participant who received the income."
+        "label": "Prijaté od",
+        "description": "Vyberte účastníka, ktorý prijal príjem."
       },
       "paidFor": {
-        "title": "Received for",
+        "title": "Prijaté pre",
         "description": "Select who the income was received for."
       },
       "splitModeDescription": "Select how to split the income.",
       "attachDescription": "See and attach receipts to the income."
     },
     "Expense": {
-      "create": "Create expense",
-      "edit": "Edit expense",
+      "create": "Vytvoriť výdavok",
+      "edit": "Upraviť výdavok",
       "TitleField": {
-        "label": "Expense title",
-        "placeholder": "Monday evening restaurant",
+        "label": "Názov výdavku",
+        "placeholder": "Reštaurácia pondelok večer",
         "description": "Enter a description for the expense."
       },
       "DateField": {
-        "label": "Expense date",
+        "label": "Dátum výdavkov",
         "description": "Enter the date the expense was paid."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Mena nákladov",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Select the expense category.",
       "paidByField": {
-        "label": "Paid by",
+        "label": "Zaplatené od",
         "placeholder": "Select a participant",
         "description": "Select the participant who paid the expense."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Opakovanie výdavkov",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "Nikto",
+        "daily": "Denne",
+        "weekly": "Týždenne",
+        "monthly": "Mesačne"
       },
       "paidFor": {
-        "title": "Paid for",
+        "title": "Zaplatené za",
         "description": "Select who the expense was paid for."
       },
       "splitModeDescription": "Select how to split the expense.",
       "attachDescription": "See and attach receipts to the expense."
     },
     "amountField": {
-      "label": "Amount"
+      "label": "Suma"
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "Suma na konverziu",
+      "repaymentLabel": "Suma na prevod",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "Použite sadzby z Frankfurter",
+      "useCustom": "Použiť vlastnú sadzbu",
+      "label": "Výmenný kurz"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "Načítavajú sa výmenné kurzy…",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Ojoj, nepodarilo sa nám získať najnovšie sadzby.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "Nižšie zadajte vlastnú sadzbu.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Obnoviť",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "Ide o náhradu"
     },
     "categoryField": {
-      "label": "Category"
+      "label": "Kategória"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "Poznámky"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "Vyberte žiadne",
+    "selectAll": "Vybrať všetko",
+    "shares": "zdieľať",
+    "advancedOptions": "Pokročilé možnosti rozdelenia…",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "Split režim",
+      "evenly": "Rovnomerne",
+      "byShares": "Nerovnomerne – podľa akcií",
+      "byPercentage": "Nerovnomerne – v percentách",
+      "byAmount": "Nerovnomerne – podľa množstva",
+      "saveAsDefault": "Uložiť ako predvolené možnosti rozdelenia"
     },
     "DeletePopup": {
-      "label": "Delete",
-      "title": "Delete this expense?",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
-      "yes": "Yes",
-      "cancel": "Cancel"
+      "label": "Odstrániť",
+      "title": "Odstrániť tento výdavok?",
+      "description": "Naozaj chcete vymazať tento výdavok? Táto akcia je nezvratná.",
+      "yes": "áno",
+      "cancel": "Zruš"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "attachDocuments": "Pripojte dokumenty",
+    "create": "Vytvor",
+    "creating": "Vytváram…",
+    "save": "Ulož",
+    "saving": "Ukladám…",
+    "cancel": "Zruš",
+    "reimbursement": "Úhrada",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Prideľte položky príjmového dokladu",
+    "conflict": "Tento výdavok zmenil niekto iný. Znova načítajte stránku a skúste to znova.",
+    "conflictTitle": "Výdavky sa zmenili inde",
+    "deleteError": "Výdavok sa nepodarilo odstrániť.",
+    "pendingReceiptTotal": "Potvrdenie naskenované v režime offline je pripravené.",
+    "pendingReceiptTotalApply": "Použiť naskenovaný súčet",
+    "pendingReceiptTotalDismiss": "Odmietnuť",
+    "saveError": "Výdavok sa nepodarilo uložiť."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "Chyba pri nahrávaní dokumentu",
+      "description": "Pri nahrávaní dokumentu sa vyskytla chyba. Skúste to znova neskôr alebo vyberte iný súbor.",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "Vytvorte výdaj z príjmového dokladu",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -309,191 +345,207 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "Chyba pri nahrávaní dokumentu",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Vo fronte. Po opätovnom pripojení sa účtenka naskenuje.",
+    "offline": "Skenovanie sa obnoví, keď ste online.",
+    "scanFailed": "AI nemohla prečítať toto potvrdenie. Skontrolujte konfiguráciu AI servera a skúste to znova.",
+    "scanning": "Skenuje sa…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Riadkové položky potvrdenia",
+    "backToExpense": "Späť k výdavkom",
+    "merchant": "Názov obchodu",
+    "printedTotal": "Celková suma vytlačená na účtenke",
+    "noReceipt": "S týmto výdavkom zatiaľ nie je spojený žiadny príjem.",
+    "empty": "Zatiaľ žiadne položky. Ak chcete začať deliť, pridajte jeden.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Vašu zmenu sa nepodarilo uložiť",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Pridať položku",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Pridať položku",
+      "nameLabel": "Meno",
+      "quantityLabel": "Množstvo",
+      "amountLabel": "Suma",
+      "sharedLabel": "Zdieľané (poplatok za celý účet)",
+      "add": "Pridať",
+      "cancel": "Zruš"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} z {total}",
+      "remaining": "Zostáva {quantity}",
+      "assign": "Prideliť",
+      "edit": "Upraviť",
+      "delete": "Odstrániť",
+      "removePortion": "Odstrániť pridelený podiel",
+      "editTitle": "Upraviť položku",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Ulož",
+      "cancel": "Zruš",
+      "deleteConfirm": "Odstrániť túto položku?",
+      "deleteDescription": "Tým sa odstráni položka a jej priradenia."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Nepriradené",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Zdieľané",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Priradiť položku",
+      "description": "Vyberte, kto zaplatí za „{name}“.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Rozdeľte rovnomerne",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Vlastné rozdelenie",
+      "customHint": "Zadajte množstvá v jednotkách pre každý cieľ.",
+      "shared": "Zdieľané",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Priradené množstvo presahuje množstvo položky.",
+      "confirm": "Prideliť",
+      "cancel": "Zruš"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Zdieľané",
+      "unassigned": "Nepriradené",
+      "optOut": "Zdieľa nepriradené položky",
+      "reconciles": "Vyvážený",
+      "offBy": "Rozdiel {amount}",
+      "itemsTotal": "Súčet položiek na účtenke",
+      "apply": "Použiť na výdavok",
+      "allOptedOut": "Všetci sa odhlásili, ale niektoré položky sú stále nepriradené.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Hodnoty potvrdenia sa líšia · Použiť znova"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Výdavky boli aktualizované",
+      "description": "Do výdaja sa uplatnili položky príjmového dokladu."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Potvrdenie sa nepodarilo použiť"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Aktualizovať výdavky?",
+      "description": "Celková suma nákladov sa líši od súčtu položiek príjmového dokladu. Uplatnením sa prepíše suma výdavku a jeho rozdelenie.",
+      "total": "celkom {current} → {new}",
+      "cancel": "Zruš",
+      "confirm": "Použiť"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Skenovanie vo fronte",
+    "scanPendingDescription": "Obrázok sa uloží do tohto zariadenia a bude naskenovaný, keď budete opäť online.",
+    "offlineQueue": "Ste offline. Teraz priložte fotografiu a po opätovnom pripojení sa naskenuje.",
+    "disabled": "Inteligentné rozdelenie nie je na tomto serveri povolené. Skenovanie účteniek je funkcia len online.",
+    "extracted": "Účtenka bola naskenovaná",
+    "extractedDescription": "Nižšie priraďte extrahované položky.",
+    "loading": "Načítava sa potvrdenie…",
+    "optOutTitle": "Odhlásenia",
+    "scanError": "Účtenku sa nepodarilo naskenovať.",
+    "scanUnavailable": "Skontrolujte konfiguráciu AI servera a skúste to znova.",
+    "scanning": "Skenuje sa potvrdenie…",
+    "upload": "Nahrajte fotografiu účtenky"
   },
   "Balances": {
-    "title": "Balances",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "title": "Zostatky",
+    "description": "Ide o sumu, ktorú každý účastník zaplatil alebo bola zaplatená.",
     "Reimbursements": {
-      "title": "Suggested reimbursements",
-      "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "title": "Navrhované náhrady",
+      "description": "Tu sú návrhy na optimalizované úhrady medzi účastníkmi.",
+      "noImbursements": "Zdá sa, že vaša skupina nepotrebuje žiadnu náhradu 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "Označiť ako zaplatené",
+      "owesPlain": "{{from}} dlhuje {{to}}"
+    },
+    "loading": "Načítavajú sa zostatky…"
   },
   "Stats": {
-    "title": "Stats",
+    "title": "Štatistiky",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Celý čas",
+      "thisMonth": "Tento mesiac",
+      "last30": "Posledných 30 dní",
+      "thisYear": "Tento rok",
+      "custom": "Vlastný rozsah",
+      "from": "Od",
+      "to": "Komu"
     },
     "Totals": {
-      "title": "Totals",
-      "description": "Spending summary of the entire group.",
-      "groupSpendings": "Total group spendings",
+      "title": "Súčty",
+      "description": "Súhrn výdavkov celej skupiny.",
+      "groupSpendings": "Celkové skupinové výdavky",
       "groupEarnings": "Total group earnings",
-      "yourSpendings": "Your total spendings",
+      "yourSpendings": "Vaše celkové výdavky",
       "yourEarnings": "Your total earnings",
-      "yourShare": "Your total share"
+      "yourShare": "Váš celkový podiel"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Zhrnutie",
+      "description": "Kľúčové údaje za zvolené obdobie.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Výdavky/Náklady",
+      "averageExpense": "Priemerný náklad",
+      "largestExpense": "Najväčší výdavok",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Výdavky v priebehu času",
+      "description": "Celkové skupinové výdavky za mesiac. Ak chcete zobraziť výdavky, vyberte mesiac.",
+      "empty": "Zatiaľ nie sú žiadne výdavky.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Výdavky v tomto mesiaci za zvolené obdobie.",
+      "detailsEmpty": "V tomto mesiaci nie sú žiadne výdavky.",
+      "showExpensesPlain": "Zobraziť výdavky za {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Výdavky podľa účastníkov",
+      "description": "Koľko zaplatil každý účastník a jeho podiel na výdavkoch.",
+      "empty": "Zatiaľ nie sú žiadne výdavky.",
+      "participant": "Účastník",
+      "paid": "Zaplatené",
       "count": "Count",
-      "share": "Share"
+      "share": "zdieľať"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Výdavky podľa kategórie",
+      "description": "Celková suma vynaložená v každej kategórii. Výberom kategórie zobrazíte jej výdavky.",
+      "empty": "Zatiaľ nie sú žiadne výdavky.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Výdavky v tejto kategórii za zvolené obdobie.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Zobraziť výdavky za {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Opakujúce sa výdavky",
+      "description": "Odhadované náklady na aktívne opakované výdavky skupiny.",
+      "estimatedMonthly": "Odhadované mesačné náklady",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Načítava sa štatistika…"
   },
   "Activity": {
-    "title": "Activity",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
-    "someone": "Someone",
-    "settingsModified": "Group settings were modified by <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "title": "Aktivita",
+    "description": "Prehľad všetkých aktivít v tejto skupine.",
+    "noActivity": "Vo vašej skupine zatiaľ nie je žiadna aktivita.",
+    "someone": "Niekto",
+    "settingsModified": "Nastavenia skupiny boli upravené pomocou <strong>{participant}</strong>.",
+    "expenseCreated": "Výdavok <em>{expense}</em> vytvorený <strong>{participant}</strong>.",
+    "expenseUpdated": "Výdavok <em>{expense}</em> aktualizovaný o <strong>{participant}</strong>.",
+    "expenseDeleted": "Výdavok <em>{expense}</em> odstránil <strong>{participant}</strong>.",
     "Groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -504,19 +556,24 @@
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
       "older": "Older"
-    }
+    },
+    "loadMore": "Načítať viac",
+    "loading": "Načítava sa aktivita…",
+    "unknown": "Neznáma aktivita"
   },
   "Information": {
-    "title": "Information",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
-    "empty": "No group information yet."
+    "title": "Informácie",
+    "description": "Použite toto miesto na pridanie akýchkoľvek informácií, ktoré môžu byť relevantné pre účastníkov skupiny.",
+    "empty": "Zatiaľ žiadne informácie o skupine."
   },
   "Settings": {
-    "title": "Settings"
+    "title": "Nastavenia",
+    "saved": "Skupina bola aktualizovaná",
+    "savedDescription": "Vaše zmeny boli uložené."
   },
   "Share": {
-    "title": "Share",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "title": "zdieľať",
+    "description": "Ak chcete, aby ostatní účastníci videli skupinu a pridali výdavky, zdieľajte s nimi jej adresu URL.",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Warning!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "zdieľať",
+    "copy": "Kopírovať odkaz",
+    "url": "Odkaz na skupinu"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -542,8 +602,11 @@
     "paidByRequired": "You must select a participant.",
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
-    "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "amountSum": "Súčet súm sa musí rovnať sume nákladov.",
+    "percentageSum": "Súčet percent sa musí rovnať 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Search category...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "K dispozícii je aktualizácia",
+    "updateDescription": "K dispozícii je nová verzia pysplit.",
+    "reload": "Znovu načítať",
+    "updating": "Aktualizuje sa…",
+    "offlineReady": "Pripravené na prácu offline",
+    "offlineReadyDescription": "Aplikačný shell je uložený vo vyrovnávacej pamäti. Raz otvorte skupinu online, aby ste si uchovali jej údaje.",
+    "dismiss": "Zavrieť",
+    "install": "Nainštalujte aplikáciu",
+    "refreshApp": "Obnoviť aplikáciu",
+    "refreshAppHint": "Vymažte súbory vo vyrovnávacej pamäti a znova načítajte najnovšiu verziu. Vaše uložené údaje zostanú v tomto zariadení."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Administračný panel",
+    "description": "Spravujte roly používateľov, povolenia na prístup k platforme a monitorujte systémové metriky.",
+    "totalGroups": "Celkový počet skupín",
+    "totalExpenses": "Celkové náklady",
+    "registeredUsers": "Registrovaní užívatelia",
+    "userManagement": "Úrovne správy používateľov a povolení",
+    "accessDenied": "Prístup odmietnutý",
+    "accessDeniedDescription": "Administračný panel je obmedzený na používateľov na úrovni správcu.",
+    "delete": "Odstrániť",
+    "deleteError": "Nepodarilo sa odstrániť",
+    "email": "E-mail",
+    "expenses": "výdavky",
+    "groupDeleted": "Skupina bola odstránená",
+    "groupManagement": "Skupiny",
+    "groupManagementDescription": "Odstráňte skupiny a skontrolujte používanie.",
+    "groups": "skupiny",
+    "loadMoreGroups": "Načítať viac skupín",
+    "loadMoreUsers": "Načítať viac používateľov",
+    "loading": "Načítava sa informačný panel…",
+    "loadingMore": "Načítava sa...",
+    "participants": "účastníkov",
+    "preauthorize": "Predbežná autorizácia používateľa",
+    "preauthorizeAction": "Predautorizovať",
+    "preauthorizeError": "Používateľa sa nepodarilo predbežne autorizovať",
+    "preauthorized": "Používateľ vopred autorizovaný",
+    "returnToGroups": "Návrat do Moje skupiny",
+    "searchGroups": "Hľadať skupiny",
+    "searchUsers": "Vyhľadajte používateľov",
+    "signInDescription": "Administračný panel vyžaduje účet správcu.",
+    "signInTitle": "Vyžaduje sa prihlásenie",
+    "tier": "Úroveň",
+    "tierError": "Nepodarilo sa aktualizovať úroveň",
+    "tierFor": "Úroveň pre",
+    "tierUpdated": "Úroveň bola aktualizovaná",
+    "userDeleted": "Používateľ bol odstránený",
+    "userTier": "Vrstvy"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Offline úložisko",
+    "loading": "Kontroluje sa toto zariadenie…",
+    "unsupported": "Tento prehliadač nemôže hlásiť stav úložiska.",
+    "usage": "Používa sa {{used}} z {{quota}}",
+    "unknown": "neznámy",
+    "persisted": "Úložisko je v tomto zariadení trvalé.",
+    "notPersisted": "Ak má zariadenie málo miesta, prehliadač môže odstrániť údaje offline.",
+    "keep": "Uchovávajte údaje v tomto zariadení",
+    "refresh": "Obnoviť",
+    "critical": "Úložisko je takmer plné. Exportujte teraz zálohu a potom odstráňte nepoužívané skupiny.",
+    "warning": "Úložisko sa zapĺňa. Odporúča sa záloha."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Čaká sa na synchronizáciu",
+    "expense": "Čaká na synchronizáciu"
+  },
+  "Attachments": {
+    "assignItems": "Prideľte položky príjmového dokladu",
+    "extractedItems": "AI extrahované položky",
+    "help": "Obrázky sú pred odovzdaním komprimované. Súbory PDF sa uchovávajú ako prílohy a otvárajú sa na novej karte.",
+    "open": "Otvoriť",
+    "openInNewTab": "Otvoriť na novej karte",
+    "pdfPreviewUnavailable": "Ukážky PDF sa otvárajú na samostatnej karte.",
+    "pending": "Čaká sa na odovzdanie",
+    "preview": "Ukážka",
+    "previewAction": "Ukážka",
+    "previewNamed": "Ukážka {{name}}",
+    "receipt": "Potvrdenie z obchodu",
+    "saveToAssignItems": "Najprv uložte výdavok a potom tieto položky priraďte účastníkom.",
+    "scanComplete": "Účtenka bola naskenovaná",
+    "scanCompleteDescription": "Priraďte extrahované položky účastníkom.",
+    "scanError": "Účtenku sa nepodarilo naskenovať",
+    "scanWithAi": "Skenovanie pomocou AI",
+    "scanning": "Skenuje sa…",
+    "view": "Zobraziť prílohy",
+    "attachment": "Príloha",
+    "onlyImagesPdf": "Podporované sú iba obrázky a súbory PDF."
+  },
+  "Backup": {
+    "downloaded": "Záloha bola stiahnutá.",
+    "export": "Exportovať zálohu",
+    "failed": "Zálohovanie zlyhalo.",
+    "restore": "Obnoviť zálohu",
+    "restoreFailed": "Obnovenie zlyhalo.",
+    "restoreLabel": "Obnovte záložný súbor",
+    "restored": "Záloha bola obnovená. Opätovné načítavanie…"
+  },
+  "Common": {
+    "addGroup": "Pridať skupinu",
+    "close": "Close",
+    "closeDialog": "Zavrieť dialógové okno",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Zrušiť upozornenie",
+    "error": "Niečo sa pokazilo",
+    "expenseNotFound": "Výdavok sa nenašiel",
+    "loading": "Načítava sa...",
+    "menu": "Menu",
+    "retry": "Skús znova",
+    "select": "Vybrať…",
+    "unknown": "neznámy",
+    "user": "Používateľ"
+  },
+  "CreateGroup": {
+    "approvalContact": "Vytvorenie nových nákladových skupín vyžaduje autorizáciu od správcu. Ak chcete povýšiť svoj účet na úroveň tvorcu skupiny, kontaktujte svojho správcu inštancie.",
+    "approvalDescription": "Váš účet je momentálne na úrovni používateľa synchronizácie. Môžete sa zúčastniť ľubovoľných skupín, ktoré s vami zdieľajú, a synchronizovať ich na všetkých svojich zariadeniach.",
+    "approvalTitle": "Vytvorenie skupiny vyžaduje schválenie",
+    "authRequiredDescription": "Ak chcete vytvoriť nové skupiny výdavkov, prihláste sa pomocou externého účtu. Pozvaní účastníci skupiny sa budú môcť bez prihlásenia pripojiť bez problémov prostredníctvom odkazu na vašu skupinu.",
+    "authRequiredTitle": "Vyžaduje sa overenie",
+    "returnToGroups": "Návrat do Moje skupiny",
+    "signIn": "Prihláste sa na vytvorenie skupiny"
+  },
+  "GroupTabs": {
+    "Expenses": "Výdavky/Náklady",
+    "Balances": "Zostatky",
+    "Information": "Informácie",
+    "Stats": "Štatistiky",
+    "Activity": "Aktivita",
+    "Settings": "Nastavenia",
+    "label": "Skupinové sekcie"
+  },
+  "Login": {
+    "title": "Prihláste sa do služby Split",
+    "description": "Ak chcete povoliť synchronizáciu skupín medzi zariadeniami, prihláste sa pomocou externého účtu.",
+    "google": "Pokračujte v službe Google",
+    "github": "Pokračujte s GitHub",
+    "noProviders": "Nie sú nakonfigurovaní žiadni poskytovatelia OAuth. Ak chcete povoliť prihlásenie, nastavte AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET."
+  },
+  "NotFound": {
+    "title": "Stránka sa nenašla",
+    "description": "Skontrolujte adresu URL a skúste to znova.",
+    "groupTitle": "Táto skupina neexistuje.",
+    "groupDescription": "Skontrolujte webovú adresu alebo požiadajte o nový odkaz na pozvánku."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline – čakajúce zmeny: {{count}}",
+    "offlineSaved": "Offline — zobrazenie uložených údajov",
+    "syncing": "Synchronizuje sa…",
+    "error": "Chyba synchronizácie: {{error}}",
+    "retryToContinue": "znova skúste pokračovať",
+    "conflicts": "Konflikty vyžadujúce kontrolu: {{count}}",
+    "failed": "Zmeny, ktoré nebolo možné synchronizovať: {{count}}",
+    "pending": "Čakajúce zmeny: {{count}}",
+    "retryFailed": "Zopakovať neúspešné zmeny",
+    "discardFailed": "Zahodiť neúspešné zmeny",
+    "resolveConflicts": "Riešenie konfliktov",
+    "syncNow": "Synchronizovať teraz",
+    "dialogTitle": "Riešenie konfliktov",
+    "dialogDescription": "Tieto úpravy zmenili rovnaké záznamy na inom zariadení. Vyberte, čo si ponecháte.",
+    "noConflicts": "Žiadne konflikty na riešenie.",
+    "serverVersion": "Verzia servera {{version}} · lokálna úprava uložená vo fronte konfliktov",
+    "keepMine": "Ponechať moju verziu",
+    "useServer": "Použiť server",
+    "duplicate": "Duplikovať ako nové"
+  },
+  "Theme": {
+    "toggle": "Prepnúť tému",
+    "light": "Svetlý",
+    "dark": "Tmavý",
+    "system": "Systém"
   }
 }

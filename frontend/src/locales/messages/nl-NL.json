@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Groepen"
+    "groups": "Groepen",
+    "adminDashboard": "Beheerdersdashboard",
+    "language": "Taal",
+    "signIn": "Log in",
+    "signOut": "Meld u af",
+    "userMenu": "Gebruikersmenu"
   },
   "Footer": {
     "madeIn": "Gemaakt in Zürich, Zwitserland 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Vorige maand",
       "earlierThisYear": "Eerder dit jaar",
       "lastYear": "Vorig jaar",
-      "older": "Ouder"
-    }
+      "older": "Ouder",
+      "today": "Vandaag",
+      "week": "Eerder deze week",
+      "month": "Eerder deze maand",
+      "year": "Eerder dit jaar"
+    },
+    "clearSearch": "Duidelijk",
+    "exportError": "Kan de uitgaven niet exporteren",
+    "filterFrom": "Van",
+    "filterTo": "Tot",
+    "loadMore": "Laad meer",
+    "loading": "Uitgaven laden…",
+    "loadingMore": "Laden…",
+    "search": "Uitgaven zoeken",
+    "showingCount": "Toont {{shown}} van {{total}} uitgaven."
   },
   "ExpenseCard": {
     "paidBy": "Betaald door <strong>{paidBy}</strong> voor <paidFor></paidFor>",
     "everyone": "iedereen",
     "receivedBy": "Ontvangen door <strong>{paidBy}</strong> voor <paidFor></paidFor>",
     "yourBalance": "Jouw balans:",
-    "notInvolved": "Je bent hier niet bij betrokken"
+    "notInvolved": "Je bent hier niet bij betrokken",
+    "paidByPlain": "Betaald door {{paidBy}} voor {{paidFor}}",
+    "receivedByPlain": "Ontvangen door {{paidBy}} voor {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Mijn groepen",
@@ -60,11 +80,11 @@
       "orAsk": "of vraag een vriend om je de link naar een bestaande groep te sturen."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Je totale saldo",
+      "description": "Je gecombineerde saldo over al je groepen.",
+      "owedToYou": "Je krijgt nog",
+      "youOwe": "Je bent verschuldigd",
+      "settledUp": "Je staat quitte in al je groepen."
     },
     "recent": "Recente groepen",
     "starred": "Favoriete groepen",
@@ -83,7 +103,7 @@
       "title": "Voeg een groep toe met een URL",
       "description": "Als een groep met je gedeeld is, kun je de URL hier plakken om deze aan je lijst toe te voegen.",
       "error": "Oeps, we kunnen de groep niet vinden met de URL die je hebt opgegeven…",
-      "urlMode": "Enter URL",
+      "urlMode": "Voer URL in",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Deze groep bestaat niet.",
       "link": "Ga naar je recente groepen"
-    }
+    },
+    "moreOptions": "Meer opties",
+    "participants": "deelnemers",
+    "star": "Sterren groep",
+    "unstar": "Groep uitsterven"
   },
   "GroupForm": {
     "title": "Groepsinformatie",
@@ -129,7 +153,10 @@
       "add": "Voeg deelnemer toe",
       "John": "Jan",
       "Jane": "Julia",
-      "Jack": "Jacob"
+      "Jack": "Jacob",
+      "cannotRemove": "Deze deelnemer maakt deel uit van een uitgave en kan niet worden verwijderd.",
+      "indexLabel": "Deelnemer #{{index}}",
+      "remove": "Deelnemer {{index}} verwijderen"
     },
     "Settings": {
       "title": "Lokale instellingen",
@@ -145,7 +172,8 @@
       "create": "Groep maken",
       "creating": "Aan het maken…",
       "cancel": "Annuleren"
-    }
+    },
+    "saveError": "Kan de groep niet opslaan."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Om een andere munteenheid in te stellen voor een uitgave en bedragen om te rekenen, kies een standaard munteenheid voor de groep.",
     "originalAmountField": {
       "label": "Om te rekenen bedrag",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Over te maken bedrag",
+      "repaymentDescription": "Omgerekend van het bedrag hierboven, dat de balans vereffent."
     },
     "conversionRateField": {
       "useApi": "Gebruik koersen van Frankfurter",
@@ -274,7 +302,15 @@
     "saving": "Aan het opslaan…",
     "cancel": "Annuleren",
     "reimbursement": "Terugbetaling",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Bonregels toewijzen",
+    "conflict": "Deze uitgave is door iemand anders gewijzigd. Laad de pagina opnieuw en probeer het opnieuw.",
+    "conflictTitle": "De kosten zijn elders gewijzigd",
+    "deleteError": "Kan de onkosten niet verwijderen.",
+    "pendingReceiptTotal": "Een ontvangstbewijs dat offline is gescand, is gereed.",
+    "pendingReceiptTotalApply": "Gebruik gescand totaal",
+    "pendingReceiptTotalDismiss": "Negeren",
+    "saveError": "Kon de kosten niet besparen."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Er is iets mis gegaan bij het uploaden van het document. Probeer het later opnieuw of kies een ander bestand.",
       "retry": "Probeer opnieuw"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "In de wachtrij. De bon wordt gescand nadat u opnieuw verbinding heeft gemaakt.",
+    "offline": "Het scannen wordt hervat zodra u online bent.",
+    "scanFailed": "De AI kon dit ontvangstbewijs niet lezen. Controleer de AI-configuratie van de server en probeer het opnieuw.",
+    "scanning": "Scannen…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Bonregels",
+    "backToExpense": "Terug naar de kosten",
+    "merchant": "Winkelnaam",
+    "printedTotal": "Totaal afgedrukt op de bon",
+    "noReceipt": "Er is nog geen ontvangstbewijs aan deze uitgave gekoppeld.",
+    "empty": "Nog geen artikelen. Voeg er één toe om te beginnen met splitsen.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Kan uw wijziging niet opslaan",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Artikel toevoegen",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Artikel toevoegen",
+      "nameLabel": "Naam",
+      "quantityLabel": "Hoeveelheid",
+      "amountLabel": "Bedrag",
+      "sharedLabel": "Gedeeld (volledige rekening)",
+      "add": "Toevoegen",
+      "cancel": "Annuleren"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} van {total}",
+      "remaining": "{quantity} over",
+      "assign": "Toewijzen",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "removePortion": "Toegekend aandeel verwijderen",
+      "editTitle": "Artikel bewerken",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "deleteConfirm": "Dit artikel verwijderen?",
+      "deleteDescription": "Hiermee worden het item en de bijbehorende toewijzingen verwijderd."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Niet toegewezen",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Gedeeld",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Artikel toewijzen",
+      "description": "Kies wie betaalt voor “{name}”.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Gelijkmatig verdelen",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Aangepaste splitsing",
+      "customHint": "Voer hoeveelheden in eenheden in voor elk doel.",
+      "shared": "Gedeeld",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "De toegewezen hoeveelheid overschrijdt de artikelhoeveelheid.",
+      "confirm": "Toewijzen",
+      "cancel": "Annuleren"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Gedeeld",
+      "unassigned": "Niet toegewezen",
+      "optOut": "Deelt niet-toegewezen items",
+      "reconciles": "Komt overeen",
+      "offBy": "Verschil van {amount}",
+      "itemsTotal": "Totaal bonregels",
+      "apply": "Toepassen op uitgave",
+      "allOptedOut": "Iedereen heeft zich afgemeld, maar sommige items zijn nog steeds niet toegewezen.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Bonwaarden verschillen · Opnieuw aanvragen"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Onkosten bijgewerkt",
+      "description": "De ontvangstitems zijn op de onkosten toegepast."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Kan de bon niet toepassen"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "De uitgave bijwerken?",
+      "description": "Het onkostentotaal verschilt van het totaal van de ontvangstitems. Als u een aanvraag indient, wordt het onkostenbedrag en de splitsing ervan overschreven.",
+      "total": "totaal {current} → {new}",
+      "cancel": "Annuleren",
+      "confirm": "Toepassen"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Scannen in wachtrij",
+    "scanPendingDescription": "De afbeelding wordt op dit apparaat opgeslagen en wordt gescand wanneer u weer online bent.",
+    "offlineQueue": "Je bent offline. Voeg de foto nu toe en deze wordt gescand zodra u opnieuw verbinding maakt.",
+    "disabled": "Smart split is niet ingeschakeld op deze server. Het scannen van bonnen is een functie die alleen online beschikbaar is.",
+    "extracted": "Bon gescand",
+    "extractedDescription": "Wijs de geëxtraheerde items hieronder toe.",
+    "loading": "Bon laden…",
+    "optOutTitle": "Afmeldingen",
+    "scanError": "Het ontvangstbewijs kon niet worden gescand.",
+    "scanUnavailable": "Controleer de AI-configuratie van de server en probeer het opnieuw.",
+    "scanning": "Bon scannen…",
+    "upload": "Upload een foto van het ontvangstbewijs"
   },
   "Balances": {
     "title": "Balans",
@@ -415,20 +462,22 @@
       "description": "Dit zijn de voorgestelde terugbetalingen tussen deelnemers.",
       "noImbursements": "Lijkt erop dat je groep geen terugbetalingen nodig heeft 😁",
       "owes": "<strong>{from}</strong> betaalt aan <strong>{to}</strong>",
-      "markAsPaid": "Markeer als betaald"
-    }
+      "markAsPaid": "Markeer als betaald",
+      "owesPlain": "{{from}} is {{to}} verschuldigd"
+    },
+    "loading": "Saldi laden…"
   },
   "Stats": {
     "title": "Statistieken",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Periode",
+      "all": "Alle tijd",
+      "thisMonth": "Deze maand",
+      "last30": "Laatste 30 dagen",
+      "thisYear": "Dit jaar",
+      "custom": "Aangepast",
+      "from": "Van",
+      "to": "Tot"
     },
     "Totals": {
       "title": "Totaaluitgaven",
@@ -440,50 +489,53 @@
       "yourShare": "Jouw totale aandeel"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Samenvatting",
+      "description": "Kerncijfers voor de geselecteerde periode.",
+      "empty": "Er zijn nog geen uitgaven.",
+      "expenseCount": "Uitgaven",
+      "averageExpense": "Gemiddelde uitgave",
+      "largestExpense": "Grootste uitgave",
+      "activeSpan": "Actieve periode"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "title": "Uitgaven in de tijd",
+      "description": "Totale uitgaven van de groep per maand. Selecteer een maand om de uitgaven te bekijken.",
+      "empty": "Er zijn nog geen uitgaven.",
+      "showExpenses": "Uitgaven voor {month} tonen",
+      "detailsDescription": "Uitgaven in deze maand voor de geselecteerde periode.",
+      "detailsEmpty": "Er zijn geen uitgaven in deze maand.",
+      "showExpensesPlain": "Toon uitgaven voor {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "Uitgaven per deelnemer",
+      "description": "Hoeveel elke deelnemer heeft betaald en zijn aandeel in de uitgaven.",
+      "empty": "Er zijn nog geen uitgaven.",
+      "participant": "Deelnemer",
+      "paid": "Betaald",
+      "count": "Aantal",
+      "share": "Aandeel"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "title": "Uitgaven per categorie",
+      "description": "Totaalbedrag dat per categorie is uitgegeven. Selecteer een categorie om de uitgaven te bekijken.",
+      "empty": "Er zijn nog geen uitgaven.",
+      "showExpenses": "Uitgaven voor {category} tonen",
+      "detailsDescription": "Uitgaven in deze categorie voor de geselecteerde periode.",
+      "detailsEmpty": "Er zijn geen uitgaven in deze categorie.",
+      "showExpensesPlain": "Toon uitgaven voor {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Terugkerende uitgaven",
+      "description": "Geschatte kosten van de actieve terugkerende uitgaven van de groep.",
+      "estimatedMonthly": "Geschatte maandelijkse kosten",
+      "estimatedYearly": "{amount} per jaar",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# dagelijkse uitgave} other {# dagelijkse uitgaven}}",
+        "WEEKLY": "{count, plural, one {# wekelijkse uitgave} other {# wekelijkse uitgaven}}",
+        "MONTHLY": "{count, plural, one {# maandelijkse uitgave} other {# maandelijkse uitgaven}}"
       }
-    }
+    },
+    "loading": "Statistieken laden…"
   },
   "Activity": {
     "title": "Gebeurtenissen",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Eerder dit jaar",
       "lastYear": "Vorig jaar",
       "older": "Ouder"
-    }
+    },
+    "loadMore": "Laad meer",
+    "loading": "Activiteit laden…",
+    "unknown": "Onbekende activiteit"
   },
   "Information": {
     "title": "Informatie",
@@ -512,20 +567,25 @@
     "empty": "Nog geen informatie toegevoegd."
   },
   "Settings": {
-    "title": "Instellingen"
+    "title": "Instellingen",
+    "saved": "Groep bijgewerkt",
+    "savedDescription": "Uw wijzigingen zijn opgeslagen."
   },
   "Share": {
     "title": "Delen",
     "description": "Om andere deelnemers de groep te laten zien en uitgaven toe te voegen, deel je de URL met hen.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Link kopiëren",
+    "shareLink": "Link delen",
     "warning": "Waarschuwing!",
     "warningHelp": "Iedereen met de groeps-URL kan de uitgaven zien en bewerken. Deel voorzichtig!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Aandeel",
+    "copy": "Link kopiëren",
+    "url": "Groepslink"
   },
   "SchemaErrors": {
     "min1": "Vul ten minste één karakter in.",
@@ -543,7 +603,10 @@
     "paidForMin1": "De uitgave moet voor ten minste één deelnemer zijn gedaan.",
     "noZeroShares": "Een deel mag niet 0 zijn.",
     "amountSum": "Het totaalbedrag moet gelijk zijn aan het uitgavebedrag.",
-    "percentageSum": "Het totaalpercentage moet gelijk zijn aan 100%."
+    "percentageSum": "Het totaalpercentage moet gelijk zijn aan 100%.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Categorie zoeken…",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Update beschikbaar",
+    "updateDescription": "Er is een nieuwe versie van pysplit beschikbaar.",
+    "reload": "Opnieuw laden",
+    "updating": "Updaten…",
+    "offlineReady": "Klaar om offline te werken",
+    "offlineReadyDescription": "De applicatieshell wordt in de cache opgeslagen. Open een groep één keer terwijl u online bent om de gegevens ervan te behouden.",
+    "dismiss": "Sluiten",
+    "install": "Installeer app",
+    "refreshApp": "App vernieuwen",
+    "refreshAppHint": "Wis in de cache opgeslagen bestanden en laad de nieuwste versie opnieuw. Uw opgeslagen gegevens blijven op dit apparaat staan."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Beheerdashboard",
+    "description": "Beheer gebruikersrollen, platformtoegangsrechten en bewaak systeemstatistieken.",
+    "totalGroups": "Totaal groepen",
+    "totalExpenses": "Totale kosten",
+    "registeredUsers": "Geregistreerde gebruikers",
+    "userManagement": "Gebruikersbeheer- en machtigingsniveaus",
+    "accessDenied": "Toegang geweigerd",
+    "accessDeniedDescription": "Het Beheerdashboard is beperkt tot gebruikers in de beheerderslaag.",
+    "delete": "Verwijderen",
+    "deleteError": "Kan niet verwijderen",
+    "email": "E-mail",
+    "expenses": "uitgaven",
+    "groupDeleted": "Groep verwijderd",
+    "groupManagement": "Groepen",
+    "groupManagementDescription": "Verwijder groepen en inspecteer het gebruik.",
+    "groups": "groepen",
+    "loadMoreGroups": "Laad meer groepen",
+    "loadMoreUsers": "Laad meer gebruikers",
+    "loading": "Dashboard laden…",
+    "loadingMore": "Laden…",
+    "participants": "deelnemers",
+    "preauthorize": "Autoriseer een gebruiker vooraf",
+    "preauthorizeAction": "Pre-autoriseren",
+    "preauthorizeError": "Kan de gebruiker niet vooraf autoriseren",
+    "preauthorized": "Gebruiker vooraf geautoriseerd",
+    "returnToGroups": "Keer terug naar Mijn groepen",
+    "searchGroups": "Zoek groepen",
+    "searchUsers": "Zoek gebruikers",
+    "signInDescription": "Voor het beheerdashboard is een beheerdersaccount vereist.",
+    "signInTitle": "Inloggen vereist",
+    "tier": "Niveau",
+    "tierError": "Kan de laag niet updaten",
+    "tierFor": "Niveau voor",
+    "tierUpdated": "Niveau bijgewerkt",
+    "userDeleted": "Gebruiker verwijderd",
+    "userTier": "Niveaus"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Offline opslag",
+    "loading": "Dit apparaat controleren...",
+    "unsupported": "Deze browser kan de opslagstatus niet rapporteren.",
+    "usage": "{{used}} of {{quota}} gebruikt",
+    "unknown": "onbekend",
+    "persisted": "De opslag is permanent op dit apparaat.",
+    "notPersisted": "De browser kan offline gegevens verwijderen als er weinig ruimte op het apparaat is.",
+    "keep": "Bewaar gegevens op dit apparaat",
+    "refresh": "Ververs",
+    "critical": "De opslag is bijna vol. Exporteer nu een back-up en verwijder vervolgens ongebruikte groepen.",
+    "warning": "De opslag raakt vol. Een back-up wordt aanbevolen."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Synchronisatie in behandeling",
+    "expense": "Synchronisatie in behandeling"
+  },
+  "Attachments": {
+    "assignItems": "Bonregels toewijzen",
+    "extractedItems": "AI geëxtraheerde items",
+    "help": "Afbeeldingen worden gecomprimeerd voordat ze worden geüpload. PDF's worden als bijlage bewaard en op een nieuw tabblad geopend.",
+    "open": "Openen",
+    "openInNewTab": "Openen in een nieuw tabblad",
+    "pdfPreviewUnavailable": "PDF-voorbeelden worden op een apart tabblad geopend.",
+    "pending": "Uploaden in afwachting",
+    "preview": "Voorbeeld",
+    "previewAction": "Voorbeeld",
+    "previewNamed": "Voorbeeld {{name}}",
+    "receipt": "Winkelbon",
+    "saveToAssignItems": "Sla de uitgave op om deze items aan deelnemers toe te wijzen.",
+    "scanComplete": "Bon gescand",
+    "scanCompleteDescription": "Wijs de geëxtraheerde items toe aan deelnemers.",
+    "scanError": "Het ontvangstbewijs kon niet worden gescand",
+    "scanWithAi": "Scannen met AI",
+    "scanning": "Scannen…",
+    "view": "Bijlagen bekijken",
+    "attachment": "Bijlage",
+    "onlyImagesPdf": "Alleen afbeeldingen en PDF-bestanden worden ondersteund."
+  },
+  "Backup": {
+    "downloaded": "Back-up gedownload.",
+    "export": "Back-up exporteren",
+    "failed": "Back-up mislukt.",
+    "restore": "Back-up herstellen",
+    "restoreFailed": "Herstellen mislukt.",
+    "restoreLabel": "Back-upbestand herstellen",
+    "restored": "Back-up hersteld. Herladen…"
+  },
+  "Common": {
+    "addGroup": "Groep toevoegen",
+    "close": "Close",
+    "closeDialog": "Dialoogvenster sluiten",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Melding afwijzen",
+    "error": "Er is iets misgegaan",
+    "expenseNotFound": "Kosten niet gevonden",
+    "loading": "Laden…",
+    "menu": "Menukaart",
+    "retry": "Probeer opnieuw",
+    "select": "Selecteer…",
+    "unknown": "onbekend",
+    "user": "Gebruiker"
+  },
+  "CreateGroup": {
+    "approvalContact": "Voor het maken van nieuwe onkostengroepen is toestemming van een beheerder vereist. Neem contact op met uw instantiebeheerder om uw account te promoveren naar het Group Creator-niveau.",
+    "approvalDescription": "Uw account bevindt zich momenteel in de laag Sync User. U kunt deelnemen aan alle groepen die met u worden gedeeld en deze op al uw apparaten synchroniseren.",
+    "approvalTitle": "Voor het maken van een groep is goedkeuring vereist",
+    "authRequiredDescription": "Om nieuwe onkostengroepen aan te maken, logt u in met een extern account. Uitgenodigde groepsdeelnemers kunnen nog steeds probleemloos lid worden via uw groepslink, zonder zich aan te melden.",
+    "authRequiredTitle": "Authenticatie vereist",
+    "returnToGroups": "Keer terug naar Mijn groepen",
+    "signIn": "Meld u aan bij Groep maken"
+  },
+  "GroupTabs": {
+    "Expenses": "Uitgaven",
+    "Balances": "Balans",
+    "Information": "Informatie",
+    "Stats": "Statistieken",
+    "Activity": "Gebeurtenissen",
+    "Settings": "Instellingen",
+    "label": "Groepssecties"
+  },
+  "Login": {
+    "title": "Meld u aan bij Split",
+    "description": "Meld u aan met een extern account om groepssynchronisatie tussen verschillende apparaten in te schakelen.",
+    "google": "Ga verder met Google",
+    "github": "Ga verder met GitHub",
+    "noProviders": "Er zijn geen OAuth-providers geconfigureerd. Stel AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET in om inloggen in te schakelen."
+  },
+  "NotFound": {
+    "title": "Pagina niet gevonden",
+    "description": "Controleer de URL en probeer het opnieuw.",
+    "groupTitle": "Deze groep bestaat niet.",
+    "groupDescription": "Controleer de URL of vraag om een nieuwe uitnodigingslink."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline — wijzigingen in behandeling: {{count}}",
+    "offlineSaved": "Offline — opgeslagen gegevens weergeven",
+    "syncing": "Synchroniseren...",
+    "error": "Synchronisatiefout: {{error}}",
+    "retryToContinue": "probeer opnieuw om door te gaan",
+    "conflicts": "Conflicten die moeten worden beoordeeld: {{count}}",
+    "failed": "Wijzigingen die niet konden worden gesynchroniseerd: {{count}}",
+    "pending": "Wijzigingen in behandeling: {{count}}",
+    "retryFailed": "Mislukte wijzigingen opnieuw proberen",
+    "discardFailed": "Mislukte wijzigingen negeren",
+    "resolveConflicts": "Conflicten oplossen",
+    "syncNow": "Synchroniseer nu",
+    "dialogTitle": "Conflicten oplossen",
+    "dialogDescription": "Door deze bewerkingen zijn dezelfde records gewijzigd op een ander apparaat. Kies wat u wilt behouden.",
+    "noConflicts": "Geen conflicten om op te lossen.",
+    "serverVersion": "Serverversie {{version}} · lokale bewerking bewaard in de conflictwachtrij",
+    "keepMine": "Mijn versie behouden",
+    "useServer": "Gebruik server",
+    "duplicate": "Dupliceren als nieuw"
+  },
+  "Theme": {
+    "toggle": "Schakel van thema",
+    "light": "Licht",
+    "dark": "Donker",
+    "system": "Systeem"
   }
 }

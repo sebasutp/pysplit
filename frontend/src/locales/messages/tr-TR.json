@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Gruplar"
+    "groups": "Gruplar",
+    "adminDashboard": "Yönetici kontrol paneli",
+    "language": "Dil",
+    "signIn": "Oturum aç",
+    "signOut": "Oturumu kapat",
+    "userMenu": "Kullanıcı menüsü"
   },
   "Footer": {
     "madeIn": "Zürih, İsviçre 🇨🇭'de yapıldı",
@@ -39,15 +44,30 @@
       "lastMonth": "Geçen ay",
       "earlierThisYear": "Bu yılın başlarında",
       "lastYear": "Geçen yıl",
-      "older": "Daha eski"
-    }
+      "older": "Daha eski",
+      "today": "Bugün",
+      "week": "Bu haftanın başlarında",
+      "month": "Bu ayın başlarında",
+      "year": "Bu yılın başlarında"
+    },
+    "clearSearch": "Temizle",
+    "exportError": "Giderler dışarı aktarılamadı",
+    "filterFrom": "Gönderen",
+    "filterTo": "Kime",
+    "loadMore": "Daha fazlasını yükle",
+    "loading": "Giderler yükleniyor…",
+    "loadingMore": "Yükleniyor…",
+    "search": "Giderleri ara",
+    "showingCount": "{{total}} giderlerin {{shown}}'si gösteriliyor."
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong> tarafından ödendi, <paidFor></paidFor> için",
     "everyone": "herkes",
     "receivedBy": "<strong>{paidBy}</strong> tarafından alındı, <paidFor></paidFor> için",
     "yourBalance": "Bakiyeniz:",
-    "notInvolved": "Dahil değilsiniz"
+    "notInvolved": "Dahil değilsiniz",
+    "paidByPlain": "{{paidFor}} için {{paidBy}} tarafından ödendi",
+    "receivedByPlain": "{{paidBy}} tarafından {{paidFor}} için alındı"
   },
   "Groups": {
     "myGroups": "Gruplarım",
@@ -60,11 +80,11 @@
       "orAsk": "ya da bir arkadaşınızdan mevcut bir grubun bağlantısını göndermesini isteyin."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Toplam bakiyeniz",
+      "description": "Tüm gruplarınızdaki birleşik bakiyeniz.",
+      "owedToYou": "borçlusun",
+      "youOwe": "borçlusun",
+      "settledUp": "Hepiniz gruplarınıza yerleşmişsiniz."
     },
     "recent": "Son gruplar",
     "starred": "Yıldızlı gruplar",
@@ -83,7 +103,7 @@
       "title": "URL ile grup ekle",
       "description": "Bir grup sizinle paylaşıldıysa, URL'sini buraya yapıştırarak listeye ekleyebilirsiniz.",
       "error": "Üzgünüz, sağladığınız URL'den bir grup bulamadık…",
-      "urlMode": "Enter URL",
+      "urlMode": "URL'yi girin",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Bu grup mevcut değil.",
       "link": "Son ziyaret ettiğiniz gruplara dön"
-    }
+    },
+    "moreOptions": "Daha fazla seçenek",
+    "participants": "katılımcılar",
+    "star": "Yıldız grubu",
+    "unstar": "Grubun yıldızını kaldır"
   },
   "GroupForm": {
     "title": "Grup bilgileri",
@@ -129,7 +153,10 @@
       "add": "Katılımcı ekle",
       "John": "John",
       "Jane": "Ayşe",
-      "Jack": "Cem"
+      "Jack": "Cem",
+      "cannotRemove": "Bu katılımcı bir giderin parçasıdır ve kaldırılamaz.",
+      "indexLabel": "Katılımcı #{{index}}",
+      "remove": "Katılımcıyı kaldır {{index}}"
     },
     "Settings": {
       "title": "Yerel ayarlar",
@@ -145,7 +172,8 @@
       "create": "Oluştur",
       "creating": "Oluşturuluyor…",
       "cancel": "İptal"
-    }
+    },
+    "saveError": "Grup kaydedilemedi."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "Her bir masraf için farklı bir para birimi belirlemek ve tutarları dönüştürmek için, grup için özel olmayan bir para birimi seçin.",
     "originalAmountField": {
       "label": "Dönüştürülecek miktar",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Aktarılacak tutar",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "Kaydediliyor…",
     "cancel": "İptal",
     "reimbursement": "Geri ödeme",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Makbuz öğelerini tahsis edin",
+    "conflict": "Bu masraf başkası tarafından değiştirildi. Sayfayı yeniden yükleyip tekrar deneyin.",
+    "conflictTitle": "Gider başka yerde değişti",
+    "deleteError": "Gider silinemedi.",
+    "pendingReceiptTotal": "Çevrimdışıyken taranan bir makbuz hazırdır.",
+    "pendingReceiptTotalApply": "Taranan toplamı kullan",
+    "pendingReceiptTotalDismiss": "Reddet",
+    "saveError": "Masraftan tasarruf edilemedi."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Belge yüklenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya farklı bir dosya seçin.",
       "retry": "Tekrar dene"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Sıraya alındı. Yeniden bağlandıktan sonra makbuz taranacaktır.",
+    "offline": "Çevrimiçi olduğunuzda tarama devam eder.",
+    "scanFailed": "Yapay zeka bu makbuzu okuyamadı. Sunucu AI yapılandırmasını kontrol edin ve tekrar deneyin.",
+    "scanning": "Taranıyor…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Makbuz satır öğeleri",
+    "backToExpense": "Gidere geri dön",
+    "merchant": "Mağaza adı",
+    "printedTotal": "Makbuzun üzerine basılan toplam",
+    "noReceipt": "Henüz bu gidere bağlı bir makbuz yok.",
+    "empty": "Henüz öğe yok. Bölmeye başlamak için bir tane ekleyin.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Değişikliğiniz kaydedilemedi",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Öğe ekle",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Öğe ekle",
+      "nameLabel": "İsim",
+      "quantityLabel": "Miktar",
+      "amountLabel": "Tutar",
+      "sharedLabel": "Paylaşılan (tüm fatura ücreti)",
+      "add": "Ekle",
+      "cancel": "İptal"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} / {total}",
+      "remaining": "{quantity} kaldı",
+      "assign": "Tahsis Et",
+      "edit": "Düzenle",
+      "delete": "Sil",
+      "removePortion": "Tahsis edilen payı kaldır",
+      "editTitle": "Öğeyi düzenle",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "deleteConfirm": "Bu öğe silinsin mi?",
+      "deleteDescription": "Bu, öğeyi ve atamalarını kaldırır."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Atanmamış",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Paylaşılan",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Öğe ata",
+      "description": "“{name}” için kimin ödeme yapacağını seçin.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Eşit olarak bölün",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Özel bölme",
+      "customHint": "Her hedef için miktarları birim cinsinden girin.",
+      "shared": "Paylaşılan",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Atanan miktar, kalem miktarını aşıyor.",
+      "confirm": "Tahsis Et",
+      "cancel": "İptal"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Paylaşılan",
+      "unassigned": "Atanmamış",
+      "optOut": "Atanmamış öğeleri paylaşır",
+      "reconciles": "Dengeli",
+      "offBy": "{amount} fark",
+      "itemsTotal": "Makbuz kalemlerinin toplamı",
+      "apply": "Gidere uygula",
+      "allOptedOut": "Herkes kapsam dışında kalmayı tercih etti ancak bazı öğelerin ataması hâlâ kaldırılmış durumda.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Makbuz değerleri farklı · Tekrar uygula"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Gider güncellendi",
+      "description": "Makbuz kalemleri gidere uygulandı."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Makbuz uygulanamadı"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Gider güncellensin mi?",
+      "description": "Gider toplamı, fiş kalemlerinin toplamından farklıdır. Başvuru, gider tutarının ve bölünmesinin üzerine yazılacaktır.",
+      "total": "toplam {current} → {new}",
+      "cancel": "İptal",
+      "confirm": "Uygula"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Tarama sıraya alındı",
+    "scanPendingDescription": "Resim bu cihaza kaydedildi ve tekrar çevrimiçi olduğunuzda taranacak.",
+    "offlineQueue": "Çevrimdışısınız. Fotoğrafı şimdi ekleyin; yeniden bağlandığınızda taranacaktır.",
+    "disabled": "Akıllı bölme bu sunucuda etkin değil. Makbuz tarama yalnızca çevrimiçi bir özelliktir.",
+    "extracted": "Makbuz tarandı",
+    "extractedDescription": "Aşağıda çıkarılan öğeleri atayın.",
+    "loading": "Makbuz yükleniyor…",
+    "optOutTitle": "Devre dışı bırakma",
+    "scanError": "Makbuz taranamadı.",
+    "scanUnavailable": "Sunucu AI yapılandırmasını kontrol edin ve tekrar deneyin.",
+    "scanning": "Makbuz taranıyor…",
+    "upload": "Makbuz fotoğrafı yükleyin"
   },
   "Balances": {
     "title": "Bakiyeler",
@@ -415,20 +462,22 @@
       "description": "Katılımcılar arasındaki en uygun geri ödeme önerileri aşağıdadır.",
       "noImbursements": "Görünüşe göre grubunuzun hiçbir geri ödemeye ihtiyacı yok 😁",
       "owes": "<strong>{from}</strong>, <strong>{to}</strong>'ya borçlu",
-      "markAsPaid": "Ödendi olarak işaretle"
-    }
+      "markAsPaid": "Ödendi olarak işaretle",
+      "owesPlain": "{{from}} borçlu {{to}}"
+    },
+    "loading": "Bakiyeler yükleniyor…"
   },
   "Stats": {
     "title": "İstatistikler",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Tüm zamanlar",
+      "thisMonth": "Bu ay",
+      "last30": "Son 30 gün",
+      "thisYear": "Bu yıl",
+      "custom": "Özel aralık",
+      "from": "Gönderen",
+      "to": "Kime"
     },
     "Totals": {
       "title": "Toplamlar",
@@ -440,50 +489,53 @@
       "yourShare": "Sizin toplam payınız"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Özet",
+      "description": "Seçilen döneme ait önemli rakamlar.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Masraflar",
+      "averageExpense": "Ortalama gider",
+      "largestExpense": "En büyük masraf",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Zaman içinde harcama",
+      "description": "Aylık toplam grup harcaması. Harcamalarını görmek için bir ay seçin.",
+      "empty": "Henüz hiçbir masraf yok.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Seçilen döneme ait bu aydaki giderler.",
+      "detailsEmpty": "Bu ay hiçbir masrafınız yok.",
+      "showExpensesPlain": "{{month}} masraflarını göster"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Katılımcıya göre harcama",
+      "description": "Her katılımcının ne kadar ödediği ve masraflardan payları.",
+      "empty": "Henüz hiçbir masraf yok.",
+      "participant": "Katılımcı",
+      "paid": "Ücretli",
       "count": "Count",
-      "share": "Share"
+      "share": "Paylaş"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Kategoriye göre harcama",
+      "description": "Her kategoride harcanan toplam tutar. Harcamalarını görmek için bir kategori seçin.",
+      "empty": "Henüz hiçbir masraf yok.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Seçilen döneme ait bu kategorideki harcamalar.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "{{category}} masraflarını göster"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Tekrarlanan harcamalar",
+      "description": "Grubun aktif yinelenen giderlerinin tahmini maliyeti.",
+      "estimatedMonthly": "Tahmini aylık maliyet",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "İstatistikler yükleniyor…"
   },
   "Activity": {
     "title": "Etkinlik",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Bu yılın başlarında",
       "lastYear": "Geçen yıl",
       "older": "Daha eski"
-    }
+    },
+    "loadMore": "Daha fazlasını yükle",
+    "loading": "Etkinlik yükleniyor…",
+    "unknown": "Bilinmeyen etkinlik"
   },
   "Information": {
     "title": "Bilgi",
@@ -512,20 +567,25 @@
     "empty": "Henüz grup bilgisi bulunmuyor."
   },
   "Settings": {
-    "title": "Ayarlar"
+    "title": "Ayarlar",
+    "saved": "Grup güncellendi",
+    "savedDescription": "Değişiklikleriniz kaydedildi."
   },
   "Share": {
     "title": "Paylaş",
     "description": "Diğer katılımcıların grubu görmesi ve masraf ekleyebilmesi için onlarla bu grubun URL'sini paylaşın.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Bağlantıyı kopyala",
+    "shareLink": "Bağlantıyı paylaş",
     "warning": "Uyarı!",
     "warningHelp": "Grubun URL'sine sahip olan herkes masrafları görebilir ve düzenleyebilir. Lütfen paylaşırken dikkatli olun!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Paylaş",
+    "copy": "Bağlantıyı kopyala",
+    "url": "Grup bağlantısı"
   },
   "SchemaErrors": {
     "min1": "En az bir karakter girin.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Masraf en az bir katılımcı için ödenmiş olmalıdır.",
     "noZeroShares": "Tüm paylar 0'dan büyük olmalıdır.",
     "amountSum": "Tutarların toplamı masraf tutarına eşit olmalıdır.",
-    "percentageSum": "Yüzdelerin toplamı 100 olmalıdır."
+    "percentageSum": "Yüzdelerin toplamı 100 olmalıdır.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Kategori ara...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Güncelleme mevcut",
+    "updateDescription": "Pysplit'in yeni bir sürümü mevcut.",
+    "reload": "Yeniden yükle",
+    "updating": "Güncelleniyor…",
+    "offlineReady": "Çevrimdışı çalışmaya hazır",
+    "offlineReadyDescription": "Uygulama kabuğu önbelleğe alınır. Verilerini korumak için bir grubu çevrimiçiyken bir kez açın.",
+    "dismiss": "Kapat",
+    "install": "Uygulamayı yükle",
+    "refreshApp": "Uygulamayı yenile",
+    "refreshAppHint": "Önbelleğe alınmış dosyaları temizleyin ve en son sürümü yeniden yükleyin. Kaydedilen verileriniz bu cihazda kalır."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Yönetim Kontrol Paneli",
+    "description": "Kullanıcı rollerini, platform erişim izinlerini yönetin ve sistem ölçümlerini izleyin.",
+    "totalGroups": "Toplam Gruplar",
+    "totalExpenses": "Toplam Giderler",
+    "registeredUsers": "Kayıtlı Kullanıcılar",
+    "userManagement": "Kullanıcı Yönetimi ve İzin Katmanları",
+    "accessDenied": "Erişim Reddedildi",
+    "accessDeniedDescription": "Yönetim Kontrol Paneli, Yönetici katmanındaki kullanıcılarla sınırlıdır.",
+    "delete": "Sil",
+    "deleteError": "Silinemedi",
+    "email": "E-posta",
+    "expenses": "giderler",
+    "groupDeleted": "Grup silindi",
+    "groupManagement": "Gruplar",
+    "groupManagementDescription": "Grupları silin ve kullanımı inceleyin.",
+    "groups": "gruplar",
+    "loadMoreGroups": "Daha fazla grup yükle",
+    "loadMoreUsers": "Daha fazla kullanıcı yükle",
+    "loading": "Kontrol paneli yükleniyor…",
+    "loadingMore": "Yükleniyor…",
+    "participants": "katılımcılar",
+    "preauthorize": "Bir kullanıcıya ön yetki verme",
+    "preauthorizeAction": "Ön yetkilendirme",
+    "preauthorizeError": "Kullanıcıya ön yetkilendirme yapılamadı",
+    "preauthorized": "Kullanıcıya önceden yetki verildi",
+    "returnToGroups": "Gruplarım'a dön",
+    "searchGroups": "Grupları ara",
+    "searchUsers": "Kullanıcıları ara",
+    "signInDescription": "Yönetim kontrol paneli bir yönetici hesabı gerektirir.",
+    "signInTitle": "Oturum açmanız gerekiyor",
+    "tier": "Seviye",
+    "tierError": "Katman güncellenemedi",
+    "tierFor": "Şunun için seviye:",
+    "tierUpdated": "Seviye güncellendi",
+    "userDeleted": "Kullanıcı silindi",
+    "userTier": "Katmanlar"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Çevrimdışı depolama",
+    "loading": "Bu cihaz kontrol ediliyor…",
+    "unsupported": "Bu tarayıcı depolama durumunu raporlayamıyor.",
+    "usage": "{{used}} / {{quota}} kullanıldı",
+    "unknown": "bilinmiyor",
+    "persisted": "Depolama bu cihazda kalıcıdır.",
+    "notPersisted": "Cihazda yer azalırsa tarayıcı çevrimdışı verileri çıkarabilir.",
+    "keep": "Verileri bu cihazda tut",
+    "refresh": "Yenile",
+    "critical": "Depolama neredeyse doldu. Şimdi bir yedeği dışa aktarın, ardından kullanılmayan grupları kaldırın.",
+    "warning": "Depolama dolmak üzere. Bir yedekleme önerilir."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Senkronizasyon bekleniyor",
+    "expense": "Eşitleme bekliyor"
+  },
+  "Attachments": {
+    "assignItems": "Makbuz öğelerini tahsis edin",
+    "extractedItems": "Yapay zekayla çıkarılan öğeler",
+    "help": "Resimler yüklenmeden önce sıkıştırılır. PDF'ler ek olarak tutulur ve yeni bir sekmede açılır.",
+    "open": "Aç",
+    "openInNewTab": "Yeni bir sekmede aç",
+    "pdfPreviewUnavailable": "PDF önizlemeleri ayrı bir sekmede açılır.",
+    "pending": "Yükleme bekleniyor",
+    "preview": "Önizleme",
+    "previewAction": "Önizleme",
+    "previewNamed": "Önizleme {{name}}",
+    "receipt": "Mağaza makbuzu",
+    "saveToAssignItems": "Önce masrafı kaydedin, ardından bu öğeleri katılımcılara atayın.",
+    "scanComplete": "Makbuz tarandı",
+    "scanCompleteDescription": "Çıkarılan öğeleri katılımcılara atayın.",
+    "scanError": "Makbuz taranamadı",
+    "scanWithAi": "AI ile tarayın",
+    "scanning": "Taranıyor…",
+    "view": "Ekleri görüntüle",
+    "attachment": "Ek",
+    "onlyImagesPdf": "Yalnızca resimler ve PDF dosyaları desteklenir."
+  },
+  "Backup": {
+    "downloaded": "Yedekleme indirildi.",
+    "export": "Yedeği dışa aktar",
+    "failed": "Yedekleme başarısız oldu.",
+    "restore": "Yedeği geri yükle",
+    "restoreFailed": "Geri yükleme başarısız oldu.",
+    "restoreLabel": "Yedekleme dosyasını geri yükle",
+    "restored": "Yedekleme geri yüklendi. Yeniden yükleniyor…"
+  },
+  "Common": {
+    "addGroup": "Grup ekle",
+    "close": "Close",
+    "closeDialog": "İletişim kutusunu kapat",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Bildirimi reddet",
+    "error": "Bir şeyler ters gitti",
+    "expenseNotFound": "Gider bulunamadı",
+    "loading": "Yükleniyor…",
+    "menu": "Menü",
+    "retry": "Tekrar dene",
+    "select": "Seç…",
+    "unknown": "bilinmiyor",
+    "user": "Kullanıcı"
+  },
+  "CreateGroup": {
+    "approvalContact": "Yeni gider grupları oluşturmak bir yöneticinin yetkilendirmesini gerektirir. Hesabınızı Grup Oluşturucu katmanına yükseltmek için lütfen örnek yöneticinizle iletişime geçin.",
+    "approvalDescription": "Hesabınız şu anda Kullanıcıyı Eşitle katmanındadır. Sizinle paylaşılan herhangi bir gruba katılabilir ve bunları tüm cihazlarınızda senkronize edebilirsiniz.",
+    "approvalTitle": "Grup Oluşturma Onay Gerektirir",
+    "authRequiredDescription": "Yeni gider grupları oluşturmak için lütfen harici bir hesapla oturum açın. Davet edilen grup katılımcıları, oturum açmaya gerek kalmadan grup bağlantınız üzerinden sorunsuz bir şekilde katılabilecekler.",
+    "authRequiredTitle": "Kimlik Doğrulaması Gerekli",
+    "returnToGroups": "Gruplarım'a dön",
+    "signIn": "Grup Oluşturmak için oturum açın"
+  },
+  "GroupTabs": {
+    "Expenses": "Masraflar",
+    "Balances": "Bakiyeler",
+    "Information": "Bilgi",
+    "Stats": "İstatistikler",
+    "Activity": "Etkinlik",
+    "Settings": "Ayarlar",
+    "label": "Grup bölümleri"
+  },
+  "Login": {
+    "title": "Split'te oturum açın",
+    "description": "Cihazlar arası grup senkronizasyonunu etkinleştirmek için harici bir hesapla oturum açın.",
+    "google": "Google ile devam et",
+    "github": "GitHub'la devam edin",
+    "noProviders": "Hiçbir OAuth sağlayıcısı yapılandırılmamış. Oturum açmayı etkinleştirmek için AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET değerini ayarlayın."
+  },
+  "NotFound": {
+    "title": "Sayfa bulunamadı",
+    "description": "URL'yi kontrol edin ve tekrar deneyin.",
+    "groupTitle": "Bu grup mevcut değil.",
+    "groupDescription": "URL'yi kontrol edin veya yeni bir davet bağlantısı isteyin."
+  },
+  "SyncStatus": {
+    "offlinePending": "Çevrimdışı — bekleyen değişiklikler: {{count}}",
+    "offlineSaved": "Çevrimdışı — kayıtlı verileri gösteriyor",
+    "syncing": "Senkronize ediliyor…",
+    "error": "Senkronizasyon hatası: {{error}}",
+    "retryToContinue": "devam etmeyi yeniden dene",
+    "conflicts": "İncelenmesi gereken çatışmalar: {{count}}",
+    "failed": "Senkronize edilemeyen değişiklikler: {{count}}",
+    "pending": "Bekleyen değişiklikler: {{count}}",
+    "retryFailed": "Başarısız değişiklikleri yeniden dene",
+    "discardFailed": "Başarısız değişiklikleri at",
+    "resolveConflicts": "Çatışmaları çözme",
+    "syncNow": "Şimdi senkronize et",
+    "dialogTitle": "Çatışmaları çözme",
+    "dialogDescription": "Bu düzenlemeler başka bir cihazdaki aynı kayıtları değiştirdi. Neyi tutacağınızı seçin.",
+    "noConflicts": "Çözülecek çatışma yok.",
+    "serverVersion": "Sunucu sürümü {{version}} · yerel düzenleme çakışma kuyruğunda tutuldu",
+    "keepMine": "Benim sürümümü koru",
+    "useServer": "Sunucuyu kullan",
+    "duplicate": "Yeni olarak çoğalt"
+  },
+  "Theme": {
+    "toggle": "Temayı değiştir",
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem"
   }
 }

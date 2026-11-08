@@ -1,0 +1,16 @@
+{
+  "Admin.email": "Loanword kept as 'Email' in several languages (for example Greek and Vietnamese).",
+  "Admin.participants": "Cognate in Catalan, French and Occitan ('participants').",
+  "Common.menu": "Cognate in Czech, French, Polish and Slovak ('menu').",
+  "ExpenseForm.notesField.label": "Cognate in Catalan and French ('notes').",
+  "GroupForm.Participants.indexLabel": "Cognate in Catalan, French, Occitan and Romanian.",
+  "GroupForm.Participants.title": "Cognate in Catalan, French and Occitan ('participants').",
+  "GroupTabs.Information": "Cognate in Swedish ('information').",
+  "Groups.participants": "Cognate in Catalan, French and Occitan ('participants').",
+  "Information.title": "Cognate in Swedish ('information').",
+  "ReceiptItems.AddItemDialog.nameLabel": "German uses 'Name' unchanged.",
+  "ReceiptItems.applyConfirm.total": "Cognate in Spanish, French, Occitan, Portuguese and Romanian ('total').",
+  "Stats.ByParticipant.participant": "Cognate in Romanian ('participant').",
+  "Stats.Totals.title": "Cognate in Catalan and Occitan ('Totals').",
+  "Theme.system": "German and Swedish use 'System' unchanged."
+}

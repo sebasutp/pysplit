@@ -16,7 +16,7 @@ export function Header() {
         <Link to="/groups" className="text-lg font-semibold tracking-tight">
           {APP_NAME}
         </Link>
-        <nav aria-label="Menu" className="flex items-center gap-1 text-sm">
+        <nav aria-label={t('Common.menu', 'Menu')} className="flex items-center gap-1 text-sm">
           <NavLink
             to="/groups"
             className={({ isActive }) =>

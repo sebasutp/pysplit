@@ -357,3 +357,167 @@ def test_items_and_apply(make_client, session: Session, tmp_path):
         select(AttachmentItem).where(AttachmentItem.attachment_id == attachment.id)
     ).all()
     assert items
+
+
+def test_fractional_portions_split_between_participants(make_client, session: Session):
+    client = make_client(enable_receipt_ai=True)
+    group, people = make_group(session)
+    attachment = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Beer", "quantity_milli": 3000, "amount": 1500}],
+    )
+    item_id = client.get(f"/api/groups/{group.id}/attachments/{attachment.id}/receipt").json()[
+        "items"
+    ][0]["id"]
+
+    response = client.put(
+        f"/api/groups/{group.id}/attachments/{attachment.id}/items/{item_id}/portions",
+        json={
+            "portions": [
+                {
+                    "target": "PARTICIPANT",
+                    "participant_id": people["Alice"].id,
+                    "quantity_milli": 2000,
+                },
+                {
+                    "target": "PARTICIPANT",
+                    "participant_id": people["Bob"].id,
+                    "quantity_milli": 1000,
+                },
+            ]
+        },
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+
+    stored = {
+        portion["participant_id"]: portion["quantity_milli"]
+        for portion in body["items"][0]["portions"]
+    }
+    assert stored == {
+        people["Alice"].id: 2000,
+        people["Bob"].id: 1000,
+    }
+
+    shares = {share["participant_id"]: share["total"] for share in body["split"]["participants"]}
+    assert shares[people["Alice"].id] == 1000
+    assert shares[people["Bob"].id] == 500
+
+
+def _put_portions(client, group, attachment, item_id, portions):
+    return client.put(
+        f"/api/groups/{group.id}/attachments/{attachment.id}/items/{item_id}/portions",
+        json={"portions": portions},
+    )
+
+
+def test_half_unit_portions_split_between_participants(make_client, session: Session):
+    client = make_client(enable_receipt_ai=True)
+    group, people = make_group(session)
+    attachment = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Beer", "quantity_milli": 1000, "amount": 1000}],
+    )
+    item_id = client.get(f"/api/groups/{group.id}/attachments/{attachment.id}/receipt").json()[
+        "items"
+    ][0]["id"]
+
+    response = _put_portions(
+        client,
+        group,
+        attachment,
+        item_id,
+        [
+            {
+                "target": "PARTICIPANT",
+                "participant_id": people["Alice"].id,
+                "quantity_milli": 500,
+            },
+            {
+                "target": "PARTICIPANT",
+                "participant_id": people["Bob"].id,
+                "quantity_milli": 500,
+            },
+        ],
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+
+    stored = {
+        portion["participant_id"]: portion["quantity_milli"]
+        for portion in body["items"][0]["portions"]
+    }
+    assert stored == {people["Alice"].id: 500, people["Bob"].id: 500}
+
+    shares = {share["participant_id"]: share["total"] for share in body["split"]["participants"]}
+    assert shares[people["Alice"].id] == 500
+    assert shares[people["Bob"].id] == 500
+
+
+def test_portions_cannot_exceed_item_quantity(make_client, session: Session):
+    client = make_client(enable_receipt_ai=True)
+    group, people = make_group(session)
+    attachment = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Beer", "quantity_milli": 1000, "amount": 500}],
+    )
+    item_id = client.get(f"/api/groups/{group.id}/attachments/{attachment.id}/receipt").json()[
+        "items"
+    ][0]["id"]
+
+    response = _put_portions(
+        client,
+        group,
+        attachment,
+        item_id,
+        [
+            {
+                "target": "PARTICIPANT",
+                "participant_id": people["Alice"].id,
+                "quantity_milli": 600,
+            },
+            {
+                "target": "PARTICIPANT",
+                "participant_id": people["Bob"].id,
+                "quantity_milli": 600,
+            },
+        ],
+    )
+    assert response.status_code == 422
+    assert "exceed" in response.text.lower()
+
+    state = client.get(f"/api/groups/{group.id}/attachments/{attachment.id}/receipt").json()
+    assert state["items"][0]["portions"] == []
+
+
+def test_portions_reject_participant_outside_group(make_client, session: Session):
+    client = make_client(enable_receipt_ai=True)
+    group, _people = make_group(session)
+    _other_group, other_people = make_group(session, name="Other Group")
+    attachment = make_receipt(
+        session,
+        group=group,
+        items=[{"name": "Beer", "quantity_milli": 1000, "amount": 500}],
+    )
+    item_id = client.get(f"/api/groups/{group.id}/attachments/{attachment.id}/receipt").json()[
+        "items"
+    ][0]["id"]
+
+    response = _put_portions(
+        client,
+        group,
+        attachment,
+        item_id,
+        [
+            {
+                "target": "PARTICIPANT",
+                "participant_id": other_people["Alice"].id,
+                "quantity_milli": 500,
+            }
+        ],
+    )
+    assert response.status_code == 422
+    assert "participant" in response.text.lower()

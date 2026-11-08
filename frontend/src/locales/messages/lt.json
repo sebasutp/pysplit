@@ -1,7 +1,7 @@
 {
   "Homepage": {
     "title": "Dalinkitės <strong>išlaidomis</strong> su <strong>draugais ir šeima</strong>",
-    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "metaTitle": "Spliit - Dalinkitės išlaidomis su draugais ir šeima",
     "description": "Sveiki atvykę į jūsų naująją <strong>Spliit</strong> !",
     "button": {
       "groups": "Eiti į grupes",
@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grupės"
+    "groups": "Grupės",
+    "adminDashboard": "Administratoriaus prietaisų skydelis",
+    "language": "Kalba",
+    "signIn": "Prisijunkite",
+    "signOut": "Atsijungti",
+    "userMenu": "Vartotojo meniu"
   },
   "Footer": {
     "madeIn": "Pagaminta Ciuriche, Šveicarijoje 🇨🇭",
@@ -39,20 +44,35 @@
       "lastMonth": "Praėjusį mėnesį",
       "earlierThisYear": "Anksčiau šiais metais",
       "lastYear": "Praeitais metais",
-      "older": "Senesnės"
-    }
+      "older": "Senesnės",
+      "today": "Šiandien",
+      "week": "Anksčiau šią savaitę",
+      "month": "Anksčiau šį mėnesį",
+      "year": "Anksčiau šiais metais"
+    },
+    "clearSearch": "Aišku",
+    "exportError": "Nepavyko eksportuoti išlaidų",
+    "filterFrom": "Nuo",
+    "filterTo": "Iki",
+    "loadMore": "Įkelti daugiau",
+    "loading": "Įkeliamos išlaidos…",
+    "loadingMore": "Įkeliama…",
+    "search": "Ieškoti išlaidų",
+    "showingCount": "Rodoma {{shown}} iš {{total}} išlaidų."
   },
   "ExpenseCard": {
     "paidBy": "Sumokėjo <strong>{paidBy}</strong> už <paidFor></paidFor>",
     "everyone": "visus",
     "receivedBy": "Gauta nuo <strong>{paidBy}</strong> už <paidFor></paidFor>",
     "yourBalance": "Jūsų balansas:",
-    "notInvolved": "Jūs nedalyvaujate"
+    "notInvolved": "Jūs nedalyvaujate",
+    "paidByPlain": "Sumokėjo {{paidBy}} už {{paidFor}}",
+    "receivedByPlain": "Gavo {{paidBy}} už {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Mano grupės",
     "create": "Sukurti",
-    "createGroup": "Create group",
+    "createGroup": "Sukurti grupę",
     "loadingRecent": "Įkeliamos paskiausios grupės…",
     "NoRecent": {
       "description": "Pastaruoju metu neaplankėte jokios grupės.",
@@ -60,11 +80,11 @@
       "orAsk": "arba paprašykite draugo atsiųsti jums nuorodą į esamą."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Jūsų bendras likutis",
+      "description": "Jūsų bendras likutis visose jūsų grupėse.",
+      "owedToYou": "Skola jums",
+      "youOwe": "Esate skolingi",
+      "settledUp": "Visose grupėse esate atsiskaitę."
     },
     "recent": "Paskiausios grupės",
     "starred": "Žvaigždute pažymėtos grupės",
@@ -83,21 +103,25 @@
       "title": "Pridėti grupę pagal nuorodą",
       "description": "jei turite grupės nuorodą, galite įkelti ją čia, kad būtų pridėta prie jūsų sąrašo.",
       "error": "Ups, pagal jūsų pateiktą nuorodą neradome jokios grupės…",
-      "urlMode": "Enter URL",
-      "qrMode": "Scan QR",
+      "urlMode": "Įveskite URL",
+      "qrMode": "Skenuokite QR",
       "scanner": {
-        "startCamera": "Start Camera",
-        "stopScanning": "Stop Scanning",
-        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
-        "noCamera": "No camera found on this device.",
-        "cameraError": "Failed to start camera. Please try again.",
-        "permissionError": "Unable to access camera. Please check permissions."
+        "startCamera": "Įjunkite kamerą",
+        "stopScanning": "Sustabdyti skenavimą",
+        "permissionDenied": "Kameros leidimas atmestas. Leiskite kamerai nuskaityti QR kodus.",
+        "noCamera": "Šiame įrenginyje nerasta jokios kameros.",
+        "cameraError": "Nepavyko paleisti kameros. Bandykite dar kartą.",
+        "permissionError": "Nepavyko pasiekti kameros. Patikrinkite leidimus."
       }
     },
     "NotFound": {
       "text": "Šios grupės nėra.",
       "link": "Eikite į paskiausiai aplankytas grupes"
-    }
+    },
+    "moreOptions": "Daugiau parinkčių",
+    "participants": "dalyvių",
+    "star": "Žvaigždžių grupė",
+    "unstar": "Panaikinkite grupę"
   },
   "GroupForm": {
     "title": "Grupės informacija",
@@ -129,7 +153,10 @@
       "add": "Pridėti dalyvį",
       "John": "Džonas",
       "Jane": "Džeinė",
-      "Jack": "Džekas"
+      "Jack": "Džekas",
+      "cannotRemove": "Šis dalyvis yra išlaidų dalis ir negali būti pašalintas.",
+      "indexLabel": "Dalyvis #{{index}}",
+      "remove": "Pašalinti dalyvį {{index}}"
     },
     "Settings": {
       "title": "Vietiniai nustatymai",
@@ -145,7 +172,8 @@
       "create": "Sukurti",
       "creating": "Kuriamia…",
       "cancel": "Atšaukti"
-    }
+    },
+    "saveError": "Nepavyko išsaugoti grupės."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Norėdami kiekvienai išlaidai nustatyti skirtingą valiutą ir konvertuoti sumas, grupei pasirinkite ne individualią valiutą.",
     "originalAmountField": {
       "label": "Konvertuotina suma",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Pervedama suma",
+      "repaymentDescription": "Konvertuota iš aukščiau nurodytos sumos, kuria padengiamas likutis."
     },
     "conversionRateField": {
       "useApi": "Naudoti „Frankfurter“ kursus",
@@ -274,7 +302,15 @@
     "saving": "Išsaugoma…",
     "cancel": "Atšaukti",
     "reimbursement": "Kompensacija",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Paskirstykite kvito elementus",
+    "conflict": "Šias išlaidas pakeitė kažkas kitas. Iš naujo įkelkite puslapį ir bandykite dar kartą.",
+    "conflictTitle": "Išlaidos pasikeitė kitur",
+    "deleteError": "Nepavyko ištrinti išlaidų.",
+    "pendingReceiptTotal": "Kvitas, nuskaitytas neprisijungus, paruoštas.",
+    "pendingReceiptTotalApply": "Naudoti nuskaitytą sumą",
+    "pendingReceiptTotalDismiss": "Atsisakyti",
+    "saveError": "Nepavyko sutaupyti išlaidų."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Įkeliant dokumentą įvyko klaida. Bandykite dar kartą vėliau arba pasirinkite kitą failą.",
       "retry": "Pakartoti"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Eilėje. Kvitas bus nuskaitytas, kai vėl prisijungsite.",
+    "offline": "Nuskaitymas tęsiamas, kai esate prisijungę.",
+    "scanFailed": "AI negalėjo perskaityti šio kvito. Patikrinkite serverio AI konfigūraciją ir bandykite dar kartą.",
+    "scanning": "Nuskaitoma…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Kvito eilutės elementai",
+    "backToExpense": "Grįžti prie išlaidų",
+    "merchant": "Parduotuvės pavadinimas",
+    "printedTotal": "Iš viso atspausdinta ant kvito",
+    "noReceipt": "Joks kvitas dar nesusietas su šiomis išlaidomis.",
+    "empty": "Prekių dar nėra. Pridėkite vieną, kad pradėtumėte skaidyti.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Nepavyko išsaugoti pakeitimo",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Pridėti elementą",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Pridėti elementą",
+      "nameLabel": "Vardas",
+      "quantityLabel": "Kiekis",
+      "amountLabel": "Suma",
+      "sharedLabel": "Bendrinamas (visos sąskaitos mokestis)",
+      "add": "Pridėti",
+      "cancel": "Atšaukti"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} iš {total}",
+      "remaining": "Liko {quantity}",
+      "assign": "Paskirstyti",
+      "edit": "Redaguoti",
+      "delete": "Ištrinti",
+      "removePortion": "Pašalinti paskirtą dalį",
+      "editTitle": "Redaguoti elementą",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Išsaugoti",
+      "cancel": "Atšaukti",
+      "deleteConfirm": "Ištrinti šį elementą?",
+      "deleteDescription": "Taip pašalinamas elementas ir jo priskyrimai."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Nepriskirta",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Bendrinama",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Priskirti elementą",
+      "description": "Pasirinkite, kas moka už „{name}“.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Padalinkite tolygiai",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Pasirinktinis padalijimas",
+      "customHint": "Įveskite kiekvieno tikslo kiekius vienetais.",
+      "shared": "Bendrinama",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Priskirtas kiekis viršija prekės kiekį.",
+      "confirm": "Paskirstyti",
+      "cancel": "Atšaukti"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Bendrinama",
+      "unassigned": "Nepriskirta",
+      "optOut": "Bendrina nepriskirtus elementus",
+      "reconciles": "Subalansuotas",
+      "offBy": "Skirtumas {amount}",
+      "itemsTotal": "Iš viso gautų prekių",
+      "apply": "Taikyti išlaidai",
+      "allOptedOut": "Visi atsisakė, bet kai kurie elementai vis dar nepriskirti.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Kvito vertės skiriasi · Taikyti dar kartą"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Išlaidos atnaujintos",
+      "description": "Kvito elementai buvo pritaikyti išlaidoms."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Nepavyko pritaikyti kvito"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Atnaujinti išlaidas?",
+      "description": "Bendra išlaidų suma skiriasi nuo kvito elementų sumos. Taikant bus perrašyta išlaidų suma ir jos padalijimas.",
+      "total": "iš viso {current} → {new}",
+      "cancel": "Atšaukti",
+      "confirm": "Taikyti"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Nuskaitymas atsidūrė eilėje",
+    "scanPendingDescription": "Vaizdas išsaugomas šiame įrenginyje ir bus nuskaitytas, kai vėl prisijungsite.",
+    "offlineQueue": "Esate neprisijungęs. Pridėkite nuotrauką dabar ir ji bus nuskaityta, kai vėl prisijungsite.",
+    "disabled": "Išmanusis padalijimas šiame serveryje neįjungtas. Kvitų nuskaitymas yra tik internetinė funkcija.",
+    "extracted": "Kvitas nuskaitytas",
+    "extractedDescription": "Toliau priskirkite ištrauktus elementus.",
+    "loading": "Įkeliamas kvitas…",
+    "optOutTitle": "Atsisakymai",
+    "scanError": "Nepavyko nuskaityti kvito.",
+    "scanUnavailable": "Patikrinkite serverio AI konfigūraciją ir bandykite dar kartą.",
+    "scanning": "Nuskaitomas kvitas…",
+    "upload": "Įkelkite kvito nuotrauką"
   },
   "Balances": {
     "title": "Atsiskaitymų likučiai",
@@ -415,20 +462,22 @@
       "description": "Čia pateikti siūlymai, kaip optimaliai atsiskaityti tarp dalyvių.",
       "noImbursements": "Panašu, kad jūsų grupei nereikia jokios kompensacijos 😁",
       "owes": "<strong>{from}</strong> yra skolingas <strong>{to}</strong>",
-      "markAsPaid": "Pažymėti kaip apmokėtą"
-    }
+      "markAsPaid": "Pažymėti kaip apmokėtą",
+      "owesPlain": "{{from}} skolingas {{to}}"
+    },
+    "loading": "Įkeliami likučiai…"
   },
   "Stats": {
     "title": "Statistika",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Laikotarpis",
+      "all": "Visą laiką",
+      "thisMonth": "Šis mėnuo",
+      "last30": "Paskutinės 30 dienų",
+      "thisYear": "Šiais metais",
+      "custom": "Pasirinktinės ribos",
+      "from": "Nuo",
+      "to": "Iki"
     },
     "Totals": {
       "title": "Sumos",
@@ -440,50 +489,53 @@
       "yourShare": "Jūsų mokėtina dalis"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Santrauka",
+      "description": "Pagrindiniai pasirinkto laikotarpio rodikliai.",
+      "empty": "Išlaidų kol kas nėra.",
+      "expenseCount": "Išlaidos",
+      "averageExpense": "Vidutinės išlaidos",
+      "largestExpense": "Didžiausios išlaidos",
+      "activeSpan": "Aktyvus laikotarpis"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "title": "Išlaidos per laikotarpį",
+      "description": "Bendros grupės išlaidos per mėnesį. Pasirinkite mėnesį, kad pamatytumėte jo išlaidas.",
+      "empty": "Išlaidų kol kas nėra.",
+      "showExpenses": "Rodyti {month} išlaidas",
+      "detailsDescription": "Šio mėnesio išlaidos pasirinktu laikotarpiu.",
+      "detailsEmpty": "Šį mėnesį išlaidų nėra.",
+      "showExpensesPlain": "Rodyti išlaidas {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "Dalyvio išlaidos",
+      "description": "Kiek sumokėjo kiekvienas dalyvis ir kokia buvo jo išlaidų dalis.",
+      "empty": "Išlaidų kol kas nėra.",
+      "participant": "Dalyvis",
+      "paid": "Sumokėta",
+      "count": "Skaičius",
+      "share": "Dalis"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "title": "Išlaidos pagal kategoriją",
+      "description": "Bendra kiekvienoje kategorijoje išleista suma. Pasirinkite kategoriją, kad pamatytumėte jos išlaidas.",
+      "empty": "Išlaidų kol kas nėra.",
+      "showExpenses": "Rodyti {category} išlaidas",
+      "detailsDescription": "Šios kategorijos išlaidos pasirinktu laikotarpiu.",
+      "detailsEmpty": "Šioje kategorijoje nėra jokių išlaidų.",
+      "showExpensesPlain": "Rodyti išlaidas {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Pasikartojančios išlaidos",
+      "description": "Suskaičiuota grupės aktyvių pasikartojančių išlaidų kaina.",
+      "estimatedMonthly": "Suskaičiuotos mėnesinės išlaidos",
+      "estimatedYearly": "{amount} per metus",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{skaičius, daugkartinė, vienintelė {# daily expense} kitos {# daily expenses}}",
+        "WEEKLY": "{skaičius, daugkartinė, vienintelė {# weekly expense} kitos {# weekly expenses}}",
+        "MONTHLY": "{skaičius, daugkartinė, vienintelė {# monthly expense} kitos {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Įkeliama statistika…"
   },
   "Activity": {
     "title": "Veikla",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Anksčiau šiais metais",
       "lastYear": "Praėjusiais metais",
       "older": "Senesnės"
-    }
+    },
+    "loadMore": "Įkelti daugiau",
+    "loading": "Įkeliama veikla…",
+    "unknown": "Nežinoma veikla"
   },
   "Information": {
     "title": "Informacija",
@@ -512,20 +567,25 @@
     "empty": "Kol kas nėra jokios grupės informacijos."
   },
   "Settings": {
-    "title": "Nustatymai"
+    "title": "Nustatymai",
+    "saved": "Grupė atnaujinta",
+    "savedDescription": "Jūsų pakeitimai buvo išsaugoti."
   },
   "Share": {
     "title": "Bendrinti",
     "description": "Norėdami, kad kiti galėtų matyti grupę ir pridėti išlaidų, pasidalykite jos nuoroda.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Kopijuoti nuorodą",
+    "shareLink": "Bendrinti nuorodą",
     "warning": "Dėmesio!",
     "warningHelp": "Visi, turintys grupės nuorodą, galės peržiūrėti ir keisti išlaidas. Dalinkitės atsargiai!",
     "qrCode": {
-      "title": "Share via QR Code",
-      "description": "Scan this QR code to open the group on any device.",
-      "download": "Download QR Code"
-    }
+      "title": "Bendrinti naudojant QR kodą",
+      "description": "Nuskaitykite šį QR kodą, kad atidarytumėte grupę bet kuriame įrenginyje.",
+      "download": "Atsisiųsti QR kodą"
+    },
+    "button": "Dalis",
+    "copy": "Kopijuoti nuorodą",
+    "url": "Grupės nuoroda"
   },
   "SchemaErrors": {
     "min1": "Įveskite bent vieną simbolį.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Turite pasirinkti bent vieną dalyvį, kuriam priskiriamos išlaidos.",
     "noZeroShares": "Visos dalys turi būti didesnės nei 0.",
     "amountSum": "Viso suma turi būti lygi išlaidų sumai.",
-    "percentageSum": "Visų procentų suma turi būti 100."
+    "percentageSum": "Visų procentų suma turi būti 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Ieškoti kategorijos…",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Galimas atnaujinimas",
+    "updateDescription": "Yra nauja pysplit versija.",
+    "reload": "Įkelti iš naujo",
+    "updating": "Atnaujinama…",
+    "offlineReady": "Paruošta dirbti neprisijungus",
+    "offlineReadyDescription": "Programos apvalkalas yra talpykloje. Atidarykite grupę vieną kartą, kai esate prisijungę, kad išsaugotumėte jos duomenis.",
+    "dismiss": "Uždaryti",
+    "install": "Įdiegti programą",
+    "refreshApp": "Atnaujinkite programą",
+    "refreshAppHint": "Išvalykite talpykloje saugomus failus ir iš naujo įkelkite naujausią versiją. Išsaugoti duomenys lieka šiame įrenginyje."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Administravimo prietaisų skydelis",
+    "description": "Tvarkykite vartotojų vaidmenis, prieigos prie platformos leidimus ir stebėkite sistemos metriką.",
+    "totalGroups": "Iš viso grupių",
+    "totalExpenses": "Bendros išlaidos",
+    "registeredUsers": "Registruoti vartotojai",
+    "userManagement": "Vartotojų valdymo ir leidimų pakopos",
+    "accessDenied": "Prieiga uždrausta",
+    "accessDeniedDescription": "Administravimo informacijos suvestinė skirta tik administratoriaus pakopos naudotojams.",
+    "delete": "Ištrinti",
+    "deleteError": "Nepavyko ištrinti",
+    "email": "El. paštas",
+    "expenses": "išlaidas",
+    "groupDeleted": "Grupė ištrinta",
+    "groupManagement": "Grupės",
+    "groupManagementDescription": "Ištrinkite grupes ir patikrinkite naudojimą.",
+    "groups": "grupės",
+    "loadMoreGroups": "Įkelti daugiau grupių",
+    "loadMoreUsers": "Įkelti daugiau vartotojų",
+    "loading": "Įkeliama informacijos suvestinė…",
+    "loadingMore": "Įkeliama…",
+    "participants": "dalyvių",
+    "preauthorize": "Iš anksto įgalioti naudotoją",
+    "preauthorizeAction": "Iš anksto autorizuoti",
+    "preauthorizeError": "Nepavyko iš anksto suteikti naudotojo prieigos teisės",
+    "preauthorized": "Vartotojas iš anksto įgaliotas",
+    "returnToGroups": "Grįžti į Mano grupes",
+    "searchGroups": "Ieškoti grupių",
+    "searchUsers": "Ieškoti vartotojų",
+    "signInDescription": "Administravimo prietaisų skydelyje reikalinga administratoriaus paskyra.",
+    "signInTitle": "Būtina prisijungti",
+    "tier": "Pakopa",
+    "tierError": "Nepavyko atnaujinti pakopos",
+    "tierFor": "Pakopa skirta",
+    "tierUpdated": "Atnaujinta pakopa",
+    "userDeleted": "Vartotojas ištrintas",
+    "userTier": "Pakopos"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Saugykla neprisijungus",
+    "loading": "Tikrinamas šis įrenginys…",
+    "unsupported": "Ši naršyklė negali pranešti apie saugyklos būseną.",
+    "usage": "Naudojama {{used}} iš {{quota}}",
+    "unknown": "nežinomas",
+    "persisted": "Šiame įrenginyje yra nuolatinė saugykla.",
+    "notPersisted": "Jei įrenginyje trūksta vietos, naršyklė gali pašalinti neprisijungus pasiekiamus duomenis.",
+    "keep": "Saugokite duomenis šiame įrenginyje",
+    "refresh": "Atnaujinti",
+    "critical": "Saugykla beveik pilna. Eksportuokite atsarginę kopiją dabar, tada pašalinkite nenaudojamas grupes.",
+    "warning": "Saugykla pildosi. Rekomenduojama atsarginė kopija."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Laukiama sinchronizavimo",
+    "expense": "Laukiama sinchronizavimo"
+  },
+  "Attachments": {
+    "assignItems": "Paskirstykite kvito elementus",
+    "extractedItems": "AI išgauti elementai",
+    "help": "Vaizdai suglaudinami prieš įkeliant. PDF failai saugomi kaip priedai ir atidaromi naujame skirtuke.",
+    "open": "Atidaryti",
+    "openInNewTab": "Atidaryti naujame skirtuke",
+    "pdfPreviewUnavailable": "PDF peržiūros atidaromos atskirame skirtuke.",
+    "pending": "Laukiama įkėlimo",
+    "preview": "Peržiūra",
+    "previewAction": "Peržiūra",
+    "previewNamed": "Peržiūrėti {{name}}",
+    "receipt": "Parduotuvės kvitas",
+    "saveToAssignItems": "Pirmiausia išsaugokite išlaidas, tada priskirkite šiuos elementus dalyviams.",
+    "scanComplete": "Kvitas nuskaitytas",
+    "scanCompleteDescription": "Priskirkite ištrauktus elementus dalyviams.",
+    "scanError": "Nepavyko nuskaityti kvito",
+    "scanWithAi": "Nuskaitykite su AI",
+    "scanning": "Nuskaitoma…",
+    "view": "Žiūrėti priedus",
+    "attachment": "Priedas",
+    "onlyImagesPdf": "Palaikomi tik vaizdai ir PDF failai."
+  },
+  "Backup": {
+    "downloaded": "Atsarginė kopija atsisiųsta.",
+    "export": "Eksportuoti atsarginę kopiją",
+    "failed": "Nepavyko sukurti atsarginės kopijos.",
+    "restore": "Atkurti atsarginę kopiją",
+    "restoreFailed": "Atkurti nepavyko.",
+    "restoreLabel": "Atkurti atsarginės kopijos failą",
+    "restored": "Atkurta atsarginė kopija. Įkeliama iš naujo…"
+  },
+  "Common": {
+    "addGroup": "Pridėti grupę",
+    "close": "Close",
+    "closeDialog": "Uždaryti dialogo langą",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Atmesti pranešimą",
+    "error": "Kažkas nepavyko",
+    "expenseNotFound": "Išlaidos nerasta",
+    "loading": "Įkeliama…",
+    "menu": "Meniu",
+    "retry": "Bandykite dar kartą",
+    "select": "Pasirinkite…",
+    "unknown": "nežinomas",
+    "user": "Vartotojas"
+  },
+  "CreateGroup": {
+    "approvalContact": "Kuriant naujas išlaidų grupes reikalingas administratoriaus leidimas. Susisiekite su savo egzemplioriaus administratoriumi, kad padidintumėte savo paskyrą grupės kūrėjo lygyje.",
+    "approvalDescription": "Šiuo metu jūsų paskyra yra vartotojo sinchronizavimo lygyje. Galite dalyvauti visose su jumis bendrinamose grupėse ir sinchronizuoti jas visuose savo įrenginiuose.",
+    "approvalTitle": "Grupės kūrimui reikalingas patvirtinimas",
+    "authRequiredDescription": "Norėdami sukurti naujas išlaidų grupes, prisijunkite naudodami išorinę paskyrą. Pakviesti grupės dalyviai vis tiek galės prisijungti be trinties naudodami jūsų grupės nuorodą neprisijungę.",
+    "authRequiredTitle": "Reikalingas autentifikavimas",
+    "returnToGroups": "Grįžti į Mano grupes",
+    "signIn": "Prisijunkite, kad sukurtumėte grupę"
+  },
+  "GroupTabs": {
+    "Expenses": "Išlaidos",
+    "Balances": "Atsiskaitymų likučiai",
+    "Information": "Informacija",
+    "Stats": "Statistika",
+    "Activity": "Veikla",
+    "Settings": "Nustatymai",
+    "label": "Grupiniai skyriai"
+  },
+  "Login": {
+    "title": "Prisijunkite prie Spliit",
+    "description": "Prisijunkite naudodami išorinę paskyrą, kad įgalintumėte kelių įrenginių grupių sinchronizavimą.",
+    "google": "Tęskite su Google",
+    "github": "Tęskite naudodami „GitHub“.",
+    "noProviders": "Nekonfigūruoti jokie OAuth teikėjai. Nustatykite AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET, kad įgalintumėte prisijungimą."
+  },
+  "NotFound": {
+    "title": "Puslapis nerastas",
+    "description": "Patikrinkite URL ir bandykite dar kartą.",
+    "groupTitle": "Šios grupės nėra.",
+    "groupDescription": "Patikrinkite URL arba paprašykite naujos kvietimo nuorodos."
+  },
+  "SyncStatus": {
+    "offlinePending": "Neprisijungus – laukiantys pakeitimai: {{count}}",
+    "offlineSaved": "Neprisijungus – rodomi išsaugoti duomenys",
+    "syncing": "Sinchronizuojama…",
+    "error": "Sinchronizavimo klaida: {{error}}",
+    "retryToContinue": "pabandykite tęsti",
+    "conflicts": "Konfliktai, kuriuos reikia peržiūrėti: {{count}}",
+    "failed": "Pakeitimai, kurių nepavyko sinchronizuoti: {{count}}",
+    "pending": "Laukiami pakeitimai: {{count}}",
+    "retryFailed": "Bandyti iš naujo nepavykusius pakeitimus",
+    "discardFailed": "Atmesti nepavykusius pakeitimus",
+    "resolveConflicts": "Išspręskite konfliktus",
+    "syncNow": "Sinchronizuoti dabar",
+    "dialogTitle": "Išspręskite konfliktus",
+    "dialogDescription": "Šie pakeitimai pakeitė tuos pačius įrašus kitame įrenginyje. Pasirinkite, ką laikyti.",
+    "noConflicts": "Nereikia spręsti konfliktų.",
+    "serverVersion": "Serverio versija {{version}} · vietinis redagavimas laikomas konflikto eilėje",
+    "keepMine": "Palikti mano versiją",
+    "useServer": "Naudokite serverį",
+    "duplicate": "Kopijuoti kaip nauja"
+  },
+  "Theme": {
+    "toggle": "Perjungti temą",
+    "light": "Šviesi",
+    "dark": "Tamsi",
+    "system": "Sistema"
   }
 }

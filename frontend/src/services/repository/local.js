@@ -2414,6 +2414,39 @@ const attachments = {
     return run(async () => {
       checkAbort(_read)
       await requireGroup(groupId)
+
+      // When online, prefer the authoritative server receipt state so another
+      // browser's assignments are visible. Keep local-first behavior while any
+      // attachment edit is still waiting in the outbox, otherwise the server
+      // response would hide unsynced work.
+      if (options.attachment_id && isOnline()) {
+        const pending = await hasPendingAttachmentOperations(options.attachment_id)
+        if (!pending) {
+          try {
+            const remote = await onlineRepository.attachments.get(groupId, options, _read)
+            if (remote) {
+              await refreshAttachmentFromServer(groupId, remote, { refreshGroup: false })
+            } else {
+              await refreshAttachmentFromServer(groupId, null, {
+                refreshGroup: false,
+                attachmentId: options.attachment_id,
+              })
+            }
+            return remote
+          } catch (error) {
+            if (
+              error &&
+              typeof error === 'object' &&
+              'code' in error &&
+              /** @type {{code?: unknown}} */ (error).code === 'aborted'
+            ) {
+              throw error
+            }
+            // Network/server failures fall back to the local cache below.
+          }
+        }
+      }
+
       let attachment = null
       if (options.attachment_id) attachment = await db.attachments.get(options.attachment_id)
       else if (options.expense_id) {
@@ -2709,22 +2742,55 @@ async function refreshAttachmentFromServer(groupId, payload, options = {}) {
   const attachment = payload?.attachment
   if (attachment?.id) {
     await db.attachments.put({ ...attachment, pending: false })
-    for (const item of payload.items || []) {
+    const remoteItems = Array.isArray(payload.items) ? payload.items : null
+    for (const item of remoteItems || []) {
       await db.attachmentItems.put({ ...item, pending: false })
       await db.attachmentPortions.where('item_id').equals(item.id).delete()
       if (item.portions?.length) await db.attachmentPortions.bulkPut(item.portions)
     }
-    await db.attachmentOptOuts.where('attachment_id').equals(attachment.id).delete()
-    for (const participantId of payload.opt_outs || []) {
-      await db.attachmentOptOuts.put({
-        id: `${attachment.id}:${participantId}`,
-        attachment_id: attachment.id,
-        participant_id: participantId,
-        updated_at: nowIso(),
-        version: 1,
-        deleted_at: null,
-      })
+    // Drop local rows the server no longer has, but never unsynced edits.
+    if (remoteItems) {
+      const remoteIds = new Set(remoteItems.map((item) => item.id))
+      const localItems = await db.attachmentItems
+        .where('attachment_id')
+        .equals(attachment.id)
+        .toArray()
+      const staleIds = localItems
+        .filter((item) => !remoteIds.has(item.id) && !item.pending)
+        .map((item) => item.id)
+      if (staleIds.length) {
+        await db.attachmentPortions.where('item_id').anyOf(staleIds).delete()
+        await db.attachmentItems.bulkDelete(staleIds)
+      }
     }
+    if (Array.isArray(payload.opt_outs)) {
+      await db.attachmentOptOuts.where('attachment_id').equals(attachment.id).delete()
+      for (const participantId of payload.opt_outs) {
+        await db.attachmentOptOuts.put({
+          id: `${attachment.id}:${participantId}`,
+          attachment_id: attachment.id,
+          participant_id: participantId,
+          updated_at: nowIso(),
+          version: 1,
+          deleted_at: null,
+        })
+      }
+    }
+  } else if (payload === null && options.attachmentId) {
+    // The server no longer has this receipt (for example it was deleted from
+    // another browser). Clear the cached copy and everything hanging off it.
+    const attachmentId = options.attachmentId
+    const items = await db.attachmentItems
+      .where('attachment_id')
+      .equals(attachmentId)
+      .toArray()
+    const itemIds = items.map((item) => item.id)
+    if (itemIds.length) {
+      await db.attachmentPortions.where('item_id').anyOf(itemIds).delete()
+    }
+    await db.attachmentItems.where('attachment_id').equals(attachmentId).delete()
+    await db.attachmentOptOuts.where('attachment_id').equals(attachmentId).delete()
+    await db.attachments.delete(attachmentId)
   }
   if (groupId && options.refreshGroup !== false) {
     await bootstrapGroup(groupId, { updateCursor: false }).catch(() => {})
@@ -2813,6 +2879,13 @@ async function mutateAttachment(groupId, attachmentId, entityType, opType, input
             position: index,
           }))
           if (rows.length) await db.attachmentPortions.bulkPut(rows)
+          await db.attachmentItems.put({
+            ...item,
+            is_shared: rows.length > 0 && rows.every((row) => row.target === 'SHARED'),
+            updated_at: timestamp,
+            version: Number(item.version || 0) + 1,
+            pending: true,
+          })
           targetId = entityId
         } else if (entityType === 'attachment_opt_out') {
           const existing = await db.attachmentOptOuts.get(`${attachmentId}:${entityId}`)
@@ -2905,6 +2978,36 @@ async function queuedOperation(entityType, entityId) {
     .equals(entityId)
     .filter((row) => row.entity_type === entityType)
     .first()
+}
+
+const ATTACHMENT_OPERATION_TYPES = new Set([
+  'attachment_upload',
+  'attachment_link',
+  'attachment_item',
+  'attachment_portion',
+  'attachment_opt_out',
+  'attachment_remove',
+])
+
+/**
+ * Whether an attachment (or one of its items/portions) has unsynced edits.
+ *
+ * Upload/link/remove rows use the attachment id as their entity id; item,
+ * portion and opt-out rows store it in meta.attachment_id.
+ *
+ * @param {string} attachmentId
+ * @returns {Promise<boolean>}
+ */
+async function hasPendingAttachmentOperations(attachmentId) {
+  const row = await db.outbox
+    .filter(
+      (operation) =>
+        ATTACHMENT_OPERATION_TYPES.has(operation.entity_type) &&
+        (operation.entity_id === attachmentId ||
+          operation.meta?.attachment_id === attachmentId),
+    )
+    .first()
+  return Boolean(row)
 }
 
 const exportsRepository = {

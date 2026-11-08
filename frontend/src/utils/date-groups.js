@@ -7,9 +7,39 @@
 
 /** @typedef {{key: string, label: string, expenses: any[]}} ExpenseDateGroup */
 
+/** Keys produced by `groupExpensesByDate`; mirrors the `Expenses.Groups.*` messages. */
+export const DATE_GROUP_KEYS = /** @type {const} */ ([
+  'today',
+  'week',
+  'month',
+  'lastMonth',
+  'year',
+  'lastYear',
+  'older',
+])
+
 /** @param {Date} date @returns {string} */
 function isoDate(date) {
   return date.toISOString().slice(0, 10)
+}
+
+/**
+ * Format a date-only API value (`YYYY-MM-DD`) in the viewer's locale. Parsing
+ * at UTC midnight keeps the displayed day stable across timezones.
+ *
+ * @param {string|null|undefined} value
+ * @param {string} [locale]
+ * @returns {string}
+ */
+export function formatExpenseDate(value, locale = 'en-US') {
+  const text = String(value || '').slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return value ? String(value) : ''
+  const date = new Date(`${text}T00:00:00Z`)
+  if (Number.isNaN(date.getTime())) return text
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeZone: 'UTC',
+  }).format(date)
 }
 
 /**

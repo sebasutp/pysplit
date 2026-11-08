@@ -18,8 +18,9 @@ The SPA now has a working online shell built on the frozen repository contract:
   refresh-and-retry on 401, rotating-refresh single-flight protection, CSRF
   double-submit headers and text/file responses for exports.
 - i18next is configured with all 35 ported locale files. Every locale has the
-  same 450-key set as `en-US`; missing reference translations are filled from
-  English and keys removed upstream are dropped.
+  same key set as `en-US`; the locale sync merges real upstream translations,
+  keeps existing app translations and app-specific keys, and fills the rest
+  from English.
 - The shell has a header, locale switcher, theme toggle, user menu, toasts,
   login dialog, accessible empty/loading/error states, and the routes frozen by
   the plan, including the `/groups/:groupId` → expenses redirect.
@@ -157,10 +158,41 @@ card stays hidden until at least one group has an active user.
 
 ### Locales
 
-The reference translation files are partial. `scripts/sync-locales.mjs` keeps
-only keys present in `en-US`, fills missing values from English, and preserves
-existing translations. This makes key parity machine-checkable now and keeps
-every translated string that upstream provides.
+The reference translation files are partial. `frontend/scripts/sync-locales.mjs`
+merges upstream translations into this app's catalogues. Its default
+`--prefer-app` mode keeps reviewed app translations, fills only English
+placeholders or missing keys from upstream (and only when the app en-US source
+still matches upstream en-US and the placeholder/markup signature is
+unchanged), and otherwise falls back to English. `--prefer-upstream` restores
+the upstream-first behaviour when a deliberate refresh is wanted. The upstream
+snapshot is vendored under `frontend/locales-upstream/`, so `--check` runs
+offline without a local `spliit/` checkout. The sync never drops keys that only
+exist in the app `en-US` catalogue, and `make i18n-sync-check` (also part of
+`make lint`) reports stale files for CI. This keeps key parity machine-checkable
+and preserves reviewed translations.
+
+The remaining source-used strings are completed by
+`scripts/translate_locales.py`: upstream human translations are matched by
+English value first, and the app-specific keys (receipt items, sync status,
+admin, attachments, offline state) are machine-translated with placeholders and
+HTML tags protected. `scripts/i18n-glossary.json` holds context phrases and a
+reviewed per-locale override map for the most visible receipt vocabulary.
+`scripts/check_i18n_coverage.py` (or `make i18n-coverage`) reports how many
+source-used keys are actually translated per locale and gates against
+`frontend/src/locales/translation-baseline.json`. Empty values, missing keys,
+placeholder/HTML-tag signature mismatches and non-allowlisted English values are
+reported separately; gating modes fail on the first three, and `--strict` also
+fails on non-allowlisted English. Allowlist entries must carry a reason.
+
+```bash
+python3 scripts/check_i18n_coverage.py \
+  --baseline frontend/src/locales/translation-baseline.json
+python3 scripts/check_i18n_coverage.py --strict
+```
+
+Every locale is at or above 98% of the source-used keys; the eleven primary
+languages are at or above 98.6%.
+
 
 ## Verification commands and output
 

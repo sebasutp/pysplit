@@ -9,10 +9,15 @@
     }
   },
   "Header": {
-    "groups": "Nhóm"
+    "groups": "Nhóm",
+    "adminDashboard": "Trang tổng quan dành cho quản trị viên",
+    "language": "Ngôn ngữ",
+    "signIn": "Đăng nhập",
+    "signOut": "Đăng xuất",
+    "userMenu": "Trình đơn người dùng"
   },
   "Footer": {
-    "madeIn": "Made in Zurich, Switzerland 🇨🇭",
+    "madeIn": "Sản xuất tại Zurich, Thụy Sĩ 🇨🇭",
     "builtBy": "Xây dựng bởi <author>Sebastien Castiel</author> và <source>các cộng sự</source>"
   },
   "Expenses": {
@@ -39,15 +44,30 @@
       "lastMonth": "Tháng trước",
       "earlierThisYear": "Trong năm nay",
       "lastYear": "Năm trước",
-      "older": "Cũ hơn"
-    }
+      "older": "Cũ hơn",
+      "today": "hôm nay",
+      "week": "Đầu tuần này",
+      "month": "Trong tháng này",
+      "year": "Trong năm nay"
+    },
+    "clearSearch": "Xóa",
+    "exportError": "Không thể xuất chi phí",
+    "filterFrom": "Từ",
+    "filterTo": "Đến",
+    "loadMore": "Tải thêm",
+    "loading": "Đang tải chi phí…",
+    "loadingMore": "Đang tải…",
+    "search": "Tìm kiếm chi phí",
+    "showingCount": "Hiển thị {{shown}} trong tổng số {{total}} chi phí."
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong> chi cho <paidFor></paidFor>",
     "everyone": "mọi người",
     "receivedBy": "Nhận bởi <strong>{paidBy}</strong> cho <paidFor></paidFor>",
     "yourBalance": "Số dư của bạn:",
-    "notInvolved": "Bạn chưa tham gia"
+    "notInvolved": "Bạn chưa tham gia",
+    "paidByPlain": "Được thanh toán bởi {{paidBy}} cho {{paidFor}}",
+    "receivedByPlain": "Được {{paidBy}} nhận cho {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Nhóm của tôi",
@@ -60,11 +80,11 @@
       "orAsk": "hoặc nhờ một người bạn gửi đường dẫn đến nhóm có sẵn."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Tổng số dư của bạn",
+      "description": "Số dư tổng hợp của bạn trên tất cả các nhóm của bạn.",
+      "owedToYou": "Bạn đang nợ",
+      "youOwe": "Bạn nợ",
+      "settledUp": "Tất cả các bạn đã ổn định trong nhóm của mình."
     },
     "recent": "Nhóm gần đây",
     "starred": "Nhóm đánh dấu",
@@ -83,7 +103,7 @@
       "title": "Thêm nhóm bằng URL",
       "description": "Nếu nhóm được chia sẻ với bạn, bạn có thể dán URL vào đây để thêm vào danh sách của bạn.",
       "error": "Rất tiếc, chúng tôi không thể tìm thấy nhóm từ URL bạn cung cấp…",
-      "urlMode": "Enter URL",
+      "urlMode": "Nhập URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Nhóm này không tồn tại.",
       "link": "Xem các nhóm bạn đã truy cập gần đây"
-    }
+    },
+    "moreOptions": "Nhiều lựa chọn hơn",
+    "participants": "người tham gia",
+    "star": "Nhóm sao",
+    "unstar": "Bỏ gắn dấu sao nhóm"
   },
   "GroupForm": {
     "title": "Thông tin nhóm",
@@ -129,7 +153,10 @@
       "add": "Thêm thành viên",
       "John": "An",
       "Jane": "Bình",
-      "Jack": "Cường"
+      "Jack": "Cường",
+      "cannotRemove": "Người tham gia này là một phần của chi phí và không thể xóa được.",
+      "indexLabel": "Người tham gia #{{index}}",
+      "remove": "Xóa người tham gia {{index}}"
     },
     "Settings": {
       "title": "Cài đặt cục bộ",
@@ -145,7 +172,8 @@
       "create": "Tạo",
       "creating": "Đang tạo…",
       "cancel": "Hủy bỏ"
-    }
+    },
+    "saveError": "Không thể lưu nhóm."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "Để thiết lập đơn vị tiền tệ khác nhau cho từng khoản chi và quy đổi đơn vị tiền tệ, hãy chọn một đơn vị tiền tệ không tùy chỉnh cho nhóm.",
     "originalAmountField": {
       "label": "Số tiền quy đổi",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Số tiền cần chuyển",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -236,45 +264,53 @@
       "currencyNotFound": "Rất tiếc, Frankfurter hiện không có tỷ giá hối đoái cho loại tiền tệ này.",
       "noDate": "Nhập ngày phát sinh chi tiêu để lấy tỷ giá quy đổi.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Làm mới",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "Đây là sự hoàn trả"
     },
     "categoryField": {
-      "label": "Category"
+      "label": "Danh mục"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "Ghi chú"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "Chọn không có",
+    "selectAll": "Chọn tất cả",
+    "shares": "(các) lượt chia sẻ",
+    "advancedOptions": "Tùy chọn chia tách nâng cao…",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "Chế độ chia tách",
+      "evenly": "đồng đều",
+      "byShares": "Không đồng đều – Bằng cổ phiếu",
+      "byPercentage": "Không đồng đều – Theo phần trăm",
+      "byAmount": "Không đồng đều - Theo số lượng",
+      "saveAsDefault": "Lưu làm tùy chọn chia tách mặc định"
     },
     "DeletePopup": {
-      "label": "Delete",
-      "title": "Delete this expense?",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
-      "yes": "Yes",
-      "cancel": "Cancel"
+      "label": "Xóa",
+      "title": "Xóa chi phí này?",
+      "description": "Bạn có thực sự muốn xóa chi phí này? Hành động này là không thể đảo ngược.",
+      "yes": "Có",
+      "cancel": "Hủy bỏ"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "attachDocuments": "Đính kèm tài liệu",
+    "create": "Tạo",
+    "creating": "Đang tạo…",
+    "save": "Lưu",
+    "saving": "Đang lưu…",
+    "cancel": "Hủy bỏ",
+    "reimbursement": "hoàn trả",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Phân bổ các khoản thu",
+    "conflict": "Chi phí này đã được thay đổi bởi người khác. Tải lại trang và thử lại.",
+    "conflictTitle": "Chi phí thay đổi ở nơi khác",
+    "deleteError": "Không thể xóa chi phí.",
+    "pendingReceiptTotal": "Biên nhận được quét khi ngoại tuyến đã sẵn sàng.",
+    "pendingReceiptTotalApply": "Sử dụng tổng số được quét",
+    "pendingReceiptTotalDismiss": "Loại bỏ",
+    "saveError": "Không thể tiết kiệm chi phí."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "Lỗi khi tải tài liệu lên",
+      "description": "Đã xảy ra lỗi khi tải tài liệu lên. Vui lòng thử lại sau hoặc chọn một tệp khác.",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "Tạo chi phí từ biên lai",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -309,191 +345,207 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "Lỗi khi tải tài liệu lên",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Đã xếp hàng. Biên nhận sẽ được quét sau khi bạn kết nối lại.",
+    "offline": "Quá trình quét sẽ tiếp tục khi bạn trực tuyến.",
+    "scanFailed": "AI không thể đọc biên nhận này. Hãy kiểm tra cấu hình AI của máy chủ và thử lại.",
+    "scanning": "Đang quét…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Chi tiết đơn hàng biên nhận",
+    "backToExpense": "Quay lại chi phí",
+    "merchant": "Tên cửa hàng",
+    "printedTotal": "Tổng số in trên biên lai",
+    "noReceipt": "Chưa có biên nhận nào được liên kết với chi phí này.",
+    "empty": "Chưa có mục nào. Thêm một để bắt đầu chia tách.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Không thể lưu thay đổi của bạn",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Thêm mục",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Thêm mục",
+      "nameLabel": "Tên",
+      "quantityLabel": "Số lượng",
+      "amountLabel": "Số tiền",
+      "sharedLabel": "Chia sẻ (tính toàn bộ hóa đơn)",
+      "add": "Thêm",
+      "cancel": "Hủy bỏ"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} của {total}",
+      "remaining": "{quantity} còn lại",
+      "assign": "Phân bổ",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "removePortion": "Xóa phần được phân bổ",
+      "editTitle": "Chỉnh sửa mục",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Lưu",
+      "cancel": "Hủy bỏ",
+      "deleteConfirm": "Xóa mục này?",
+      "deleteDescription": "Thao tác này sẽ xóa mục và nhiệm vụ của nó."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Chưa được chỉ định",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Đã chia sẻ",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Chỉ định mục",
+      "description": "Chọn người thanh toán cho “{name}”.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Chia đều",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Phân chia tùy chỉnh",
+      "customHint": "Nhập số lượng theo đơn vị cho từng mục tiêu.",
+      "shared": "Đã chia sẻ",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Số lượng được chỉ định vượt quá số lượng mặt hàng.",
+      "confirm": "Phân bổ",
+      "cancel": "Hủy bỏ"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Đã chia sẻ",
+      "unassigned": "Chưa được chỉ định",
+      "optOut": "Chia sẻ các mục chưa được chỉ định",
+      "reconciles": "Cân bằng",
+      "offBy": "Chênh lệch {amount}",
+      "itemsTotal": "Tổng số mặt hàng nhận",
+      "apply": "Áp dụng cho chi phí",
+      "allOptedOut": "Mọi người đều chọn không tham gia nhưng một số mục vẫn chưa được chỉ định.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Giá trị biên nhận khác nhau · Áp dụng lại"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Đã cập nhật chi phí",
+      "description": "Các mục biên nhận đã được áp dụng cho chi phí."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Không thể áp dụng biên nhận"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Cập nhật chi phí?",
+      "description": "Tổng chi phí khác với tổng các khoản đã nhận. Việc áp dụng sẽ ghi đè số tiền chi phí và phần chia của nó.",
+      "total": "tổng cộng {current} → {new}",
+      "cancel": "Hủy bỏ",
+      "confirm": "Áp dụng"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Quét hàng đợi",
+    "scanPendingDescription": "Hình ảnh được lưu trên thiết bị này và sẽ được quét khi bạn trực tuyến trở lại.",
+    "offlineQueue": "Bạn đang ngoại tuyến. Hãy đính kèm ảnh ngay bây giờ và ảnh sẽ được quét sau khi bạn kết nối lại.",
+    "disabled": "Phân chia thông minh không được bật trên máy chủ này. Quét biên nhận là một tính năng chỉ có trực tuyến.",
+    "extracted": "Đã quét biên lai",
+    "extractedDescription": "Chỉ định các mục được trích xuất bên dưới.",
+    "loading": "Đang tải biên nhận…",
+    "optOutTitle": "Chọn không tham gia",
+    "scanError": "Không thể quét biên lai.",
+    "scanUnavailable": "Hãy kiểm tra cấu hình AI của máy chủ và thử lại.",
+    "scanning": "Đang quét biên nhận…",
+    "upload": "Tải lên ảnh biên nhận"
   },
   "Balances": {
-    "title": "Balances",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "title": "Số dư",
+    "description": "Đây là số tiền mà mỗi người tham gia đã trả hoặc được trả.",
     "Reimbursements": {
-      "title": "Suggested reimbursements",
-      "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "title": "Đề xuất bồi hoàn",
+      "description": "Dưới đây là những gợi ý để tối ưu hóa việc hoàn trả giữa những người tham gia.",
+      "noImbursements": "Có vẻ như nhóm của bạn không cần hoàn tiền 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "Đánh dấu là đã thanh toán",
+      "owesPlain": "{{from}} nợ {{to}}"
+    },
+    "loading": "Đang tải số dư…"
   },
   "Stats": {
-    "title": "Stats",
+    "title": "Thống kê",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Mọi lúc",
+      "thisMonth": "Tháng này",
+      "last30": "30 ngày qua",
+      "thisYear": "Năm nay",
+      "custom": "Phạm vi tùy chỉnh",
+      "from": "Từ",
+      "to": "Đến"
     },
     "Totals": {
-      "title": "Totals",
-      "description": "Spending summary of the entire group.",
-      "groupSpendings": "Total group spendings",
+      "title": "Tổng số",
+      "description": "Tổng hợp chi tiêu của toàn nhóm.",
+      "groupSpendings": "Tổng chi tiêu của nhóm",
       "groupEarnings": "Total group earnings",
-      "yourSpendings": "Your total spendings",
+      "yourSpendings": "Tổng chi tiêu của bạn",
       "yourEarnings": "Your total earnings",
-      "yourShare": "Your total share"
+      "yourShare": "Tổng số cổ phần của bạn"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Tóm tắt",
+      "description": "Các số liệu chính cho khoảng thời gian đã chọn.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Chi tiêu",
+      "averageExpense": "Chi phí trung bình",
+      "largestExpense": "Chi phí lớn nhất",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Chi tiêu theo thời gian",
+      "description": "Tổng chi tiêu nhóm mỗi tháng. Chọn một tháng để xem chi phí của nó.",
+      "empty": "Chưa có chi phí nào cả.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Chi phí trong tháng này trong khoảng thời gian đã chọn.",
+      "detailsEmpty": "Không có chi phí nào trong tháng này.",
+      "showExpensesPlain": "Hiển thị chi phí cho {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Chi tiêu của người tham gia",
+      "description": "Mỗi người tham gia đã trả bao nhiêu và phần chi phí của họ.",
+      "empty": "Chưa có chi phí nào cả.",
+      "participant": "Người tham gia",
+      "paid": "Đã trả tiền",
       "count": "Count",
-      "share": "Share"
+      "share": "Chia sẻ"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Chi tiêu theo danh mục",
+      "description": "Tổng số tiền chi tiêu trong mỗi danh mục. Chọn một danh mục để xem chi phí của nó.",
+      "empty": "Chưa có chi phí nào cả.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Các chi phí thuộc danh mục này trong khoảng thời gian đã chọn.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Hiển thị chi phí cho {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Chi phí thường xuyên",
+      "description": "Ước tính chi phí hoạt động thường xuyên của nhóm.",
+      "estimatedMonthly": "Chi phí ước tính hàng tháng",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Đang tải số liệu thống kê…"
   },
   "Activity": {
-    "title": "Activity",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
-    "someone": "Someone",
-    "settingsModified": "Group settings were modified by <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "title": "Hoạt động",
+    "description": "Tổng quan về tất cả các hoạt động trong nhóm này.",
+    "noActivity": "Chưa có bất kỳ hoạt động nào trong nhóm của bạn.",
+    "someone": "ai đó",
+    "settingsModified": "Cài đặt nhóm đã được sửa đổi bởi <strong>{participant}</strong>.",
+    "expenseCreated": "Chi phí <em>{expense}</em> được tạo bởi <strong>{participant}</strong>.",
+    "expenseUpdated": "Chi phí <em>{expense}</em> được cập nhật bởi <strong>{participant}</strong>.",
+    "expenseDeleted": "Chi phí <em>{expense}</em> bị xóa bởi <strong>{participant}</strong>.",
     "Groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -504,19 +556,24 @@
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
       "older": "Older"
-    }
+    },
+    "loadMore": "Tải thêm",
+    "loading": "Đang tải hoạt động…",
+    "unknown": "Hoạt động không xác định"
   },
   "Information": {
-    "title": "Information",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
-    "empty": "No group information yet."
+    "title": "Thông tin",
+    "description": "Sử dụng nơi này để thêm bất kỳ thông tin nào có thể liên quan đến những người tham gia nhóm.",
+    "empty": "Chưa có thông tin nhóm."
   },
   "Settings": {
-    "title": "Settings"
+    "title": "Cài đặt",
+    "saved": "Đã cập nhật nhóm",
+    "savedDescription": "Những thay đổi của bạn đã được lưu."
   },
   "Share": {
-    "title": "Share",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "title": "Chia sẻ",
+    "description": "Để những người tham gia khác có thể xem nhóm và thêm chi phí, hãy chia sẻ URL của nhóm với họ.",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Warning!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Chia sẻ",
+    "copy": "Sao chép liên kết",
+    "url": "Liên kết nhóm"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -542,8 +602,11 @@
     "paidByRequired": "You must select a participant.",
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
-    "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "amountSum": "Tổng số tiền phải bằng số tiền chi phí.",
+    "percentageSum": "Tổng các phần trăm phải bằng 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Search category...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Đã có bản cập nhật",
+    "updateDescription": "Đã có phiên bản mới của pysplit.",
+    "reload": "Tải lại",
+    "updating": "Đang cập nhật…",
+    "offlineReady": "Sẵn sàng làm việc ngoại tuyến",
+    "offlineReadyDescription": "Shell ứng dụng được lưu trữ. Mở một nhóm một lần khi trực tuyến để lưu giữ dữ liệu của nhóm đó.",
+    "dismiss": "Đóng",
+    "install": "Cài đặt ứng dụng",
+    "refreshApp": "Làm mới ứng dụng",
+    "refreshAppHint": "Xóa các tập tin được lưu trong bộ nhớ cache và tải lại phiên bản mới nhất. Dữ liệu đã lưu của bạn vẫn còn trên thiết bị này."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Bảng điều khiển quản trị",
+    "description": "Quản lý vai trò người dùng, quyền truy cập nền tảng và giám sát số liệu hệ thống.",
+    "totalGroups": "Tổng số nhóm",
+    "totalExpenses": "Tổng chi phí",
+    "registeredUsers": "Người dùng đã đăng ký",
+    "userManagement": "Cấp quyền và quản lý người dùng",
+    "accessDenied": "Truy cập bị từ chối",
+    "accessDeniedDescription": "Bảng điều khiển quản trị được giới hạn cho người dùng ở cấp Quản trị viên.",
+    "delete": "Xóa",
+    "deleteError": "Không thể xóa",
+    "email": "Email",
+    "expenses": "chi phí",
+    "groupDeleted": "Đã xóa nhóm",
+    "groupManagement": "Nhóm",
+    "groupManagementDescription": "Xóa nhóm và kiểm tra việc sử dụng.",
+    "groups": "nhóm",
+    "loadMoreGroups": "Tải thêm nhóm",
+    "loadMoreUsers": "Tải thêm người dùng",
+    "loading": "Đang tải trang tổng quan…",
+    "loadingMore": "Đang tải…",
+    "participants": "người tham gia",
+    "preauthorize": "Ủy quyền trước cho người dùng",
+    "preauthorizeAction": "Ủy quyền trước",
+    "preauthorizeError": "Không thể ủy quyền trước cho người dùng",
+    "preauthorized": "Người dùng được ủy quyền trước",
+    "returnToGroups": "Quay lại Nhóm của tôi",
+    "searchGroups": "Tìm kiếm nhóm",
+    "searchUsers": "Tìm kiếm người dùng",
+    "signInDescription": "Bảng điều khiển quản trị yêu cầu tài khoản quản trị viên.",
+    "signInTitle": "Yêu cầu đăng nhập",
+    "tier": "cấp",
+    "tierError": "Không thể cập nhật cấp độ",
+    "tierFor": "Cấp độ cho",
+    "tierUpdated": "Đã cập nhật cấp độ",
+    "userDeleted": "Người dùng đã xóa",
+    "userTier": "Bậc"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Lưu trữ ngoại tuyến",
+    "loading": "Đang kiểm tra thiết bị này…",
+    "unsupported": "Trình duyệt này không thể báo cáo trạng thái lưu trữ.",
+    "usage": "{{used}} trong số {{quota}} đã sử dụng",
+    "unknown": "không rõ",
+    "persisted": "Bộ nhớ được lưu trữ liên tục trên thiết bị này.",
+    "notPersisted": "Trình duyệt có thể gỡ bỏ dữ liệu ngoại tuyến nếu thiết bị sắp hết dung lượng.",
+    "keep": "Giữ dữ liệu trên thiết bị này",
+    "refresh": "Làm mới",
+    "critical": "Bộ nhớ gần đầy. Xuất bản sao lưu ngay bây giờ, sau đó xóa các nhóm không sử dụng.",
+    "warning": "Bộ nhớ sắp đầy. Một bản sao lưu được khuyến khích."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Đang chờ đồng bộ hóa",
+    "expense": "Đang chờ đồng bộ"
+  },
+  "Attachments": {
+    "assignItems": "Phân bổ các khoản thu",
+    "extractedItems": "Các mục được trích xuất bằng AI",
+    "help": "Hình ảnh được nén trước khi upload. Các tệp PDF được lưu giữ dưới dạng tệp đính kèm và mở trong tab mới.",
+    "open": "Mở",
+    "openInNewTab": "Mở trong tab mới",
+    "pdfPreviewUnavailable": "Bản xem trước PDF mở trong một tab riêng biệt.",
+    "pending": "Đang chờ tải lên",
+    "preview": "Xem trước",
+    "previewAction": "Xem trước",
+    "previewNamed": "Xem trước {{name}}",
+    "receipt": "Biên lai cửa hàng",
+    "saveToAssignItems": "Lưu chi phí trước, sau đó phân bổ các mục này cho người tham gia.",
+    "scanComplete": "Đã quét biên lai",
+    "scanCompleteDescription": "Chỉ định các mục được trích xuất cho người tham gia.",
+    "scanError": "Không thể quét biên lai",
+    "scanWithAi": "Quét bằng AI",
+    "scanning": "Đang quét…",
+    "view": "Xem tệp đính kèm",
+    "attachment": "Tệp đính kèm",
+    "onlyImagesPdf": "Chỉ hỗ trợ hình ảnh và tệp PDF."
+  },
+  "Backup": {
+    "downloaded": "Đã tải xuống bản sao lưu.",
+    "export": "Xuất bản sao lưu",
+    "failed": "Sao lưu không thành công.",
+    "restore": "Khôi phục bản sao lưu",
+    "restoreFailed": "Khôi phục không thành công.",
+    "restoreLabel": "Khôi phục tập tin sao lưu",
+    "restored": "Đã khôi phục bản sao lưu. Đang tải lại…"
+  },
+  "Common": {
+    "addGroup": "Thêm nhóm",
+    "close": "Close",
+    "closeDialog": "Đóng hộp thoại",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Loại bỏ thông báo",
+    "error": "Đã xảy ra lỗi",
+    "expenseNotFound": "Không tìm thấy chi phí",
+    "loading": "Đang tải…",
+    "menu": "Thực đơn",
+    "retry": "Thử lại",
+    "select": "Chọn…",
+    "unknown": "không rõ",
+    "user": "người dùng"
+  },
+  "CreateGroup": {
+    "approvalContact": "Việc tạo các nhóm chi phí mới cần có sự cho phép của quản trị viên. Vui lòng liên hệ với quản trị viên phiên bản của bạn để thăng cấp tài khoản của bạn lên cấp Người tạo nhóm.",
+    "approvalDescription": "Tài khoản của bạn hiện ở cấp Người dùng đồng bộ hóa. Bạn có thể tham gia vào bất kỳ nhóm nào được chia sẻ với bạn và đồng bộ hóa chúng trên tất cả các thiết bị của bạn.",
+    "approvalTitle": "Tạo nhóm yêu cầu phê duyệt",
+    "authRequiredDescription": "Để tạo nhóm chi phí mới, vui lòng đăng nhập bằng tài khoản bên ngoài. Những người tham gia nhóm được mời vẫn có thể tham gia dễ dàng thông qua liên kết nhóm của bạn mà không cần đăng nhập.",
+    "authRequiredTitle": "Yêu cầu xác thực",
+    "returnToGroups": "Quay lại Nhóm của tôi",
+    "signIn": "Đăng nhập để tạo nhóm"
+  },
+  "GroupTabs": {
+    "Expenses": "Chi tiêu",
+    "Balances": "Số dư",
+    "Information": "Thông tin",
+    "Stats": "Thống kê",
+    "Activity": "Hoạt động",
+    "Settings": "Cài đặt",
+    "label": "Phần nhóm"
+  },
+  "Login": {
+    "title": "Đăng nhập vào Split",
+    "description": "Đăng nhập bằng tài khoản bên ngoài để bật đồng bộ hóa nhóm trên nhiều thiết bị.",
+    "google": "Tiếp tục với Google",
+    "github": "Tiếp tục với GitHub",
+    "noProviders": "Không có nhà cung cấp OAuth nào được định cấu hình. Đặt AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET để bật đăng nhập."
+  },
+  "NotFound": {
+    "title": "Không tìm thấy trang",
+    "description": "Hãy kiểm tra URL và thử lại.",
+    "groupTitle": "Nhóm này không tồn tại.",
+    "groupDescription": "Kiểm tra URL hoặc yêu cầu liên kết lời mời mới."
+  },
+  "SyncStatus": {
+    "offlinePending": "Ngoại tuyến — các thay đổi đang chờ xử lý: {{count}}",
+    "offlineSaved": "Ngoại tuyến - hiển thị dữ liệu đã lưu",
+    "syncing": "Đang đồng bộ hóa…",
+    "error": "Lỗi đồng bộ hóa: {{error}}",
+    "retryToContinue": "thử lại để tiếp tục",
+    "conflicts": "Xung đột cần xem xét: {{count}}",
+    "failed": "Những thay đổi không thể đồng bộ hóa: {{count}}",
+    "pending": "Các thay đổi đang chờ xử lý: {{count}}",
+    "retryFailed": "Thử lại các thay đổi thất bại",
+    "discardFailed": "Hủy các thay đổi thất bại",
+    "resolveConflicts": "Giải quyết xung đột",
+    "syncNow": "Đồng bộ hóa ngay bây giờ",
+    "dialogTitle": "Giải quyết xung đột",
+    "dialogDescription": "Những chỉnh sửa này đã thay đổi các bản ghi tương tự trên một thiết bị khác. Chọn những gì để giữ.",
+    "noConflicts": "Không có xung đột để giải quyết.",
+    "serverVersion": "Phiên bản máy chủ {{version}} · chỉnh sửa cục bộ được giữ trong hàng đợi xung đột",
+    "keepMine": "Giữ phiên bản của tôi",
+    "useServer": "Sử dụng máy chủ",
+    "duplicate": "Nhân đôi như mới"
+  },
+  "Theme": {
+    "toggle": "Chuyển đổi chủ đề",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
   }
 }

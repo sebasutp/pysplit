@@ -636,6 +636,258 @@ describe('local repository', () => {
     expect(outbox[1].entity_id).toBe(item.id)
   })
 
+  it('updates the item shared flag when portions are replaced', async () => {
+    const cleared = await localRepository.attachments.setPortions('g1', 'r1', 'i1', [])
+    expect(cleared.items.find((/** @type {any} */ row) => row.id === 'i1').is_shared).toBe(false)
+    expect((await db.attachmentItems.get('i1'))?.is_shared).toBe(false)
+
+    const shared = await localRepository.attachments.setPortions('g1', 'r1', 'i1', [
+      { target: 'SHARED', participant_id: null, quantity_milli: 1000 },
+    ])
+    expect(shared.items.find((/** @type {any} */ row) => row.id === 'i1').is_shared).toBe(true)
+
+    const participant = await localRepository.attachments.setPortions('g1', 'r1', 'i1', [
+      { target: 'PARTICIPANT', participant_id: 'a', quantity_milli: 1000 },
+    ])
+    expect(
+      participant.items.find((/** @type {any} */ row) => row.id === 'i1').is_shared,
+    ).toBe(false)
+    expect((await db.attachmentItems.get('i1'))?.is_shared).toBe(false)
+  })
+
+  it('refreshes a receipt from the server when no attachment edits are pending', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
+    const serverState = {
+      attachment: {
+        id: 'r1',
+        group_id: 'g1',
+        expense_id: 'e1',
+        url: '/uploads/server.jpg',
+        thumbnail_url: null,
+        filename: 'server.jpg',
+        content_type: 'image/jpeg',
+        byte_size: 4,
+        width: 1,
+        height: 1,
+        receipt_status: 'EXTRACTED',
+        attempts: 1,
+        merchant: 'Server Cafe',
+        receipt_date: null,
+        currency_code: 'USD',
+        total: 2000,
+        provider: 'mock',
+        model: 'mock',
+        created_at: '2026-01-02T10:00:00.000Z',
+        updated_at: '2026-01-03T10:00:00.000Z',
+        version: 2,
+        deleted_at: null,
+      },
+      items: [
+        {
+          id: 'i1',
+          attachment_id: 'r1',
+          name: 'Server Pizza',
+          quantity_milli: 1000,
+          unit_price: 2000,
+          amount: 2000,
+          is_shared: false,
+          is_adjustment: false,
+          position: 0,
+          version: 2,
+          updated_at: '2026-01-03T10:00:00.000Z',
+          deleted_at: null,
+          portions: [
+            {
+              id: 'ap1',
+              item_id: 'i1',
+              target: 'PARTICIPANT',
+              participant_id: 'a',
+              quantity_milli: 1000,
+              version: 1,
+            },
+          ],
+        },
+      ],
+      opt_outs: [],
+      split: { items_total: 2000, participants: [] },
+    }
+    const spy = vi.spyOn(onlineRepository.attachments, 'get').mockResolvedValue(serverState)
+
+    const state = await localRepository.attachments.get('g1', { attachment_id: 'r1' })
+
+    expect(spy).toHaveBeenCalledWith('g1', { attachment_id: 'r1' }, expect.anything())
+    expect(state).toBe(serverState)
+    expect(await db.attachmentItems.get('i1')).toMatchObject({
+      name: 'Server Pizza',
+      pending: false,
+    })
+    const portions = await db.attachmentPortions.where('item_id').equals('i1').toArray()
+    expect(portions.map((/** @type {any} */ row) => row.participant_id)).toEqual(['a'])
+  })
+
+  it('keeps local receipt state while an attachment edit is pending', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
+    await db.outbox.put(
+      outboxRow(/** @type {any} */ ({
+        op_id: 'op-pending',
+        group_id: 'g1',
+        entity_type: 'attachment_portion',
+        entity_id: 'i1',
+        op_type: 'update',
+        payload: {},
+        meta: { attachment_id: 'r1', item_id: 'i1' },
+      })),
+    )
+    const spy = vi.spyOn(onlineRepository.attachments, 'get').mockResolvedValue({})
+
+    const state = await localRepository.attachments.get('g1', { attachment_id: 'r1' })
+
+    expect(spy).not.toHaveBeenCalled()
+    expect(state.items[0]).toMatchObject({ name: 'Pizza' })
+  })
+
+  it('purges stale non-pending items but keeps pending local items on refresh', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
+    const now = '2026-01-02T10:00:00.000Z'
+    await db.attachmentItems.bulkPut([
+      {
+        id: 'i-stale',
+        attachment_id: 'r1',
+        name: 'Old item',
+        quantity_milli: 1000,
+        amount: 100,
+        is_shared: false,
+        is_adjustment: false,
+        position: 1,
+        created_at: now,
+        updated_at: now,
+        version: 1,
+        deleted_at: null,
+      },
+      {
+        id: 'i-pending',
+        attachment_id: 'r1',
+        name: 'Pending item',
+        quantity_milli: 1000,
+        amount: 100,
+        is_shared: false,
+        is_adjustment: false,
+        position: 2,
+        created_at: now,
+        updated_at: now,
+        version: 1,
+        deleted_at: null,
+        pending: true,
+      },
+    ])
+    await db.attachmentPortions.bulkPut([
+      {
+        id: 'ap-stale',
+        item_id: 'i-stale',
+        target: 'PARTICIPANT',
+        participant_id: 'a',
+        quantity_milli: 1000,
+        created_at: now,
+        updated_at: now,
+        version: 1,
+        deleted_at: null,
+      },
+      {
+        id: 'ap-pending',
+        item_id: 'i-pending',
+        target: 'PARTICIPANT',
+        participant_id: 'a',
+        quantity_milli: 1000,
+        created_at: now,
+        updated_at: now,
+        version: 1,
+        deleted_at: null,
+      },
+    ])
+    vi.spyOn(onlineRepository.attachments, 'get').mockResolvedValue({
+      attachment: { id: 'r1', group_id: 'g1', receipt_status: 'EXTRACTED' },
+      items: [
+        {
+          id: 'i1',
+          attachment_id: 'r1',
+          name: 'Server Pizza',
+          quantity_milli: 1000,
+          amount: 1000,
+          portions: [],
+        },
+      ],
+      opt_outs: [],
+    })
+
+    await localRepository.attachments.get('g1', { attachment_id: 'r1' })
+
+    expect(await db.attachmentItems.get('i-stale')).toBeUndefined()
+    expect(await db.attachmentPortions.where('item_id').equals('i-stale').count()).toBe(0)
+    expect(await db.attachmentItems.get('i-pending')).toMatchObject({
+      name: 'Pending item',
+      pending: true,
+    })
+    expect(await db.attachmentPortions.where('item_id').equals('i-pending').count()).toBe(1)
+  })
+
+  it('purges the cached attachment when the server has no receipt', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
+    const now = '2026-01-02T10:00:00.000Z'
+    await db.attachmentPortions.put({
+      id: 'ap1',
+      item_id: 'i1',
+      target: 'PARTICIPANT',
+      participant_id: 'a',
+      quantity_milli: 1000,
+      created_at: now,
+      updated_at: now,
+      version: 1,
+      deleted_at: null,
+    })
+    await db.attachmentOptOuts.put({
+      id: 'r1:a',
+      attachment_id: 'r1',
+      participant_id: 'a',
+      created_at: now,
+      updated_at: now,
+      version: 1,
+      deleted_at: null,
+    })
+    vi.spyOn(onlineRepository.attachments, 'get').mockResolvedValue(null)
+
+    const state = await localRepository.attachments.get('g1', { attachment_id: 'r1' })
+
+    expect(state).toBeNull()
+    expect(await db.attachments.get('r1')).toBeUndefined()
+    expect(await db.attachmentItems.where('attachment_id').equals('r1').count()).toBe(0)
+    expect(await db.attachmentPortions.where('item_id').equals('i1').count()).toBe(0)
+    expect(await db.attachmentOptOuts.where('attachment_id').equals('r1').count()).toBe(0)
+  })
+
+  it('preserves local opt-outs when the apply response has no opt_outs', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true })
+    const now = '2026-01-02T10:00:00.000Z'
+    await db.attachmentOptOuts.put({
+      id: 'r1:a',
+      attachment_id: 'r1',
+      participant_id: 'a',
+      created_at: now,
+      updated_at: now,
+      version: 1,
+      deleted_at: null,
+    })
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('no network')))
+    vi.spyOn(onlineRepository.attachments, 'apply').mockResolvedValue({
+      attachment: { id: 'r1', group_id: 'g1', receipt_status: 'EXTRACTED' },
+      split: { items_total: 1000 },
+    })
+
+    await localRepository.attachments.apply('g1', 'r1', { expense_id: 'e1' })
+
+    const optOuts = await db.attachmentOptOuts.where('attachment_id').equals('r1').toArray()
+    expect(optOuts.map((/** @type {any} */ row) => row.participant_id)).toEqual(['a'])
+  })
+
   it('rejects online-only operations while offline', async () => {
     await expect(
       localRepository.attachments.extractTotal('g1', 'r1'),

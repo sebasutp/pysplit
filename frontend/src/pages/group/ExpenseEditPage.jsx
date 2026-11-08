@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import { useGroupContext } from '../../components/groups/GroupLayout'
 import { ExpenseForm } from '../../components/expenses/ExpenseForm'
@@ -13,6 +14,7 @@ import { repository } from '../../services/repository'
 
 export function ExpenseEditPage() {
   const { group } = useGroupContext()
+  const { t } = useTranslation()
   const { activeUserId } = useActiveUser(group.id)
   const { expenseId } = useParams()
   const { categories, loading: categoriesLoading } = useCategories()
@@ -50,7 +52,7 @@ export function ExpenseEditPage() {
 
   if (loading || categoriesLoading) return <LoadingState />
   if (error) return <ErrorState detail={error.detail || error.message} />
-  if (!expense) return <ErrorState title="Expense not found" />
+  if (!expense) return <ErrorState title={t('Common.expenseNotFound', 'Expense not found')} />
 
   return (
     <ExpenseForm

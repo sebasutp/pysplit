@@ -68,7 +68,8 @@ def test_bug_3a_apply_attachment_split_emits_sync_change(make_client, session: S
     # Pull changes since initial cursor - incremental sync clients must receive the update
     pulled = pull(client, initial_cursor, [group.id]).json()
     expense_changes = [
-        c for c in pulled["changes"]
+        c
+        for c in pulled["changes"]
         if c["entity_type"] == "expense" and c["entity_id"] == expense.id
     ]
     assert len(expense_changes) > 0, (
@@ -106,7 +107,8 @@ def test_bug_3b_direct_rest_mutations_emit_sync_change(client, session: Session)
     # Pull changes since initial cursor - incremental sync clients must receive the created expense
     pulled = pull(client, initial_cursor, [group.id]).json()
     expense_changes = [
-        c for c in pulled["changes"]
+        c
+        for c in pulled["changes"]
         if c["entity_type"] == "expense" and c["entity_id"] == created_id
     ]
     assert len(expense_changes) > 0, (
@@ -160,8 +162,7 @@ def test_bug_4_recurring_materialization_emits_sync_change_for_previous_frame(
 
     # Incremental pull clients MUST receive an update SyncChange for exp-rec-head with is_recurring_head=False
     head_updates = [
-        c for c in changes
-        if c["entity_id"] == "exp-rec-head" and c["op_type"] == "update"
+        c for c in changes if c["entity_id"] == "exp-rec-head" and c["op_type"] == "update"
     ]
     assert len(head_updates) > 0, (
         f"Bug 4 reproduced: materialize_due_recurring_expenses only emitted SyncChange for the new frame. "
@@ -252,12 +253,9 @@ def test_bug_15c_membership_patch_emits_sync_change(client, session: Session):
     assert resp.status_code == 200, resp.text
 
     pulled = pull(client, initial_cursor, [group.id], headers=headers).json()
-    user_group_changes = [
-        c for c in pulled["changes"] if c["entity_type"] == "user_group"
-    ]
+    user_group_changes = [c for c in pulled["changes"] if c["entity_type"] == "user_group"]
     assert len(user_group_changes) > 0, (
         f"Bug 15c reproduced: PATCH /membership did not emit user_group SyncChange. "
         f"Changes: {pulled['changes']}"
     )
     assert user_group_changes[-1]["snapshot"]["is_starred"] is True
-
