@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Групи"
+    "groups": "Групи",
+    "adminDashboard": "Інформаційна панель адміністратора",
+    "language": "Мова",
+    "signIn": "Увійдіть",
+    "signOut": "Вийти",
+    "userMenu": "Меню користувача"
   },
   "Footer": {
     "madeIn": "Зроблено в Цюриху, Швейцарія 🇨🇭",
@@ -21,7 +26,7 @@
     "create": "Створити витрату",
     "createFirst": "Створіть першу витрату",
     "noExpenses": "У вашій групі ще немає витрат",
-    "export": "Export",
+    "export": "Експорт",
     "exportJson": "Експортувати у JSON",
     "exportCsv": "Експортувати у CSV",
     "searchPlaceholder": "Пошук витрат...",
@@ -39,15 +44,30 @@
       "lastMonth": "Минулого місяця",
       "earlierThisYear": "Раніше цього року",
       "lastYear": "Минулого року",
-      "older": "Старіші"
-    }
+      "older": "Старіші",
+      "today": "Сьогодні",
+      "week": "Раніше цього тижня",
+      "month": "Раніше цього місяця",
+      "year": "Раніше цього року"
+    },
+    "clearSearch": "ясно",
+    "exportError": "Не вдалося експортувати витрати",
+    "filterFrom": "З",
+    "filterTo": "До",
+    "loadMore": "Завантажте більше",
+    "loading": "Завантаження витрат…",
+    "loadingMore": "Завантаження…",
+    "search": "Пошук витрат",
+    "showingCount": "Показано витрати {{shown}} з {{total}}."
   },
   "ExpenseCard": {
     "paidBy": "Сплачено <strong>{paidBy}</strong> за <paidFor></paidFor>",
-    "everyone": "everyone",
+    "everyone": "всіх",
     "receivedBy": "Отримано <strong>{paidBy}</strong> за <paidFor></paidFor>",
     "yourBalance": "Ваш баланс:",
-    "notInvolved": "You are not involved"
+    "notInvolved": "You are not involved",
+    "paidByPlain": "Оплачено {{paidBy}} за {{paidFor}}",
+    "receivedByPlain": "Отримано {{paidBy}} для {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Мої групи",
@@ -60,11 +80,11 @@
       "orAsk": "або попросіть друга надіслати вам посилання на існуючу"
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Ваш загальний баланс",
+      "description": "Ваш сумарний баланс за всіма групами.",
+      "owedToYou": "Вам винні",
+      "youOwe": "Ви винні",
+      "settledUp": "У всіх ваших групах усе розраховано."
     },
     "recent": "Нещодавні групи",
     "starred": "Обрані групи",
@@ -83,7 +103,7 @@
       "title": "Додати групу за URL",
       "description": "Якщо з вами поділились групою, ви можете вставити її URL тут, щоб додати до свого списку",
       "error": "На жаль, ми не змогли знайти групу за наданим URL",
-      "urlMode": "Enter URL",
+      "urlMode": "Введіть URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Цієї групи не існує",
       "link": "Перейти до нещодавно відвіданих груп"
-    }
+    },
+    "moreOptions": "Більше варіантів",
+    "participants": "учасників",
+    "star": "Зоряна група",
+    "unstar": "Зняти зірочку з групи"
   },
   "GroupForm": {
     "title": "Інформація про групу",
@@ -116,8 +140,8 @@
       "description": "Ми будемо використовувати його для відображення сум"
     },
     "CurrencyCodeField": {
-      "label": "Main currency",
-      "createDescription": "All amounts and balances will be in this currency.",
+      "label": "Основна валюта",
+      "createDescription": "Усі суми та залишки будуть у цій валюті.",
       "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
       "customOption": "Custom"
     },
@@ -129,7 +153,10 @@
       "add": "Додати учасника",
       "John": "Андрій",
       "Jane": "Оксана",
-      "Jack": "Василь"
+      "Jack": "Василь",
+      "cannotRemove": "Цей учасник є частиною витрат і не може бути вилучений.",
+      "indexLabel": "Учасник №{{index}}",
+      "remove": "Видалити учасника {{index}}"
     },
     "Settings": {
       "title": "Локальні налаштування",
@@ -145,7 +172,8 @@
       "create": "Створити",
       "creating": "Створення...",
       "cancel": "Скасувати"
-    }
+    },
+    "saveError": "Не вдалося зберегти групу."
   },
   "ExpenseForm": {
     "Income": {
@@ -189,7 +217,7 @@
         "description": "Введіть дату, коли було сплачено"
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Валюта витрат",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Оберіть категорію витрати",
@@ -199,12 +227,12 @@
         "description": "Оберіть учасника, який сплатив"
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Повторення витрат",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "Ніхто",
+        "daily": "Щодня",
+        "weekly": "Щотижня",
+        "monthly": "Щомісяця"
       },
       "paidFor": {
         "title": "Учасники",
@@ -218,25 +246,25 @@
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "Сума для конвертації",
+      "repaymentLabel": "Сума для переказу",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "Використовуйте тарифи від Frankfurter",
+      "useCustom": "Використовуйте індивідуальну ставку",
+      "label": "Обмінний курс"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "Отримання курсів валют…",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Нам не вдалося отримати останні тарифи.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "Введіть спеціальну ставку нижче.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Оновити",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
@@ -274,7 +302,15 @@
     "saving": "Збереження..",
     "cancel": "Скасувати",
     "reimbursement": "Відшкодування",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Розподілити позиції чека",
+    "conflict": "Ці витрати змінив хтось інший. Перезавантажте сторінку та повторіть спробу.",
+    "conflictTitle": "Витрати змінені в іншому місці",
+    "deleteError": "Не вдалося видалити витрати.",
+    "pendingReceiptTotal": "Квитанція, відсканована в режимі офлайн, готова.",
+    "pendingReceiptTotalApply": "Використовуйте відскановану суму",
+    "pendingReceiptTotalDismiss": "Відхилити",
+    "saveError": "Не вдалося заощадити кошти."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Виникла помилка під час завантаження документа. Будь ласка, спробуйте ще раз пізніше або виберіть інший файл",
       "retry": "Спробувати ще раз"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "У черзі. Квитанцію буде відскановано після повторного підключення.",
+    "offline": "Сканування відновлюється, коли ви в мережі.",
+    "scanFailed": "ШІ не зміг прочитати цю квитанцію. Перевірте конфігурацію AI сервера та повторіть спробу.",
+    "scanning": "Сканування…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Позиції чека",
+    "backToExpense": "Повернемося до витрат",
+    "merchant": "Назва магазину",
+    "printedTotal": "Усього надруковано на квитанції",
+    "noReceipt": "Жодна квитанція ще не пов’язана з цими витратами.",
+    "empty": "Елементів ще немає. Додайте один, щоб почати розділення.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Не вдалося зберегти зміни",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Додати товар",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Додати товар",
+      "nameLabel": "Ім'я",
+      "quantityLabel": "Кількість",
+      "amountLabel": "Сума",
+      "sharedLabel": "Спільно (плата за весь рахунок)",
+      "add": "додати",
+      "cancel": "Скасувати"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} з {total}",
+      "remaining": "Залишилося {quantity}",
+      "assign": "Виділити",
+      "edit": "Редагувати",
+      "delete": "Видалити",
+      "removePortion": "Видалити виділену частку",
+      "editTitle": "Редагувати елемент",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Зберегти",
+      "cancel": "Скасувати",
+      "deleteConfirm": "Видалити цей елемент?",
+      "deleteDescription": "Це видаляє елемент і його призначення."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Непризначений",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Спільний",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Призначити предмет",
+      "description": "Виберіть, хто платить за “{name}”.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Розділіть рівномірно",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Спеціальний розподіл",
+      "customHint": "Введіть кількість в одиницях для кожної цілі.",
+      "shared": "Спільний",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Призначена кількість перевищує кількість товару.",
+      "confirm": "Виділити",
+      "cancel": "Скасувати"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Спільний",
+      "unassigned": "Непризначений",
+      "optOut": "Ділиться непризначеними елементами",
+      "reconciles": "Збалансований",
+      "offBy": "Різниця {amount}",
+      "itemsTotal": "Усього позицій чека",
+      "apply": "Застосувати до витрати",
+      "allOptedOut": "Усі відмовилися, але деякі елементи досі не призначені.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Значення квитанцій відрізняються · Подайте заявку ще раз"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Витрати оновлені",
+      "description": "Статті надходження віднесено до витрат."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Не вдалося застосувати квитанцію"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Оновити витрати?",
+      "description": "Загальна сума витрат відрізняється від загальної суми статей надходження. Подання заявки замінить суму витрат і її розподіл.",
+      "total": "всього {current} → {new}",
+      "cancel": "Скасувати",
+      "confirm": "Застосувати"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Сканування в черзі",
+    "scanPendingDescription": "Зображення збережено на цьому пристрої та буде відскановано, коли ви знову будете в мережі.",
+    "offlineQueue": "Ви офлайн. Прикріпіть фотографію зараз, і вона буде відсканована після повторного підключення.",
+    "disabled": "Smart split не ввімкнено на цьому сервері. Функція сканування квитанцій доступна лише онлайн.",
+    "extracted": "Відсканована квитанція",
+    "extractedDescription": "Призначте витягнуті елементи нижче.",
+    "loading": "Завантаження квитанції…",
+    "optOutTitle": "Відмова",
+    "scanError": "Не вдалося відсканувати квитанцію.",
+    "scanUnavailable": "Перевірте конфігурацію AI сервера та повторіть спробу.",
+    "scanning": "Сканування квитанції…",
+    "upload": "Завантажте фото квитанції"
   },
   "Balances": {
     "title": "Баланси",
@@ -415,20 +462,22 @@
       "description": "Ось пропозиції для оптимізованих відшкодувань між учасниками",
       "noImbursements": "Схоже, ніхто нікому не винен 😁",
       "owes": "<strong>{from}</strong> винен <strong>{to}</strong>",
-      "markAsPaid": "Позначити як сплачене"
-    }
+      "markAsPaid": "Позначити як сплачене",
+      "owesPlain": "{{from}} винен {{to}}"
+    },
+    "loading": "Завантаження балансів…"
   },
   "Stats": {
     "title": "Статистика",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Період",
+      "all": "За весь час",
+      "thisMonth": "Цей місяць",
+      "last30": "Останні 30 днів",
+      "thisYear": "Цей рік",
+      "custom": "Довільний період",
+      "from": "З",
+      "to": "До"
     },
     "Totals": {
       "title": "Загальні дані",
@@ -440,50 +489,53 @@
       "yourShare": "Ваша частка"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Зведення",
+      "description": "Ключові показники за вибраний період.",
+      "empty": "Витрат поки немає.",
+      "expenseCount": "Витрати",
+      "averageExpense": "Середня витрата",
+      "largestExpense": "Найбільша витрата",
+      "activeSpan": "Активний період"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Витрати за часом",
+      "description": "Загальні витрати групи за місяцями.",
+      "empty": "Витрат поки немає.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Витрати в цьому місяці за обраний період.",
+      "detailsEmpty": "Витрат у цьому місяці немає.",
+      "showExpensesPlain": "Показати витрати на {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "Витрати за учасниками",
+      "description": "Скільки заплатив кожен учасник і його частка у витратах.",
+      "empty": "Витрат поки немає.",
+      "participant": "Учасник",
+      "paid": "Сплачено",
+      "count": "Кількість",
+      "share": "Частка"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Витрати за категоріями",
+      "description": "Загальна сума витрат за кожною категорією.",
+      "empty": "Витрат поки немає.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Витрати цієї категорії за обраний період.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Показати витрати на {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Регулярні витрати",
+      "description": "Орієнтовна вартість активних регулярних витрат групи.",
+      "estimatedMonthly": "Орієнтовні місячні витрати",
+      "estimatedYearly": "{amount} на рік",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# щоденна витрата} few {# щоденні витрати} many {# щоденних витрат} other {# щоденної витрати}}",
+        "WEEKLY": "{count, plural, one {# щотижнева витрата} few {# щотижневі витрати} many {# щотижневих витрат} other {# щотижневої витрати}}",
+        "MONTHLY": "{count, plural, one {# щомісячна витрата} few {# щомісячні витрати} many {# щомісячних витрат} other {# щомісячної витрати}}"
       }
-    }
+    },
+    "loading": "Завантаження статистики…"
   },
   "Activity": {
     "title": "Активність",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Раніше цього року",
       "lastYear": "Минулого року",
       "older": "Старіші"
-    }
+    },
+    "loadMore": "Завантажте більше",
+    "loading": "Завантаження активності…",
+    "unknown": "Невідома діяльність"
   },
   "Information": {
     "title": "Інформація",
@@ -512,20 +567,25 @@
     "empty": "Ще немає інформації про групу"
   },
   "Settings": {
-    "title": "Налаштування"
+    "title": "Налаштування",
+    "saved": "Групу оновлено",
+    "savedDescription": "Ваші зміни збережено."
   },
   "Share": {
     "title": "Поділитися",
     "description": "Щоб інші учасники могли побачити групу і додати витрати, поділіться з ними її URL",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Копіювати посилання",
+    "shareLink": "Поділитися посиланням",
     "warning": "Попередження!",
     "warningHelp": "Кожна людина з URL групи зможе переглядати та редагувати витрати. Діліться з обережністю!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Частка",
+    "copy": "Копіювати посилання",
+    "url": "Посилання на групу"
   },
   "SchemaErrors": {
     "min1": "Введіть принаймні один символ",
@@ -543,7 +603,10 @@
     "paidForMin1": "Витрата повинна бути сплачена принаймні для одного учасника",
     "noZeroShares": "Усі частки повинні бути більшими за 0",
     "amountSum": "Сума повинна відповідати витраті",
-    "percentageSum": "Сума відсотків повинна дорівнювати 100"
+    "percentageSum": "Сума відсотків повинна дорівнювати 100",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Шукати категорію..",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Доступне оновлення",
+    "updateDescription": "Доступна нова версія pysplit.",
+    "reload": "Оновити",
+    "updating": "Оновлення…",
+    "offlineReady": "Готовий до роботи в автономному режимі",
+    "offlineReadyDescription": "Оболонка програми кешується. Відкрийте групу один раз у режимі онлайн, щоб зберегти її дані.",
+    "dismiss": "Закрити",
+    "install": "Встановити додаток",
+    "refreshApp": "Оновити додаток",
+    "refreshAppHint": "Очистіть кешовані файли та оновіть останню версію. Ваші збережені дані залишаються на цьому пристрої."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Інформаційна панель адміністрування",
+    "description": "Керуйте ролями користувачів, дозволами доступу до платформи та відстежуйте системні показники.",
+    "totalGroups": "Всього груп",
+    "totalExpenses": "Загальні витрати",
+    "registeredUsers": "Зареєстровані користувачі",
+    "userManagement": "Керування користувачами та рівні дозволів",
+    "accessDenied": "Доступ заборонено",
+    "accessDeniedDescription": "Інформаційна панель адміністрування доступна лише для користувачів рівня адміністратора.",
+    "delete": "Видалити",
+    "deleteError": "Не вдалося видалити",
+    "email": "Електронна пошта",
+    "expenses": "витрати",
+    "groupDeleted": "Групу видалено",
+    "groupManagement": "Групи",
+    "groupManagementDescription": "Видаліть групи та перевірте використання.",
+    "groups": "групи",
+    "loadMoreGroups": "Завантажити більше груп",
+    "loadMoreUsers": "Завантажити більше користувачів",
+    "loading": "Завантаження інформаційної панелі…",
+    "loadingMore": "Завантаження…",
+    "participants": "учасників",
+    "preauthorize": "Попередньо авторизуйте користувача",
+    "preauthorizeAction": "Попередньо авторизуватися",
+    "preauthorizeError": "Не вдалося попередньо авторизувати користувача",
+    "preauthorized": "Користувач попередньо авторизований",
+    "returnToGroups": "Повернутися до Моїх груп",
+    "searchGroups": "Пошук груп",
+    "searchUsers": "Пошук користувачів",
+    "signInDescription": "Панель адміністрування потребує облікового запису адміністратора.",
+    "signInTitle": "Необхідно ввійти",
+    "tier": "Рівень",
+    "tierError": "Не вдалося оновити рівень",
+    "tierFor": "Рівень для",
+    "tierUpdated": "Рівень оновлено",
+    "userDeleted": "Користувача видалено",
+    "userTier": "Яруси"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Офлайн-сховище",
+    "loading": "Перевірка цього пристрою…",
+    "unsupported": "Цей браузер не може повідомити про стан зберігання.",
+    "usage": "{{used}} з {{quota}} використано",
+    "unknown": "невідомий",
+    "persisted": "Пам’ять на цьому пристрої постійна.",
+    "notPersisted": "Браузер може видалити офлайн-дані, якщо на пристрої мало місця.",
+    "keep": "Зберігайте дані на цьому пристрої",
+    "refresh": "Оновити",
+    "critical": "Сховище майже заповнене. Експортуйте резервну копію зараз, а потім видаліть групи, які не використовуються.",
+    "warning": "Сховище заповнюється. Рекомендується створити резервну копію."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Очікує на синхронізацію",
+    "expense": "Очікує синхронізації"
+  },
+  "Attachments": {
+    "assignItems": "Розподілити позиції чека",
+    "extractedItems": "ШІ видобув елементи",
+    "help": "Перед завантаженням зображення стискаються. PDF-файли зберігаються як вкладені файли та відкриваються в новій вкладці.",
+    "open": "Відкрити",
+    "openInNewTab": "Відкрити в новій вкладці",
+    "pdfPreviewUnavailable": "Попередній перегляд PDF відкривається в окремій вкладці.",
+    "pending": "Очікує на завантаження",
+    "preview": "Попередній перегляд",
+    "previewAction": "Попередній перегляд",
+    "previewNamed": "Попередній перегляд {{name}}",
+    "receipt": "Магазинний чек",
+    "saveToAssignItems": "Спочатку збережіть витрати, а потім призначте ці пункти учасникам.",
+    "scanComplete": "Відсканована квитанція",
+    "scanCompleteDescription": "Призначте витягнуті елементи учасникам.",
+    "scanError": "Не вдалося відсканувати квитанцію",
+    "scanWithAi": "Сканування за допомогою ШІ",
+    "scanning": "Сканування…",
+    "view": "Переглянути вкладення",
+    "attachment": "вкладення",
+    "onlyImagesPdf": "Підтримуються лише зображення та файли PDF."
+  },
+  "Backup": {
+    "downloaded": "Резервну копію завантажено.",
+    "export": "Експорт резервної копії",
+    "failed": "Помилка резервного копіювання.",
+    "restore": "Відновити резервну копію",
+    "restoreFailed": "Не вдалося відновити.",
+    "restoreLabel": "Відновити файл резервної копії",
+    "restored": "Резервну копію відновлено. Перезавантаження…"
+  },
+  "Common": {
+    "addGroup": "Додати групу",
+    "close": "Close",
+    "closeDialog": "Закрити діалогове вікно",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Відхилити сповіщення",
+    "error": "Щось пішло не так",
+    "expenseNotFound": "Витрати не знайдено",
+    "loading": "Завантаження…",
+    "menu": "Меню",
+    "retry": "Спробувати ще раз",
+    "select": "Виберіть…",
+    "unknown": "невідомий",
+    "user": "Користувач"
+  },
+  "CreateGroup": {
+    "approvalContact": "Для створення нових груп витрат потрібен дозвіл адміністратора. Будь ласка, зверніться до свого адміністратора екземпляра, щоб підвищити ваш обліковий запис до рівня Group Creator.",
+    "approvalDescription": "Зараз ваш обліковий запис знаходиться на рівні користувача синхронізації. Ви можете брати участь у будь-яких спільних з вами групах і синхронізувати їх на всіх своїх пристроях.",
+    "approvalTitle": "Створення групи потребує схвалення",
+    "authRequiredDescription": "Щоб створити нові групи витрат, увійдіть із зовнішнім обліковим записом. Запрошені учасники групи все одно зможуть без проблем приєднатися через посилання на вашу групу без входу.",
+    "authRequiredTitle": "Потрібна автентифікація",
+    "returnToGroups": "Повернутися до Моїх груп",
+    "signIn": "Увійдіть, щоб створити групу"
+  },
+  "GroupTabs": {
+    "Expenses": "Витрати",
+    "Balances": "Баланси",
+    "Information": "Інформація",
+    "Stats": "Статистика",
+    "Activity": "Активність",
+    "Settings": "Налаштування",
+    "label": "Групові розділи"
+  },
+  "Login": {
+    "title": "Увійдіть до Spliit",
+    "description": "Увійдіть із зовнішнім обліковим записом, щоб увімкнути групову синхронізацію між пристроями.",
+    "google": "Продовжуйте з Google",
+    "github": "Продовжити з GitHub",
+    "noProviders": "Немає налаштованих постачальників OAuth. Установіть AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET, щоб увімкнути вхід."
+  },
+  "NotFound": {
+    "title": "Сторінка не знайдена",
+    "description": "Перевірте URL-адресу та повторіть спробу.",
+    "groupTitle": "Цієї групи не існує",
+    "groupDescription": "Перевірте URL-адресу або попросіть нове посилання для запрошення."
+  },
+  "SyncStatus": {
+    "offlinePending": "Офлайн — зміни очікують на розгляд: {{count}}",
+    "offlineSaved": "Офлайн — показ збережених даних",
+    "syncing": "Синхронізація…",
+    "error": "Помилка синхронізації: {{error}}",
+    "retryToContinue": "спробуйте продовжити",
+    "conflicts": "Конфлікти, які потребують перегляду: {{count}}",
+    "failed": "Зміни, які не вдалося синхронізувати: {{count}}",
+    "pending": "Зміни, що очікують на розгляд: {{count}}",
+    "retryFailed": "Повторити невдалі зміни",
+    "discardFailed": "Відхилити невдалі зміни",
+    "resolveConflicts": "Вирішуйте конфлікти",
+    "syncNow": "Синхронізувати зараз",
+    "dialogTitle": "Вирішуйте конфлікти",
+    "dialogDescription": "Ці зміни змінили ті самі записи на іншому пристрої. Виберіть, що зберегти.",
+    "noConflicts": "Жодних конфліктів для вирішення.",
+    "serverVersion": "Версія сервера {{version}} · локальне редагування зберігається в черзі конфлікту",
+    "keepMine": "Залишити мою версію",
+    "useServer": "Використовувати сервер",
+    "duplicate": "Створити дублікат як новий"
+  },
+  "Theme": {
+    "toggle": "Перемкнути тему",
+    "light": "Світла",
+    "dark": "Темна",
+    "system": "Система"
   }
 }

@@ -738,7 +738,6 @@ export async function refreshActivities(groupId) {
  */
 export async function prefetchGroups(groupIds) {
   if (!isOnline() || !groupIds.length) return
-  let changed = false
   for (const groupId of groupIds) {
     const cached = await db.groups.get(groupId)
     // Only prefetch groups that the list cache actually accepted. A pending
@@ -747,14 +746,13 @@ export async function prefetchGroups(groupIds) {
     if (cached.cached_at && !cached.list_only) continue
     try {
       await bootstrapGroup(groupId, { updateCursor: false })
-      changed = true
     } catch {
       // Prefetch is best-effort; a failed group must not block startup.
     }
   }
-  if (changed && typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('pysplit:refresh'))
-  }
+  // Deliberately no `pysplit:refresh` here. The groups page calls this while
+  // handling a refresh, so dispatching another refresh starts an endless
+  // sync -> prefetch -> refresh loop and keeps the list in its loading state.
 }
 
 /**

@@ -25,8 +25,12 @@ export function PwaUpdatePrompt() {
 
   async function reload() {
     setUpdating(true)
-    const activated = await applyUpdate()
-    if (!activated) setUpdating(false)
+    try {
+      const activated = await applyUpdate()
+      if (!activated) setUpdating(false)
+    } catch {
+      setUpdating(false)
+    }
   }
 
   return (

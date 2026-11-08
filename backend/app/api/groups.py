@@ -273,9 +273,7 @@ def update_membership(
     user: CurrentUser,
     session: SessionDep,
 ) -> UserGroupRead:
-    membership = groups_service.set_membership(
-        session, group_id, user.id, payload, commit=False
-    )
+    membership = groups_service.set_membership(session, group_id, user.id, payload, commit=False)
     sync_service.record_user_group_change(
         session,
         group_id=group_id,

@@ -1,4 +1,4 @@
-.PHONY: install dev test test-coverage lint typecheck e2e build parity architecture performance backup restore clean
+.PHONY: install dev test test-coverage lint typecheck e2e build parity architecture i18n i18n-keys i18n-coverage i18n-sync-check performance backup restore clean
 
 PYTHON ?= python3
 PYTEST = PYTHONPATH=. .venv/bin/pytest
@@ -23,7 +23,7 @@ test:
 test-coverage:
 	cd frontend && npm run test:coverage
 
-lint:
+lint: i18n-sync-check
 	cd backend && $(RUFF) check .
 	cd backend && $(RUFF) format --check .
 	cd frontend && npm run lint
@@ -60,6 +60,22 @@ parity:
 
 architecture:
 	$(PYTHON) scripts/check_architecture.py
+
+i18n: i18n-keys i18n-coverage i18n-sync-check
+
+i18n-keys:
+	$(PYTHON) scripts/check_i18n_keys.py
+
+i18n-coverage:
+	$(PYTHON) scripts/check_i18n_coverage.py \
+		--baseline frontend/src/locales/translation-baseline.json \
+		--strict --allowlist scripts/i18n-allowlist.json
+
+# Verify the committed app catalogues match the vendored upstream snapshot
+# without writing any files. Uses frontend/locales-upstream, so no network or
+# local spliit/ checkout is required. Reviewed app translations are preserved.
+i18n-sync-check:
+	node frontend/scripts/sync-locales.mjs --source frontend/locales-upstream --check
 
 clean:
 	rm -rf backend/.pytest_cache backend/.ruff_cache backend/htmlcov backend/.coverage backend/coverage.xml

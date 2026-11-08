@@ -2,25 +2,30 @@
   "Homepage": {
     "title": "Comparte <strong>Gastos</strong> con <strong>Amigos y Familia</strong>",
     "metaTitle": "Spliit · Comparte gastos con amigos y familia",
-    "description": "¡Bienvenido a tu nueva instancia de <strong>Spliit</strong>!",
+    "description": "¡Te damos la bienvenida a tu nueva instancia de <strong>Spliit</strong>!",
     "button": {
       "groups": "Ir a grupos",
       "github": "GitHub"
     }
   },
   "Header": {
-    "groups": "Grupos"
+    "groups": "Grupos",
+    "adminDashboard": "Panel de administración",
+    "language": "Idioma",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "userMenu": "Menú de usuario"
   },
   "Footer": {
     "madeIn": "Hecho en Zúrich, Suiza 🇨🇭",
-    "builtBy": "Construido por <author>Sebastien Castiel</author> y <source>colaboradores</source>"
+    "builtBy": "Desarrollado por <author>Sebastien Castiel</author> y <source>colaboradores</source>"
   },
   "Expenses": {
     "title": "Gastos",
     "description": "Aqui encontraras los gastos que has creado para tu grupo.",
     "create": "Crear gasto",
     "createFirst": "Crea el primero",
-    "noExpenses": "Tu grupo aun no tiene gastos.",
+    "noExpenses": "Tu grupo aún no tiene gastos.",
     "export": "Exportar",
     "exportJson": "Exportar a JSON",
     "exportCsv": "Exportar a CSV",
@@ -39,15 +44,30 @@
       "lastMonth": "El mes pasado",
       "earlierThisYear": "A principios de este año",
       "lastYear": "El año pasado",
-      "older": "Más antiguo"
-    }
+      "older": "Más antiguo",
+      "today": "Hoy",
+      "week": "A principios de esta semana",
+      "month": "A principios de este mes",
+      "year": "A principios de este año"
+    },
+    "clearSearch": "Borrar",
+    "exportError": "No se pudieron exportar los gastos.",
+    "filterFrom": "Desde",
+    "filterTo": "Hasta",
+    "loadMore": "Cargar más",
+    "loading": "Cargando gastos…",
+    "loadingMore": "Cargando…",
+    "search": "Buscar gastos",
+    "showingCount": "Mostrando {{shown}} de {{total}} gastos."
   },
   "ExpenseCard": {
     "paidBy": "Pagado por <strong>{paidBy}</strong> para <paidFor></paidFor>",
     "everyone": "todos",
     "receivedBy": "Recibido por <strong>{paidBy}</strong> para <paidFor></paidFor>",
     "yourBalance": "Tu balance:",
-    "notInvolved": "No estás incluido"
+    "notInvolved": "No estás incluido",
+    "paidByPlain": "Pagado por {{paidBy}} por {{paidFor}}",
+    "receivedByPlain": "Recibido por {{paidBy}} para {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Mis grupos",
@@ -60,11 +80,11 @@
       "orAsk": "o pídele a un amigo que te envíe el enlace a uno ya existente."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Tu saldo total",
+      "description": "Tu saldo combinado en todos tus grupos.",
+      "owedToYou": "Te deben",
+      "youOwe": "Debes",
+      "settledUp": "Estás al día en todos tus grupos."
     },
     "recent": "Grupos recientes",
     "starred": "Grupos favoritos",
@@ -83,7 +103,7 @@
       "title": "Añadir grupo mediante url",
       "description": "Si un grupo ha sido compartido contigo, puedes pegar su URL aquí para añadirlo a tu lista.",
       "error": "Ups, no pudimos encontrar el grupo a partir de la URL que proporcionaste…",
-      "urlMode": "Enter URL",
+      "urlMode": "Ingrese la URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Este grupo no existe.",
       "link": "Ir a los grupos visitados recientemente"
-    }
+    },
+    "moreOptions": "Más opciones",
+    "participants": "participantes",
+    "star": "grupo estelar",
+    "unstar": "grupo no estrella"
   },
   "GroupForm": {
     "title": "Información del grupo",
@@ -129,7 +153,10 @@
       "add": "Añadir participante",
       "John": "Juan",
       "Jane": "Maria",
-      "Jack": "Sergio"
+      "Jack": "Sergio",
+      "cannotRemove": "Este participante es parte de un gasto y no se puede eliminar.",
+      "indexLabel": "Participante #{{index}}",
+      "remove": "Eliminar participante {{index}}"
     },
     "Settings": {
       "title": "Ajustes locales",
@@ -145,7 +172,8 @@
       "create": "Crear",
       "creating": "Creando…",
       "cancel": "Cancelar"
-    }
+    },
+    "saveError": "No se pudo salvar el grupo."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Para establecer una moneda diferente por gasto y convertir los importes, seleccione una moneda no personalizada para el grupo.",
     "originalAmountField": {
       "label": "Monto a convertir",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Monto a transferir",
+      "repaymentDescription": "Convertido del monto de arriba, que es el que salda el balance."
     },
     "conversionRateField": {
       "useApi": "Utilizar las tasas del Frankfurter",
@@ -274,7 +302,15 @@
     "saving": "Guardando…",
     "cancel": "Cancelar",
     "reimbursement": "Reembolso",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Asignar artículos de recibo",
+    "conflict": "Este gasto fue cambiado por otra persona. Vuelve a cargar la página e inténtalo de nuevo.",
+    "conflictTitle": "Gasto cambiado en otro lugar",
+    "deleteError": "No se pudo eliminar el gasto.",
+    "pendingReceiptTotal": "Un recibo escaneado sin conexión está listo.",
+    "pendingReceiptTotalApply": "Usar total escaneado",
+    "pendingReceiptTotalDismiss": "Descartar",
+    "saveError": "No se pudo ahorrar el gasto."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,122 +349,135 @@
       "description": "Ha ocurrido un error al cargar el documento. Vuelva a intentarlo más tarde o seleccione otro archivo.",
       "retry": "Reintentar"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "En cola. El recibo se escaneará después de volver a conectarse.",
+    "offline": "El escaneo se reanuda cuando estás en línea.",
+    "scanFailed": "La IA no pudo leer este recibo. Verifique la configuración de AI del servidor e inténtelo nuevamente.",
+    "scanning": "Escaneando…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Partidas de recibo",
+    "backToExpense": "Volver a gastos",
+    "merchant": "Nombre de la tienda",
+    "printedTotal": "Total impreso en el recibo",
+    "noReceipt": "Aún no hay ningún recibo vinculado a este gasto.",
+    "empty": "Aún no hay artículos. Agregue uno para comenzar a dividir.",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "No se pudo guardar el cambio",
+      "description": "Volvimos a cargar el recibo para que puedas intentarlo de nuevo."
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "Agregar artículo",
+    "quantitySummary": "{count} · {quantity} unidades",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Agregar artículo",
+      "nameLabel": "Nombre",
+      "quantityLabel": "Cantidad",
+      "amountLabel": "Importe",
+      "sharedLabel": "Compartido (cargo por toda la factura)",
+      "add": "Añadir",
+      "cancel": "Cancelar"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{assigned} de {total}",
+      "remaining": "{quantity} restante",
+      "assign": "Asignar",
+      "edit": "Editar",
+      "delete": "Borrar",
+      "removePortion": "Eliminar parte asignada",
+      "editTitle": "Editar elemento",
+      "nameLabel": "Nombre",
+      "quantityLabel": "Cantidad",
+      "amountLabel": "Importe",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "deleteConfirm": "¿Eliminar este elemento?",
+      "deleteDescription": "Esto elimina el elemento y sus asignaciones."
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "No asignado",
+      "unassignedHint": "Aún no asignado a nadie",
+      "shared": "Compartido",
+      "sharedHint": "Dividido por igual entre todos",
+      "participantHint": "Artículos asignados a {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "Asignar artículo",
+      "description": "Elige quién paga por “{name}”.",
+      "whole": "Asignar el artículo completo",
+      "everyone": "Todos (compartido)",
+      "even": "Dividir uniformemente",
+      "evenHint": "Elige los participantes entre los que dividir.",
+      "custom": "División personalizada",
+      "customHint": "Ingrese cantidades en unidades para cada objetivo.",
+      "shared": "Compartido",
+      "selectParticipant": "Seleccionar un participante",
+      "exceeds": "La cantidad asignada excede la cantidad del artículo.",
+      "confirm": "Asignar",
+      "cancel": "Cancelar"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "Propio",
+      "shared": "Compartido",
+      "unassigned": "No asignado",
+      "optOut": "Comparte los elementos sin asignar",
+      "reconciles": "Cuadra",
+      "offBy": "Diferencia de {amount}",
+      "itemsTotal": "Total de artículos de recibo",
+      "apply": "Aplicar al gasto",
+      "allOptedOut": "Todos optaron por no participar, pero algunos elementos aún están sin asignar.",
+      "negativeShare": "Un total negativo hace que alguien deba menos que nada. Ajusta los artículos antes de aplicar.",
+      "divergent": "Los valores del recibo difieren · Aplicar nuevamente"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Gasto actualizado",
+      "description": "Las partidas del recibo se aplicaron al gasto."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "No se pudo aplicar el recibo"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "title": "¿Actualizar el gasto?",
+      "description": "El total de gastos difiere del total de artículos de recibo. La solicitud sobrescribirá el monto del gasto y su división.",
       "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "cancel": "Cancelar",
+      "confirm": "Aplicar"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Escaneo en cola",
+    "scanPendingDescription": "La imagen se guarda en este dispositivo y se escaneará cuando vuelva a estar en línea.",
+    "offlineQueue": "Estás desconectado. Adjunte la foto ahora y será escaneada después de volver a conectarse.",
+    "disabled": "La división inteligente no está habilitada en este servidor. El escaneo de recibos es una función únicamente en línea.",
+    "extracted": "Recibo escaneado",
+    "extractedDescription": "Asigne los elementos extraídos a continuación.",
+    "loading": "Cargando recibo…",
+    "optOutTitle": "Exclusión voluntaria",
+    "scanError": "No se pudo escanear el recibo.",
+    "scanUnavailable": "Verifique la configuración de AI del servidor e inténtelo nuevamente.",
+    "scanning": "Escaneando recibo…",
+    "upload": "Sube una foto del recibo"
   },
   "Balances": {
-    "title": "Balances",
+    "title": "Saldos",
     "description": "Se trata del importe que ha pagado o ha recibido cada participante.",
     "Reimbursements": {
       "title": "Reembolsos propuestos",
       "description": "He aquí algunas sugerencias para optimizar los reembolsos entre los participantes.",
       "noImbursements": "Parece que tu grupo no necesita ningún reembolso 😁",
       "owes": "<strong>{from}</strong> debe a <strong>{to}</strong>",
-      "markAsPaid": "Marcar como pagado"
-    }
+      "markAsPaid": "Marcar como pagado",
+      "owesPlain": "{{from}} debe {{to}}"
+    },
+    "loading": "Cargando saldos…"
   },
   "Stats": {
     "title": "Estadísticas",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Período",
+      "all": "Todo el tiempo",
+      "thisMonth": "Este mes",
+      "last30": "Últimos 30 días",
+      "thisYear": "Este año",
+      "custom": "Personalizado",
+      "from": "Desde",
+      "to": "Hasta"
     },
     "Totals": {
       "title": "Totales",
@@ -440,50 +489,53 @@
       "yourShare": "Tu parte final"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Resumen",
+      "description": "Cifras clave del período seleccionado.",
+      "empty": "Todavía no hay gastos.",
+      "expenseCount": "Gastos",
+      "averageExpense": "Gasto medio",
+      "largestExpense": "Gasto más alto",
+      "activeSpan": "Período activo"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "title": "Gastos a lo largo del tiempo",
+      "description": "Gasto total del grupo por mes. Selecciona un mes para ver sus gastos.",
+      "empty": "Todavía no hay gastos.",
+      "showExpenses": "Mostrar los gastos de {month}",
+      "detailsDescription": "Gastos de este mes en el período seleccionado.",
+      "detailsEmpty": "No hay gastos en este mes.",
+      "showExpensesPlain": "Mostrar gastos de {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "Gastos por participante",
+      "description": "Cuánto pagó cada participante y su parte de los gastos.",
+      "empty": "Todavía no hay gastos.",
+      "participant": "Participante",
+      "paid": "Pagado",
+      "count": "Cantidad",
+      "share": "Parte"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "title": "Gastos por categoría",
+      "description": "Cantidad total gastada en cada categoría. Selecciona una categoría para ver sus gastos.",
+      "empty": "Todavía no hay gastos.",
+      "showExpenses": "Mostrar los gastos de {category}",
+      "detailsDescription": "Gastos de esta categoría en el período seleccionado.",
+      "detailsEmpty": "No hay gastos en esta categoría.",
+      "showExpensesPlain": "Mostrar gastos de {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Gastos recurrentes",
+      "description": "Coste estimado de los gastos recurrentes activos del grupo.",
+      "estimatedMonthly": "Coste mensual estimado",
+      "estimatedYearly": "{amount} al año",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# gasto diario} other {# gastos diarios}}",
+        "WEEKLY": "{count, plural, one {# gasto semanal} other {# gastos semanales}}",
+        "MONTHLY": "{count, plural, one {# gasto mensual} other {# gastos mensuales}}"
       }
-    }
+    },
+    "loading": "Cargando estadísticas…"
   },
   "Activity": {
     "title": "Actividad",
@@ -504,7 +556,10 @@
       "earlierThisYear": "A principios de este año",
       "lastYear": "El ultimo año",
       "older": "Más antiguos"
-    }
+    },
+    "loadMore": "Cargar más",
+    "loading": "Cargando actividad…",
+    "unknown": "Actividad desconocida"
   },
   "Information": {
     "title": "Información",
@@ -512,20 +567,25 @@
     "empty": "Aún no hay información sobre el grupo."
   },
   "Settings": {
-    "title": "Ajustes"
+    "title": "Ajustes",
+    "saved": "Grupo actualizado",
+    "savedDescription": "Tus cambios se han guardado."
   },
   "Share": {
     "title": "Compartir",
     "description": "Para que otros participantes puedan ver el grupo y añadir gastos, compárteles su URL.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Copiar enlace",
+    "shareLink": "Compartir enlace",
     "warning": "Cuidado!",
     "warningHelp": "Todas las personas que tengan la URL del grupo podrán ver y editar los gastos. ¡Comparte con precaución!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Parte",
+    "copy": "Copiar enlace",
+    "url": "Enlace de grupo"
   },
   "SchemaErrors": {
     "min1": "Introduzca al menos un carácter.",
@@ -543,7 +603,10 @@
     "paidForMin1": "El gasto debe ser pagado por al menos un participante.",
     "noZeroShares": "Todas las partes deben ser mayor que 0.",
     "amountSum": "La suma de los importes debe ser igual al importe del gasto total.",
-    "percentageSum": "Suma de porcentajes debe ser igual a 100."
+    "percentageSum": "Suma de porcentajes debe ser igual a 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Buscar categoría...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Actualización disponible",
+    "updateDescription": "Una nueva versión de pysplit está disponible.",
+    "reload": "Recargar",
+    "updating": "Actualizando…",
+    "offlineReady": "Listo para trabajar sin conexión",
+    "offlineReadyDescription": "El shell de la aplicación está almacenado en caché. Abra un grupo una vez mientras esté en línea para conservar sus datos.",
+    "dismiss": "Cerrar",
+    "install": "Instalar aplicación",
+    "refreshApp": "Actualizar aplicación",
+    "refreshAppHint": "Borre los archivos en caché y vuelva a cargar la última versión. Tus datos guardados permanecen en este dispositivo."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Panel de administración",
+    "description": "Administre roles de usuario, permisos de acceso a la plataforma y supervise las métricas del sistema.",
+    "totalGroups": "Total de grupos",
+    "totalExpenses": "Gastos Totales",
+    "registeredUsers": "Usuarios registrados",
+    "userManagement": "Gestión de usuarios y niveles de permisos",
+    "accessDenied": "Acceso denegado",
+    "accessDeniedDescription": "El Panel de administración está restringido a usuarios del nivel Administrador.",
+    "delete": "Borrar",
+    "deleteError": "No se pudo eliminar",
+    "email": "Correo electrónico",
+    "expenses": "gastos",
+    "groupDeleted": "Grupo eliminado",
+    "groupManagement": "Grupos",
+    "groupManagementDescription": "Elimine grupos e inspeccione el uso.",
+    "groups": "grupos",
+    "loadMoreGroups": "Cargar más grupos",
+    "loadMoreUsers": "Cargar más usuarios",
+    "loading": "Cargando panel…",
+    "loadingMore": "Cargando…",
+    "participants": "participantes",
+    "preauthorize": "Autorizar previamente a un usuario",
+    "preauthorizeAction": "Preautorizar",
+    "preauthorizeError": "No se pudo preautorizar al usuario",
+    "preauthorized": "Usuario preautorizado",
+    "returnToGroups": "Volver a Mis grupos",
+    "searchGroups": "Buscar grupos",
+    "searchUsers": "Buscar usuarios",
+    "signInDescription": "El panel de administración requiere una cuenta de administrador.",
+    "signInTitle": "Es necesario iniciar sesión",
+    "tier": "Nivel",
+    "tierError": "No se pudo actualizar el nivel",
+    "tierFor": "Nivel para",
+    "tierUpdated": "Nivel actualizado",
+    "userDeleted": "Usuario eliminado",
+    "userTier": "Niveles"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Almacenamiento sin conexión",
+    "loading": "Comprobando este dispositivo...",
+    "unsupported": "Este navegador no puede informar el estado de almacenamiento.",
+    "usage": "{{used}} de {{quota}} usado",
+    "unknown": "desconocido",
+    "persisted": "El almacenamiento es persistente en este dispositivo.",
+    "notPersisted": "El navegador puede expulsar los datos sin conexión si el dispositivo se queda sin espacio.",
+    "keep": "Mantener datos en este dispositivo",
+    "refresh": "Actualizar",
+    "critical": "El almacenamiento está casi lleno. Exporte una copia de seguridad ahora y luego elimine los grupos no utilizados.",
+    "warning": "El almacenamiento se está llenando. Se recomienda una copia de seguridad."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Sincronización pendiente",
+    "expense": "Sincronización pendiente"
+  },
+  "Attachments": {
+    "assignItems": "Asignar artículos de recibo",
+    "extractedItems": "Elementos extraídos por IA",
+    "help": "Las imágenes se comprimen antes de cargarlas. Los archivos PDF se guardan como archivos adjuntos y se abren en una nueva pestaña.",
+    "open": "Abrir",
+    "openInNewTab": "Abrir en una nueva pestaña",
+    "pdfPreviewUnavailable": "Las vistas previas de PDF se abren en una pestaña separada.",
+    "pending": "Carga pendiente",
+    "preview": "Vista previa",
+    "previewAction": "Vista previa",
+    "previewNamed": "Vista previa {{name}}",
+    "receipt": "recibo de la tienda",
+    "saveToAssignItems": "Guarda el gasto para asignar estos artículos a los participantes.",
+    "scanComplete": "Recibo escaneado",
+    "scanCompleteDescription": "Asigne los elementos extraídos a los participantes.",
+    "scanError": "No se pudo escanear el recibo",
+    "scanWithAi": "Escanear con IA",
+    "scanning": "Escaneando…",
+    "view": "Ver archivos adjuntos",
+    "attachment": "Adjunto",
+    "onlyImagesPdf": "Sólo se admiten imágenes y archivos PDF."
+  },
+  "Backup": {
+    "downloaded": "Copia de seguridad descargada.",
+    "export": "Exportar copia de seguridad",
+    "failed": "La copia de seguridad falló.",
+    "restore": "Restaurar copia de seguridad",
+    "restoreFailed": "La restauración falló.",
+    "restoreLabel": "Restaurar archivo de copia de seguridad",
+    "restored": "Copia de seguridad restaurada. Recargando…"
+  },
+  "Common": {
+    "addGroup": "Agregar grupo",
+    "close": "Cerrar",
+    "closeDialog": "Cerrar diálogo",
+    "dismiss": "Descartar",
+    "dismissNotification": "Descartar notificación",
+    "error": "Algo salió mal",
+    "expenseNotFound": "Gasto no encontrado",
+    "loading": "Cargando…",
+    "menu": "Menú",
+    "retry": "Reintentar",
+    "select": "Seleccione…",
+    "unknown": "desconocido",
+    "user": "Usuario"
+  },
+  "CreateGroup": {
+    "approvalContact": "La creación de nuevos grupos de gastos requiere la autorización de un administrador. Comuníquese con el administrador de su instancia para promover su cuenta al nivel de Creador de grupo.",
+    "approvalDescription": "Su cuenta se encuentra actualmente en el nivel Usuario de sincronización. Puede participar en cualquier grupo compartido con usted y sincronizarlo en todos sus dispositivos.",
+    "approvalTitle": "La creación de grupos requiere aprobación",
+    "authRequiredDescription": "Para crear nuevos grupos de gastos, inicie sesión con una cuenta externa. Los participantes invitados del grupo aún podrán unirse sin problemas a través del enlace de su grupo sin iniciar sesión.",
+    "authRequiredTitle": "Se requiere autenticación",
+    "returnToGroups": "Volver a Mis grupos",
+    "signIn": "Iniciar sesión para crear grupo"
+  },
+  "GroupTabs": {
+    "Expenses": "Gastos",
+    "Balances": "Saldos",
+    "Information": "Información",
+    "Stats": "Estadísticas",
+    "Activity": "Actividad",
+    "Settings": "Ajustes",
+    "label": "Secciones de grupo"
+  },
+  "Login": {
+    "title": "Iniciar sesión en Split",
+    "description": "Inicie sesión con una cuenta externa para habilitar la sincronización de grupos entre dispositivos.",
+    "google": "Continuar con Google",
+    "github": "Continuar con GitHub",
+    "noProviders": "No hay proveedores de OAuth configurados. Configure AUTH_GOOGLE_ID/AUTH_GOOGLE_SECRET para habilitar el inicio de sesión."
+  },
+  "NotFound": {
+    "title": "Página no encontrada",
+    "description": "Verifique la URL e inténtelo nuevamente.",
+    "groupTitle": "Este grupo no existe.",
+    "groupDescription": "Verifique la URL o solicite un nuevo enlace de invitación."
+  },
+  "SyncStatus": {
+    "offlinePending": "Sin conexión — cambios pendientes: {{count}}",
+    "offlineSaved": "Sin conexión: muestra los datos guardados",
+    "syncing": "Sincronizando…",
+    "error": "Error de sincronización: {{error}}",
+    "retryToContinue": "reintentar para continuar",
+    "conflicts": "Conflictos que necesitan revisión: {{count}}",
+    "failed": "Cambios que no se pudieron sincronizar: {{count}}",
+    "pending": "Cambios pendientes: {{count}}",
+    "retryFailed": "Reintentar cambios fallidos",
+    "discardFailed": "Descartar cambios fallidos",
+    "resolveConflicts": "Resolver conflictos",
+    "syncNow": "Sincronizar ahora",
+    "dialogTitle": "Resolver conflictos",
+    "dialogDescription": "Estas ediciones cambiaron los mismos registros en otro dispositivo. Elige qué conservar.",
+    "noConflicts": "No hay conflictos que resolver.",
+    "serverVersion": "Versión del servidor {{version}} · edición local mantenida en la cola de conflictos",
+    "keepMine": "Conservar mi versión",
+    "useServer": "Usar servidor",
+    "duplicate": "Duplicar como nuevo"
+  },
+  "Theme": {
+    "toggle": "Alternar tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
   }
 }

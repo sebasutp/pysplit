@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grupuri"
+    "groups": "Grupuri",
+    "adminDashboard": "Tabloul de bord administrativ",
+    "language": "Limba",
+    "signIn": "Conectați-vă",
+    "signOut": "Deconectați-vă",
+    "userMenu": "Meniul utilizatorului"
   },
   "Footer": {
     "madeIn": "Dezvoltat în Zürich, Elveția 🇨🇭",
@@ -21,7 +26,7 @@
     "create": "Adaugă o cheltuială",
     "createFirst": "Adaug-o pe prima",
     "noExpenses": "Grupul tău nu conține nicio cheltuială încă.",
-    "export": "Export",
+    "export": "Exportați",
     "exportJson": "Salvează în JSON",
     "exportCsv": "Salvează în CSV",
     "searchPlaceholder": "Caută o cheltuială…",
@@ -39,15 +44,30 @@
       "lastMonth": "Luna trecută",
       "earlierThisYear": "La începutul anului",
       "lastYear": "Anul trecut",
-      "older": "Mai vechi"
-    }
+      "older": "Mai vechi",
+      "today": "Azi",
+      "week": "La începutul săptămânii",
+      "month": "La începutul lunii",
+      "year": "La începutul anului"
+    },
+    "clearSearch": "Clar",
+    "exportError": "Nu s-au putut exporta cheltuielile",
+    "filterFrom": "De la",
+    "filterTo": "Pentru a",
+    "loadMore": "Încărcați mai multe",
+    "loading": "Se încarcă cheltuielile…",
+    "loadingMore": "Se încarcă…",
+    "search": "Caută cheltuieli",
+    "showingCount": "Se afișează {{shown}} din {{total}} cheltuieli."
   },
   "ExpenseCard": {
     "paidBy": "Plătit de <strong>{paidBy}</strong> pentru <paidFor></paidFor>",
-    "everyone": "everyone",
+    "everyone": "toți",
     "receivedBy": "Primit de <strong>{paidBy}</strong> pentru <paidFor></paidFor>",
     "yourBalance": "Soldul tău:",
-    "notInvolved": "You are not involved"
+    "notInvolved": "You are not involved",
+    "paidByPlain": "Plătit de {{paidBy}} pentru {{paidFor}}",
+    "receivedByPlain": "Primit de {{paidBy}} pentru {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Grupurile mele",
@@ -60,11 +80,11 @@
       "orAsk": "sau roagă un prieten să îți trimită un link către unul deja existent."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Soldul dvs. total",
+      "description": "Soldul dvs. combinat în toate grupurile dvs.",
+      "owedToYou": "Ești dator",
+      "youOwe": "Tu datorezi",
+      "settledUp": "Sunteți cu toții stabiliți în grupurile voastre."
     },
     "recent": "Ultimele grupuri",
     "starred": "Grupuri favorite",
@@ -83,7 +103,7 @@
       "title": "Adaugă un grup folosind un URL",
       "description": "Dacă un grup a fost distribuit cu tine, poți atașa URL-ul acestuia aici pentru a-l adăuga în listă.",
       "error": "Ups, nu am găsit grupul folosind URL-ul primit de la tine…",
-      "urlMode": "Enter URL",
+      "urlMode": "Introduceți adresa URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Acest grup nu există.",
       "link": "Mergi la ultimele grupuri vizitate"
-    }
+    },
+    "moreOptions": "Mai multe opțiuni",
+    "participants": "participanții",
+    "star": "Grup de vedete",
+    "unstar": "Anulați stea grupului"
   },
   "GroupForm": {
     "title": "Informații despre grup",
@@ -116,8 +140,8 @@
       "description": "O vom folosi pentru a afișa sume."
     },
     "CurrencyCodeField": {
-      "label": "Main currency",
-      "createDescription": "All amounts and balances will be in this currency.",
+      "label": "Moneda principală",
+      "createDescription": "Toate sumele și soldurile vor fi în această monedă.",
       "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
       "customOption": "Custom"
     },
@@ -129,7 +153,10 @@
       "add": "Adaugă membru",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "Acest participant face parte dintr-o cheltuială și nu poate fi eliminat.",
+      "indexLabel": "Participant #{{index}}",
+      "remove": "Eliminați participantul {{index}}"
     },
     "Settings": {
       "title": "Setări locale",
@@ -145,7 +172,8 @@
       "create": "Adaugă",
       "creating": "Se adaugă…",
       "cancel": "Anulează"
-    }
+    },
+    "saveError": "Grupul nu a putut fi salvat."
   },
   "ExpenseForm": {
     "Income": {
@@ -189,7 +217,7 @@
         "description": "Adaugă data la care cheltuiala a fost facută."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Moneda de cheltuieli",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Selectează categoria cheltuielii.",
@@ -199,12 +227,12 @@
         "description": "Selectează membrul care a plătit cheltuiala."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Recurența cheltuielilor",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "Niciunul",
+        "daily": "Zilnic",
+        "weekly": "Săptămânal",
+        "monthly": "Lunar"
       },
       "paidFor": {
         "title": "Plătit pentru",
@@ -218,25 +246,25 @@
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "Suma de convertit",
+      "repaymentLabel": "Suma de transferat",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "Utilizați tarifele de la Frankfurter",
+      "useCustom": "Utilizați tarif personalizat",
+      "label": "Cursul de schimb"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "Obținerea cursurilor de schimb...",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Hopa, nu am putut obține cele mai recente tarife.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "Introduceți un tarif personalizat mai jos.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Reîmprospătați",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
@@ -274,7 +302,15 @@
     "saving": "Se salvează…",
     "cancel": "Anulează",
     "reimbursement": "Rambursare",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Alocați elemente de chitanță",
+    "conflict": "Această cheltuială a fost schimbată de altcineva. Reîncărcați pagina și încercați din nou.",
+    "conflictTitle": "Cheltuiala s-a schimbat în altă parte",
+    "deleteError": "Nu s-a putut șterge cheltuiala.",
+    "pendingReceiptTotal": "O chitanță scanată în timp ce offline este gata.",
+    "pendingReceiptTotalApply": "Utilizați totalul scanat",
+    "pendingReceiptTotalDismiss": "Respingeți",
+    "saveError": "Nu s-a putut economisi cheltuiala."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Ceva a mers greșit la adăugarea fișierului. Încearcă mai târziu sau cum un alt fișier.",
       "retry": "Reîncearcă"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "În coadă. Chitanța va fi scanată după ce vă reconectați.",
+    "offline": "Scanarea se reia atunci când sunteți online.",
+    "scanFailed": "AI nu a putut citi această chitanță. Verificați configurația serverului AI și încercați din nou.",
+    "scanning": "Se scanează…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Elemente rând de chitanță",
+    "backToExpense": "Înapoi la cheltuieli",
+    "merchant": "Numele magazinului",
+    "printedTotal": "Total tipărit pe chitanță",
+    "noReceipt": "Nicio chitanță nu este încă legată de această cheltuială.",
+    "empty": "Niciun articol încă. Adăugați unul pentru a începe împărțirea.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Schimbarea nu a putut fi salvată",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Adăugați articol",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Adăugați articol",
+      "nameLabel": "Nume",
+      "quantityLabel": "Cantitate",
+      "amountLabel": "Sumă",
+      "sharedLabel": "Partajat (debitul total al facturii)",
+      "add": "Adăugați",
+      "cancel": "Anulează"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} din {total}",
+      "remaining": "{quantity} rămas",
+      "assign": "Alocați",
+      "edit": "Editați",
+      "delete": "Șterge",
+      "removePortion": "Eliminați cota alocată",
+      "editTitle": "Editați elementul",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Salvează",
+      "cancel": "Anulează",
+      "deleteConfirm": "Ștergeți acest articol?",
+      "deleteDescription": "Acest lucru elimină elementul și atribuțiile acestuia."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Nealocat",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Partajat",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Atribuiți element",
+      "description": "Alegeți cine plătește pentru „{name}”.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Împărțiți uniform",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Împărțire personalizată",
+      "customHint": "Introduceți cantitățile în unități pentru fiecare țintă.",
+      "shared": "Partajat",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Cantitatea atribuită depășește cantitatea articolului.",
+      "confirm": "Alocați",
+      "cancel": "Anulează"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Partajat",
+      "unassigned": "Nealocat",
+      "optOut": "Partajează articole nealocate",
+      "reconciles": "Echilibrat",
+      "offBy": "Diferența de {amount}",
+      "itemsTotal": "Total articole de chitanță",
+      "apply": "Aplică la cheltuială",
+      "allOptedOut": "Toți au renunțat, dar unele articole sunt încă nealocate.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Valorile chitanțelor diferă · Aplicați din nou"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Cheltuieli actualizate",
+      "description": "Elementele de chitanță au fost aplicate la cheltuială."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Nu s-a putut aplica chitanța"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "title": "Actualizați cheltuiala?",
+      "description": "Totalul cheltuielilor diferă de totalul articolelor de chitanță. Aplicarea va suprascrie suma cheltuielilor și împărțirea acesteia.",
       "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "cancel": "Anulează",
+      "confirm": "Aplică"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Scanare în coadă",
+    "scanPendingDescription": "Imaginea este salvată pe acest dispozitiv și va fi scanată când reveniți online.",
+    "offlineQueue": "Ești offline. Atașați fotografia acum și va fi scanată după ce vă reconectați.",
+    "disabled": "Divizarea inteligentă nu este activată pe acest server. Scanarea chitanțelor este o funcție doar online.",
+    "extracted": "Chitanța scanată",
+    "extractedDescription": "Atribuiți elementele extrase de mai jos.",
+    "loading": "Se încarcă chitanța…",
+    "optOutTitle": "Renunțări",
+    "scanError": "Chitanța nu a putut fi scanată.",
+    "scanUnavailable": "Verificați configurația serverului AI și încercați din nou.",
+    "scanning": "Se scanează chitanța…",
+    "upload": "Încărcați o fotografie de chitanță"
   },
   "Balances": {
     "title": "Solduri",
@@ -415,20 +462,22 @@
       "description": "Acestea sunt sugestiile pentru rambursări optimizate între membrii.",
       "noImbursements": "Se pare că grupul tău nu are nevoie de rambursări 😁",
       "owes": "<strong>{from}</strong> datorează <strong>{to}</strong>",
-      "markAsPaid": "Bifează ca plătit"
-    }
+      "markAsPaid": "Bifează ca plătit",
+      "owesPlain": "{{from}} datorează {{to}}"
+    },
+    "loading": "Se încarcă soldurile…"
   },
   "Stats": {
     "title": "Statistici",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Tot timpul",
+      "thisMonth": "Luna aceasta",
+      "last30": "Ultimele 30 de zile",
+      "thisYear": "Anul acesta",
+      "custom": "Gamă personalizată",
+      "from": "De la",
+      "to": "Pentru a"
     },
     "Totals": {
       "title": "Totaluri",
@@ -440,50 +489,53 @@
       "yourShare": "Partea ta"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Rezumat",
+      "description": "Cifre cheie pentru perioada selectată.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Cheltuieli",
+      "averageExpense": "Cheltuiala medie",
+      "largestExpense": "Cea mai mare cheltuială",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Cheltuirea în timp",
+      "description": "Cheltuielile totale ale grupului pe lună. Selectați o lună pentru a-i vedea cheltuielile.",
+      "empty": "Nu există încă cheltuieli.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Cheltuieli din această lună pentru perioada selectată.",
+      "detailsEmpty": "Nu există cheltuieli în această lună.",
+      "showExpensesPlain": "Afișați cheltuielile pentru {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Cheltuieli de către participant",
+      "description": "Cât a plătit fiecare participant și partea sa din cheltuieli.",
+      "empty": "Nu există încă cheltuieli.",
       "participant": "Participant",
-      "paid": "Paid",
+      "paid": "Plătit",
       "count": "Count",
-      "share": "Share"
+      "share": "Distribuie"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Cheltuieli pe categorii",
+      "description": "Suma totală cheltuită în fiecare categorie. Selectați o categorie pentru a-i vedea cheltuielile.",
+      "empty": "Nu există încă cheltuieli.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Cheltuieli din această categorie pentru perioada selectată.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Afișați cheltuielile pentru {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Cheltuieli recurente",
+      "description": "Costul estimat al cheltuielilor recurente active ale grupului.",
+      "estimatedMonthly": "Costul lunar estimat",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Se încarcă statisticile..."
   },
   "Activity": {
     "title": "Activități",
@@ -504,7 +556,10 @@
       "earlierThisYear": "La începutul anului",
       "lastYear": "Anul trecut",
       "older": "Mai vechi"
-    }
+    },
+    "loadMore": "Încărcați mai multe",
+    "loading": "Se încarcă activitatea…",
+    "unknown": "Activitate necunoscută"
   },
   "Information": {
     "title": "Informații",
@@ -512,20 +567,25 @@
     "empty": "Nicio informație de grup încă."
   },
   "Settings": {
-    "title": "Setări"
+    "title": "Setări",
+    "saved": "Grupul a fost actualizat",
+    "savedDescription": "Modificările dvs. au fost salvate."
   },
   "Share": {
     "title": "Distribuie",
     "description": "Pentru ca ceilalți participanți să poată vedea grupul și cheltuielile adăugate, distribuie URL-ul acestuia cu ei.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Copiază linkul",
+    "shareLink": "Distribuie linkul",
     "warning": "Avertisment!",
     "warningHelp": "Oricine are URL-ul grupului va putea să vadă și să editeze cheltuielile. Distribuie cu grijă!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Distribuie",
+    "copy": "Copiază linkul",
+    "url": "Link de grup"
   },
   "SchemaErrors": {
     "min1": "Introduceți cel puțin un caracter.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Cheltuiala trebuie plătită pentru cel puțin un membru.",
     "noZeroShares": "Toate părțile trebuie să fie mai mari de 0.",
     "amountSum": "Suma valorilor trebuie să fie egală cu suma cheltuielilor.",
-    "percentageSum": "Suma procentajelor trebuie să fie egală cu 100."
+    "percentageSum": "Suma procentajelor trebuie să fie egală cu 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Căutați categorie…",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Actualizare disponibilă",
+    "updateDescription": "Este disponibilă o nouă versiune de pysplit.",
+    "reload": "Reîncarcă",
+    "updating": "Se actualizează…",
+    "offlineReady": "Gata de lucru offline",
+    "offlineReadyDescription": "Shell-ul aplicației este stocat în cache. Deschideți un grup o dată când sunteți online pentru a-și păstra datele.",
+    "dismiss": "Închide",
+    "install": "Instalați aplicația",
+    "refreshApp": "Actualizează aplicația",
+    "refreshAppHint": "Ștergeți fișierele din cache și reîncărcați cea mai recentă versiune. Datele dvs. salvate rămân pe acest dispozitiv."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Tabloul de bord administrativ",
+    "description": "Gestionați rolurile utilizatorilor, permisiunile de acces la platformă și monitorizați valorile sistemului.",
+    "totalGroups": "Total grupuri",
+    "totalExpenses": "Cheltuieli totale",
+    "registeredUsers": "Utilizatori inregistrati",
+    "userManagement": "Managementul utilizatorilor și nivelurile de permisiuni",
+    "accessDenied": "Acces refuzat",
+    "accessDeniedDescription": "Tabloul de bord de administrare este limitat la utilizatorii din nivelul Administrator.",
+    "delete": "Șterge",
+    "deleteError": "Nu s-a putut șterge",
+    "email": "E-mail",
+    "expenses": "cheltuieli",
+    "groupDeleted": "Grupul a fost șters",
+    "groupManagement": "Grupuri",
+    "groupManagementDescription": "Ștergeți grupurile și verificați utilizarea.",
+    "groups": "grupuri",
+    "loadMoreGroups": "Încărcați mai multe grupuri",
+    "loadMoreUsers": "Încărcați mai mulți utilizatori",
+    "loading": "Se încarcă tabloul de bord...",
+    "loadingMore": "Se încarcă…",
+    "participants": "participanții",
+    "preauthorize": "Preautorizarea unui utilizator",
+    "preauthorizeAction": "Preautorizare",
+    "preauthorizeError": "Nu s-a putut preautoriza utilizatorul",
+    "preauthorized": "Utilizator preautorizat",
+    "returnToGroups": "Reveniți la Grupurile mele",
+    "searchGroups": "Căutați grupuri",
+    "searchUsers": "Căutați utilizatori",
+    "signInDescription": "Tabloul de bord de administrare necesită un cont de administrator.",
+    "signInTitle": "Este necesară conectarea",
+    "tier": "Nivelul",
+    "tierError": "Nu s-a putut actualiza nivelul",
+    "tierFor": "Nivel pentru",
+    "tierUpdated": "Nivelul a fost actualizat",
+    "userDeleted": "Utilizatorul a fost șters",
+    "userTier": "Niveluri"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Stocare offline",
+    "loading": "Se verifică acest dispozitiv...",
+    "unsupported": "Acest browser nu poate raporta starea stocării.",
+    "usage": "{{used}} din {{quota}} folosit",
+    "unknown": "necunoscut",
+    "persisted": "Stocarea este persistentă pe acest dispozitiv.",
+    "notPersisted": "Browserul poate elimina datele offline dacă dispozitivul nu dispune de spațiu.",
+    "keep": "Păstrați datele pe acest dispozitiv",
+    "refresh": "Reîmprospătați",
+    "critical": "Depozitarea este aproape plină. Exportați acum o copie de rezervă, apoi eliminați grupurile neutilizate.",
+    "warning": "Spațiul de stocare se umple. Se recomandă o copie de rezervă."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Sincronizare în așteptare",
+    "expense": "Sincronizare în așteptare"
+  },
+  "Attachments": {
+    "assignItems": "Alocați elemente de chitanță",
+    "extractedItems": "Articole extrase AI",
+    "help": "Imaginile sunt comprimate înainte de încărcare. PDF-urile sunt păstrate ca atașamente și se deschid într-o filă nouă.",
+    "open": "Deschide",
+    "openInNewTab": "Deschideți într-o filă nouă",
+    "pdfPreviewUnavailable": "Previzualizările PDF se deschid într-o filă separată.",
+    "pending": "În așteptarea încărcării",
+    "preview": "Previzualizare",
+    "previewAction": "Previzualizare",
+    "previewNamed": "Previzualizare {{name}}",
+    "receipt": "Chitanță de magazin",
+    "saveToAssignItems": "Salvați mai întâi cheltuiala, apoi atribuiți aceste articole participanților.",
+    "scanComplete": "Chitanța scanată",
+    "scanCompleteDescription": "Atribuiți elementele extrase participanților.",
+    "scanError": "Chitanța nu a putut fi scanată",
+    "scanWithAi": "Scanează cu AI",
+    "scanning": "Se scanează…",
+    "view": "Vizualizați atașamentele",
+    "attachment": "Atașament",
+    "onlyImagesPdf": "Sunt acceptate doar imaginile și fișierele PDF."
+  },
+  "Backup": {
+    "downloaded": "Backup descărcat.",
+    "export": "Exportați backup",
+    "failed": "Copierea de rezervă a eșuat.",
+    "restore": "Restaurați backupul",
+    "restoreFailed": "Restaurarea a eșuat.",
+    "restoreLabel": "Restaurați fișierul de rezervă",
+    "restored": "Backup restaurat. Se reîncarcă..."
+  },
+  "Common": {
+    "addGroup": "Adăugați grup",
+    "close": "Close",
+    "closeDialog": "Închide caseta de dialog",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Respinge notificarea",
+    "error": "Ceva a mers prost",
+    "expenseNotFound": "Cheltuiala nu a fost găsită",
+    "loading": "Se încarcă…",
+    "menu": "Meniu",
+    "retry": "Reîncearcă",
+    "select": "Selectați…",
+    "unknown": "necunoscut",
+    "user": "Utilizator"
+  },
+  "CreateGroup": {
+    "approvalContact": "Crearea de noi grupuri de cheltuieli necesită autorizarea unui administrator. Contactați administratorul instanței pentru a vă promova contul la nivelul Creator de grup.",
+    "approvalDescription": "Contul dvs. se află în prezent în nivelul Sincronizare utilizator. Puteți participa la orice grup partajat cu dvs. și le puteți sincroniza pe toate dispozitivele dvs.",
+    "approvalTitle": "Crearea grupului necesită aprobare",
+    "authRequiredDescription": "Pentru a crea noi grupuri de cheltuieli, vă rugăm să vă conectați cu un cont extern. Participanții la grupul invitați se vor putea alătura în continuare fără fricțiuni prin linkul de grup fără a se conecta.",
+    "authRequiredTitle": "Este necesară autentificarea",
+    "returnToGroups": "Reveniți la Grupurile mele",
+    "signIn": "Conectați-vă pentru a crea grup"
+  },
+  "GroupTabs": {
+    "Expenses": "Cheltuieli",
+    "Balances": "Solduri",
+    "Information": "Informații",
+    "Stats": "Statistici",
+    "Activity": "Activități",
+    "Settings": "Setări",
+    "label": "Secțiuni de grup"
+  },
+  "Login": {
+    "title": "Conectați-vă la Split",
+    "description": "Conectați-vă cu un cont extern pentru a activa sincronizarea între grupuri de dispozitive.",
+    "google": "Continuați cu Google",
+    "github": "Continuați cu GitHub",
+    "noProviders": "Nu sunt configurați furnizori OAuth. Setați AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET pentru a activa conectarea."
+  },
+  "NotFound": {
+    "title": "Pagina nu a fost găsită",
+    "description": "Verificați adresa URL și încercați din nou.",
+    "groupTitle": "Acest grup nu există.",
+    "groupDescription": "Verificați adresa URL sau solicitați un nou link de invitație."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline — modificări în așteptare: {{count}}",
+    "offlineSaved": "Offline — afișează datele salvate",
+    "syncing": "Se sincronizează…",
+    "error": "Eroare de sincronizare: {{error}}",
+    "retryToContinue": "reîncercați să continuați",
+    "conflicts": "Conflicte care necesită revizuire: {{count}}",
+    "failed": "Modificări care nu au putut fi sincronizate: {{count}}",
+    "pending": "Modificări în așteptare: {{count}}",
+    "retryFailed": "Reîncearcă modificările eșuate",
+    "discardFailed": "Elimină modificările eșuate",
+    "resolveConflicts": "Rezolvați conflictele",
+    "syncNow": "Sincronizează acum",
+    "dialogTitle": "Rezolvați conflictele",
+    "dialogDescription": "Aceste editări au schimbat aceleași înregistrări pe alt dispozitiv. Alegeți ce să păstrați.",
+    "noConflicts": "Fără conflicte de rezolvat.",
+    "serverVersion": "Versiunea serverului {{version}} · editarea locală păstrată în coada de conflicte",
+    "keepMine": "Păstrează versiunea mea",
+    "useServer": "Utilizați serverul",
+    "duplicate": "Duplicați ca nou"
+  },
+  "Theme": {
+    "toggle": "Comutați tema",
+    "light": "Luminos",
+    "dark": "Întunecat",
+    "system": "Sistem"
   }
 }

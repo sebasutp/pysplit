@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Outlet, useOutletContext, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import { useActiveUser } from '../../hooks/useActiveUser'
 import { useAuth } from '../../hooks/useAuth'
@@ -25,6 +26,7 @@ function normalizeName(name) {
 }
 
 export function GroupLayout() {
+  const { t } = useTranslation()
   const { groupId } = useParams()
   const { group, details, loading, error, reload } = useGroup(groupId)
   const { user } = useAuth()
@@ -83,8 +85,11 @@ export function GroupLayout() {
   if (!group) {
     return (
       <ErrorState
-        title="This group does not exist."
-        detail="Check the URL or ask for a new invitation link."
+        title={t('NotFound.groupTitle', 'This group does not exist.')}
+        detail={t(
+          'NotFound.groupDescription',
+          'Check the URL or ask for a new invitation link.',
+        )}
       />
     )
   }

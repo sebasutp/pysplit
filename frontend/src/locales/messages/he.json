@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "קבוצות"
+    "groups": "קבוצות",
+    "adminDashboard": "לוח המחוונים של מנהל מערכת",
+    "language": "שפה",
+    "signIn": "היכנס",
+    "signOut": "צא",
+    "userMenu": "תפריט משתמש"
   },
   "Footer": {
     "madeIn": "נבנה בציריך, שווייץ 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "חודש שעבר",
       "earlierThisYear": "מוקדם יותר השנה",
       "lastYear": "שנה שעברה",
-      "older": "ישנות יותר"
-    }
+      "older": "ישנות יותר",
+      "today": "היום",
+      "week": "מוקדם יותר השבוע",
+      "month": "מוקדם יותר החודש",
+      "year": "מוקדם יותר השנה"
+    },
+    "clearSearch": "ברור",
+    "exportError": "לא ניתן לייצא את ההוצאות",
+    "filterFrom": "מ",
+    "filterTo": "ל",
+    "loadMore": "טען עוד",
+    "loading": "טוען הוצאות…",
+    "loadingMore": "טוען...",
+    "search": "חיפוש הוצאות",
+    "showingCount": "מציג הוצאות של {{shown}} מתוך {{total}}."
   },
   "ExpenseCard": {
     "paidBy": "שולם על ידי <strong>{paidBy}</strong> עבור <paidFor></paidFor>",
     "everyone": "כולם",
     "receivedBy": "התקבל על ידי <strong>{paidBy}</strong> עבור <paidFor></paidFor>",
     "yourBalance": "היתרה שלך:",
-    "notInvolved": "אתה לא מעורב"
+    "notInvolved": "אתה לא מעורב",
+    "paidByPlain": "שולם על ידי {{paidBy}} עבור {{paidFor}}",
+    "receivedByPlain": "התקבל על ידי {{paidBy}} עבור {{paidFor}}"
   },
   "Groups": {
     "myGroups": "הקבוצות שלי",
@@ -60,11 +80,11 @@
       "orAsk": "או בקש מחבר לשלוח לך את הקישור לקבוצה קיימת."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "היתרה הכוללת שלך",
+      "description": "היתרה המשולבת שלך בכל הקבוצות שלך.",
+      "owedToYou": "אתה חייב",
+      "youOwe": "אתה חייב",
+      "settledUp": "כולכם מסודרים בקבוצות שלכם."
     },
     "recent": "קבוצות אחרונות",
     "starred": "קבוצות מסומנות בכוכב",
@@ -83,7 +103,7 @@
       "title": "הוסף קבוצה באמצעות קישור",
       "description": "אם שיתפו איתך קבוצה, תוכל להדביק את הקישור שלה כאן כדי להוסיף אותה לרשימה שלך.",
       "error": "אופס, אנחנו לא מצליחים למצוא את הקבוצה מכתובת ה-URL שסיפקת…",
-      "urlMode": "Enter URL",
+      "urlMode": "הזן כתובת URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "קבוצה זו אינה קיימת.",
       "link": "עבור לקבוצות שביקרת בהן לאחרונה"
-    }
+    },
+    "moreOptions": "אפשרויות נוספות",
+    "participants": "משתתפים",
+    "star": "קבוצת כוכבים",
+    "unstar": "הסר כוכב לקבוצה"
   },
   "GroupForm": {
     "title": "מידע על הקבוצה",
@@ -129,7 +153,10 @@
       "add": "הוסף משתתף",
       "John": "אבי",
       "Jane": "ריקי",
-      "Jack": "ג'קי"
+      "Jack": "ג'קי",
+      "cannotRemove": "משתתף זה הוא חלק מהוצאה ולא ניתן להסירו.",
+      "indexLabel": "משתתף #{{index}}",
+      "remove": "הסר את המשתתף {{index}}"
     },
     "Settings": {
       "title": "הגדרות מקומיות",
@@ -145,7 +172,8 @@
       "create": "צור",
       "creating": "יוצר…",
       "cancel": "ביטול"
-    }
+    },
+    "saveError": "לא ניתן היה לשמור את הקבוצה."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "כדי להגדיר מטבע שונה לכל הוצאה ולהמיר סכומים, בחר מטבע לא מותאם אישית לקבוצה.",
     "originalAmountField": {
       "label": "סכום להמרה",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "סכום להעברה",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "שומר…",
     "cancel": "ביטול",
     "reimbursement": "החזר",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "הקצאת פריטי קבלה",
+    "conflict": "הוצאה זו שונתה על ידי מישהו אחר. טען מחדש את הדף ונסה שוב.",
+    "conflictTitle": "ההוצאה השתנתה במקום אחר",
+    "deleteError": "לא ניתן למחוק את ההוצאה.",
+    "pendingReceiptTotal": "קבלה שנסרקה במצב לא מקוון מוכנה.",
+    "pendingReceiptTotalApply": "השתמש בסך הכל סרוק",
+    "pendingReceiptTotalDismiss": "לבטל",
+    "saveError": "לא ניתן היה לחסוך את ההוצאה."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "משהו השתבש בעת העלאת המסמך. נסה שוב מאוחר יותר או בחר קובץ אחר.",
       "retry": "נסה שוב"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "בתור. הקבלה תיסרק לאחר שתתחבר מחדש.",
+    "offline": "הסריקה מתחדשת כאשר אתה מחובר.",
+    "scanFailed": "ה-AI לא הצליח לקרוא את הקבלה הזו. בדוק את תצורת ה-AI של השרת ונסה שוב.",
+    "scanning": "סורק..."
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "פריטי קבלה",
+    "backToExpense": "חזרה להוצאה",
+    "merchant": "שם החנות",
+    "printedTotal": "סך הכל מודפס על הקבלה",
+    "noReceipt": "עדיין לא צמודה קבלה להוצאה זו.",
+    "empty": "עדיין אין פריטים. הוסף אחד כדי להתחיל לפצל.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "לא ניתן היה לשמור את השינוי שלך",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "הוסף פריט",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "הוסף פריט",
+      "nameLabel": "שם",
+      "quantityLabel": "כמות",
+      "amountLabel": "סכום",
+      "sharedLabel": "משותף (חיוב מלא)",
+      "add": "הוסף",
+      "cancel": "ביטול"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} מתוך {total}",
+      "remaining": "נותרו {quantity}",
+      "assign": "להקצות",
+      "edit": "ערוך",
+      "delete": "מחק",
+      "removePortion": "הסר נתח שהוקצה",
+      "editTitle": "ערוך פריט",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "שמור",
+      "cancel": "ביטול",
+      "deleteConfirm": "למחוק את הפריט הזה?",
+      "deleteDescription": "פעולה זו מסירה את הפריט ואת ההקצאות שלו."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "לא הוקצה",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "משותף",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "הקצה פריט",
+      "description": "בחר מי משלם עבור \"{name}\".",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "מחלקים באופן שווה",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "פיצול מותאם אישית",
+      "customHint": "הזן כמויות ביחידות עבור כל יעד.",
+      "shared": "משותף",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "הכמות שהוקצתה עולה על כמות הפריט.",
+      "confirm": "להקצות",
+      "cancel": "ביטול"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "משותף",
+      "unassigned": "לא הוקצה",
+      "optOut": "משתף פריטים שלא הוקצו",
+      "reconciles": "מאוזן",
+      "offBy": "הפרש של {amount}",
+      "itemsTotal": "סך כל פריטי הקבלה",
+      "apply": "החל על ההוצאה",
+      "allOptedOut": "כולם ביטלו את הסכמתם, אבל חלק מהפריטים עדיין לא הוקצו.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "ערכי הקבלה שונים · החל שוב"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "ההוצאה עודכנה",
+      "description": "פריטי הקבלה הוחלו על ההוצאה."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "לא ניתן להחיל את הקבלה"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "לעדכן את ההוצאה?",
+      "description": "סה\"כ ההוצאה שונה מסך כל פריטי הקבלה. הגשת הבקשה תחליף את סכום ההוצאה ופיצולו.",
+      "total": "סך הכל {current} → {new}",
+      "cancel": "ביטול",
+      "confirm": "החל"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "סריקה בתור",
+    "scanPendingDescription": "התמונה נשמרת במכשיר זה ותיסרק כשתחזור לאינטרנט.",
+    "offlineQueue": "אתה במצב לא מקוון. צרף את התמונה עכשיו והיא תיסרק לאחר שתתחבר מחדש.",
+    "disabled": "פיצול חכם אינו מופעל בשרת זה. סריקת קבלות היא תכונה מקוונת בלבד.",
+    "extracted": "קבלה נסרקה",
+    "extractedDescription": "הקצה את הפריטים שחולצו למטה.",
+    "loading": "טוען קבלה...",
+    "optOutTitle": "ביטולי הסכמה",
+    "scanError": "לא ניתן היה לסרוק את הקבלה.",
+    "scanUnavailable": "בדוק את תצורת ה-AI של השרת ונסה שוב.",
+    "scanning": "סורק קבלה...",
+    "upload": "העלה תמונה של קבלה"
   },
   "Balances": {
     "title": "יתרות",
@@ -415,20 +462,22 @@
       "description": "הנה הצעות להחזרים אופטימליים בין משתתפים.",
       "noImbursements": "נראה שהקבוצה שלך לא צריכה החזרים 😁",
       "owes": "<strong>{from}</strong> חייב ל<strong>{to}</strong>",
-      "markAsPaid": "סמן כשולם"
-    }
+      "markAsPaid": "סמן כשולם",
+      "owesPlain": "{{from}} חייב {{to}}"
+    },
+    "loading": "טוען יתרות..."
   },
   "Stats": {
     "title": "סטטיסטיקות",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "כל הזמן",
+      "thisMonth": "החודש הזה",
+      "last30": "30 הימים האחרונים",
+      "thisYear": "השנה",
+      "custom": "טווח מותאם אישית",
+      "from": "מ",
+      "to": "ל"
     },
     "Totals": {
       "title": "סיכומים",
@@ -440,50 +489,53 @@
       "yourShare": "סך החלק שלך"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "סיכום",
+      "description": "נתוני מפתח לתקופה שנבחרה.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "הוצאות",
+      "averageExpense": "הוצאה ממוצעת",
+      "largestExpense": "ההוצאה הגדולה ביותר",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "הוצאה לאורך זמן",
+      "description": "סך הוצאה קבוצתית לחודש. בחר חודש כדי לראות את ההוצאות שלו.",
+      "empty": "עדיין אין הוצאות.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "הוצאות בחודש זה עבור התקופה שנבחרה.",
+      "detailsEmpty": "אין הוצאות בחודש זה.",
+      "showExpensesPlain": "הצג הוצאות עבור {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "הוצאה לפי משתתף",
+      "description": "כמה שילם כל משתתף וחלקו בהוצאות.",
+      "empty": "עדיין אין הוצאות.",
+      "participant": "משתתף",
+      "paid": "בתשלום",
       "count": "Count",
-      "share": "Share"
+      "share": "שתף"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "הוצאה לפי קטגוריות",
+      "description": "הסכום הכולל שהוצא בכל קטגוריה. בחר קטגוריה כדי לראות את ההוצאות שלה.",
+      "empty": "עדיין אין הוצאות.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "הוצאות בקטגוריה זו לתקופה שנבחרה.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "הצג הוצאות עבור {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "הוצאות חוזרות",
+      "description": "עלות משוערת של ההוצאות החוזרות הפעילות של הקבוצה.",
+      "estimatedMonthly": "עלות חודשית משוערת",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "טוען נתונים סטטיסטיים..."
   },
   "Activity": {
     "title": "פעילות",
@@ -504,7 +556,10 @@
       "earlierThisYear": "מוקדם יותר השנה",
       "lastYear": "שנה שעברה",
       "older": "ישנות יותר"
-    }
+    },
+    "loadMore": "טען עוד",
+    "loading": "טוען פעילות...",
+    "unknown": "פעילות לא ידועה"
   },
   "Information": {
     "title": "מידע",
@@ -512,20 +567,25 @@
     "empty": "עדיין אין מידע על הקבוצה."
   },
   "Settings": {
-    "title": "הגדרות"
+    "title": "הגדרות",
+    "saved": "הקבוצה עודכנה",
+    "savedDescription": "השינויים שלך נשמרו."
   },
   "Share": {
     "title": "שתף",
     "description": "כדי שמשתתפים אחרים יראו את הקבוצה ויוסיפו הוצאות, שתף איתם את הקישור שלה.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "העתק קישור",
+    "shareLink": "שתף קישור",
     "warning": "אזהרה!",
     "warningHelp": "כל אדם עם קישור לקבוצה יוכל לראות ולערוך הוצאות. שתף בזהירות!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "שתף",
+    "copy": "העתק קישור",
+    "url": "קישור לקבוצה"
   },
   "SchemaErrors": {
     "min1": "הזן לפחות תו אחד.",
@@ -543,7 +603,10 @@
     "paidForMin1": "ההוצאה חייבת להיות משולמת עבור לפחות משתתף אחד.",
     "noZeroShares": "כל חלקי ההשתתפות חייבים להיות גבוהים מ-0.",
     "amountSum": "סיכום הסכומים חייב להיות שווה לסכום ההוצאה.",
-    "percentageSum": "סיכום האחוזים חייב להיות שווה ל-100."
+    "percentageSum": "סיכום האחוזים חייב להיות שווה ל-100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "חפש קטגוריה...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "עדכון זמין",
+    "updateDescription": "גרסה חדשה של pysplit זמינה.",
+    "reload": "טען מחדש",
+    "updating": "מעדכן...",
+    "offlineReady": "מוכן לעבוד במצב לא מקוון",
+    "offlineReadyDescription": "מעטפת היישום נשמרת במטמון. פתח קבוצה פעם אחת בזמן שאתה מקוון כדי לשמור על הנתונים שלה.",
+    "dismiss": "סגור",
+    "install": "התקן אפליקציה",
+    "refreshApp": "רענן את האפליקציה",
+    "refreshAppHint": "נקה קבצים בקובץ שמור וטען מחדש את הגרסה העדכנית ביותר. הנתונים השמורים שלך נשארים במכשיר הזה."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "לוח מחוונים לניהול",
+    "description": "נהל תפקידי משתמש, הרשאות גישה לפלטפורמה וניטור מדדי מערכת.",
+    "totalGroups": "סך הכל קבוצות",
+    "totalExpenses": "סך ההוצאות",
+    "registeredUsers": "משתמשים רשומים",
+    "userManagement": "שכבות ניהול משתמשים והרשאות",
+    "accessDenied": "הגישה נדחתה",
+    "accessDeniedDescription": "לוח המחוונים לניהול מוגבל למשתמשים בשכבת המנהל.",
+    "delete": "מחק",
+    "deleteError": "לא ניתן למחוק",
+    "email": "דוא\"ל",
+    "expenses": "הוצאות",
+    "groupDeleted": "הקבוצה נמחקה",
+    "groupManagement": "קבוצות",
+    "groupManagementDescription": "מחק קבוצות ובדוק את השימוש.",
+    "groups": "קבוצות",
+    "loadMoreGroups": "טען עוד קבוצות",
+    "loadMoreUsers": "טען יותר משתמשים",
+    "loading": "טוען את לוח המחוונים...",
+    "loadingMore": "טוען...",
+    "participants": "משתתפים",
+    "preauthorize": "הרשאה מראש למשתמש",
+    "preauthorizeAction": "אישור מראש",
+    "preauthorizeError": "לא ניתן לאשר מראש את המשתמש",
+    "preauthorized": "משתמש מורשה מראש",
+    "returnToGroups": "חזור אל הקבוצות שלי",
+    "searchGroups": "חפש קבוצות",
+    "searchUsers": "חפש משתמשים",
+    "signInDescription": "לוח המחוונים לניהול דורש חשבון מנהל.",
+    "signInTitle": "נדרשת כניסה",
+    "tier": "שכבה",
+    "tierError": "לא ניתן היה לעדכן את השכבה",
+    "tierFor": "שכבה עבור",
+    "tierUpdated": "הרמה עודכנה",
+    "userDeleted": "המשתמש נמחק",
+    "userTier": "שכבות"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "אחסון לא מקוון",
+    "loading": "בודק את המכשיר הזה...",
+    "unsupported": "דפדפן זה אינו יכול לדווח על מצב אחסון.",
+    "usage": "{{used}} מתוך {{quota}} בשימוש",
+    "unknown": "לא ידוע",
+    "persisted": "האחסון קבוע במכשיר הזה.",
+    "notPersisted": "הדפדפן עלול להוציא נתונים במצב לא מקוון אם נפח השטח במכשיר יגמר.",
+    "keep": "שמור נתונים במכשיר זה",
+    "refresh": "רענן",
+    "critical": "האחסון כמעט מלא. ייצא גיבוי כעת, ולאחר מכן הסר קבוצות שאינן בשימוש.",
+    "warning": "האחסון מתמלא. מומלץ לבצע גיבוי."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "ממתין לסנכרון",
+    "expense": "ממתין לסנכרון"
+  },
+  "Attachments": {
+    "assignItems": "הקצאת פריטי קבלה",
+    "extractedItems": "פריטים שחולצו בינה מלאכותית",
+    "help": "התמונות נדחסות לפני העלאה. קובצי PDF נשמרים כקבצים מצורפים ונפתחים בלשונית חדשה.",
+    "open": "פתח",
+    "openInNewTab": "פתח בכרטיסייה חדשה",
+    "pdfPreviewUnavailable": "תצוגות מקדימות של PDF נפתחות בכרטיסייה נפרדת.",
+    "pending": "בהמתנה להעלאה",
+    "preview": "תצוגה מקדימה",
+    "previewAction": "תצוגה מקדימה",
+    "previewNamed": "תצוגה מקדימה {{name}}",
+    "receipt": "קבלה בחנות",
+    "saveToAssignItems": "שמור תחילה את ההוצאה, ולאחר מכן הקצה את הפריטים הללו למשתתפים.",
+    "scanComplete": "קבלה נסרקה",
+    "scanCompleteDescription": "הקצה את הפריטים שחולצו למשתתפים.",
+    "scanError": "לא ניתן היה לסרוק את הקבלה",
+    "scanWithAi": "סריקה עם AI",
+    "scanning": "סורק...",
+    "view": "הצג קבצים מצורפים",
+    "attachment": "קובץ מצורף",
+    "onlyImagesPdf": "רק תמונות וקבצי PDF נתמכים."
+  },
+  "Backup": {
+    "downloaded": "הורד הגיבוי.",
+    "export": "ייצוא גיבוי",
+    "failed": "הגיבוי נכשל.",
+    "restore": "שחזר גיבוי",
+    "restoreFailed": "השחזור נכשל.",
+    "restoreLabel": "שחזר קובץ גיבוי",
+    "restored": "הגיבוי שוחזר. טוען מחדש..."
+  },
+  "Common": {
+    "addGroup": "הוסף קבוצה",
+    "close": "Close",
+    "closeDialog": "סגור דו-שיח",
+    "dismiss": "Dismiss",
+    "dismissNotification": "בטל הודעה",
+    "error": "משהו השתבש",
+    "expenseNotFound": "הוצאה לא נמצאה",
+    "loading": "טוען...",
+    "menu": "תפריט",
+    "retry": "נסה שוב",
+    "select": "בחר…",
+    "unknown": "לא ידוע",
+    "user": "משתמש"
+  },
+  "CreateGroup": {
+    "approvalContact": "יצירת קבוצות הוצאות חדשות דורשת הרשאה ממנהל מערכת. אנא צור קשר עם מנהל המופע שלך כדי לקדם את חשבונך לשכבת יוצר הקבוצה.",
+    "approvalDescription": "חשבונך נמצא כעת בשכבת משתמש סינכרון. אתה יכול להשתתף בכל קבוצה ששותפה איתך ולסנכרן אותן בכל המכשירים שלך.",
+    "approvalTitle": "יצירת קבוצה דורשת אישור",
+    "authRequiredDescription": "כדי ליצור קבוצות הוצאות חדשות, היכנס באמצעות חשבון חיצוני. משתתפי הקבוצה המוזמנים עדיין יוכלו להצטרף ללא חיכוכים דרך הקישור לקבוצה שלך מבלי להיכנס.",
+    "authRequiredTitle": "נדרש אימות",
+    "returnToGroups": "חזור אל הקבוצות שלי",
+    "signIn": "היכנס ליצירת קבוצה"
+  },
+  "GroupTabs": {
+    "Expenses": "הוצאות",
+    "Balances": "יתרות",
+    "Information": "מידע",
+    "Stats": "סטטיסטיקות",
+    "Activity": "פעילות",
+    "Settings": "הגדרות",
+    "label": "קטעי קבוצה"
+  },
+  "Login": {
+    "title": "היכנס ל-Spliit",
+    "description": "היכנס באמצעות חשבון חיצוני כדי לאפשר סנכרון קבוצות חוצות-מכשירים.",
+    "google": "המשך עם גוגל",
+    "github": "המשך עם GitHub",
+    "noProviders": "לא מוגדרים ספקי OAuth. הגדר את AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET כדי לאפשר כניסה."
+  },
+  "NotFound": {
+    "title": "הדף לא נמצא",
+    "description": "בדוק את כתובת האתר ונסה שוב.",
+    "groupTitle": "קבוצה זו אינה קיימת.",
+    "groupDescription": "בדוק את כתובת האתר או בקש קישור הזמנה חדש."
+  },
+  "SyncStatus": {
+    "offlinePending": "לא מקוון - שינויים ממתינים: {{count}}",
+    "offlineSaved": "לא מקוון — מציג נתונים שנשמרו",
+    "syncing": "מסנכרן...",
+    "error": "שגיאת סנכרון: {{error}}",
+    "retryToContinue": "נסה שוב להמשיך",
+    "conflicts": "קונפליקטים הדורשים בדיקה: {{count}}",
+    "failed": "שינויים שלא ניתן היה לסנכרן: {{count}}",
+    "pending": "שינויים ממתינים: {{count}}",
+    "retryFailed": "נסה שוב שינויים שנכשלו",
+    "discardFailed": "התעלם משינויים שנכשלו",
+    "resolveConflicts": "לפתור קונפליקטים",
+    "syncNow": "סנכרן עכשיו",
+    "dialogTitle": "לפתור קונפליקטים",
+    "dialogDescription": "עריכות אלו שינו את אותן רשומות במכשיר אחר. בחר מה לשמור.",
+    "noConflicts": "אין קונפליקטים לפתור.",
+    "serverVersion": "גרסת שרת {{version}} · עריכה מקומית נשמרת בתור המתנגש",
+    "keepMine": "שמור את הגרסה שלי",
+    "useServer": "השתמש בשרת",
+    "duplicate": "שכפול כחדש"
+  },
+  "Theme": {
+    "toggle": "החלף נושא",
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת"
   }
 }

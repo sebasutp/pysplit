@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grops"
+    "groups": "Grops",
+    "adminDashboard": "Tablèu de bòrd d'administracion",
+    "language": "Lenga",
+    "signIn": "Connectatz-vos",
+    "signOut": "Desconnectar",
+    "userMenu": "Menú d'utilizaire"
   },
   "Footer": {
     "madeIn": "Fach a Zuric, Soïssa 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Lo mes passat",
       "earlierThisYear": "Mai d’ora ongan",
       "lastYear": "L’an passat",
-      "older": "Mai ancians"
-    }
+      "older": "Mai ancians",
+      "today": "Uèi",
+      "week": "Al començament d'aquesta setmana",
+      "month": "A la debuta del mes",
+      "year": "Mai d’ora ongan"
+    },
+    "clearSearch": "Escafar",
+    "exportError": "Poguèt pas exportar las despensas",
+    "filterFrom": "De",
+    "filterTo": "A",
+    "loadMore": "Cargar mai",
+    "loading": "Cargament de las despensas…",
+    "loadingMore": "En cargament...",
+    "search": "Cercar de despensas",
+    "showingCount": "Mostrant {{shown}} de {{total}} despensas."
   },
   "ExpenseCard": {
     "paidBy": "Pagat per <strong>{paidBy}</strong> per <paidFor></paidFor>",
     "everyone": "totòm",
     "receivedBy": "Recebut per <strong>{paidBy}</strong> per <paidFor></paidFor>",
     "yourBalance": "Vòstre resultat :",
-    "notInvolved": "Sètz pas concernit"
+    "notInvolved": "Sètz pas concernit",
+    "paidByPlain": "Pagat per {{paidBy}} per {{paidFor}}",
+    "receivedByPlain": "Recebut per {{paidBy}} per {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Mos grops",
@@ -55,16 +75,16 @@
     "createGroup": "Create group",
     "loadingRecent": "Cargament dels grops recents…",
     "NoRecent": {
-      "description": "You have not visited any group recently.",
+      "description": "Avètz pas visitat cap de grop recentament.",
       "create": "Ne crear un",
-      "orAsk": "or ask a friend to send you the link to an existing one."
+      "orAsk": "o demandatz a un amic de vos mandar lo ligam cap a un existent."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Vòstre solde total",
+      "description": "Vòstre solde combinat dins totes vòstres grops.",
+      "owedToYou": "Sètz degut",
+      "youOwe": "Vos devètz",
+      "settledUp": "Sètz totes installats dins vòstres grops."
     },
     "recent": "Grops recents",
     "starred": "Grops preferits",
@@ -74,16 +94,16 @@
     "removeRecent": "Tirar dels grops recents",
     "RecentRemovedToast": {
       "title": "Lo grop es estat suprimit",
-      "description": "The group was removed from your recent groups list.",
+      "description": "Lo grop es estat suprimit de vòstra lista dels grops recents.",
       "undoAlt": "Anullar la supression del grop",
       "undo": "Desfar"
     },
     "AddByURL": {
       "button": "Apondre per URL",
       "title": "Apondre un grop via URL",
-      "description": "If a group was shared with you, you can paste its URL here to add it to your list.",
-      "error": "Oops, we are not able to find the group from the URL you provided…",
-      "urlMode": "Enter URL",
+      "description": "Se un grop es estat partejat amb vos, podètz pegar son URL aicí per l'apondre a vòstra lista.",
+      "error": "Òps, sèm pas capables de trobar lo grop a partir de l'URL qu'avètz provesit...",
+      "urlMode": "Picatz l'URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Aqueste grop existís pas.",
       "link": "Anar als darrièrs grops consultats"
-    }
+    },
+    "moreOptions": "Mai d'opcions",
+    "participants": "participants",
+    "star": "Grop d'estelas",
+    "unstar": "Grop sens estela"
   },
   "GroupForm": {
     "title": "Informacions del grop",
@@ -108,16 +132,16 @@
     },
     "InformationField": {
       "label": "Informacions del grop",
-      "placeholder": "What information is relevant to group participants?"
+      "placeholder": "Quina informacion es pertinenta pels participants del grop?"
     },
     "CurrencyField": {
-      "label": "Currency symbol",
+      "label": "Simbòl de moneda",
       "placeholder": "$, €, £…",
-      "description": "We’ll use it to display amounts."
+      "description": "L'utilizarem per afichar de montants."
     },
     "CurrencyCodeField": {
-      "label": "Main currency",
-      "createDescription": "All amounts and balances will be in this currency.",
+      "label": "Moneda principala",
+      "createDescription": "Totes los montants e los soldes seràn dins aquesta moneda.",
       "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
       "customOption": "Custom"
     },
@@ -125,11 +149,14 @@
       "title": "Participants",
       "description": "Enter the name for each participant.",
       "protectedParticipant": "This participant is part of expenses, and can not be removed.",
-      "new": "New",
-      "add": "Add participant",
+      "new": "Novèl",
+      "add": "Apondre lo participant",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "Aqueste participant fa partida d'una despensa e pòt pas èsser levat.",
+      "indexLabel": "Participant #{{index}}",
+      "remove": "Suprimir participant {{index}}"
     },
     "Settings": {
       "title": "Local settings",
@@ -142,22 +169,23 @@
       },
       "save": "Save",
       "saving": "Saving…",
-      "create": "Create",
-      "creating": "Creating…",
-      "cancel": "Cancel"
-    }
+      "create": "Crear",
+      "creating": "En creant…",
+      "cancel": "Anullar"
+    },
+    "saveError": "Poguèt pas enregistrar lo grop."
   },
   "ExpenseForm": {
     "Income": {
-      "create": "Create income",
-      "edit": "Edit income",
+      "create": "Crear de revenguts",
+      "edit": "Modificar lo revengut",
       "TitleField": {
-        "label": "Income title",
+        "label": "Títol de revengut",
         "placeholder": "Monday evening restaurant",
         "description": "Enter a description for the income."
       },
       "DateField": {
-        "label": "Income date",
+        "label": "Data de revengut",
         "description": "Enter the date the income was received."
       },
       "currencyField": {
@@ -166,7 +194,7 @@
       },
       "categoryFieldDescription": "Select the income category.",
       "paidByField": {
-        "label": "Received by",
+        "label": "Recebut per",
         "description": "Select the participant who received the income."
       },
       "paidFor": {
@@ -177,104 +205,112 @@
       "attachDescription": "See and attach receipts to the income."
     },
     "Expense": {
-      "create": "Create expense",
-      "edit": "Edit expense",
+      "create": "Crear una despensa",
+      "edit": "Modificar la despensa",
       "TitleField": {
-        "label": "Expense title",
-        "placeholder": "Monday evening restaurant",
+        "label": "Títol de despensa",
+        "placeholder": "Diluns de ser restaurant",
         "description": "Enter a description for the expense."
       },
       "DateField": {
-        "label": "Expense date",
+        "label": "Data de despensa",
         "description": "Enter the date the expense was paid."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Moneda de despensa",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Select the expense category.",
       "paidByField": {
-        "label": "Paid by",
+        "label": "Pagat per",
         "placeholder": "Select a participant",
         "description": "Select the participant who paid the expense."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Recurréncia de despensa",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "Cap",
+        "daily": "Quotidian",
+        "weekly": "Setmanièr",
+        "monthly": "Mensual"
       },
       "paidFor": {
-        "title": "Paid for",
+        "title": "Pagat per",
         "description": "Select who the expense was paid for."
       },
       "splitModeDescription": "Select how to split the expense.",
       "attachDescription": "See and attach receipts to the expense."
     },
     "amountField": {
-      "label": "Amount"
+      "label": "Montant"
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "Quantitat a convertir",
+      "repaymentLabel": "Impòrt a transferir",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "Tarifas d'utilizacion de Francfòrt",
+      "useCustom": "Utilizar lo taus personalizat",
+      "label": "Taus de cambi"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "Obténer de tausses de cambiament...",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Ups, podèm pas obténer los prètzs mai recents.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "Picatz un prètz personalizat çai-jos.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Actualizar",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "Aquò's un remborsament"
     },
     "categoryField": {
-      "label": "Category"
+      "label": "Categoria"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "Nòtas"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "Seleccionatz cap",
+    "selectAll": "Seleccionar tot",
+    "shares": "partatge(s)",
+    "advancedOptions": "Opcions de division avançadas...",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "Mòde de division",
+      "evenly": "Egalament",
+      "byShares": "Desigualament – Per parts",
+      "byPercentage": "Desigualament – Per percentatge",
+      "byAmount": "Desigualament – Per quantitat",
+      "saveAsDefault": "Enregistrar coma opcions de division per defaut"
     },
     "DeletePopup": {
-      "label": "Delete",
-      "title": "Delete this expense?",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
-      "yes": "Yes",
-      "cancel": "Cancel"
+      "label": "Suprimir",
+      "title": "Suprimir aquesta despensa?",
+      "description": "Volètz vertadièrament suprimir aquesta despensa ? Aquesta accion es irreversibla.",
+      "yes": "Òc",
+      "cancel": "Anullar"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "attachDocuments": "Adjuntar los documents",
+    "create": "Crear",
+    "creating": "En creant…",
+    "save": "Enregistrar",
+    "saving": "En estalviant…",
+    "cancel": "Anullar",
+    "reimbursement": "Remborsament",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Assignar los articles del rebut",
+    "conflict": "Aquela despensa foguèt cambiada per qualqu'un d'autre. Tornatz cargar la pagina e ensajatz tornarmai.",
+    "conflictTitle": "Despensa cambiada endacòm mai",
+    "deleteError": "Pogut pas suprimir la despensa.",
+    "pendingReceiptTotal": "Un rebut escanejat del temps fòra linha es prèst.",
+    "pendingReceiptTotalApply": "Utilizar lo total escanejat",
+    "pendingReceiptTotalDismiss": "Descartar",
+    "saveError": "Poguèt pas estalviar la despensa."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "Error al moment del mandadís del document",
+      "description": "Quicòm de mal s'es passat al moment del mandadís del document. Tornatz ensajar mai tard o seleccionatz un fichièr diferent.",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "Crear la despensa a partir de la recepcion",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -309,191 +345,207 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "Error al moment del mandadís del document",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "En cola. Lo rebut serà escanejat après que vos tornatz connectar.",
+    "offline": "L'escanatge dels CVs quand sètz en linha.",
+    "scanFailed": "L'IA poguèt pas legir aqueste rebut. Verificatz la configuracion de l'IA del servidor e ensajatz tornarmai.",
+    "scanning": "Escanar..."
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Articles del rebut",
+    "backToExpense": "Tornatz a la despensa",
+    "merchant": "Nom de la botiga",
+    "printedTotal": "Total estampat sul rebut",
+    "noReceipt": "Cap de rebut es pas encara ligat a aquesta despensa.",
+    "empty": "Pas d'articles encara. Apondre un per començar de fendre.",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "Poguèt pas enregistrar vòstra modificacion",
+      "description": "Avèm recargat lo rebut per que posquètz tornar ensajar."
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "Apondre l'element",
+    "quantitySummary": "{count} · {quantity} unitats",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Apondre l'element",
+      "nameLabel": "Nom",
+      "quantityLabel": "Quantitat",
+      "amountLabel": "Montant",
+      "sharedLabel": "Partatjat (carga de la factura entièra)",
+      "add": "Apondre",
+      "cancel": "Anullar"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{assigned} de {total}",
+      "remaining": "{quantity} restant",
+      "assign": "Assignar",
+      "edit": "Modificar",
+      "delete": "Suprimir",
+      "removePortion": "Suprimir la part assignada",
+      "editTitle": "Modificar l'element",
+      "nameLabel": "Nom",
+      "quantityLabel": "Quantitat",
+      "amountLabel": "Montant",
+      "save": "Enregistrar",
+      "cancel": "Anullar",
+      "deleteConfirm": "Suprimir aqueste element ?",
+      "deleteDescription": "Aquò suprimís l'element e sas assignacions."
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "Non assignat",
+      "unassignedHint": "Pas encara assignat a degun",
+      "shared": "Partatjat",
+      "sharedHint": "Partatjat egalament entre totes",
+      "participantHint": "Articles assignats a {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "Assignar l'element",
+      "description": "Causissètz qui paga per \"{name}\".",
+      "whole": "Assignar l’article entièr",
+      "everyone": "Totes (partatjat)",
+      "even": "Fendir uniformement",
+      "evenHint": "Causissètz los participants entre los quals devesir.",
+      "custom": "Division personalizada",
+      "customHint": "Picatz de quantitats en unitats per cada cibla.",
+      "shared": "Partatjat",
+      "selectParticipant": "Seleccionar un participant",
+      "exceeds": "La quantitat assignada despassa la quantitat de l'article.",
+      "confirm": "Assignar",
+      "cancel": "Anullar"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "Propri",
+      "shared": "Partatjat",
+      "unassigned": "Non assignat",
+      "optOut": "Parteja d'elements non assignats",
+      "reconciles": "Equilibrat",
+      "offBy": "Diferéncia de {amount}",
+      "itemsTotal": "Total dels articles del rebut",
+      "apply": "Aplicar a la despesa",
+      "allOptedOut": "Tot lo monde s'es desactivat, mas qualques elements son pas encara assignats.",
+      "negativeShare": "Un total negatiu fa que qualqu’un dega mens que res. Ajustatz los articles abans d’aplicar.",
+      "divergent": "Las valors de recepcion diferís · Tornar demandar"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Despensa mesa a jorn",
+      "description": "Los articles de rebut foguèron aplicats a la despensa."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Poguèt pas aplicar lo rebut"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "title": "Metre a jorn la despensa?",
+      "description": "Lo total de las despensas diferís del total dels articles de recepcion. La demanda subrescriurà lo montant de la despensa e sa division.",
       "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "cancel": "Anullar",
+      "confirm": "Aplicar"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Escanar en cola",
+    "scanPendingDescription": "L'imatge es enregistrat sus aqueste periferic e serà escanejat quand seràs tornat en linha.",
+    "offlineQueue": "Sètz fòra linha. Adjuntatz la fòto ara e serà escanejada après que vos tornatz connectar.",
+    "disabled": "La division intelligenta es pas activada sus aqueste servidor. L'escanèr dels rebuts es una foncionalitat solament en linha.",
+    "extracted": "Rebut escanejat",
+    "extractedDescription": "Assignatz los elements extraches çai-jos.",
+    "loading": "Lo rebut en cargament...",
+    "optOutTitle": "Desactivacions",
+    "scanError": "Lo rebut a pas pogut èsser escanejat.",
+    "scanUnavailable": "Verificatz la configuracion de l'IA del servidor e ensajatz tornarmai.",
+    "scanning": "Rebut d'escanatge...",
+    "upload": "Enviatz una fòto de rebut"
   },
   "Balances": {
-    "title": "Balances",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "title": "Saldes",
+    "description": "Aquò's la quantitat que cada participant paguèt o foguèt pagat.",
     "Reimbursements": {
-      "title": "Suggested reimbursements",
-      "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "title": "Remborsaments suggerits",
+      "description": "Vaquí de suggestions per de remborsaments optimizats entre los participants.",
+      "noImbursements": "Sembla que vòstre grop a pas besonh de cap de remborsament 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "Marcar coma pagat",
+      "owesPlain": "{{from}} deu {{to}}"
+    },
+    "loading": "De soldes de cargament..."
   },
   "Stats": {
-    "title": "Stats",
+    "title": "Estatisticas",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Tot lo temps",
+      "thisMonth": "Aqueste mes",
+      "last30": "Darrièr 30 jorns",
+      "thisYear": "Ongan",
+      "custom": "Gamma personalizada",
+      "from": "De",
+      "to": "A"
     },
     "Totals": {
       "title": "Totals",
-      "description": "Spending summary of the entire group.",
-      "groupSpendings": "Total group spendings",
+      "description": "Resumit de despensas de tot lo grop.",
+      "groupSpendings": "Despensas totalas del grop",
       "groupEarnings": "Total group earnings",
-      "yourSpendings": "Your total spendings",
+      "yourSpendings": "Vòstras despensas totalas",
       "yourEarnings": "Your total earnings",
-      "yourShare": "Your total share"
+      "yourShare": "Vòstra part totala"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Resumit",
+      "description": "Chifras claus del periòde seleccionat.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Despensas",
+      "averageExpense": "Despensa mejana",
+      "largestExpense": "Despensa mai granda",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Gastar dins lo temps",
+      "description": "Despensa totala de grop per mes. Seleccionatz un mes per veire sas despensas.",
+      "empty": "I a pas encara de despensas.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Despensas d'aqueste mes pel periòde seleccionat.",
+      "detailsEmpty": "I a pas de despensas dins aqueste mes.",
+      "showExpensesPlain": "Mostrar despensas per {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Despensas per participant",
+      "description": "Quant pagèt cada participant e sa part de las despensas.",
+      "empty": "I a pas encara de despensas.",
       "participant": "Participant",
-      "paid": "Paid",
+      "paid": "Pagat",
       "count": "Count",
-      "share": "Share"
+      "share": "Partatjar"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Despensas per categoria",
+      "description": "Impòrt totau despensat en cada categoria. Seleccionatz una categoria per veire sas despensas.",
+      "empty": "I a pas encara de despensas.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Despensas d'aquesta categoria pel periòde seleccionat.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Mostrar despensas per {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Despensas recurrentas",
+      "description": "Còst estimat de las despensas recurrentas activas del grop.",
+      "estimatedMonthly": "Còst mensual estimat",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "En cargament d'estatisticas..."
   },
   "Activity": {
-    "title": "Activity",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
-    "someone": "Someone",
-    "settingsModified": "Group settings were modified by <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "title": "Activitat",
+    "description": "Vista generala de tota l'activitat d'aqueste grop.",
+    "noActivity": "I a pas encara cap d'activitat dins vòstre grop.",
+    "someone": "Qualqu'un",
+    "settingsModified": "Los paramètres del grop foguèron modificats per <strong>{participant}</strong>.",
+    "expenseCreated": "Despensa <em>{expense}</em> creada per <strong>{participant}</strong>.",
+    "expenseUpdated": "Despensa <em>{expense}</em> actualizada por <strong>{participant}</strong>.",
+    "expenseDeleted": "Despensa <em>{expense}</em> suprimida per <strong>{participant}</strong>.",
     "Groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -504,19 +556,24 @@
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
       "older": "Older"
-    }
+    },
+    "loadMore": "Cargar mai",
+    "loading": "Activitat de cargament…",
+    "unknown": "Activitat desconeguda"
   },
   "Information": {
-    "title": "Information",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
-    "empty": "No group information yet."
+    "title": "Informacion",
+    "description": "Utilizatz aqueste luòc per apondre quina informacion que siá que pòt èsser pertinenta pels participants del grop.",
+    "empty": "Pas d'informacion del grop encara."
   },
   "Settings": {
-    "title": "Settings"
+    "title": "Paramètres",
+    "saved": "Lo grop mes a jorn",
+    "savedDescription": "Vòstras modificacions son estadas enregistradas."
   },
   "Share": {
-    "title": "Share",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "title": "Partatjar",
+    "description": "Per que los autres participants pòscan veire lo grop e apondre de despensas, partejatz son URL amb eles.",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Warning!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Partatjar",
+    "copy": "Còpiar lo ligam",
+    "url": "Ligam del grop"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -542,8 +602,11 @@
     "paidByRequired": "You must select a participant.",
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
-    "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "amountSum": "La soma de montants deu èsser egala a la quantitat de despensa.",
+    "percentageSum": "La soma dels percentatges deu èsser egala a 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Search category...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Mesa a jorn disponibla",
+    "updateDescription": "Una novèla version de pysplit es disponibla.",
+    "reload": "Recargar",
+    "updating": "A jorn...",
+    "offlineReady": "Lèst per trabalhar fòra linha",
+    "offlineReadyDescription": "Lo shell de l'aplicacion es en escondedor. Dobrissètz un grop un còp en linha per gardar sas donadas.",
+    "dismiss": "Tampar",
+    "install": "Installar l'aplicacion",
+    "refreshApp": "Actualizar l'aplicacion",
+    "refreshAppHint": "Escafatz los fichièrs en cache e tornatz cargar la darrièra version. Vòstras donadas enregistradas demòran sus aqueste periferic."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Tablèu de bòrd d'administracion",
+    "description": "Gerir los ròtles d'utilizaire, las permissions d'accès a la plataforma e susvelhar las mesuras del sistèma.",
+    "totalGroups": "Total de grops",
+    "totalExpenses": "Despensas totalas",
+    "registeredUsers": "Utilizaires enregistrats",
+    "userManagement": "Gestion de l'utilizaire e nivèls de permissions",
+    "accessDenied": "Accès refusat",
+    "accessDeniedDescription": "Lo tablèu de bòrd d'administracion es restrench als utilizaires del nivèl d'administrator.",
+    "delete": "Suprimir",
+    "deleteError": "Pogut pas suprimir",
+    "email": "Corrièl",
+    "expenses": "despensas",
+    "groupDeleted": "Grop suprimit",
+    "groupManagement": "Grops",
+    "groupManagementDescription": "Suprimir los grops e inspeccionar l'utilizacion.",
+    "groups": "grops",
+    "loadMoreGroups": "Cargar mai de grops",
+    "loadMoreUsers": "Cargar mai d'utilizaires",
+    "loading": "Lo tablèu de bòrd en cargament...",
+    "loadingMore": "En cargament...",
+    "participants": "participants",
+    "preauthorize": "Preautorizar un utilizaire",
+    "preauthorizeAction": "Preautorizar",
+    "preauthorizeError": "Poguèt pas preautorizar l'utilizaire",
+    "preauthorized": "Utilizaire preautorizat",
+    "returnToGroups": "Tornar a mos grops",
+    "searchGroups": "Cercar de grops",
+    "searchUsers": "Cercar d'utilizaires",
+    "signInDescription": "Lo tablèu de bòrd d'administracion demanda un compte d'administrator.",
+    "signInTitle": "Connexion obligatòria",
+    "tier": "Nivèl",
+    "tierError": "Impossible de metre a jorn lo nivèl",
+    "tierFor": "Nivèl per",
+    "tierUpdated": "Nivèl mes a jorn",
+    "userDeleted": "Utilizaire suprimit",
+    "userTier": "Nivèls"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Emmagazinatge fòra linha",
+    "loading": "Verificant aqueste periferic...",
+    "unsupported": "Aqueste navigador pòt pas raportar l'estat d'emmagazinatge.",
+    "usage": "{{used}} de {{quota}} utilizat",
+    "unknown": "desconegut",
+    "persisted": "L'emmagazinatge es persistent sus aqueste periferic.",
+    "notPersisted": "Lo navigador pòt expulsar de donadas fòra linha se lo periferic manca d'espaci.",
+    "keep": "Conservar las donadas sus aqueste periferic",
+    "refresh": "Actualizar",
+    "critical": "L'emmagazinatge es gaireben plen. Exportatz una còpia de seguretat ara, puèi suprimissètz los grops non utilizats.",
+    "warning": "L'emmagazinatge s'emplena. Una còpia de seguretat es recomandada."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Sincronizacion en espèra",
+    "expense": "Sincronizacion en espèra"
+  },
+  "Attachments": {
+    "assignItems": "Assignar los articles del rebut",
+    "extractedItems": "IA extraguèt d'elements",
+    "help": "Los imatges son comprimits abans lo mandadís. Los PDF son gardats coma de pèças juntas e dobèrts dins un onglet novèl.",
+    "open": "Dobrir",
+    "openInNewTab": "Dobrir dins un onglet novèl",
+    "pdfPreviewUnavailable": "Los apercebuts PDF se dobrisson dins un onglet a despart.",
+    "pending": "En espèra de mandadís",
+    "preview": "Apercebut",
+    "previewAction": "Apercebut",
+    "previewNamed": "Apercebut {{name}}",
+    "receipt": "Rebut de botiga",
+    "saveToAssignItems": "Enregistratz la despensa abans, puèi assignatz aqueles elements als participants.",
+    "scanComplete": "Rebut escanejat",
+    "scanCompleteDescription": "Assignatz los elements extraches als participants.",
+    "scanError": "Lo rebut a pas pogut èsser escanejat",
+    "scanWithAi": "Escanar amb l'IA",
+    "scanning": "Escanar...",
+    "view": "Afichar las pèças juntas",
+    "attachment": "Annèxa",
+    "onlyImagesPdf": "Sonque los imatges e los fichièrs PDF son preses en carga."
+  },
+  "Backup": {
+    "downloaded": "Sauvagarda telecargada.",
+    "export": "Exportar la còpia de seguretat",
+    "failed": "La salvagarda a fracassat.",
+    "restore": "Restablir la còpia de seguretat",
+    "restoreFailed": "La restauracion a fracassat.",
+    "restoreLabel": "Restablir lo fichièr de sauvagarda",
+    "restored": "Sauvagarda restablida. En recargament..."
+  },
+  "Common": {
+    "addGroup": "Apondre lo grop",
+    "close": "Tampar",
+    "closeDialog": "Barrar la bóstia de dialòg",
+    "dismiss": "Ignorar",
+    "dismissNotification": "Notificacion de descartament",
+    "error": "Quicòm s'es marrit",
+    "expenseNotFound": "Despensa pas trobada",
+    "loading": "En cargament...",
+    "menu": "Menú",
+    "retry": "Tornatz ensajar",
+    "select": "Seleccionatz...",
+    "unknown": "desconegut",
+    "user": "Utilizaire"
+  },
+  "CreateGroup": {
+    "approvalContact": "La creacion de grops de despensas novèls demanda l'autorizacion d'un administrator. Mercés de contactar vòstre administrator d'instància per promòure vòstre compte al nivèl Creator de grop.",
+    "approvalDescription": "Vòstre compte es actualament dins lo nivèl Utilizaire de sincronizacion. Podètz participar a quin grop que siá partejat amb vos e los sincronizar sus totes vòstres periferics.",
+    "approvalTitle": "La creacion de grop demanda l'aprobacion",
+    "authRequiredDescription": "Per crear de novèls grops de despensas, mercés de vos connectar amb un compte extèrne. Los participants del grop convidats poiràn encara s'i inscriure sens fregament via vòstre ligam de grop sens se connectar.",
+    "authRequiredTitle": "Autentificacion requerida",
+    "returnToGroups": "Tornar a mos grops",
+    "signIn": "Connectatz-vos per crear un grop"
+  },
+  "GroupTabs": {
+    "Expenses": "Despensas",
+    "Balances": "Saldes",
+    "Information": "Informacion",
+    "Stats": "Estatisticas",
+    "Activity": "Activitat",
+    "Settings": "Paramètres",
+    "label": "Seccions de grop"
+  },
+  "Login": {
+    "title": "Connectatz-vos a Spliit",
+    "description": "Connectatz-vos amb un compte extèrne per activar la sincronizacion de grops entre periferics.",
+    "google": "Contunhar amb Google",
+    "github": "Contunhar amb GitHub",
+    "noProviders": "Cap de provesidor OAuth es pas configurat. Definir AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET per activar la connexion."
+  },
+  "NotFound": {
+    "title": "Pagina pas trobada",
+    "description": "Verificatz l'URL e ensajatz tornarmai.",
+    "groupTitle": "Aqueste grop existís pas.",
+    "groupDescription": "Verificatz l'URL o demandatz un novèl ligam d'invitacion."
+  },
+  "SyncStatus": {
+    "offlinePending": "fòra linha — modificacions en cors : {{count}}",
+    "offlineSaved": "fòra linha — mòstra de donadas enregistradas",
+    "syncing": "Sincronizacion...",
+    "error": "Error de sincronizacion : {{error}}",
+    "retryToContinue": "tornatz ensajar de contunhar",
+    "conflicts": "Conflictes que necessitan de revision: {{count}}",
+    "failed": "Modificacions que poguèron pas èsser sincronizadas : {{count}}",
+    "pending": "Modificacions en espèra: {{count}}",
+    "retryFailed": "Reensajar las modificacions fracassadas",
+    "discardFailed": "Descartar las modificacions fracassadas",
+    "resolveConflicts": "Resolver los conflictes",
+    "syncNow": "Sincronizar ara",
+    "dialogTitle": "Resolver los conflictes",
+    "dialogDescription": "Aquestas modificacions an cambiat los meteisses enregistraments sus un autre periferic. Causissètz çò que volètz gardar.",
+    "noConflicts": "Pas de conflictes a resòlvre.",
+    "serverVersion": "Version del servidor {{version}} · modificacion locala gardada dins la còla de conflicte",
+    "keepMine": "Conservar ma version",
+    "useServer": "Utilizar lo servidor",
+    "duplicate": "Duplicar coma novèl"
+  },
+  "Theme": {
+    "toggle": "Bascular lo tèma",
+    "light": "Clar",
+    "dark": "Escur",
+    "system": "Sistèma"
   }
 }

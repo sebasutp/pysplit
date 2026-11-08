@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grupper"
+    "groups": "Grupper",
+    "adminDashboard": "Admin instrumentpanel",
+    "language": "Språk",
+    "signIn": "Logga in",
+    "signOut": "Logga ut",
+    "userMenu": "Användarmeny"
   },
   "Footer": {
     "madeIn": "Gjord i Zürich, Schweiz 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Förra månaden",
       "earlierThisYear": "Tidigare detta år",
       "lastYear": "Förra året",
-      "older": "Äldre"
-    }
+      "older": "Äldre",
+      "today": "Idag",
+      "week": "Tidigare denna vecka",
+      "month": "Tidigare denna månad",
+      "year": "Tidigare detta år"
+    },
+    "clearSearch": "Rensa",
+    "exportError": "Kunde inte exportera kostnaderna",
+    "filterFrom": "Från",
+    "filterTo": "Till",
+    "loadMore": "Ladda mer",
+    "loading": "Laddar utgifter…",
+    "loadingMore": "Laddar...",
+    "search": "Sök utgifter",
+    "showingCount": "Visar {{shown}} av {{total}} utgifter."
   },
   "ExpenseCard": {
     "paidBy": "Betald av <strong>{paidBy}</strong> för <paidFor></paidFor>",
     "everyone": "alla",
     "receivedBy": "Mottagen av <strong>{paidBy}</strong> för <paidFor></paidFor>",
     "yourBalance": "Din balans:",
-    "notInvolved": "Du är inte involverad"
+    "notInvolved": "Du är inte involverad",
+    "paidByPlain": "Betald av {{paidBy}} för {{paidFor}}",
+    "receivedByPlain": "Mottaget av {{paidBy}} för {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Mina grupper",
@@ -60,11 +80,11 @@
       "orAsk": "eller fråga en vän att skicka länken till en existerande."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Ditt totala saldo",
+      "description": "Ditt kombinerade saldo för alla dina grupper.",
+      "owedToYou": "Du är skyldig",
+      "youOwe": "Du är skyldig",
+      "settledUp": "Ni är alla uppbyggda i era grupper."
     },
     "recent": "Senaste grupper",
     "starred": "Stjärnmärkta grupper",
@@ -83,7 +103,7 @@
       "title": "Lägg till en grupp via URL",
       "description": "Om en grupp har delats med dig, kan du klistra in URL här för att lägga till den till din lista.",
       "error": "Hoppsan, vi hittade inte gruppen från URL du angav…",
-      "urlMode": "Enter URL",
+      "urlMode": "Ange URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Denna grupp existerar inte.",
       "link": "Gå till nyligen besökta grupper"
-    }
+    },
+    "moreOptions": "Fler alternativ",
+    "participants": "deltagare",
+    "star": "Stjärngrupp",
+    "unstar": "Avstjärna grupp"
   },
   "GroupForm": {
     "title": "Grupp information",
@@ -129,7 +153,10 @@
       "add": "Lägg till deltagare",
       "John": "John",
       "Jane": "Jonna",
-      "Jack": "Jonas"
+      "Jack": "Jonas",
+      "cannotRemove": "Denna deltagare är en del av en kostnad och kan inte tas bort.",
+      "indexLabel": "Deltagare #{{index}}",
+      "remove": "Ta bort deltagare {{index}}"
     },
     "Settings": {
       "title": "Lokala inställningar",
@@ -145,7 +172,8 @@
       "create": "Skapa",
       "creating": "Skapar…",
       "cancel": "Avbryt"
-    }
+    },
+    "saveError": "Det gick inte att spara gruppen."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "För att ange en annan valuta per utgift och konvertera belopp, välj en icke-anpassad valuta för gruppen.",
     "originalAmountField": {
       "label": "Belopp att konvertera",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Belopp att överföra",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "Sparar…",
     "cancel": "Avbryt",
     "reimbursement": "Ersättning",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Tilldela kvittoartiklar",
+    "conflict": "Denna utgift har ändrats av någon annan. Ladda om sidan och försök igen.",
+    "conflictTitle": "Kostnaden har ändrats på annat håll",
+    "deleteError": "Det gick inte att ta bort utgiften.",
+    "pendingReceiptTotal": "Ett kvitto som skannats när det är offline är klart.",
+    "pendingReceiptTotalApply": "Använd skannad total",
+    "pendingReceiptTotalDismiss": "Avvisa",
+    "saveError": "Kunde inte spara utgiften."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Något fel uppstod när dokumentet laddades upp. Försök igen senare eller välj en annan fil.",
       "retry": "Försök igen"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "I kö. Kvittot kommer att skannas när du återansluter.",
+    "offline": "Skanningen återupptas när du är online.",
+    "scanFailed": "AI kunde inte läsa detta kvitto. Kontrollera serverns AI-konfiguration och försök igen.",
+    "scanning": "Skannar..."
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Kvittorader",
+    "backToExpense": "Tillbaka till bekostnad",
+    "merchant": "Butiksnamn",
+    "printedTotal": "Totalt tryckt på kvittot",
+    "noReceipt": "Inget kvitto är kopplat till denna utgift ännu.",
+    "empty": "Inga föremål ännu. Lägg till en för att börja dela.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Det gick inte att spara ändringen",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Lägg till objekt",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Lägg till objekt",
+      "nameLabel": "Namn",
+      "quantityLabel": "Kvantitet",
+      "amountLabel": "Summa",
+      "sharedLabel": "Delad (helräkningsavgift)",
+      "add": "Lägg till",
+      "cancel": "Avbryt"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} av {total}",
+      "remaining": "{quantity} återstår",
+      "assign": "Tilldela",
+      "edit": "Redigera",
+      "delete": "Radera",
+      "removePortion": "Ta bort allokerad andel",
+      "editTitle": "Redigera objekt",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "deleteConfirm": "Vill du ta bort det här objektet?",
+      "deleteDescription": "Detta tar bort objektet och dess tilldelningar."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Otilldelad",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Delad",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Tilldela objekt",
+      "description": "Välj vem som betalar för \"{name}\".",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Dela jämnt",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Anpassad uppdelning",
+      "customHint": "Ange kvantiteter i enheter för varje mål.",
+      "shared": "Delad",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Den tilldelade kvantiteten överstiger artikelkvantiteten.",
+      "confirm": "Tilldela",
+      "cancel": "Avbryt"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Delad",
+      "unassigned": "Otilldelad",
+      "optOut": "Delar objekt som inte har tilldelats",
+      "reconciles": "Balanserad",
+      "offBy": "Skillnad på {amount}",
+      "itemsTotal": "Summa kvittoartiklar",
+      "apply": "Tillämpa på utgiften",
+      "allOptedOut": "Alla valde bort, men vissa objekt är fortfarande otilldelade.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Kvittovärdena skiljer sig · Ansök igen"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Kostnad uppdaterad",
+      "description": "Kvittoposterna applicerades på utgiften."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Det gick inte att tillämpa kvittot"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Uppdatera utgiften?",
+      "description": "Utgiftssumman skiljer sig från summan av kvittoposterna. Genom att ansöka skrivs utgiftsbeloppet och dess uppdelning över.",
+      "total": "totalt {current} → {new}",
+      "cancel": "Avbryt",
+      "confirm": "Tillämpa"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Skanning i kö",
+    "scanPendingDescription": "Bilden sparas på den här enheten och kommer att skannas när du är online igen.",
+    "offlineQueue": "Du är offline. Bifoga fotot nu så skannas det när du återansluter.",
+    "disabled": "Smart split är inte aktiverat på den här servern. Kvittoskanning är en funktion som endast är online.",
+    "extracted": "Kvitto skannat",
+    "extractedDescription": "Tilldela de extraherade objekten nedan.",
+    "loading": "Läser in kvitto...",
+    "optOutTitle": "Opt-out",
+    "scanError": "Det gick inte att skanna kvittot.",
+    "scanUnavailable": "Kontrollera serverns AI-konfiguration och försök igen.",
+    "scanning": "Skannar kvitto...",
+    "upload": "Ladda upp ett kvittofoto"
   },
   "Balances": {
     "title": "Balanser",
@@ -415,20 +462,22 @@
       "description": "Här är förslag på optimerade ersättningar mellan deltagarna.",
       "noImbursements": "Det verkar som att er grupp inte behöver någon ersättning 😁",
       "owes": "<strong>{from}</strong> är skyldig <strong>{to}</strong>",
-      "markAsPaid": "Markera som betald"
-    }
+      "markAsPaid": "Markera som betald",
+      "owesPlain": "{{from}} är skyldig {{to}}"
+    },
+    "loading": "Laddar saldon..."
   },
   "Stats": {
     "title": "Statistik",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Hela tiden",
+      "thisMonth": "Denna månad",
+      "last30": "Senaste 30 dagarna",
+      "thisYear": "I år",
+      "custom": "Anpassat sortiment",
+      "from": "Från",
+      "to": "Till"
     },
     "Totals": {
       "title": "Summor",
@@ -440,50 +489,53 @@
       "yourShare": "Din totala andel"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Sammanfattning",
+      "description": "Nyckeltal för den valda perioden.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Utgifter",
+      "averageExpense": "Genomsnittlig kostnad",
+      "largestExpense": "Största utgiften",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Spendera över tid",
+      "description": "Totala grupputgifter per månad. Välj en månad för att se dess utgifter.",
+      "empty": "Det finns inga utgifter ännu.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Kostnader under den här månaden för den valda perioden.",
+      "detailsEmpty": "Det finns inga utgifter den här månaden.",
+      "showExpensesPlain": "Visa utgifter för {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Utgifter per deltagare",
+      "description": "Hur mycket varje deltagare betalade och deras andel av kostnaderna.",
+      "empty": "Det finns inga utgifter ännu.",
+      "participant": "Deltagare",
+      "paid": "Betalt",
       "count": "Count",
-      "share": "Share"
+      "share": "Dela"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Utgifter per kategori",
+      "description": "Totalt belopp som spenderats i varje kategori. Välj en kategori för att se dess utgifter.",
+      "empty": "Det finns inga utgifter ännu.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Kostnader i denna kategori för den valda perioden.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Visa utgifter för {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Återkommande utgifter",
+      "description": "Beräknad kostnad för koncernens aktiva återkommande kostnader.",
+      "estimatedMonthly": "Beräknad månadskostnad",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Läser in statistik..."
   },
   "Activity": {
     "title": "Aktivitet",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Tidigare detta år",
       "lastYear": "Förra året",
       "older": "Äldre"
-    }
+    },
+    "loadMore": "Ladda mer",
+    "loading": "Laddar aktivitet...",
+    "unknown": "Okänd aktivitet"
   },
   "Information": {
     "title": "Information",
@@ -512,7 +567,9 @@
     "empty": "Ingen grupp information ännu."
   },
   "Settings": {
-    "title": "Inställningar"
+    "title": "Inställningar",
+    "saved": "Gruppen uppdaterad",
+    "savedDescription": "Dina ändringar har sparats."
   },
   "Share": {
     "title": "Dela",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Dela",
+    "copy": "Kopiera länk",
+    "url": "Grupplänk"
   },
   "SchemaErrors": {
     "min1": "Ange minst ett tecken.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Kostnaden måste betalas för minst en deltagare.",
     "noZeroShares": "Alla delningar måste vara högre än 0.",
     "amountSum": "Summan av beloppen måste vara lika med utgiftsbeloppet.",
-    "percentageSum": "Summan av procentsatserna måste vara lika med 100."
+    "percentageSum": "Summan av procentsatserna måste vara lika med 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Sök kategori...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Uppdatering tillgänglig",
+    "updateDescription": "En ny version av pysplit är tillgänglig.",
+    "reload": "Ladda om",
+    "updating": "Uppdaterar...",
+    "offlineReady": "Redo att arbeta offline",
+    "offlineReadyDescription": "Applikationsskalet cachelagras. Öppna en grupp en gång när du är online för att behålla dess data.",
+    "dismiss": "Stäng",
+    "install": "Installera appen",
+    "refreshApp": "Uppdatera appen",
+    "refreshAppHint": "Rensa cachade filer och ladda om den senaste versionen. Din sparade data finns kvar på den här enheten."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Administrationsinstrumentpanel",
+    "description": "Hantera användarroller, plattformsåtkomstbehörigheter och övervaka systemstatistik.",
+    "totalGroups": "Totalt antal grupper",
+    "totalExpenses": "Totala utgifter",
+    "registeredUsers": "Registrerade användare",
+    "userManagement": "Användarhantering och behörighetsnivåer",
+    "accessDenied": "Åtkomst nekad",
+    "accessDeniedDescription": "Administrationsinstrumentpanelen är begränsad till användare i administratörsnivån.",
+    "delete": "Radera",
+    "deleteError": "Kunde inte radera",
+    "email": "E-post",
+    "expenses": "utgifter",
+    "groupDeleted": "Grupp raderad",
+    "groupManagement": "Grupper",
+    "groupManagementDescription": "Ta bort grupper och inspektera användningen.",
+    "groups": "grupper",
+    "loadMoreGroups": "Ladda fler grupper",
+    "loadMoreUsers": "Ladda fler användare",
+    "loading": "Läser in instrumentpanelen...",
+    "loadingMore": "Laddar...",
+    "participants": "deltagare",
+    "preauthorize": "Förauktorisera en användare",
+    "preauthorizeAction": "Förauktorisera",
+    "preauthorizeError": "Kunde inte förauktorisera användaren",
+    "preauthorized": "Användare förauktoriserad",
+    "returnToGroups": "Återgå till Mina grupper",
+    "searchGroups": "Sök efter grupper",
+    "searchUsers": "Sök användare",
+    "signInDescription": "Administrationsinstrumentpanelen kräver ett administratörskonto.",
+    "signInTitle": "Logga in krävs",
+    "tier": "Nivå",
+    "tierError": "Det gick inte att uppdatera nivån",
+    "tierFor": "Tier för",
+    "tierUpdated": "Nivå uppdaterad",
+    "userDeleted": "Användare raderad",
+    "userTier": "Nivåer"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Offlinelagring",
+    "loading": "Kontrollerar den här enheten...",
+    "unsupported": "Den här webbläsaren kan inte rapportera lagringsstatus.",
+    "usage": "{{used}} av {{quota}} används",
+    "unknown": "okänt",
+    "persisted": "Lagringen är beständig på den här enheten.",
+    "notPersisted": "Webbläsaren kan ta bort offlinedata om enheten får ont om utrymme.",
+    "keep": "Behåll data på den här enheten",
+    "refresh": "Uppdatera",
+    "critical": "Förrådet är nästan fullt. Exportera en säkerhetskopia nu och ta sedan bort oanvända grupper.",
+    "warning": "Lagringen börjar bli full. En säkerhetskopia rekommenderas."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Väntar på synkronisering",
+    "expense": "Väntar på synkronisering"
+  },
+  "Attachments": {
+    "assignItems": "Tilldela kvittoartiklar",
+    "extractedItems": "AI extraherade föremål",
+    "help": "Bilder komprimeras före uppladdning. PDF-filer sparas som bilagor och öppnas på en ny flik.",
+    "open": "Öppna",
+    "openInNewTab": "Öppna i en ny flik",
+    "pdfPreviewUnavailable": "PDF-förhandsvisningar öppnas på en separat flik.",
+    "pending": "Väntar på uppladdning",
+    "preview": "Förhandsgranska",
+    "previewAction": "Förhandsgranska",
+    "previewNamed": "Förhandsgranska {{name}}",
+    "receipt": "Butikskvitto",
+    "saveToAssignItems": "Spara utgiften först och tilldela sedan dessa poster till deltagarna.",
+    "scanComplete": "Kvitto skannat",
+    "scanCompleteDescription": "Tilldela de extraherade föremålen till deltagarna.",
+    "scanError": "Det gick inte att skanna kvittot",
+    "scanWithAi": "Skanna med AI",
+    "scanning": "Skannar...",
+    "view": "Visa bilagor",
+    "attachment": "Bilaga",
+    "onlyImagesPdf": "Endast bilder och PDF-filer stöds."
+  },
+  "Backup": {
+    "downloaded": "Säkerhetskopiering nedladdad.",
+    "export": "Exportera säkerhetskopia",
+    "failed": "Säkerhetskopieringen misslyckades.",
+    "restore": "Återställ säkerhetskopia",
+    "restoreFailed": "Återställningen misslyckades.",
+    "restoreLabel": "Återställ säkerhetskopia",
+    "restored": "Säkerhetskopieringen återställd. Laddar om..."
+  },
+  "Common": {
+    "addGroup": "Lägg till grupp",
+    "close": "Close",
+    "closeDialog": "Stäng dialogrutan",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Avvisa meddelande",
+    "error": "Något gick fel",
+    "expenseNotFound": "Utgift hittades inte",
+    "loading": "Laddar...",
+    "menu": "Meny",
+    "retry": "Försök igen",
+    "select": "Välj...",
+    "unknown": "okänt",
+    "user": "Användare"
+  },
+  "CreateGroup": {
+    "approvalContact": "Skapa nya utgiftsgrupper kräver auktorisering från en administratör. Vänligen kontakta din instansadministratör för att marknadsföra ditt konto till Group Creator-nivån.",
+    "approvalDescription": "Ditt konto är för närvarande i Sync User-nivån. Du kan delta i alla grupper som delas med dig och synkronisera dem på alla dina enheter.",
+    "approvalTitle": "Skapande av grupp kräver godkännande",
+    "authRequiredDescription": "För att skapa nya utgiftsgrupper, vänligen logga in med ett externt konto. Inbjudna gruppdeltagare kommer fortfarande att kunna gå med friktionsfritt via din grupplänk utan att logga in.",
+    "authRequiredTitle": "Autentisering krävs",
+    "returnToGroups": "Återgå till Mina grupper",
+    "signIn": "Logga in för att skapa grupp"
+  },
+  "GroupTabs": {
+    "Expenses": "Utgifter",
+    "Balances": "Balanser",
+    "Information": "Information",
+    "Stats": "Statistik",
+    "Activity": "Aktivitet",
+    "Settings": "Inställningar",
+    "label": "Gruppsektioner"
+  },
+  "Login": {
+    "title": "Logga in på Spliit",
+    "description": "Logga in med ett externt konto för att aktivera gruppsynkronisering över flera enheter.",
+    "google": "Fortsätt med Google",
+    "github": "Fortsätt med GitHub",
+    "noProviders": "Inga OAuth-leverantörer är konfigurerade. Ställ in AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET för att aktivera inloggning."
+  },
+  "NotFound": {
+    "title": "Sidan hittades inte",
+    "description": "Kontrollera webbadressen och försök igen.",
+    "groupTitle": "Denna grupp existerar inte.",
+    "groupDescription": "Kontrollera webbadressen eller be om en ny inbjudningslänk."
+  },
+  "SyncStatus": {
+    "offlinePending": "Offline – väntande ändringar: {{count}}",
+    "offlineSaved": "Offline — visar sparad data",
+    "syncing": "Synkroniseras...",
+    "error": "Synkroniseringsfel: {{error}}",
+    "retryToContinue": "försök igen för att fortsätta",
+    "conflicts": "Konflikter som behöver granskas: {{count}}",
+    "failed": "Ändringar som inte kunde synkroniseras: {{count}}",
+    "pending": "Väntande ändringar: {{count}}",
+    "retryFailed": "Försök igen med misslyckade ändringar",
+    "discardFailed": "Kasta misslyckade ändringar",
+    "resolveConflicts": "Lös konflikter",
+    "syncNow": "Synkronisera nu",
+    "dialogTitle": "Lös konflikter",
+    "dialogDescription": "Dessa redigeringar ändrade samma poster på en annan enhet. Välj vad du vill behålla.",
+    "noConflicts": "Inga konflikter att lösa.",
+    "serverVersion": "Serverversion {{version}} · lokal redigering hålls i konfliktkön",
+    "keepMine": "Behåll min version",
+    "useServer": "Använd server",
+    "duplicate": "Duplicera som ny"
+  },
+  "Theme": {
+    "toggle": "Växla tema",
+    "light": "Ljus",
+    "dark": "Mörk",
+    "system": "System"
   }
 }

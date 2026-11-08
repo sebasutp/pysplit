@@ -5,11 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useTheme } from '../../hooks/useTheme'
 
-const OPTIONS = [
-  ['light', 'Light'],
-  ['dark', 'Dark'],
-  ['system', 'System'],
-]
+export const THEME_OPTIONS = ['light', 'dark', 'system']
 
 export function ThemeToggle() {
   const { t } = useTranslation()
@@ -33,7 +29,7 @@ export function ThemeToggle() {
           role="menu"
           className="absolute right-0 top-9 z-40 w-32 rounded-md border border-border bg-popover p-1 text-sm shadow-lg"
         >
-          {OPTIONS.map(([value, label]) => (
+          {THEME_OPTIONS.map((value) => (
             <button
               key={value}
               type="button"
@@ -44,7 +40,7 @@ export function ThemeToggle() {
                 setOpen(false)
               }}
             >
-              {t(`Theme.${value}`, label)}
+              {t(`Theme.${value}`)}
             </button>
           ))}
         </div>

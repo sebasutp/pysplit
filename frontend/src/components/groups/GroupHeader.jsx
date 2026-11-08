@@ -8,21 +8,20 @@ import { Button } from '../ui/Button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/Dialog'
 import { Input } from '../ui/Input'
 
-/** @type {{key: string, path: string}[]} */
-const TABS = [
+export const GROUP_TABS = /** @type {{key: string, path: string}[]} */ ([
   { key: 'Expenses', path: 'expenses' },
   { key: 'Balances', path: 'balances' },
   { key: 'Information', path: 'information' },
   { key: 'Stats', path: 'stats' },
   { key: 'Activity', path: 'activity' },
   { key: 'Settings', path: 'edit' },
-]
+])
 
 /** @param {any} group */
 function visibleTabs(group) {
   const hasInformation =
     typeof group?.information === 'string' && group.information.trim().length > 0
-  return TABS.filter((tab) => tab.key !== 'Information' || hasInformation)
+  return GROUP_TABS.filter((tab) => tab.key !== 'Information' || hasInformation)
 }
 
 /**

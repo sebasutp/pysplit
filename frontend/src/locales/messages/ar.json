@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "المجموعات"
+    "groups": "المجموعات",
+    "adminDashboard": "لوحة تحكم المشرف",
+    "language": "اللغة",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "userMenu": "قائمة المستخدم"
   },
   "Footer": {
     "madeIn": "صُنع في زيورخ، سويسرا 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "الشهر الماضي",
       "earlierThisYear": "في وقت سابق من هذا العام",
       "lastYear": "العام الماضي",
-      "older": "أقدم"
-    }
+      "older": "أقدم",
+      "today": "اليوم",
+      "week": "في وقت سابق من هذا الأسبوع",
+      "month": "في وقت سابق من هذا الشهر",
+      "year": "في وقت سابق من هذا العام"
+    },
+    "clearSearch": "واضح",
+    "exportError": "لا يمكن تصدير النفقات",
+    "filterFrom": "من",
+    "filterTo": "ل",
+    "loadMore": "تحميل المزيد",
+    "loading": "جارٍ تحميل النفقات…",
+    "loadingMore": "جارٍ التحميل…",
+    "search": "البحث في النفقات",
+    "showingCount": "عرض {{shown}} من {{total}} النفقات."
   },
   "ExpenseCard": {
     "paidBy": "دفعه <strong>{paidBy}</strong> لـ <paidFor></paidFor>",
     "everyone": "الجميع",
     "receivedBy": "استلمه <strong>{paidBy}</strong> لـ <paidFor></paidFor>",
     "yourBalance": "رصيدك:",
-    "notInvolved": "أنت غير مشارك"
+    "notInvolved": "أنت غير مشارك",
+    "paidByPlain": "مدفوع بواسطة {{paidBy}} مقابل {{paidFor}}",
+    "receivedByPlain": "تم الاستلام بواسطة {{paidBy}} لـ {{paidFor}}"
   },
   "Groups": {
     "myGroups": "مجموعاتي",
@@ -60,11 +80,11 @@
       "orAsk": "أو اطلب من صديق إرسال رابط مجموعة حالية."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "رصيدك الإجمالي",
+      "description": "رصيدك المجمع في جميع مجموعاتك.",
+      "owedToYou": "أنت مستحق",
+      "youOwe": "أنت مدين",
+      "settledUp": "لقد استقرتم جميعًا عبر مجموعاتكم."
     },
     "recent": "المجموعات الأخيرة",
     "starred": "المجموعات المميزة",
@@ -83,7 +103,7 @@
       "title": "إضافة مجموعة عبر الرابط",
       "description": "إذا تمت مشاركة مجموعة معك، يمكنك لصق رابطها هنا لإضافتها إلى قائمتك.",
       "error": "عذرًا، لم نتمكن من العثور على المجموعة من الرابط الذي أدخلته…",
-      "urlMode": "Enter URL",
+      "urlMode": "أدخل عنوان URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "هذه المجموعة غير موجودة.",
       "link": "الذهاب إلى المجموعات التي زرتها مؤخرًا"
-    }
+    },
+    "moreOptions": "المزيد من الخيارات",
+    "participants": "المشاركين",
+    "star": "مجموعة النجوم",
+    "unstar": "إلغاء تمييز المجموعة بنجمة"
   },
   "GroupForm": {
     "title": "معلومات المجموعة",
@@ -129,7 +153,10 @@
       "add": "إضافة مشارك",
       "John": "أحمد",
       "Jane": "سارة",
-      "Jack": "خالد"
+      "Jack": "خالد",
+      "cannotRemove": "هذا المشارك جزء من النفقات ولا يمكن إزالته.",
+      "indexLabel": "المشارك #{{index}}",
+      "remove": "إزالة المشارك {{index}}"
     },
     "Settings": {
       "title": "الإعدادات المحلية",
@@ -145,7 +172,8 @@
       "create": "إنشاء",
       "creating": "جاري الإنشاء…",
       "cancel": "إلغاء"
-    }
+    },
+    "saveError": "تعذر حفظ المجموعة."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "لتحديد عملة مختلفة لكل مصروف وتحويل المبالغ، اختر عملة غير مخصصة للمجموعة.",
     "originalAmountField": {
       "label": "المبلغ المراد تحويله",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "المبلغ المراد تحويله",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "جاري الحفظ…",
     "cancel": "إلغاء",
     "reimbursement": "تسوية",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "تخصيص بنود الإيصال",
+    "conflict": "تم تغيير هذه النفقات من قبل شخص آخر. أعد تحميل الصفحة ثم حاول مرة أخرى.",
+    "conflictTitle": "تغيرت النفقات في مكان آخر",
+    "deleteError": "لا يمكن حذف النفقات.",
+    "pendingReceiptTotal": "الإيصال الذي تم مسحه ضوئيًا أثناء عدم الاتصال بالإنترنت جاهز.",
+    "pendingReceiptTotalApply": "استخدام الإجمالي الممسوحة ضوئيا",
+    "pendingReceiptTotalDismiss": "استبعاد",
+    "saveError": "لا يمكن حفظ النفقات."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "حدث خطأ ما أثناء رفع المستند. يرجى المحاولة لاحقًا أو تحديد ملف آخر.",
       "retry": "إعادة المحاولة"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "في قائمة الانتظار. سيتم فحص الإيصال ضوئيًا بعد إعادة الاتصال.",
+    "offline": "يتم استئناف المسح عندما تكون متصلاً بالإنترنت.",
+    "scanFailed": "لم يتمكن الذكاء الاصطناعي من قراءة هذا الإيصال. تحقق من تكوين الذكاء الاصطناعي للخادم وحاول مرة أخرى.",
+    "scanning": "جارٍ المسح…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "بنود الإيصال",
+    "backToExpense": "العودة إلى النفقات",
+    "merchant": "اسم المتجر",
+    "printedTotal": "المجموع مطبوع على الإيصال",
+    "noReceipt": "لا يوجد إيصال مرتبط بهذه النفقات حتى الآن.",
+    "empty": "لا توجد عناصر بعد. أضف واحدًا لبدء التقسيم.",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "تعذر حفظ التغيير",
+      "description": "أعدنا تحميل الإيصال حتى تتمكن من المحاولة مرة أخرى."
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "إضافة عنصر",
+    "quantitySummary": "{count} · {quantity} وحدات",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "إضافة عنصر",
+      "nameLabel": "الاسم",
+      "quantityLabel": "كمية",
+      "amountLabel": "المبلغ",
+      "sharedLabel": "مشترك (رسوم الفاتورة الكاملة)",
+      "add": "أضف",
+      "cancel": "إلغاء"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{assigned} من {total}",
+      "remaining": "{quantity} متبقٍ",
+      "assign": "تخصيص",
+      "edit": "تحرير",
+      "delete": "حذف",
+      "removePortion": "إزالة الحصة المخصصة",
+      "editTitle": "تحرير العنصر",
+      "nameLabel": "الاسم",
+      "quantityLabel": "الكمية",
+      "amountLabel": "المبلغ",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "deleteConfirm": "هل تريد حذف هذا العنصر؟",
+      "deleteDescription": "يؤدي هذا إلى إزالة العنصر وتعييناته."
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "غير معين",
+      "unassignedHint": "لم يتم تعيينه لأي شخص بعد",
+      "shared": "مشترك",
+      "sharedHint": "يُقسم بالتساوي بين الجميع",
+      "participantHint": "العناصر المعينة إلى {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "تعيين العنصر",
+      "description": "اختر من يدفع ثمن \"{name}\".",
+      "whole": "تعيين العنصر بالكامل",
+      "everyone": "الجميع (مشترك)",
+      "even": "تقسيم بالتساوي",
+      "evenHint": "اختر المشاركين المراد التقسيم بينهم.",
+      "custom": "تقسيم مخصص",
+      "customHint": "أدخل الكميات بالوحدات لكل هدف.",
+      "shared": "مشترك",
+      "selectParticipant": "اختر مشاركًا",
+      "exceeds": "الكمية المخصصة تتجاوز كمية البند.",
+      "confirm": "تخصيص",
+      "cancel": "إلغاء"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "خاصتي",
+      "shared": "مشترك",
+      "unassigned": "غير معين",
+      "optOut": "يشارك العناصر غير المعينة",
+      "reconciles": "متوازن",
+      "offBy": "فرق {amount}",
+      "itemsTotal": "إجمالي بنود الإيصال",
+      "apply": "تطبيق على المصروف",
+      "allOptedOut": "لقد قام الجميع بإلغاء الاشتراك، ولكن لا تزال بعض العناصر غير مخصصة.",
+      "negativeShare": "المجموع السالب يجعل شخصًا مدينًا بأقل من لا شيء. عدّل العناصر قبل التطبيق.",
+      "divergent": "تختلف قيم الاستلام · تقدم مرة أخرى"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "تم تحديث النفقات",
+      "description": "تم تطبيق بنود الاستلام على المصروفات."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "تعذَّر تطبيق الإيصال"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "تحديث النفقات؟",
+      "description": "يختلف إجمالي المصروفات عن إجمالي عناصر الاستلام. سيؤدي التقديم إلى استبدال مبلغ النفقات وتقسيمه.",
+      "total": "الإجمالي {current} → {new}",
+      "cancel": "إلغاء",
+      "confirm": "تطبيق"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "المسح في قائمة الانتظار",
+    "scanPendingDescription": "يتم حفظ الصورة على هذا الجهاز وسيتم مسحها ضوئيًا عند معاودة الاتصال بالإنترنت.",
+    "offlineQueue": "أنت غير متصل. قم بإرفاق الصورة الآن وسيتم مسحها ضوئيًا بعد إعادة الاتصال.",
+    "disabled": "لم يتم تمكين التقسيم الذكي على هذا الخادم. يعد مسح الإيصالات ميزة متاحة عبر الإنترنت فقط.",
+    "extracted": "تم فحص الإيصال",
+    "extractedDescription": "قم بتعيين العناصر المستخرجة أدناه.",
+    "loading": "جارٍ تحميل الإيصال…",
+    "optOutTitle": "إلغاء الاشتراك",
+    "scanError": "لا يمكن مسح الإيصال ضوئيًا.",
+    "scanUnavailable": "تحقق من تكوين الذكاء الاصطناعي للخادم وحاول مرة أخرى.",
+    "scanning": "جارٍ مسح الإيصال…",
+    "upload": "قم بتحميل صورة الإيصال"
   },
   "Balances": {
     "title": "الأرصدة",
@@ -415,20 +462,22 @@
       "description": "إليك مقترحات للتسويات المحسّنة بين المشاركين.",
       "noImbursements": "يبدو أن مجموعتك لا تحتاج إلى أي تسويات 😁",
       "owes": "يدين <strong>{from}</strong> لـ <strong>{to}</strong> بمبلغ",
-      "markAsPaid": "تحديد كمدفوع"
-    }
+      "markAsPaid": "تحديد كمدفوع",
+      "owesPlain": "{{from}} مدين {{to}}"
+    },
+    "loading": "جارٍ تحميل الأرصدة…"
   },
   "Stats": {
     "title": "الإحصائيات",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "كل الوقت",
+      "thisMonth": "هذا الشهر",
+      "last30": "آخر 30 يومًا",
+      "thisYear": "هذا العام",
+      "custom": "نطاق مخصص",
+      "from": "من",
+      "to": "ل"
     },
     "Totals": {
       "title": "الإجماليات",
@@ -440,50 +489,53 @@
       "yourShare": "إجمالي حصتك"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "ملخص",
+      "description": "الأرقام الرئيسية للفترة المختارة.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "المصاريف",
+      "averageExpense": "متوسط النفقات",
+      "largestExpense": "أكبر نفقة",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "الإنفاق مع مرور الوقت",
+      "description": "إجمالي إنفاق المجموعة شهريًا. اختر شهرًا لمعرفة نفقاته.",
+      "empty": "لا توجد نفقات حتى الآن.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "النفقات في هذا الشهر للفترة المحددة.",
+      "detailsEmpty": "لا يوجد أي نفقات في هذا الشهر.",
+      "showExpensesPlain": "عرض النفقات لـ {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "الإنفاق حسب المشارك",
+      "description": "كم دفع كل مشارك ونصيبه من النفقات.",
+      "empty": "لا توجد نفقات حتى الآن.",
+      "participant": "مشارك",
+      "paid": "مدفوعة",
       "count": "Count",
-      "share": "Share"
+      "share": "مشاركة"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "الإنفاق حسب الفئة",
+      "description": "إجمالي المبلغ الذي تم إنفاقه في كل فئة. اختر فئة لمعرفة نفقاتها.",
+      "empty": "لا توجد نفقات حتى الآن.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "النفقات في هذه الفئة للفترة المحددة.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "عرض النفقات لـ {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "النفقات المتكررة",
+      "description": "التكلفة المقدرة للنفقات المتكررة النشطة للمجموعة.",
+      "estimatedMonthly": "التكلفة الشهرية المقدرة",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "جارٍ تحميل الإحصائيات..."
   },
   "Activity": {
     "title": "النشاط",
@@ -504,7 +556,10 @@
       "earlierThisYear": "في وقت سابق من هذا العام",
       "lastYear": "العام الماضي",
       "older": "أقدم"
-    }
+    },
+    "loadMore": "تحميل المزيد",
+    "loading": "جارٍ تحميل النشاط…",
+    "unknown": "نشاط غير معروف"
   },
   "Information": {
     "title": "المعلومات",
@@ -512,7 +567,9 @@
     "empty": "لا توجد معلومات للمجموعة بعد."
   },
   "Settings": {
-    "title": "الإعدادات"
+    "title": "الإعدادات",
+    "saved": "تم تحديث المجموعة",
+    "savedDescription": "تم حفظ تغييراتك."
   },
   "Share": {
     "title": "مشاركة",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "مشاركة",
+    "copy": "انسخ الرابط",
+    "url": "رابط المجموعة"
   },
   "SchemaErrors": {
     "min1": "أدخل حرفًا واحدًا على الأقل.",
@@ -543,7 +603,10 @@
     "paidForMin1": "يجب دفع المصروف لمشارك واحد على الأقل.",
     "noZeroShares": "يجب أن تكون جميع الحصص أكبر من 0.",
     "amountSum": "يجب أن يساوي مجموع المبالغ مبلغ المصروف الكلي.",
-    "percentageSum": "يجب أن يساوي مجموع النسب المئوية 100."
+    "percentageSum": "يجب أن يساوي مجموع النسب المئوية 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "البحث عن فئة...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "التحديث متاح",
+    "updateDescription": "يتوفر إصدار جديد من pysplit.",
+    "reload": "إعادة تحميل",
+    "updating": "جارٍ التحديث…",
+    "offlineReady": "جاهز للعمل دون اتصال بالإنترنت",
+    "offlineReadyDescription": "يتم تخزين غلاف التطبيق مؤقتًا. افتح مجموعة مرة واحدة أثناء الاتصال بالإنترنت للاحتفاظ ببياناتها.",
+    "dismiss": "إغلاق",
+    "install": "تثبيت التطبيق",
+    "refreshApp": "تحديث التطبيق",
+    "refreshAppHint": "امسح الملفات المخزنة مؤقتًا وأعد تحميل الإصدار الأحدث. تبقى بياناتك المحفوظة على هذا الجهاز."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "لوحة الإدارة",
+    "description": "إدارة أدوار المستخدم وأذونات الوصول إلى النظام الأساسي ومراقبة مقاييس النظام.",
+    "totalGroups": "مجموع المجموعات",
+    "totalExpenses": "إجمالي النفقات",
+    "registeredUsers": "المستخدمين المسجلين",
+    "userManagement": "إدارة المستخدم ومستويات الأذونات",
+    "accessDenied": "تم رفض الوصول",
+    "accessDeniedDescription": "تقتصر لوحة معلومات الإدارة على المستخدمين في طبقة المسؤول.",
+    "delete": "حذف",
+    "deleteError": "لا يمكن الحذف",
+    "email": "البريد الإلكتروني",
+    "expenses": "النفقات",
+    "groupDeleted": "تم حذف المجموعة",
+    "groupManagement": "المجموعات",
+    "groupManagementDescription": "حذف المجموعات وفحص الاستخدام.",
+    "groups": "المجموعات",
+    "loadMoreGroups": "تحميل المزيد من المجموعات",
+    "loadMoreUsers": "تحميل المزيد من المستخدمين",
+    "loading": "جارٍ تحميل لوحة البيانات…",
+    "loadingMore": "جارٍ التحميل…",
+    "participants": "المشاركون",
+    "preauthorize": "التفويض المسبق للمستخدم",
+    "preauthorizeAction": "تفويض مسبق",
+    "preauthorizeError": "لا يمكن التفويض المسبق للمستخدم",
+    "preauthorized": "المستخدم مرخص مسبقًا",
+    "returnToGroups": "العودة إلى مجموعاتي",
+    "searchGroups": "البحث عن المجموعات",
+    "searchUsers": "بحث المستخدمين",
+    "signInDescription": "تتطلب لوحة التحكم الإدارية حساب مسؤول.",
+    "signInTitle": "تسجيل الدخول مطلوب",
+    "tier": "الطبقة",
+    "tierError": "لا يمكن تحديث الطبقة",
+    "tierFor": "الطبقة ل",
+    "tierUpdated": "تم تحديث الطبقة",
+    "userDeleted": "تم حذف المستخدم",
+    "userTier": "طبقات"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "تخزين دون اتصال",
+    "loading": "جارٍ التحقق من هذا الجهاز…",
+    "unsupported": "لا يمكن لهذا المتصفح الإبلاغ عن حالة التخزين.",
+    "usage": "{{used}} من {{quota}} المستخدمة",
+    "unknown": "غير معروف",
+    "persisted": "التخزين مستمر على هذا الجهاز.",
+    "notPersisted": "قد يقوم المتصفح بحذف البيانات دون اتصال بالإنترنت إذا كانت مساحة الجهاز منخفضة.",
+    "keep": "احتفظ بالبيانات على هذا الجهاز",
+    "refresh": "تحديث",
+    "critical": "مساحة التخزين ممتلئة تقريبًا. قم بتصدير نسخة احتياطية الآن، ثم قم بإزالة المجموعات غير المستخدمة.",
+    "warning": "التخزين يمتلئ. يوصى بعمل نسخة احتياطية."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "في انتظار المزامنة",
+    "expense": "في انتظار المزامنة"
+  },
+  "Attachments": {
+    "assignItems": "تخصيص بنود الإيصال",
+    "extractedItems": "العناصر المستخرجة من منظمة العفو الدولية",
+    "help": "يتم ضغط الصور قبل التحميل. يتم الاحتفاظ بملفات PDF كمرفقات ويتم فتحها في علامة تبويب جديدة.",
+    "open": "فتح",
+    "openInNewTab": "افتح في علامة تبويب جديدة",
+    "pdfPreviewUnavailable": "يتم فتح معاينات PDF في علامة تبويب منفصلة.",
+    "pending": "في انتظار التحميل",
+    "preview": "معاينة",
+    "previewAction": "معاينة",
+    "previewNamed": "معاينة {{name}}",
+    "receipt": "إيصال المتجر",
+    "saveToAssignItems": "احفظ المصروف أولاً، ثم قم بتعيين هذه العناصر للمشاركين.",
+    "scanComplete": "تم فحص الإيصال",
+    "scanCompleteDescription": "تعيين العناصر المستخرجة للمشاركين.",
+    "scanError": "لا يمكن مسح الإيصال ضوئيًا",
+    "scanWithAi": "المسح باستخدام الذكاء الاصطناعي",
+    "scanning": "جارٍ المسح…",
+    "view": "عرض المرفقات",
+    "attachment": "مرفق",
+    "onlyImagesPdf": "يتم دعم الصور وملفات PDF فقط."
+  },
+  "Backup": {
+    "downloaded": "تم تنزيل النسخة الاحتياطية.",
+    "export": "تصدير النسخة الاحتياطية",
+    "failed": "فشل النسخ الاحتياطي.",
+    "restore": "استعادة النسخة الاحتياطية",
+    "restoreFailed": "فشلت عملية الاستعادة.",
+    "restoreLabel": "استعادة ملف النسخ الاحتياطي",
+    "restored": "تمت استعادة النسخة الاحتياطية. جارٍ إعادة التحميل…"
+  },
+  "Common": {
+    "addGroup": "أضف مجموعة",
+    "close": "إغلاق",
+    "closeDialog": "إغلاق مربع الحوار",
+    "dismiss": "تجاهل",
+    "dismissNotification": "رفض الإخطار",
+    "error": "حدث خطأ ما",
+    "expenseNotFound": "لم يتم العثور على النفقات",
+    "loading": "جارٍ التحميل…",
+    "menu": "القائمة",
+    "retry": "إعادة المحاولة",
+    "select": "اختر…",
+    "unknown": "غير معروف",
+    "user": "المستخدم"
+  },
+  "CreateGroup": {
+    "approvalContact": "يتطلب إنشاء مجموعات نفقات جديدة تصريحًا من المسؤول. يرجى الاتصال بمسؤول المثيل الخاص بك لترقية حسابك إلى طبقة منشئ المجموعة.",
+    "approvalDescription": "حسابك موجود حاليًا في طبقة مستخدم المزامنة. يمكنك المشاركة في أي مجموعات تمت مشاركتها معك ومزامنتها عبر جميع أجهزتك.",
+    "approvalTitle": "يتطلب إنشاء المجموعة الموافقة",
+    "authRequiredDescription": "لإنشاء مجموعات نفقات جديدة، يرجى تسجيل الدخول باستخدام حساب خارجي. سيظل المشاركون في المجموعة المدعوون قادرين على الانضمام بسهولة عبر رابط مجموعتك دون تسجيل الدخول.",
+    "authRequiredTitle": "المصادقة مطلوبة",
+    "returnToGroups": "العودة إلى مجموعاتي",
+    "signIn": "قم بتسجيل الدخول لإنشاء مجموعة"
+  },
+  "GroupTabs": {
+    "Expenses": "المصاريف",
+    "Balances": "الأرصدة",
+    "Information": "المعلومات",
+    "Stats": "الإحصائيات",
+    "Activity": "النشاط",
+    "Settings": "الإعدادات",
+    "label": "أقسام المجموعة"
+  },
+  "Login": {
+    "title": "قم بتسجيل الدخول إلى سبليت",
+    "description": "قم بتسجيل الدخول باستخدام حساب خارجي لتمكين مزامنة المجموعة عبر الأجهزة.",
+    "google": "تواصل مع جوجل",
+    "github": "تواصل مع جيثب",
+    "noProviders": "لم يتم تكوين أي موفري OAuth. قم بتعيين AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET لتمكين تسجيل الدخول."
+  },
+  "NotFound": {
+    "title": "لم يتم العثور على الصفحة",
+    "description": "تحقق من عنوان URL وحاول مرة أخرى.",
+    "groupTitle": "هذه المجموعة غير موجودة.",
+    "groupDescription": "تحقق من عنوان URL أو اطلب رابط دعوة جديدًا."
+  },
+  "SyncStatus": {
+    "offlinePending": "غير متصل - في انتظار التغييرات: {{count}}",
+    "offlineSaved": "غير متصل - عرض البيانات المحفوظة",
+    "syncing": "جارٍ المزامنة…",
+    "error": "خطأ في المزامنة: {{error}}",
+    "retryToContinue": "أعد المحاولة للمتابعة",
+    "conflicts": "النزاعات التي تحتاج إلى مراجعة: {{count}}",
+    "failed": "التغييرات التي لا يمكن مزامنتها: {{count}}",
+    "pending": "التغييرات المعلقة: {{count}}",
+    "retryFailed": "إعادة محاولة التغييرات الفاشلة",
+    "discardFailed": "تجاهل التغييرات الفاشلة",
+    "resolveConflicts": "حل النزاعات",
+    "syncNow": "مزامنة الآن",
+    "dialogTitle": "حل النزاعات",
+    "dialogDescription": "أدت هذه التعديلات إلى تغيير نفس السجلات على جهاز آخر. اختر ما تريد الاحتفاظ به.",
+    "noConflicts": "لا توجد صراعات لحلها.",
+    "serverVersion": "إصدار الخادم {{version}} · يتم الاحتفاظ بالتحرير المحلي في قائمة انتظار التعارض",
+    "keepMine": "الاحتفاظ بنسختي",
+    "useServer": "استخدم الخادم",
+    "duplicate": "مكررة وكأنها جديدة"
+  },
+  "Theme": {
+    "toggle": "تبديل الموضوع",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
   }
 }

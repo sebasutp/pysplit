@@ -83,7 +83,7 @@ export function AddGroupByUrlButton({ reload }) {
                 setError(false)
               }}
             />
-            <Button type="submit" size="icon" disabled={pending} aria-label="Add group">
+            <Button type="submit" size="icon" disabled={pending} aria-label={t('Common.addGroup', 'Add group')}>
               +
             </Button>
           </form>

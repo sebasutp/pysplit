@@ -1,5 +1,6 @@
 /** Prepare an image or PDF for upload. */
 
+import i18n from '../services/i18n'
 import { IMAGE_MAX_DIMENSION, IMAGE_QUALITY } from '../services/config'
 import { compressImage, imageDimensions } from './compress-image'
 
@@ -17,7 +18,9 @@ export async function prepareUpload(file) {
     return { file, width: 1, height: 1, contentType: PDF_CONTENT_TYPE }
   }
   if (!type.startsWith('image/')) {
-    throw new Error('Only images and PDF files are supported.')
+    throw new Error(
+      i18n.t('Attachments.onlyImagesPdf', 'Only images and PDF files are supported.'),
+    )
   }
 
   const compressed = await compressImage(file, {
@@ -46,7 +49,9 @@ export function isPdf(attachment) {
 
 /** @param {any} attachment */
 export function attachmentLabel(attachment) {
-  return attachment?.filename || attachment?.id || 'Attachment'
+  return (
+    attachment?.filename || attachment?.id || i18n.t('Attachments.attachment', 'Attachment')
+  )
 }
 
 /** @param {number} size */

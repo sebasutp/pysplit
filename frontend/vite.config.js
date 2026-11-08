@@ -48,9 +48,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      // Registration is manual so the update prompt controls when a waiting
-      // worker activates. `registerType: 'prompt'` never calls skipWaiting on
-      // its own.
+      // `registerType: 'prompt'` keeps activation gated by the compatibility
+      // checks in services/pwa.js. The generated worker still claims clients
+      // (clientsClaim) so an activated update reloads already-open pages.
       registerType: 'prompt',
       injectRegister: false,
       includeAssets,
@@ -88,6 +88,14 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: [webHost],
     proxy,
+    watch: {
+      // Bind-mounted workspaces and some container filesystems do not deliver
+      // inotify events to Vite, which makes dev silently serve stale modules.
+      // Polling keeps HMR working; node_modules stays ignored by Vite's default
+      // ignored list. Set VITE_USE_POLLING=false to opt out.
+      usePolling: process.env.VITE_USE_POLLING !== 'false',
+      interval: 300,
+    },
   },
   preview: {
     host: listenHost,

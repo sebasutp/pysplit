@@ -59,7 +59,7 @@ describe('Workbox policy', () => {
     )
     expect(workbox.cleanupOutdatedCaches).toBe(true)
     expect(workbox.skipWaiting).toBe(false)
-    expect(workbox.clientsClaim).toBe(false)
+    expect(workbox.clientsClaim).toBe(true)
     expect(workbox.globPatterns.join(' ')).toContain('html')
     expect(workbox.globPatterns.join(' ')).toContain('js')
     expect(workbox.globPatterns.join(' ')).toContain('css')

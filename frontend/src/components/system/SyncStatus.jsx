@@ -1,6 +1,7 @@
 /** Global synchronization banner and explicit conflict resolution dialog. */
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useSyncStatus } from '../../hooks/useSyncStatus'
 import { Button } from '../ui/Button'
@@ -13,6 +14,7 @@ import {
 } from '../ui/Dialog'
 
 export function SyncStatus() {
+  const { t } = useTranslation()
   const { status, conflicts, resolve, syncNow, retryFailed, discardFailed } = useSyncStatus()
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -38,38 +40,48 @@ export function SyncStatus() {
         <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-2">
           <span>
             {!status.online && pending
-              ? `Offline — ${status.pending} change${status.pending === 1 ? '' : 's'} pending`
+              ? t('SyncStatus.offlinePending', 'Offline — pending changes: {{count}}', {
+                  count: status.pending,
+                })
               : !status.online
-                ? 'Offline — showing saved data'
+                ? t('SyncStatus.offlineSaved', 'Offline — showing saved data')
                 : status.phase === 'syncing'
-                  ? 'Syncing…'
+                  ? t('SyncStatus.syncing', 'Syncing…')
                   : status.phase === 'error'
-                    ? `Sync error: ${status.lastError || 'retry to continue'}`
+                    ? t('SyncStatus.error', 'Sync error: {{error}}', {
+                        error: status.lastError || t('SyncStatus.retryToContinue', 'retry to continue'),
+                      })
                     : status.conflicts > 0
-                      ? `${status.conflicts} conflict${status.conflicts === 1 ? '' : 's'} need review`
+                      ? t('SyncStatus.conflicts', 'Conflicts needing review: {{count}}', {
+                          count: status.conflicts,
+                        })
                       : failed
-                        ? `${status.failed} change${status.failed === 1 ? '' : 's'} could not be synced`
-                        : `${status.pending} change${status.pending === 1 ? '' : 's'} pending`}
+                        ? t('SyncStatus.failed', 'Changes that could not be synced: {{count}}', {
+                            count: status.failed,
+                          })
+                        : t('SyncStatus.pending', 'Pending changes: {{count}}', {
+                            count: status.pending,
+                          })}
           </span>
           <span className="flex items-center gap-2">
             {failed ? (
               <>
                 <Button size="sm" variant="outline" onClick={() => void retryFailed()}>
-                  Retry failed
+                  {t('SyncStatus.retryFailed', 'Retry failed changes')}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => void discardFailed()}>
-                  Discard failed
+                  {t('SyncStatus.discardFailed', 'Discard failed changes')}
                 </Button>
               </>
             ) : null}
             {status.phase === 'conflict' || status.conflicts > 0 ? (
               <Button size="sm" variant="outline" onClick={() => setDialogOpen(true)}>
-                Resolve conflicts
+                {t('SyncStatus.resolveConflicts', 'Resolve conflicts')}
               </Button>
             ) : null}
             {status.online ? (
               <Button size="sm" variant="outline" onClick={() => void syncNow()}>
-                Sync now
+                {t('SyncStatus.syncNow', 'Sync now')}
               </Button>
             ) : null}
           </span>
@@ -79,14 +91,19 @@ export function SyncStatus() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Resolve conflicts</DialogTitle>
+            <DialogTitle>{t('SyncStatus.dialogTitle', 'Resolve conflicts')}</DialogTitle>
             <DialogDescription>
-              These edits changed the same records on another device. Choose what to keep.
+              {t(
+                'SyncStatus.dialogDescription',
+                'These edits changed the same records on another device. Choose what to keep.',
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="mt-4 flex flex-col gap-3">
             {conflicts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No conflicts to resolve.</p>
+              <p className="text-sm text-muted-foreground">
+                {t('SyncStatus.noConflicts', 'No conflicts to resolve.')}
+              </p>
             ) : (
               conflicts.map((conflict) => (
                 <div
@@ -98,22 +115,25 @@ export function SyncStatus() {
                     {conflict.entity_type} {conflict.entity_id}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Server version {conflict.server_version ?? 'unknown'} · local edit kept in the
-                    conflict queue
+                    {t(
+                      'SyncStatus.serverVersion',
+                      'Server version {{version}} · local edit kept in the conflict queue',
+                      { version: conflict.server_version ?? t('Common.unknown', 'unknown') },
+                    )}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       onClick={() => void resolve(conflict.id, 'mine')}
                     >
-                      Keep mine
+                      {t('SyncStatus.keepMine', 'Keep mine')}
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => void resolve(conflict.id, 'server')}
                     >
-                      Use server
+                      {t('SyncStatus.useServer', 'Use server')}
                     </Button>
                     {conflict.entity_type === 'expense' ? (
                       <Button
@@ -121,7 +141,7 @@ export function SyncStatus() {
                         variant="outline"
                         onClick={() => void resolve(conflict.id, 'duplicate')}
                       >
-                        Duplicate as new
+                        {t('SyncStatus.duplicate', 'Duplicate as new')}
                       </Button>
                     ) : null}
                   </div>

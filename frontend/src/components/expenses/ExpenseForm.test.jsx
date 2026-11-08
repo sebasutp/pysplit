@@ -182,6 +182,28 @@ describe('ExpenseForm', () => {
     )
   })
 
+  it('saves zero-decimal currency amounts in whole units', async () => {
+    const yenGroup = { ...group, currency: '¥', currency_code: 'JPY' }
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter initialEntries={['/groups/group-1/expenses/create']}>
+        <ToastProvider>
+          <ExpenseForm group={yenGroup} categories={categories} />
+        </ToastProvider>
+      </MemoryRouter>,
+    )
+
+    await user.type(screen.getByLabelText('Expense title'), 'Sushi')
+    await user.type(screen.getByLabelText('Amount'), '1000')
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    await waitFor(() => expect(create).toHaveBeenCalled())
+    expect(create).toHaveBeenCalledWith(
+      'group-1',
+      expect.objectContaining({ amount: 1000 }),
+    )
+  })
+
   it('does not send a version when creating an expense', async () => {
     const user = userEvent.setup()
     render(
@@ -302,7 +324,7 @@ describe('ExpenseForm', () => {
     await user.click(screen.getByRole('button', { name: 'Use scanned total' }))
 
     expect(screen.getByLabelText('Expense title')).toHaveValue('Lunch')
-    expect(screen.getByLabelText('Amount')).toHaveValue('42.50')
+    expect(screen.getByLabelText('Amount')).toHaveValue('42.5')
     expect(clearPendingTotal).toHaveBeenCalledWith('group-1')
     expect(
       screen.queryByText('A receipt scanned while offline is ready.'),

@@ -82,10 +82,11 @@ export const CACHE_NAMES = {
 
 /** @type {Record<string, any>} */
 export const workbox = {
-  // Never activate a new build behind the user's back: the update prompt asks
-  // for an explicit reload (see services/pwa.js).
+  // Activation stays gated by services/pwa.js compatibility checks. Once a new
+  // worker is activated it claims existing clients so the reload can happen
+  // reliably on already-open pages.
   skipWaiting: false,
-  clientsClaim: false,
+  clientsClaim: true,
   cleanupOutdatedCaches: true,
   navigateFallback: '/index.html',
   // API requests must always reach the network. Besides the runtime route

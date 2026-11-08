@@ -7,7 +7,7 @@ import { FormField } from '../ui/Form'
 import { Input } from '../ui/Input'
 import { Select } from '../ui/Select'
 
-const RECURRENCES = /** @type {const} */ ([
+export const RECURRENCES = /** @type {const} */ ([
   { value: 'NONE', label: 'None' },
   { value: 'DAILY', label: 'Daily' },
   { value: 'WEEKLY', label: 'Weekly' },

@@ -1,11 +1,13 @@
 /** Versioned JSON backup and restore controls. */
 
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { repository } from '../../services/repository'
 import { Button } from '../ui/Button'
 
 export function BackupControls() {
+  const { t } = useTranslation()
   const input = useRef(/** @type {HTMLInputElement | null} */ (null))
   const [message, setMessage] = useState('')
 
@@ -19,9 +21,11 @@ export function BackupControls() {
       anchor.download = `pysplit-backup-${new Date().toISOString().slice(0, 10)}.json`
       anchor.click()
       URL.revokeObjectURL(url)
-      setMessage('Backup downloaded.')
+      setMessage(t('Backup.downloaded', 'Backup downloaded.'))
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Backup failed.')
+      setMessage(
+        error instanceof Error ? error.message : t('Backup.failed', 'Backup failed.'),
+      )
     }
   }
 
@@ -31,10 +35,12 @@ export function BackupControls() {
     if (!file) return
     try {
       await repository.sync.restore(await file.text())
-      setMessage('Backup restored. Reloading…')
+      setMessage(t('Backup.restored', 'Backup restored. Reloading…'))
       window.location.reload()
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Restore failed.')
+      setMessage(
+        error instanceof Error ? error.message : t('Backup.restoreFailed', 'Restore failed.'),
+      )
     } finally {
       event.target.value = ''
     }
@@ -43,17 +49,17 @@ export function BackupControls() {
   return (
     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
       <Button size="sm" variant="outline" onClick={() => void exportBackup()}>
-        Export backup
+        {t('Backup.export', 'Export backup')}
       </Button>
       <Button size="sm" variant="outline" onClick={() => input.current?.click()}>
-        Restore backup
+        {t('Backup.restore', 'Restore backup')}
       </Button>
       <input
         ref={input}
         type="file"
         accept="application/json,.json"
         className="hidden"
-        aria-label="Restore backup file"
+        aria-label={t('Backup.restoreLabel', 'Restore backup file')}
         onChange={(event) => void restoreBackup(event)}
       />
       {message ? <span role="status">{message}</span> : null}

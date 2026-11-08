@@ -17,9 +17,9 @@ import { Input } from '../components/ui/Input'
 import { Select } from '../components/ui/Select'
 
 const TIERS = [
-  { value: 'sync_users', label: 'Sync User' },
-  { value: 'group_creators', label: 'Group Creator' },
-  { value: 'admin', label: 'Admin' },
+  { value: 'sync_users', labelKey: 'Auth.syncUser' },
+  { value: 'group_creators', labelKey: 'Auth.groupCreator' },
+  { value: 'admin', labelKey: 'Auth.admin' },
 ]
 
 const PAGE_SIZE = 20
@@ -47,6 +47,7 @@ export function AdminPage() {
   const { t } = useTranslation()
   const { user, loading: authLoading, isAdmin } = useAuth()
   const { toast } = useToast()
+  const tierOptions = TIERS.map(({ value, labelKey }) => ({ value, label: t(labelKey) }))
   const [metrics, setMetrics] = useState(/** @type {any|null} */ (null))
   const [users, setUsers] = useState(/** @type {any[]} */ ([]))
   const [groups, setGroups] = useState(/** @type {any[]} */ ([]))
@@ -292,7 +293,7 @@ export function AdminPage() {
                   <div className="w-40">
                     <Select
                       value={item.tier}
-                      options={TIERS}
+                      options={tierOptions}
                       ariaLabel={`${t('Admin.tierFor', 'Tier for')} ${item.email || item.id}`}
                       onChange={(value) => {
                         void repository.admin.users
@@ -360,7 +361,7 @@ export function AdminPage() {
                 <label className="mb-1 block text-sm font-medium" htmlFor="admin-tier">
                   {t('Admin.tier', 'Tier')}
                 </label>
-                <Select id="admin-tier" value={tier} options={TIERS} onChange={setTier} />
+                <Select id="admin-tier" value={tier} options={tierOptions} onChange={setTier} />
               </div>
               <Button
                 onClick={() => {

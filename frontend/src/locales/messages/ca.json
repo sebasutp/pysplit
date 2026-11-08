@@ -1,7 +1,7 @@
 {
   "Homepage": {
     "title": "Comparteix <strong>despeses</strong> amb <strong>família i amics</strong>",
-    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "metaTitle": "Spliit · Comparteix despeses amb família i amics",
     "description": "Et donem la benvinguda a <strong>Spliit</strong>!",
     "button": {
       "groups": "Ves als grups",
@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grups"
+    "groups": "Grups",
+    "adminDashboard": "Tauler d'administració",
+    "language": "Llengua",
+    "signIn": "Inicieu la sessió",
+    "signOut": "Tanca la sessió",
+    "userMenu": "Menú d'usuari"
   },
   "Footer": {
     "madeIn": "Fet a Zuric, Suïssa 🇨🇭",
@@ -39,20 +44,35 @@
       "lastMonth": "El mes anterior",
       "earlierThisYear": "A principi d'aquest any",
       "lastYear": "L'any passat",
-      "older": "Més antics"
-    }
+      "older": "Més antics",
+      "today": "Avui",
+      "week": "A inicis d'aquesta setmana",
+      "month": "Al principi d'aquest mes",
+      "year": "A principi d'aquest any"
+    },
+    "clearSearch": "Clar",
+    "exportError": "No s'han pogut exportar les despeses",
+    "filterFrom": "Des de",
+    "filterTo": "Fins a",
+    "loadMore": "Carregueu més",
+    "loading": "S'estan carregant les despeses…",
+    "loadingMore": "S'està carregant…",
+    "search": "Cerca despeses",
+    "showingCount": "Es mostren {{shown}} de {{total}} despeses."
   },
   "ExpenseCard": {
     "paidBy": "Pagada per <strong>{paidBy}</strong> per a <paidFor></paidFor>",
     "everyone": "tothom",
     "receivedBy": "Rebuda per <strong>{paidBy}</strong> per a <paidFor></paidFor>",
     "yourBalance": "El teu balanç:",
-    "notInvolved": "No t'afecta"
+    "notInvolved": "No t'afecta",
+    "paidByPlain": "Pagat per {{paidBy}} per {{paidFor}}",
+    "receivedByPlain": "Rebut per {{paidBy}} per {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Els meus grups",
     "create": "Crea",
-    "createGroup": "Create group",
+    "createGroup": "Crea un grup",
     "loadingRecent": "S'estan carregant els grups recents…",
     "NoRecent": {
       "description": "No has visitat cap grup recentment.",
@@ -60,11 +80,11 @@
       "orAsk": "o demana a una amiga que et comparteixi l'enllaç a un grup ja existent."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "El teu saldo total",
+      "description": "El teu saldo combinat de tots els teus grups.",
+      "owedToYou": "Et deuen",
+      "youOwe": "Deus",
+      "settledUp": "Estàs al dia en tots els teus grups."
     },
     "recent": "Grups recents",
     "starred": "Grups preferits",
@@ -83,7 +103,7 @@
       "title": "Afegeix un grup mitjançant un URL",
       "description": "Si t'han compartit un grup, pots enganxar-ne aqui l'enllaç per a afegir-lo a la teva llista.",
       "error": "Vatua l’olla! No podem trobar el grup des de l'enllaç que has proporcionat…",
-      "urlMode": "Enter URL",
+      "urlMode": "Introduïu l'URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Aquest grup no existeix.",
       "link": "Ves als grups visitats recentment"
-    }
+    },
+    "moreOptions": "Més opcions",
+    "participants": "participants",
+    "star": "Grup estrella",
+    "unstar": "Unstar el grup"
   },
   "GroupForm": {
     "title": "Informació del grup",
@@ -129,7 +153,10 @@
       "add": "Afegeix un participant",
       "John": "Ermessenda",
       "Jane": "Guillem",
-      "Jack": "Jaume"
+      "Jack": "Jaume",
+      "cannotRemove": "Aquest participant forma part d'una despesa i no es pot eliminar.",
+      "indexLabel": "Participant #{{index}}",
+      "remove": "Elimina el participant {{index}}"
     },
     "Settings": {
       "title": "Configuració local",
@@ -145,7 +172,8 @@
       "create": "Crea",
       "creating": "S'està creant…",
       "cancel": "Cancel·la"
-    }
+    },
+    "saveError": "No s'ha pogut desar el grup."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Per a establir una moneda diferent per despesa i convertir imports, tria una moneda no personalitzada per al grup.",
     "originalAmountField": {
       "label": "Import a convertir",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Quantitat a transferir",
+      "repaymentDescription": "Convertida a partir de la quantitat de dalt, que és la que salda el balanç."
     },
     "conversionRateField": {
       "useApi": "Usa les taxes de Frankfurter",
@@ -274,7 +302,15 @@
     "saving": "S'està desant…",
     "cancel": "Cancel·la",
     "reimbursement": "Reemborsament",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Assignar elements de rebut",
+    "conflict": "Aquesta despesa la va canviar una altra persona. Torneu a carregar la pàgina i torneu-ho a provar.",
+    "conflictTitle": "La despesa ha canviat en un altre lloc",
+    "deleteError": "No s'ha pogut suprimir la despesa.",
+    "pendingReceiptTotal": "Un rebut escanejat mentre està fora de línia a punt.",
+    "pendingReceiptTotalApply": "Utilitzeu el total escanejat",
+    "pendingReceiptTotalDismiss": "Descartar",
+    "saveError": "No s'ha pogut estalviar la despesa."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Hi ha hagut un error al carregar el document. Torna a intentar-ho més tard o selecciona un altre fitxer.",
       "retry": "Tornar-ho a intentar"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "En cua. El rebut s'escanejarà després de tornar a connectar-se.",
+    "offline": "L'escaneig es reprendrà quan esteu en línia.",
+    "scanFailed": "L'IA no ha pogut llegir aquest rebut. Comproveu la configuració de l'IA del servidor i torneu-ho a provar.",
+    "scanning": "S'està escanejant…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Elements de línia de rebut",
+    "backToExpense": "Tornar a la despesa",
+    "merchant": "Nom de la botiga",
+    "printedTotal": "Total imprès al rebut",
+    "noReceipt": "Encara no hi ha cap rebut vinculat a aquesta despesa.",
+    "empty": "Encara no hi ha articles. Afegiu-ne un per començar a dividir.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "No s'ha pogut desar el canvi",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Afegeix un element",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Afegeix un element",
+      "nameLabel": "Nom",
+      "quantityLabel": "Quantitat",
+      "amountLabel": "Import",
+      "sharedLabel": "Compartit (càrrec total de la factura)",
+      "add": "Afegeix",
+      "cancel": "Cancel·la"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} de {total}",
+      "remaining": "{quantity} restant",
+      "assign": "Assignar",
+      "edit": "Edita",
+      "delete": "Suprimeix",
+      "removePortion": "Elimina la quota assignada",
+      "editTitle": "Edita l'element",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Desa",
+      "cancel": "Cancel·la",
+      "deleteConfirm": "Vols suprimir aquest element?",
+      "deleteDescription": "Això elimina l'element i les seves assignacions."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Sense assignar",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Compartit",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Assigna un element",
+      "description": "Trieu qui paga per \"{name}\".",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Dividir uniformement",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Divisió personalitzada",
+      "customHint": "Introduïu les quantitats en unitats per a cada objectiu.",
+      "shared": "Compartit",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "La quantitat assignada supera la quantitat de l'article.",
+      "confirm": "Assignar",
+      "cancel": "Cancel·la"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Compartit",
+      "unassigned": "Sense assignar",
+      "optOut": "Comparteix elements no assignats",
+      "reconciles": "Equilibrat",
+      "offBy": "Diferència de {amount}",
+      "itemsTotal": "Total d'elements de rebut",
+      "apply": "Aplicar a la despesa",
+      "allOptedOut": "Tothom s'ha desactivat, però alguns elements encara estan sense assignar.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Els valors dels rebuts són diferents · Sol·licitar de nou"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Despesa actualitzada",
+      "description": "Les partides del rebut s'han aplicat a la despesa."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "No s'ha pogut aplicar el rebut"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "title": "Actualitzar la despesa?",
+      "description": "El total de la despesa difereix del total de les partides del rebut. L'aplicació sobreescriurà l'import de la despesa i el seu repartiment.",
       "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "cancel": "Cancel·la",
+      "confirm": "Aplica"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Escaneig a la cua",
+    "scanPendingDescription": "La imatge es desa en aquest dispositiu i s'escanejarà quan tornis a estar en línia.",
+    "offlineQueue": "Estàs fora de línia. Adjunteu la foto ara i s'escanejarà després de tornar-vos a connectar.",
+    "disabled": "La divisió intel·ligent no està activada en aquest servidor. L'escaneig de rebuts és una funció només en línia.",
+    "extracted": "Rebut escanejat",
+    "extractedDescription": "Assigna els elements extrets a continuació.",
+    "loading": "S'està carregant el rebut...",
+    "optOutTitle": "Extincions",
+    "scanError": "No s'ha pogut escanejar el rebut.",
+    "scanUnavailable": "Comproveu la configuració de l'IA del servidor i torneu-ho a provar.",
+    "scanning": "S'està escanejant el rebut...",
+    "upload": "Carregueu una foto de rebut"
   },
   "Balances": {
     "title": "Balanç",
@@ -415,20 +462,22 @@
       "description": "Suggeriments per a optimitzar els reemborsaments entre participants.",
       "noImbursements": "Sembla que el teu grup no necessita cap reemborsament 😁",
       "owes": "<strong>{from}</strong> deu a <strong>{to}</strong>",
-      "markAsPaid": "Marca com a pagat"
-    }
+      "markAsPaid": "Marca com a pagat",
+      "owesPlain": "{{from}} deu {{to}}"
+    },
+    "loading": "S'estan carregant els saldos..."
   },
   "Stats": {
     "title": "Estadístiques",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Període",
+      "all": "Tot el temps",
+      "thisMonth": "Aquest mes",
+      "last30": "Últims 30 dies",
+      "thisYear": "Enguany",
+      "custom": "Personalitzat",
+      "from": "Des de",
+      "to": "Fins a"
     },
     "Totals": {
       "title": "Totals",
@@ -440,50 +489,53 @@
       "yourShare": "La teva part total"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Resum",
+      "description": "Xifres clau del període seleccionat.",
+      "empty": "Encara no hi ha cap despesa.",
+      "expenseCount": "Despeses",
+      "averageExpense": "Despesa mitjana",
+      "largestExpense": "Despesa més gran",
+      "activeSpan": "Període actiu"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Despeses al llarg del temps",
+      "description": "Despesa total del grup per mes.",
+      "empty": "Encara no hi ha cap despesa.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Despeses d'aquest mes per al període seleccionat.",
+      "detailsEmpty": "No hi ha despeses en aquest mes.",
+      "showExpensesPlain": "Mostra les despeses de {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Despeses per participant",
+      "description": "Quant ha pagat cada participant i la seva part de les despeses.",
+      "empty": "Encara no hi ha cap despesa.",
       "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "paid": "Pagat",
+      "count": "Nombre",
+      "share": "Part"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Despeses per categoria",
+      "description": "Import total gastat en cada categoria.",
+      "empty": "Encara no hi ha cap despesa.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Despeses d'aquesta categoria per al període seleccionat.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Mostra les despeses de {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Despeses recurrents",
+      "description": "Cost estimat de les despeses recurrents actives del grup.",
+      "estimatedMonthly": "Cost mensual estimat",
+      "estimatedYearly": "{amount} a l'any",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# despesa diària} other {# despeses diàries}}",
+        "WEEKLY": "{count, plural, one {# despesa setmanal} other {# despeses setmanals}}",
+        "MONTHLY": "{count, plural, one {# despesa mensual} other {# despeses mensuals}}"
       }
-    }
+    },
+    "loading": "S'estan carregant les estadístiques..."
   },
   "Activity": {
     "title": "Activitat",
@@ -504,7 +556,10 @@
       "earlierThisYear": "A inicis d'aquest any",
       "lastYear": "El darrer any",
       "older": "Més antigues"
-    }
+    },
+    "loadMore": "Carregueu més",
+    "loading": "S'està carregant l'activitat...",
+    "unknown": "Activitat desconeguda"
   },
   "Information": {
     "title": "Informació",
@@ -512,20 +567,25 @@
     "empty": "Encara no hi ha informació sobre el grup."
   },
   "Settings": {
-    "title": "Configuració"
+    "title": "Configuració",
+    "saved": "Grup actualitzat",
+    "savedDescription": "Els vostres canvis s'han desat."
   },
   "Share": {
     "title": "Comparteix",
     "description": "Comparteix l'enllaç al grup amb altres participants perquè puguin veure el grup i afegir-hi despeses.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Copia l'enllaç",
+    "shareLink": "Comparteix l'enllaç",
     "warning": "Alerta!",
     "warningHelp": "Tothom qui tingui l'enllaç del grup podrà veure i editar-ne les despeses. Comparteix-lo amb cura!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Part",
+    "copy": "Copia l'enllaç",
+    "url": "Enllaç del grup"
   },
   "SchemaErrors": {
     "min1": "Introdueix com a mínim un caràcter.",
@@ -543,7 +603,10 @@
     "paidForMin1": "La despesa ha de ser pagada per, com a mínim, un participant.",
     "noZeroShares": "Totes les participacions han de ser superiors a 0.",
     "amountSum": "La suma dels imports ha de ser igual a l'import de la despesa.",
-    "percentageSum": "La suma dels percentatges ha de ser igual a 100."
+    "percentageSum": "La suma dels percentatges ha de ser igual a 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Cerca una categoria...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Actualització disponible",
+    "updateDescription": "Hi ha disponible una nova versió de pysplit.",
+    "reload": "Torna a carregar",
+    "updating": "S'està actualitzant…",
+    "offlineReady": "A punt per treballar fora de línia",
+    "offlineReadyDescription": "L'intèrpret d'ordres de l'aplicació està en memòria cau. Obre un grup una vegada mentre estàs connectat per conservar les seves dades.",
+    "dismiss": "Tanca",
+    "install": "Instal·la l'aplicació",
+    "refreshApp": "Actualitza l'aplicació",
+    "refreshAppHint": "Esborra els fitxers a la memòria cau i torna a carregar la darrera versió. Les vostres dades desades es mantenen en aquest dispositiu."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Tauler d'administració",
+    "description": "Gestioneu els rols d'usuari, els permisos d'accés a la plataforma i controleu les mètriques del sistema.",
+    "totalGroups": "Total de grups",
+    "totalExpenses": "Despeses totals",
+    "registeredUsers": "Usuaris registrats",
+    "userManagement": "Gestió d'usuaris i nivells de permisos",
+    "accessDenied": "Accés denegat",
+    "accessDeniedDescription": "El tauler d'administració està restringit als usuaris del nivell d'administrador.",
+    "delete": "Suprimeix",
+    "deleteError": "No s'ha pogut suprimir",
+    "email": "Correu electrònic",
+    "expenses": "despeses",
+    "groupDeleted": "Grup suprimit",
+    "groupManagement": "Grups",
+    "groupManagementDescription": "Suprimeix grups i inspecciona l'ús.",
+    "groups": "grups",
+    "loadMoreGroups": "Carrega més grups",
+    "loadMoreUsers": "Carregueu més usuaris",
+    "loading": "S'està carregant el tauler...",
+    "loadingMore": "S'està carregant…",
+    "participants": "participants",
+    "preauthorize": "Preautoritzar un usuari",
+    "preauthorizeAction": "Autorització prèvia",
+    "preauthorizeError": "No s'ha pogut autoritzar prèviament l'usuari",
+    "preauthorized": "Usuari preautoritzat",
+    "returnToGroups": "Torna a Els meus grups",
+    "searchGroups": "Cerca grups",
+    "searchUsers": "Cerca usuaris",
+    "signInDescription": "El tauler d'administració requereix un compte d'administrador.",
+    "signInTitle": "Cal iniciar sessió",
+    "tier": "Nivell",
+    "tierError": "No s'ha pogut actualitzar el nivell",
+    "tierFor": "Nivell per",
+    "tierUpdated": "Nivell actualitzat",
+    "userDeleted": "Usuari suprimit",
+    "userTier": "Grades"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Emmagatzematge fora de línia",
+    "loading": "S'està comprovant aquest dispositiu...",
+    "unsupported": "Aquest navegador no pot informar de l'estat d'emmagatzematge.",
+    "usage": "{{used}} de {{quota}} utilitzat",
+    "unknown": "desconegut",
+    "persisted": "L'emmagatzematge és persistent en aquest dispositiu.",
+    "notPersisted": "El navegador pot desallotjar les dades fora de línia si el dispositiu es queda sense espai.",
+    "keep": "Conserva les dades en aquest dispositiu",
+    "refresh": "Actualitza",
+    "critical": "L'emmagatzematge està gairebé ple. Exporteu una còpia de seguretat ara i, a continuació, elimineu els grups no utilitzats.",
+    "warning": "L'emmagatzematge s'està omplint. Es recomana una còpia de seguretat."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Sincronització pendent",
+    "expense": "Sincronització pendent"
+  },
+  "Attachments": {
+    "assignItems": "Assignar elements de rebut",
+    "extractedItems": "Elements extrets de la IA",
+    "help": "Les imatges es comprimeixen abans de pujar. Els PDF es conserven com a fitxers adjunts i s'obren en una pestanya nova.",
+    "open": "Obre",
+    "openInNewTab": "Obre en una pestanya nova",
+    "pdfPreviewUnavailable": "Les previsualitzacions PDF s'obren en una pestanya independent.",
+    "pending": "Pendent de càrrega",
+    "preview": "Vista prèvia",
+    "previewAction": "Vista prèvia",
+    "previewNamed": "Vista prèvia {{name}}",
+    "receipt": "Rebut de la botiga",
+    "saveToAssignItems": "Primer deseu la despesa i després assigneu aquests elements als participants.",
+    "scanComplete": "Rebut escanejat",
+    "scanCompleteDescription": "Assigna els elements extrets als participants.",
+    "scanError": "No s'ha pogut escanejar el rebut",
+    "scanWithAi": "Escaneja amb IA",
+    "scanning": "S'està escanejant…",
+    "view": "Veure fitxers adjunts",
+    "attachment": "Adjunt",
+    "onlyImagesPdf": "Només s'admeten imatges i fitxers PDF."
+  },
+  "Backup": {
+    "downloaded": "Còpia de seguretat baixada.",
+    "export": "Exporta la còpia de seguretat",
+    "failed": "La còpia de seguretat ha fallat.",
+    "restore": "Restaura la còpia de seguretat",
+    "restoreFailed": "La restauració ha fallat.",
+    "restoreLabel": "Restaura el fitxer de còpia de seguretat",
+    "restored": "S'ha restaurat la còpia de seguretat. S'està tornant a carregar…"
+  },
+  "Common": {
+    "addGroup": "Afegeix grup",
+    "close": "Close",
+    "closeDialog": "Tanca el diàleg",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Ignorar la notificació",
+    "error": "Alguna cosa va fallar",
+    "expenseNotFound": "No s'ha trobat despesa",
+    "loading": "S'està carregant…",
+    "menu": "Menú",
+    "retry": "Tornar-ho a intentar",
+    "select": "Seleccioneu…",
+    "unknown": "desconegut",
+    "user": "Usuari"
+  },
+  "CreateGroup": {
+    "approvalContact": "La creació de nous grups de despeses requereix l'autorització d'un administrador. Poseu-vos en contacte amb l'administrador de la vostra instància per promocionar el vostre compte al nivell de creador de grups.",
+    "approvalDescription": "El vostre compte es troba actualment al nivell d'usuari de sincronització. Pots participar en qualsevol grup compartit amb tu i sincronitzar-los a tots els teus dispositius.",
+    "approvalTitle": "La creació del grup requereix aprovació",
+    "authRequiredDescription": "Per crear nous grups de despeses, inicieu la sessió amb un compte extern. Els participants del grup convidats encara podran unir-se sense friccions mitjançant l'enllaç del vostre grup sense iniciar la sessió.",
+    "authRequiredTitle": "Autenticació necessària",
+    "returnToGroups": "Torna a Els meus grups",
+    "signIn": "Inicieu la sessió per crear un grup"
+  },
+  "GroupTabs": {
+    "Expenses": "Despeses",
+    "Balances": "Balanç",
+    "Information": "Informació",
+    "Stats": "Estadístiques",
+    "Activity": "Activitat",
+    "Settings": "Configuració",
+    "label": "Seccions de grup"
+  },
+  "Login": {
+    "title": "Inicieu la sessió a Split",
+    "description": "Inicieu la sessió amb un compte extern per activar la sincronització de grups entre dispositius.",
+    "google": "Continueu amb Google",
+    "github": "Continueu amb GitHub",
+    "noProviders": "No s'ha configurat cap proveïdor d'OAuth. Estableix AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET per habilitar l'inici de sessió."
+  },
+  "NotFound": {
+    "title": "No s'ha trobat la pàgina",
+    "description": "Comproveu l'URL i torneu-ho a provar.",
+    "groupTitle": "Aquest grup no existeix.",
+    "groupDescription": "Comproveu l'URL o demaneu un enllaç d'invitació nou."
+  },
+  "SyncStatus": {
+    "offlinePending": "Fora de línia: canvis pendents: {{count}}",
+    "offlineSaved": "Fora de línia: mostra les dades desades",
+    "syncing": "S'està sincronitzant...",
+    "error": "Error de sincronització: {{error}}",
+    "retryToContinue": "torna a intentar continuar",
+    "conflicts": "Conflictes que necessiten revisió: {{count}}",
+    "failed": "Canvis que no s'han pogut sincronitzar: {{count}}",
+    "pending": "Canvis pendents: {{count}}",
+    "retryFailed": "Torna a provar els canvis fallits",
+    "discardFailed": "Descarta els canvis fallits",
+    "resolveConflicts": "Resoldre conflictes",
+    "syncNow": "Sincronitza ara",
+    "dialogTitle": "Resoldre conflictes",
+    "dialogDescription": "Aquestes modificacions han canviat els mateixos registres en un altre dispositiu. Trieu què voleu conservar.",
+    "noConflicts": "Sense conflictes per resoldre.",
+    "serverVersion": "Versió del servidor {{version}} · edició local conservada a la cua de conflictes",
+    "keepMine": "Conserva la meva versió",
+    "useServer": "Utilitza el servidor",
+    "duplicate": "Duplicar com a nou"
+  },
+  "Theme": {
+    "toggle": "Canvia el tema",
+    "light": "Clar",
+    "dark": "Fosc",
+    "system": "Sistema"
   }
 }

@@ -31,19 +31,26 @@ import {
  * }} GroupsState
  */
 
-/** @returns {GroupsState} */
-function emptyState() {
+/**
+ * Render the locally remembered groups immediately. The server sync then
+ * replaces this list in the background, so a slow network never hides groups
+ * the browser already knows about.
+ *
+ * @returns {GroupsState}
+ */
+function initialState() {
+  const groups = getRecentGroups()
   return {
-    status: 'pending',
-    groups: [],
-    starredGroups: [],
-    archivedGroups: [],
+    status: groups.length ? 'complete' : 'pending',
+    groups,
+    starredGroups: getStarredGroups(),
+    archivedGroups: getArchivedGroups(),
     details: [],
   }
 }
 
 export function useGroups() {
-  const [state, setState] = useState(/** @type {GroupsState} */ (emptyState()))
+  const [state, setState] = useState(initialState)
 
   const load = useCallback(
     /** @param {AbortSignal} [signal] */
@@ -51,7 +58,12 @@ export function useGroups() {
     const localGroups = getRecentGroups()
     const localStarred = getStarredGroups()
     const localArchived = getArchivedGroups()
-    setState((previous) => ({ ...previous, status: 'pending' }))
+    // Keep cached groups visible during a background refresh. The loading
+    // state is only for a first visit with nothing to show yet.
+    setState((previous) => ({
+      ...previous,
+      status: previous.groups.length ? 'complete' : 'pending',
+    }))
 
     try {
       const result = await repository.groups.sync(

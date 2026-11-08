@@ -1,7 +1,7 @@
 {
   "Homepage": {
     "title": "Jaga <strong>kulusid</strong> <strong>sõprade ja perega</strong>",
-    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "metaTitle": "Spliit · Jaga kulusid sõprade ja perega",
     "description": "Tere tulemast oma uude <strong>Spliit</strong> i keskkonda!",
     "button": {
       "groups": "Mine gruppidesse",
@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Grupid"
+    "groups": "Grupid",
+    "adminDashboard": "Administraatori armatuurlaud",
+    "language": "Keel",
+    "signIn": "Logi sisse",
+    "signOut": "Logi välja",
+    "userMenu": "Kasutajamenüü"
   },
   "Footer": {
     "madeIn": "Valmistatud Zürichis, Šveitsis 🇨🇭",
@@ -39,20 +44,35 @@
       "lastMonth": "Eelmisel kuul",
       "earlierThisYear": "Varem sel aastal",
       "lastYear": "Eelmisel aastal",
-      "older": "Vanemad"
-    }
+      "older": "Vanemad",
+      "today": "Täna",
+      "week": "Varem sel nädalal",
+      "month": "Varem sel kuul",
+      "year": "Varem sel aastal"
+    },
+    "clearSearch": "Selge",
+    "exportError": "Kulusid ei saanud eksportida",
+    "filterFrom": "Alates",
+    "filterTo": "Kuni",
+    "loadMore": "Laadige rohkem",
+    "loading": "Kulude laadimine…",
+    "loadingMore": "Laadimine…",
+    "search": "Otsi kulusid",
+    "showingCount": "Kuvatakse {{shown}} {{total}} kuludest."
   },
   "ExpenseCard": {
     "paidBy": "Maksis <strong>{paidBy}</strong> kasutaja(te) <paidFor></paidFor> eest",
     "everyone": "kõikide",
     "receivedBy": "Sai <strong>{paidBy}</strong> kasutaja(te) <paidFor></paidFor> eest",
     "yourBalance": "Sinu saldo:",
-    "notInvolved": "Sa ei ole seotud"
+    "notInvolved": "Sa ei ole seotud",
+    "paidByPlain": "Tasus {{paidBy}} {{paidFor}} eest",
+    "receivedByPlain": "Saanud {{paidBy}} jaoks {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Minu grupid",
     "create": "Loo",
-    "createGroup": "Create group",
+    "createGroup": "Loo grupp",
     "loadingRecent": "Hiljutiste gruppide laadimine…",
     "NoRecent": {
       "description": "Sa ei ole hiljuti ühtegi gruppi külastanud.",
@@ -60,11 +80,11 @@
       "orAsk": "või palu sõbral saata sulle link olemasolevale grupile."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Sinu kontojääk",
+      "description": "Sinu kontojääk üle kõikide gruppide.",
+      "owedToYou": "Sulle ollakse võlgu",
+      "youOwe": "Sina oled võlgu",
+      "settledUp": "Kõik sinu grupid on tasaarveldatud."
     },
     "recent": "Hiljutised grupid",
     "starred": "Tähistatud grupid",
@@ -83,21 +103,25 @@
       "title": "Lisa grupp URL-i kaudu",
       "description": "Kui sinuga jagati gruppi, saad selle URL-i siia kleepida, et lisada see oma loendisse.",
       "error": "Oih, me ei leidnud gruppi sinu esitatud URL-i põhjal…",
-      "urlMode": "Enter URL",
-      "qrMode": "Scan QR",
+      "urlMode": "Sisesta URL",
+      "qrMode": "Skänni QR kood",
       "scanner": {
-        "startCamera": "Start Camera",
-        "stopScanning": "Stop Scanning",
-        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
-        "noCamera": "No camera found on this device.",
-        "cameraError": "Failed to start camera. Please try again.",
-        "permissionError": "Unable to access camera. Please check permissions."
+        "startCamera": "Käivita kaamera",
+        "stopScanning": "Lõpeta skännimine",
+        "permissionDenied": "Kaamera kasutamise luba puudub. QR-koodide skannimiseks luba palun juurdepääs kaamerale.",
+        "noCamera": "Selles seadmes ei leitud kaamerat.",
+        "cameraError": "Kaamera käivitamine ebaõnnestus. Palun proovi uuesti.",
+        "permissionError": "Ligipääs kaamerale puudub. Palun kontrolli õiguseid."
       }
     },
     "NotFound": {
       "text": "Seda gruppi ei ole olemas.",
       "link": "Mine hiljuti külastatud gruppidesse"
-    }
+    },
+    "moreOptions": "Rohkem valikuid",
+    "participants": "osalejad",
+    "star": "Täherühm",
+    "unstar": "Eemalda grupist tärn"
   },
   "GroupForm": {
     "title": "Grupi info",
@@ -129,7 +153,10 @@
       "add": "Lisa osaleja",
       "John": "Jaan",
       "Jane": "Jaana",
-      "Jack": "Jüri"
+      "Jack": "Jüri",
+      "cannotRemove": "See osaleja on osa kuludest ja seda ei saa eemaldada.",
+      "indexLabel": "Osaleja #{{index}}",
+      "remove": "Eemalda osaleja {{index}}"
     },
     "Settings": {
       "title": "Lokaalsed seaded",
@@ -145,7 +172,8 @@
       "create": "Loo",
       "creating": "Loomine…",
       "cancel": "Loobu"
-    }
+    },
+    "saveError": "Gruppi ei õnnestunud salvestada."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Erineva valuuta seadmiseks kulu kohta ja summade teisendamiseks vali grupile mitte-kohandatud valuuta.",
     "originalAmountField": {
       "label": "Teisendatav summa",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Ülekantav summa",
+      "repaymentDescription": "Teisendatud ülaltoodud summast, millega saldo tasaarveldatakse."
     },
     "conversionRateField": {
       "useApi": "Kasuta Frankfurteri kursse",
@@ -274,7 +302,15 @@
     "saving": "Salvestamine…",
     "cancel": "Loobu",
     "reimbursement": "Hüvitis",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Kviitungiüksuste eraldamine",
+    "conflict": "Seda kulu muutis keegi teine. Laadige leht uuesti ja proovige uuesti.",
+    "conflictTitle": "Kulud muudetud mujal",
+    "deleteError": "Kulut ei saanud kustutada.",
+    "pendingReceiptTotal": "Võrguühenduseta skannitud kviitung on valmis.",
+    "pendingReceiptTotalApply": "Kasutage skannitud kogusummat",
+    "pendingReceiptTotalDismiss": "Loobu",
+    "saveError": "Kulusid säästa ei õnnestunud."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Dokumendi üleslaadimisel tekkis viga. Palun proovi hiljem uuesti või vali teine fail.",
       "retry": "Proovi uuesti"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Järjekorras. Kviitung skannitakse pärast uuesti ühenduse loomist.",
+    "offline": "Skannimine jätkub, kui olete võrgus.",
+    "scanFailed": "AI ei saanud seda kviitungit lugeda. Kontrollige serveri AI konfiguratsiooni ja proovige uuesti.",
+    "scanning": "Skannimine…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Kviitungi reaüksused",
+    "backToExpense": "Tagasi kuludesse",
+    "merchant": "Kaupluse nimi",
+    "printedTotal": "Kviitungile trükitud kokku",
+    "noReceipt": "Selle kuluga pole veel kviitungit seotud.",
+    "empty": "Üksusi pole veel. Jagamise alustamiseks lisage üks.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Teie muudatust ei saanud salvestada",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Lisa üksus",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Lisa üksus",
+      "nameLabel": "Nimi",
+      "quantityLabel": "Kogus",
+      "amountLabel": "Summa",
+      "sharedLabel": "Jagatud (kogu arve tasu)",
+      "add": "Lisa",
+      "cancel": "Loobu"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} / {total}",
+      "remaining": "{quantity} jäänud",
+      "assign": "Eraldada",
+      "edit": "Muuda",
+      "delete": "Kustuta",
+      "removePortion": "Eemalda eraldatud osa",
+      "editTitle": "Muuda üksust",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Salvesta",
+      "cancel": "Loobu",
+      "deleteConfirm": "Kas kustutada see üksus?",
+      "deleteDescription": "See eemaldab üksuse ja selle ülesanded."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Määramata",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Jagatud",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Määra üksus",
+      "description": "Valige, kes maksab „{name}” eest.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Jaotage ühtlaselt",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Kohandatud jaotus",
+      "customHint": "Sisestage kogused iga sihtmärgi jaoks ühikutes.",
+      "shared": "Jagatud",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Määratud kogus ületab kauba koguse.",
+      "confirm": "Eraldada",
+      "cancel": "Loobu"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Jagatud",
+      "unassigned": "Määramata",
+      "optOut": "Jagab määramata üksusi",
+      "reconciles": "Tasakaalustatud",
+      "offBy": "Erinevus {amount}",
+      "itemsTotal": "Kviitungi esemed kokku",
+      "apply": "Rakenda kulule",
+      "allOptedOut": "Kõik loobusid, kuid mõned üksused on endiselt määramata.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Kviitungi väärtused erinevad · Rakenda uuesti"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Kulu uuendatud",
+      "description": "Kviitungi kirjed kanti kulule."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Kviitungit ei saanud rakendada"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Kas uuendada kulu?",
+      "description": "Kulude kogusumma erineb laekumiste kogusummast. Taotlemisel kirjutatakse kulusumma ja selle jaotus üle.",
+      "total": "kokku {current} → {new}",
+      "cancel": "Loobu",
+      "confirm": "Rakenda"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Skannimine on järjekorras",
+    "scanPendingDescription": "Pilt salvestatakse sellesse seadmesse ja skannitakse, kui olete uuesti võrgus.",
+    "offlineQueue": "Olete võrguühenduseta. Manustage foto kohe ja see skannitakse pärast uuesti ühendamist.",
+    "disabled": "Nutikas jagamine pole selles serveris lubatud. Kviitungi skannimine on ainult võrgufunktsioon.",
+    "extracted": "Kviitung skaneeritud",
+    "extractedDescription": "Määrake allpool ekstraheeritud üksused.",
+    "loading": "Kviitungi laadimine…",
+    "optOutTitle": "Loobumised",
+    "scanError": "Kviitungit ei saanud skannida.",
+    "scanUnavailable": "Kontrollige serveri AI konfiguratsiooni ja proovige uuesti.",
+    "scanning": "Kviitungi skannimine…",
+    "upload": "Laadige üles kviitungi foto"
   },
   "Balances": {
     "title": "Saldod",
@@ -415,23 +462,25 @@
       "description": "Siin on soovitused optimeeritud hüvitisteks osalejate vahel.",
       "noImbursements": "Tundub, et sinu grupp ei vaja ühtegi hüvitist 😁",
       "owes": "<strong>{from}</strong> võlgneb <strong>{to}</strong>",
-      "markAsPaid": "Märgi makstuks"
-    }
+      "markAsPaid": "Märgi makstuks",
+      "owesPlain": "{{from}} võlgneb {{to}}"
+    },
+    "loading": "Saldode laadimine…"
   },
   "Stats": {
     "title": "Statistika",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Periood",
+      "all": "Kogu periood",
+      "thisMonth": "See kuu",
+      "last30": "Viimased 30 päeva",
+      "thisYear": "See aasta",
+      "custom": "Kohandatud periood",
+      "from": "Alates",
+      "to": "Kuni"
     },
     "Totals": {
-      "title": "Kokkuvõte",
+      "title": "Summad",
       "description": "Kogu grupi kulutuste ülevaade.",
       "groupSpendings": "Grupi kogukulud",
       "groupEarnings": "Grupi kogutulud",
@@ -440,50 +489,53 @@
       "yourShare": "Sinu kogu osa"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Kokkuvõte",
+      "description": "Valitud perioodi põhinäitajad.",
+      "empty": "Kulusid veel ei ole.",
+      "expenseCount": "Kulud",
+      "averageExpense": "Keskmine kulu",
+      "largestExpense": "Suurim kulu",
+      "activeSpan": "Aktiivne periood"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "title": "Kulud aja jooksul",
+      "description": "Grupi kogukulud kuude kaupa. Vali kuu, et näha selle kulusid.",
+      "empty": "Kulusid veel ei ole.",
+      "showExpenses": "Näita {month} kulusid",
+      "detailsDescription": "Selle kuu kulud valitud perioodil.",
+      "detailsEmpty": "Sellel kuul veel kulusid ei ole.",
+      "showExpensesPlain": "Kuva {{month}} kulud"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "title": "Kulud osaleja kaupa",
+      "description": "Kui palju iga osaleja maksis ja kui suur oli tema osa kuludest.",
+      "empty": "Kulusid veel ei ole.",
+      "participant": "Osaleja",
+      "paid": "Makstud",
+      "count": "Arv",
+      "share": "Osak"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "title": "Kulud kategooriate kaupa",
+      "description": "Igas kategoorias kulutatud kogusumma. Vali kategooria, et näha selle kulusid.",
+      "empty": "Kulusid veel ei ole.",
+      "showExpenses": "Näita kategooria {category} kulusid",
+      "detailsDescription": "Selle kategooria kulud valitud perioodil.",
+      "detailsEmpty": "Selles kategoorias kulusid ei ole.",
+      "showExpensesPlain": "Kuva {{category}} kulud"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Korduvad kulud",
+      "description": "Grupi aktiivsete korduvkulude hinnanguline maksumus.",
+      "estimatedMonthly": "Hinnanguline kuukulu",
+      "estimatedYearly": "{amount} aastas",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# päevane kulu} other {# päevast kulu}}",
+        "WEEKLY": "{count, plural, one {# iganädalane kulu} other {# iganädalast kulu}}",
+        "MONTHLY": "{count, plural, one {# igakuine kulu} other {# igakuist kulu}}"
       }
-    }
+    },
+    "loading": "Statistika laadimine…"
   },
   "Activity": {
     "title": "Tegevus",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Varem sel aastal",
       "lastYear": "Eelmisel aastal",
       "older": "Vanemad"
-    }
+    },
+    "loadMore": "Laadige rohkem",
+    "loading": "Tegevuse laadimine…",
+    "unknown": "Tundmatu tegevus"
   },
   "Information": {
     "title": "Info",
@@ -512,20 +567,25 @@
     "empty": "Grupi kohta info puudub."
   },
   "Settings": {
-    "title": "Seaded"
+    "title": "Seaded",
+    "saved": "Gruppi värskendati",
+    "savedDescription": "Teie muudatused on salvestatud."
   },
   "Share": {
     "title": "Jaga",
     "description": "Selleks, et teised osalejad saaksid gruppi näha ja kulusid lisada, jaga nendega grupi URL-i.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Kopeeri link",
+    "shareLink": "Jaga linki",
     "warning": "Hoiatus!",
     "warningHelp": "Igaüks, kellel on grupi URL, saab kulusid näha ja muuta. Jaga ettevaatlikult!",
     "qrCode": {
-      "title": "Share via QR Code",
-      "description": "Scan this QR code to open the group on any device.",
-      "download": "Download QR Code"
-    }
+      "title": "Jaga QR koodiga",
+      "description": "Skäneeri QR koodi et avada grupp teisest seadmest.",
+      "download": "Lae QR kood alla"
+    },
+    "button": "Osak",
+    "copy": "Kopeeri link",
+    "url": "Grupi link"
   },
   "SchemaErrors": {
     "min1": "Sisesta vähemalt üks tähemärk.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Kulu peab olema makstud vähemalt ühe osaleja eest.",
     "noZeroShares": "Kõik osad peavad olema suuremad kui 0.",
     "amountSum": "Summade kogusumma peab võrduma kulu summaga.",
-    "percentageSum": "Protsentide summa peab võrduma 100-ga."
+    "percentageSum": "Protsentide summa peab võrduma 100-ga.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Otsi kategooriat...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Värskendus on saadaval",
+    "updateDescription": "Saadaval on pyspliti uus versioon.",
+    "reload": "Lae uuesti",
+    "updating": "Värskendamine…",
+    "offlineReady": "Valmis töötama võrguühenduseta",
+    "offlineReadyDescription": "Rakenduse kest on vahemällu salvestatud. Avage rühm üks kord võrgus olles, et selle andmeid säilitada.",
+    "dismiss": "Sulge",
+    "install": "Installige rakendus",
+    "refreshApp": "Värskenda rakendust",
+    "refreshAppHint": "Tühjendage vahemällu salvestatud failid ja laadige uuesti uusim versioon. Teie salvestatud andmed jäävad sellesse seadmesse."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Administreerimise armatuurlaud",
+    "description": "Hallake kasutajarolle, platvormi juurdepääsuõigusi ja jälgige süsteemimõõdikuid.",
+    "totalGroups": "Rühmad kokku",
+    "totalExpenses": "Kulud kokku",
+    "registeredUsers": "Registreeritud kasutajad",
+    "userManagement": "Kasutajate haldamise ja lubade tasemed",
+    "accessDenied": "Juurdepääs keelatud",
+    "accessDeniedDescription": "Administraatori armatuurlaud on piiratud administraatoritaseme kasutajatele.",
+    "delete": "Kustuta",
+    "deleteError": "Ei saanud kustutada",
+    "email": "Meil",
+    "expenses": "kulud",
+    "groupDeleted": "Grupp kustutatud",
+    "groupManagement": "Grupid",
+    "groupManagementDescription": "Kustutage rühmad ja kontrollige kasutust.",
+    "groups": "rühmad",
+    "loadMoreGroups": "Laadige rohkem gruppe",
+    "loadMoreUsers": "Laadige rohkem kasutajaid",
+    "loading": "Armatuurlaua laadimine…",
+    "loadingMore": "Laadimine…",
+    "participants": "osalejad",
+    "preauthorize": "Kasutaja eelvolitamine",
+    "preauthorizeAction": "Eelluba",
+    "preauthorizeError": "Kasutajat ei saanud eelvolitada",
+    "preauthorized": "Kasutaja eelvolitatud",
+    "returnToGroups": "Tagasi Minu gruppidesse",
+    "searchGroups": "Otsi gruppe",
+    "searchUsers": "Otsige kasutajaid",
+    "signInDescription": "Haldamise armatuurlaud nõuab administraatori kontot.",
+    "signInTitle": "Sisselogimine on vajalik",
+    "tier": "Tase",
+    "tierError": "Taset ei saanud värskendada",
+    "tierFor": "Tase jaoks",
+    "tierUpdated": "Tase värskendatud",
+    "userDeleted": "Kasutaja kustutatud",
+    "userTier": "Tasemed"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Võrguühenduseta salvestusruum",
+    "loading": "Selle seadme kontrollimine…",
+    "unsupported": "See brauser ei saa salvestusolekust teatada.",
+    "usage": "{{used}} / {{quota}} kasutatud",
+    "unknown": "teadmata",
+    "persisted": "Salvestusruum on selles seadmes püsiv.",
+    "notPersisted": "Kui seadmes hakkab tühjaks saama, võib brauser võrguühenduseta andmed välja saata.",
+    "keep": "Hoidke andmeid selles seadmes",
+    "refresh": "Värskenda",
+    "critical": "Salvestusruum on peaaegu täis. Eksportige varukoopia kohe, seejärel eemaldage kasutamata rühmad.",
+    "warning": "Salvestusruum hakkab täis saama. Soovitatav on varundus."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Ootel sünkroonimine",
+    "expense": "Sünkroonimine ootel"
+  },
+  "Attachments": {
+    "assignItems": "Kviitungiüksuste eraldamine",
+    "extractedItems": "AI ekstraheeritud üksused",
+    "help": "Pildid tihendatakse enne üleslaadimist. PDF-faile hoitakse manusena ja need avatakse uuel vahelehel.",
+    "open": "Ava",
+    "openInNewTab": "Ava uuel vahelehel",
+    "pdfPreviewUnavailable": "PDF-i eelvaated avanevad eraldi vahekaardil.",
+    "pending": "Ootel üleslaadimine",
+    "preview": "Eelvaade",
+    "previewAction": "Eelvaade",
+    "previewNamed": "Eelvaade {{name}}",
+    "receipt": "Kaupluse kviitung",
+    "saveToAssignItems": "Esmalt salvestage kulud ja seejärel määrake need üksused osalejatele.",
+    "scanComplete": "Kviitung skaneeritud",
+    "scanCompleteDescription": "Määrake eraldatud üksused osalejatele.",
+    "scanError": "Kviitungit ei saanud skannida",
+    "scanWithAi": "Skannige AI-ga",
+    "scanning": "Skannimine…",
+    "view": "Vaata manuseid",
+    "attachment": "Manus",
+    "onlyImagesPdf": "Toetatakse ainult pilte ja PDF-faile."
+  },
+  "Backup": {
+    "downloaded": "Varukoopia alla laaditud.",
+    "export": "Ekspordi varukoopia",
+    "failed": "Varundamine ebaõnnestus.",
+    "restore": "Taasta varukoopia",
+    "restoreFailed": "Taastamine ebaõnnestus.",
+    "restoreLabel": "Taastage varukoopiafail",
+    "restored": "Varukoopia taastatud. Uuesti laadimine…"
+  },
+  "Common": {
+    "addGroup": "Lisa grupp",
+    "close": "Close",
+    "closeDialog": "Sule dialoog",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Loobu teatisest",
+    "error": "Midagi läks valesti",
+    "expenseNotFound": "Kulu ei leitud",
+    "loading": "Laadimine…",
+    "menu": "Menüü",
+    "retry": "Proovi uuesti",
+    "select": "Vali…",
+    "unknown": "teadmata",
+    "user": "Kasutaja"
+  },
+  "CreateGroup": {
+    "approvalContact": "Uute kulugruppide loomiseks on vaja administraatori volitusi. Võtke ühendust oma eksemplari administraatoriga, et ülendada oma konto grupilooja tasemele.",
+    "approvalDescription": "Teie konto on praegu kasutaja sünkroonimise tasemel. Saate osaleda kõigis teiega jagatud rühmades ja sünkroonida neid kõigis oma seadmetes.",
+    "approvalTitle": "Grupi loomine nõuab heakskiitu",
+    "authRequiredDescription": "Uute kulugruppide loomiseks logige sisse välise kontoga. Kutsutud grupis osalejad saavad endiselt teie grupilingi kaudu hõõrdumiseta liituda ilma sisse logimata.",
+    "authRequiredTitle": "Nõutav autentimine",
+    "returnToGroups": "Tagasi Minu gruppidesse",
+    "signIn": "Logige grupi loomiseks sisse"
+  },
+  "GroupTabs": {
+    "Expenses": "Kulud",
+    "Balances": "Saldod",
+    "Information": "Info",
+    "Stats": "Statistika",
+    "Activity": "Tegevus",
+    "Settings": "Seaded",
+    "label": "Grupi sektsioonid"
+  },
+  "Login": {
+    "title": "Logi sisse Spliiti",
+    "description": "Seadmeülese rühma sünkroonimise lubamiseks logige sisse välise kontoga.",
+    "google": "Jätkake Google'iga",
+    "github": "Jätkake GitHubiga",
+    "noProviders": "Ühtegi OAuthi pakkujat pole seadistatud. Sisselogimise lubamiseks määrake AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET."
+  },
+  "NotFound": {
+    "title": "Lehte ei leitud",
+    "description": "Kontrollige URL-i ja proovige uuesti.",
+    "groupTitle": "Seda gruppi ei ole olemas.",
+    "groupDescription": "Kontrollige URL-i või küsige uut kutse linki."
+  },
+  "SyncStatus": {
+    "offlinePending": "Võrguühenduseta – ootel muudatused: {{count}}",
+    "offlineSaved": "Võrguühenduseta – salvestatud andmete kuvamine",
+    "syncing": "Sünkroonimine…",
+    "error": "Sünkroonimisviga: {{error}}",
+    "retryToContinue": "proovi jätkamiseks uuesti",
+    "conflicts": "Ülevaatamist vajavad konfliktid: {{count}}",
+    "failed": "Muudatused, mida ei saanud sünkroonida: {{count}}",
+    "pending": "Ootel muudatused: {{count}}",
+    "retryFailed": "Proovi nurjunud muudatusi uuesti",
+    "discardFailed": "Loobu nurjunud muudatustest",
+    "resolveConflicts": "Lahendage konflikte",
+    "syncNow": "Sünkrooni kohe",
+    "dialogTitle": "Lahendage konflikte",
+    "dialogDescription": "Need muudatused muutsid samu kirjeid teises seadmes. Valige, mida hoida.",
+    "noConflicts": "Pole vaja lahendada konflikte.",
+    "serverVersion": "Serveri versioon {{version}} · kohalik redigeerimine hoitakse konfliktijärjekorras",
+    "keepMine": "Jäta minu versioon",
+    "useServer": "Kasuta serverit",
+    "duplicate": "Duplikaat nagu uus"
+  },
+  "Theme": {
+    "toggle": "Lülitage teema sisse",
+    "light": "Hele",
+    "dark": "Tume",
+    "system": "Süsteem"
   }
 }

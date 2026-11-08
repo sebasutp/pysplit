@@ -1,6 +1,7 @@
 /** Toast context and renderer. */
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /** @typedef {{id: number, title: string, description?: string}} Toast */
 
@@ -52,6 +53,7 @@ export function useToast() {
 
 /** @param {{toasts: Toast[], dismiss: (id: number) => void}} props */
 function Toaster({ toasts, dismiss }) {
+  const { t } = useTranslation()
   return (
     <div
       aria-live="polite"
@@ -75,7 +77,7 @@ function Toaster({ toasts, dismiss }) {
               type="button"
               className="text-xs text-muted-foreground hover:text-foreground"
               onClick={() => dismiss(item.id)}
-              aria-label="Dismiss notification"
+              aria-label={t('Common.dismissNotification', 'Dismiss notification')}
             >
               ✕
             </button>

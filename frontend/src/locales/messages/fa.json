@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "گروه ها"
+    "groups": "گروه ها",
+    "adminDashboard": "داشبورد مدیریت",
+    "language": "زبان",
+    "signIn": "وارد شوید",
+    "signOut": "از سیستم خارج شوید",
+    "userMenu": "منوی کاربر"
   },
   "Footer": {
     "madeIn": "ساخته‌شده در زوریخ، سوئیس 🇨🇭",
@@ -17,7 +22,7 @@
   },
   "Expenses": {
     "title": "مخارج",
-    "description": "Here are the expenses that you created for your group.",
+    "description": "در اینجا هزینه هایی است که برای گروه خود ایجاد کرده اید.",
     "create": "افزودن هزینه",
     "createFirst": "افزودن هزینه اول",
     "noExpenses": "گروه شما هنوز خرجی ثبت نکرده است.",
@@ -39,15 +44,30 @@
       "lastMonth": "ماه گذشته",
       "earlierThisYear": "اویل امسال",
       "lastYear": "سال گذشته",
-      "older": "قدیمی تر"
-    }
+      "older": "قدیمی تر",
+      "today": "امروز",
+      "week": "اوایل این هفته",
+      "month": "اوایل این ماه",
+      "year": "اویل امسال"
+    },
+    "clearSearch": "پاک کردن",
+    "exportError": "نمی توان هزینه ها را صادر کرد",
+    "filterFrom": "از",
+    "filterTo": "به",
+    "loadMore": "بیشتر بارگیری کنید",
+    "loading": "در حال بارگیری هزینه‌ها…",
+    "loadingMore": "در حال بارگیری…",
+    "search": "جستجوی هزینه‌ها",
+    "showingCount": "نمایش {{shown}} از هزینه‌های {{total}}."
   },
   "ExpenseCard": {
     "paidBy": "پرداخت شده توسط  <strong>{paidBy}</strong> برای <paidFor></paidFor>",
     "everyone": "همه",
     "receivedBy": "دریافت شده از <strong>{paidBy}</strong> برای <paidFor></paidFor>",
     "yourBalance": "تراز شما:",
-    "notInvolved": "شامل شما نمی شود"
+    "notInvolved": "شامل شما نمی شود",
+    "paidByPlain": "پرداخت شده توسط {{paidBy}} برای {{paidFor}}",
+    "receivedByPlain": "دریافت شده توسط {{paidBy}} برای {{paidFor}}"
   },
   "Groups": {
     "myGroups": "گروه های من",
@@ -60,11 +80,11 @@
       "orAsk": "یا از دوستتان بخواهید لینک یکی از گروه‌های موجود را برایتان ارسال کند."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "کل موجودی شما",
+      "description": "تعادل ترکیبی شما در تمام گروه های شما.",
+      "owedToYou": "شما مدیون هستید",
+      "youOwe": "شما مدیون هستید",
+      "settledUp": "همه شما در گروه های خود مستقر هستید."
     },
     "recent": "گروه‌های اخیر",
     "starred": "گروه های ستاره خورده",
@@ -74,7 +94,7 @@
     "removeRecent": "حذف از گروه‌های اخیر",
     "RecentRemovedToast": {
       "title": "گروه حذف شد",
-      "description": "The group was removed from your recent groups list.",
+      "description": "این گروه از لیست گروه های اخیر شما حذف شد.",
       "undoAlt": "بازگرداندن گروه حذف شده",
       "undo": "واگرد"
     },
@@ -82,8 +102,8 @@
       "button": "افزودن با استفاده از لینک",
       "title": "افزودن گروه با استفاده از لینک",
       "description": "اگر لینک گروهی با شما به اشتراک گذاشته شده، می‌توانید آن را اینجا بچسبانید (پیست کنید) تا به لیستتان اضافه شود.",
-      "error": "Oops, we are not able to find the group from the URL you provided…",
-      "urlMode": "Enter URL",
+      "error": "متأسفم، ما نمی‌توانیم گروه را از نشانی اینترنتی که ارائه کرده‌اید پیدا کنیم…",
+      "urlMode": "URL را وارد کنید",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "این گروه وجود ندارد.",
       "link": "مشاهده گروه‌های اخیر"
-    }
+    },
+    "moreOptions": "گزینه های بیشتر",
+    "participants": "شرکت کنندگان",
+    "star": "گروه ستاره",
+    "unstar": "گروه حذف ستاره"
   },
   "GroupForm": {
     "title": "اطلاعات گروه",
@@ -129,7 +153,10 @@
       "add": "افزودن عضو",
       "John": "محمد",
       "Jane": "فاطمه",
-      "Jack": "علی"
+      "Jack": "علی",
+      "cannotRemove": "این شرکت کننده بخشی از هزینه است و قابل حذف نیست.",
+      "indexLabel": "شرکت کننده #{{index}}",
+      "remove": "حذف شرکت‌کننده {{index}}"
     },
     "Settings": {
       "title": "تنظیمات دستگاه",
@@ -145,7 +172,8 @@
       "create": "بساز",
       "creating": "در حال ساختن…",
       "cancel": "لغو"
-    }
+    },
+    "saveError": "گروه ذخیره نشد."
   },
   "ExpenseForm": {
     "Income": {
@@ -181,27 +209,27 @@
       "edit": "اصلاح هزینه",
       "TitleField": {
         "label": "عنوان هزینه",
-        "placeholder": "Monday evening restaurant",
+        "placeholder": "رستوران، شنبه شب",
         "description": "Enter a description for the expense."
       },
       "DateField": {
-        "label": "Expense date",
+        "label": "تاریخ هزینه",
         "description": "Enter the date the expense was paid."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "ارز هزینه",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Select the expense category.",
       "paidByField": {
-        "label": "Paid by",
+        "label": "پرداخت شده توسط",
         "placeholder": "Select a participant",
         "description": "Select the participant who paid the expense."
       },
       "recurrenceRule": {
         "label": "تناوب هزینه",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
+        "none": "هیچکس",
         "daily": "روزانه",
         "weekly": "هفتگی",
         "monthly": "ماهانه"
@@ -218,63 +246,71 @@
     },
     "conversionUnavailable": "To set a different currency per expense and convert amounts, select a non-custom currency for the group.",
     "originalAmountField": {
-      "label": "Amount to convert",
-      "repaymentLabel": "Amount to transfer",
+      "label": "مبلغ برای تبدیل",
+      "repaymentLabel": "مبلغ برای انتقال",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
-      "useApi": "Use rates from Frankfurter",
-      "useCustom": "Use custom rate",
-      "label": "Exchange rate"
+      "useApi": "از نرخ های فرانکفورتر استفاده کنید",
+      "useCustom": "از نرخ سفارشی استفاده کنید",
+      "label": "نرخ ارز"
     },
     "conversionRateState": {
-      "loading": "Getting exchange rates…",
+      "loading": "دریافت نرخ ارز…",
       "success": "Obtained rates:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "وای، ما نتوانستیم جدیدترین نرخ ها را دریافت کنیم.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "نرخ سفارشی را در زیر وارد کنید.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "تازه کردن",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "این یک بازپرداخت است"
     },
     "categoryField": {
       "label": "دسته بندی"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "یادداشت ها"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "هیچ کدام را انتخاب نکنید",
+    "selectAll": "همه را انتخاب کنید",
+    "shares": "سهم(ها)",
+    "advancedOptions": "گزینه های تقسیم پیشرفته…",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "حالت تقسیم",
+      "evenly": "به طور مساوی",
+      "byShares": "نابرابر - بر اساس سهام",
+      "byPercentage": "نابرابر - بر اساس درصد",
+      "byAmount": "نابرابر - بر اساس مقدار",
+      "saveAsDefault": "ذخیره به عنوان گزینه های تقسیم پیش فرض"
     },
     "DeletePopup": {
       "label": "حذف",
       "title": "این هزینه را حذف کنیم؟",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
+      "description": "آیا واقعاً می خواهید این هزینه را حذف کنید؟ این عمل برگشت ناپذیر است.",
       "yes": "آره",
       "cancel": "لغو"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "attachDocuments": "اسناد را ضمیمه کنید",
+    "create": "افزودن گروه",
+    "creating": "در حال ساختن…",
+    "save": "ذخیره سازی",
+    "saving": "در حال ذخیره سازی…",
+    "cancel": "لغو",
+    "reimbursement": "بازپرداخت",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "اختصاص اقلام رسید",
+    "conflict": "این هزینه توسط شخص دیگری تغییر کرده است. صفحه را دوباره بارگیری کنید و دوباره امتحان کنید.",
+    "conflictTitle": "هزینه در جای دیگری تغییر کرد",
+    "deleteError": "نمی توان هزینه را حذف کرد.",
+    "pendingReceiptTotal": "رسید اسکن شده در حالت آفلاین آماده است.",
+    "pendingReceiptTotalApply": "از کل اسکن شده استفاده کنید",
+    "pendingReceiptTotalDismiss": "رد کردن",
+    "saveError": "نمی توان در هزینه صرفه جویی کرد."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "خطا در آپلود فایل",
+      "description": "هنگام آپلود رسید خطایی پیش آمد. لطفاً بعداً دوباره امتحان کنید یا فایل دیگری را انتخاب کنید.",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "ایجاد هزینه از دریافت",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -313,99 +349,110 @@
       "description": "هنگام آپلود رسید خطایی پیش آمد. لطفاً بعداً دوباره امتحان کنید یا فایل دیگری را انتخاب کنید.",
       "retry": "تلاش مجدد"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "در صف. پس از اتصال مجدد، رسید اسکن می شود.",
+    "offline": "وقتی آنلاین هستید، اسکن از سر گرفته می شود.",
+    "scanFailed": "هوش مصنوعی نتوانست این رسید را بخواند. پیکربندی AI سرور را بررسی کنید و دوباره امتحان کنید.",
+    "scanning": "در حال اسکن…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "اقلام رسید",
+    "backToExpense": "بازگشت به هزینه",
+    "merchant": "نام فروشگاه",
+    "printedTotal": "کل روی رسید چاپ شده است",
+    "noReceipt": "هنوز هیچ رسیدی به این هزینه مرتبط نیست.",
+    "empty": "هنوز موردی وجود ندارد. برای شروع تقسیم یکی اضافه کنید.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "تغییر شما ذخیره نشد",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "مورد را اضافه کنید",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "مورد را اضافه کنید",
+      "nameLabel": "نام",
+      "quantityLabel": "مقدار",
+      "amountLabel": "مقدار",
+      "sharedLabel": "اشتراکی (هزینه تمام قبض)",
+      "add": "اضافه کنید",
+      "cancel": "لغو"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} از {total}",
+      "remaining": "{quantity} باقی مانده",
+      "assign": "اختصاص دهید",
+      "edit": "ویرایش کنید",
+      "delete": "حذف",
+      "removePortion": "حذف سهم اختصاص داده شده",
+      "editTitle": "مورد را ویرایش کنید",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "ذخیره سازی",
+      "cancel": "لغو",
+      "deleteConfirm": "این مورد حذف شود؟",
+      "deleteDescription": "این مورد و تکالیف آن را حذف می کند."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "اختصاص داده نشده",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "به اشتراک گذاشته شده",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "مورد را اختصاص دهید",
+      "description": "انتخاب کنید چه کسی برای \"{name}\" پرداخت می کند.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "به طور مساوی تقسیم کنید",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "تقسیم سفارشی",
+      "customHint": "برای هر هدف، مقادیر را به واحد وارد کنید.",
+      "shared": "به اشتراک گذاشته شده",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "مقدار اختصاص داده شده از مقدار مورد بیشتر است.",
+      "confirm": "اختصاص دهید",
+      "cancel": "لغو"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "به اشتراک گذاشته شده",
+      "unassigned": "اختصاص داده نشده",
+      "optOut": "موارد اختصاص داده نشده را به اشتراک می گذارد",
+      "reconciles": "متعادل",
+      "offBy": "تفاوت {amount}",
+      "itemsTotal": "مجموع اقلام رسید",
+      "apply": "اعمال به هزینه",
+      "allOptedOut": "همه انصراف دادند، اما برخی از موارد هنوز تعیین تکلیف نشده‌اند.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "مقادیر رسید متفاوت است · دوباره درخواست کنید"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "هزینه به روز شد",
+      "description": "اقلام رسید به هزینه اعمال شد."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "رسید اعمال نشد"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "هزینه را به روز کنید؟",
+      "description": "کل هزینه با کل اقلام دریافتی متفاوت است. با درخواست، مبلغ هزینه و تقسیم آن بازنویسی می شود.",
+      "total": "مجموع {current} → {new}",
+      "cancel": "لغو",
+      "confirm": "اعمال"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "اسکن در صف است",
+    "scanPendingDescription": "تصویر در این دستگاه ذخیره شده است و وقتی دوباره آنلاین شدید اسکن می شود.",
+    "offlineQueue": "شما آفلاین هستید. اکنون عکس را پیوست کنید و پس از اتصال مجدد اسکن می شود.",
+    "disabled": "تقسیم هوشمند در این سرور فعال نیست. اسکن رسید یک ویژگی فقط آنلاین است.",
+    "extracted": "رسید اسکن شد",
+    "extractedDescription": "موارد استخراج شده را در زیر اختصاص دهید.",
+    "loading": "در حال بارگیری رسید…",
+    "optOutTitle": "انصراف",
+    "scanError": "رسید اسکن نشد.",
+    "scanUnavailable": "پیکربندی AI سرور را بررسی کنید و دوباره امتحان کنید.",
+    "scanning": "در حال اسکن رسید…",
+    "upload": "عکس رسید را آپلود کنید"
   },
   "Balances": {
     "title": "تراز ها",
@@ -415,20 +462,22 @@
       "description": "اینجا پیشنهاداتی برای بازپرداخت‌های با کمترین تعداد تراکنش بین اعضا داده شده است.",
       "noImbursements": "به نظر می‌آید گروه شما نیازی به بازپرداخت ندارد 😁",
       "owes": "<strong>{from}</strong> به <strong>{to}</strong> بدهکار است",
-      "markAsPaid": "تایید تسویه حساب"
-    }
+      "markAsPaid": "تایید تسویه حساب",
+      "owesPlain": "{{from}} مدیون {{to}}"
+    },
+    "loading": "در حال بارگیری موجودی…"
   },
   "Stats": {
     "title": "‍آمار‌ها",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "تمام زمان",
+      "thisMonth": "این ماه",
+      "last30": "30 روز گذشته",
+      "thisYear": "امسال",
+      "custom": "محدوده سفارشی",
+      "from": "از",
+      "to": "به"
     },
     "Totals": {
       "title": "مجموع",
@@ -440,60 +489,63 @@
       "yourShare": "مجموع سهم شما"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "خلاصه",
+      "description": "ارقام کلیدی برای دوره انتخاب شده",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "مخارج",
+      "averageExpense": "هزینه متوسط",
+      "largestExpense": "بزرگترین هزینه",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "خرج کردن در طول زمان",
+      "description": "کل هزینه های گروه در ماه. یک ماه را برای دیدن هزینه های آن انتخاب کنید.",
+      "empty": "هنوز هیچ هزینه ای وجود ندارد.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "هزینه های این ماه برای دوره انتخابی.",
+      "detailsEmpty": "هیچ هزینه ای در این ماه وجود ندارد.",
+      "showExpensesPlain": "نمایش هزینه‌ها برای {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "هزینه توسط شرکت کننده",
+      "description": "میزان پرداختی هر شرکت کننده و سهم آنها از هزینه ها.",
+      "empty": "هنوز هیچ هزینه ای وجود ندارد.",
+      "participant": "شرکت کننده",
+      "paid": "پرداخت شده است",
       "count": "Count",
-      "share": "Share"
+      "share": "به اشتراک بگذارید"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "هزینه بر اساس دسته بندی",
+      "description": "کل مبلغ هزینه شده در هر دسته یک دسته را انتخاب کنید تا هزینه های آن را ببینید.",
+      "empty": "هنوز هیچ هزینه ای وجود ندارد.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "هزینه های این دسته برای دوره انتخاب شده.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "نمایش هزینه‌ها برای {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "هزینه های مکرر",
+      "description": "هزینه تخمینی هزینه های مکرر فعال گروه.",
+      "estimatedMonthly": "هزینه تخمینی ماهانه",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "در حال بارگیری آمار…"
   },
   "Activity": {
     "title": "فعالیت‌ها",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
-    "someone": "Someone",
-    "settingsModified": "Group settings were modified by <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "description": "نمای کلی تمام فعالیت های این گروه.",
+    "noActivity": "هنوز هیچ فعالیتی در گروه شما وجود ندارد.",
+    "someone": "کسی",
+    "settingsModified": "تنظیمات گروه با <strong>{participant}</strong> اصلاح شد.",
+    "expenseCreated": "هزینه <em>{expense}</em> ایجاد شده توسط <strong>{participant}</strong>.",
+    "expenseUpdated": "هزینه <em>{expense}</em> توسط <strong>{participant}</strong> به‌روزرسانی شد.",
+    "expenseDeleted": "هزینه <em>{expense}</em> توسط <strong>{participant}</strong> حذف شد.",
     "Groups": {
       "today": "امروز",
       "yesterday": "دیروز",
@@ -504,19 +556,24 @@
       "earlierThisYear": "اوایل امسال",
       "lastYear": "سال گذشته",
       "older": "قدیمی تر"
-    }
+    },
+    "loadMore": "بیشتر بارگیری کنید",
+    "loading": "در حال بارگیری فعالیت…",
+    "unknown": "فعالیت ناشناخته"
   },
   "Information": {
-    "title": "Information",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
-    "empty": "No group information yet."
+    "title": "اطلاعات",
+    "description": "از این مکان برای اضافه کردن اطلاعاتی که می تواند به شرکت کنندگان گروه مرتبط باشد استفاده کنید.",
+    "empty": "هنوز اطلاعات گروهی وجود ندارد."
   },
   "Settings": {
-    "title": "Settings"
+    "title": "تنظیمات",
+    "saved": "گروه به روز شد",
+    "savedDescription": "تغییرات شما ذخیره شده است."
   },
   "Share": {
-    "title": "Share",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "title": "به اشتراک بگذارید",
+    "description": "برای اینکه سایر شرکت‌کنندگان گروه را ببینند و هزینه‌ها را اضافه کنند، URL آن را با آنها به اشتراک بگذارید.",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Warning!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "به اشتراک بگذارید",
+    "copy": "لینک را کپی کنید",
+    "url": "لینک گروه"
   },
   "SchemaErrors": {
     "min1": "حداقل یک حرف وارد کنید.",
@@ -543,7 +603,10 @@
     "paidForMin1": "هزینه باید برای حداقل یک عضو پرداخت شود.",
     "noZeroShares": "تمام سهم‌ها باید بیشتر از ۰ باشند.",
     "amountSum": "مجموع سهم‌ها باید برابر کل هزینه باشد.",
-    "percentageSum": "مجموع درصدها باید برابر ۱۰۰ باشد."
+    "percentageSum": "مجموع درصدها باید برابر ۱۰۰ باشد.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "جستجوی دسته‌بندی…",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "به روز رسانی موجود است",
+    "updateDescription": "نسخه جدید pysplit در دسترس است.",
+    "reload": "بارگذاری مجدد",
+    "updating": "در حال به روز رسانی…",
+    "offlineReady": "آماده برای کار آفلاین",
+    "offlineReadyDescription": "پوسته برنامه ذخیره شده است. وقتی آنلاین هستید، یک گروه را باز کنید تا داده های آن حفظ شود.",
+    "dismiss": "بستن",
+    "install": "برنامه را نصب کنید",
+    "refreshApp": "برنامه را به روز کنید",
+    "refreshAppHint": "فایل های کش را پاک کنید و آخرین نسخه را بارگیری مجدد کنید. داده های ذخیره شده شما در این دستگاه باقی می ماند."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "داشبورد مدیریت",
+    "description": "نقش‌های کاربر، مجوزهای دسترسی به پلتفرم، و نظارت بر معیارهای سیستم را مدیریت کنید.",
+    "totalGroups": "مجموع گروه ها",
+    "totalExpenses": "مجموع هزینه ها",
+    "registeredUsers": "کاربران ثبت نام شده",
+    "userManagement": "مدیریت کاربر و سطوح مجوز",
+    "accessDenied": "دسترسی ممنوع شد",
+    "accessDeniedDescription": "داشبورد مدیریت به کاربران در ردیف Administrator محدود می شود.",
+    "delete": "حذف",
+    "deleteError": "حذف نشد",
+    "email": "ایمیل",
+    "expenses": "هزینه ها",
+    "groupDeleted": "گروه حذف شد",
+    "groupManagement": "گروه ها",
+    "groupManagementDescription": "گروه ها را حذف کنید و استفاده را بررسی کنید.",
+    "groups": "گروه ها",
+    "loadMoreGroups": "بارگیری گروه های بیشتر",
+    "loadMoreUsers": "کاربران بیشتری را بارگیری کنید",
+    "loading": "در حال بارگیری داشبورد…",
+    "loadingMore": "در حال بارگیری…",
+    "participants": "شرکت کنندگان",
+    "preauthorize": "یک کاربر را از قبل مجوز دهید",
+    "preauthorizeAction": "پیش مجوز دادن",
+    "preauthorizeError": "نمی‌توان کاربر را از قبل مجوز داد",
+    "preauthorized": "کاربر از قبل مجاز شده است",
+    "returnToGroups": "به گروه های من برگردید",
+    "searchGroups": "جستجو در گروه ها",
+    "searchUsers": "جستجوی کاربران",
+    "signInDescription": "داشبورد مدیریت به یک حساب مدیر نیاز دارد.",
+    "signInTitle": "ورود به سیستم الزامی است",
+    "tier": "ردیف",
+    "tierError": "نمی‌توان ردیف را به‌روزرسانی کرد",
+    "tierFor": "ردیف برای",
+    "tierUpdated": "ردیف به روز شد",
+    "userDeleted": "کاربر حذف شد",
+    "userTier": "طبقات"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "ذخیره سازی آفلاین",
+    "loading": "در حال بررسی این دستگاه…",
+    "unsupported": "این مرورگر نمی تواند وضعیت فضای ذخیره سازی را گزارش کند.",
+    "usage": "{{used}} از {{quota}} استفاده شده است",
+    "unknown": "ناشناخته",
+    "persisted": "فضای ذخیره‌سازی در این دستگاه دائمی است.",
+    "notPersisted": "اگر فضای دستگاه کم باشد، ممکن است مرورگر داده‌های آفلاین را خارج کند.",
+    "keep": "داده ها را در این دستگاه نگه دارید",
+    "refresh": "تازه کردن",
+    "critical": "فضای ذخیره سازی تقریبا پر است. اکنون یک نسخه پشتیبان صادر کنید، سپس گروه های استفاده نشده را حذف کنید.",
+    "warning": "فضای ذخیره سازی در حال پر شدن است تهیه نسخه پشتیبان توصیه می شود."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "در انتظار همگام سازی",
+    "expense": "در انتظار همگام‌سازی"
+  },
+  "Attachments": {
+    "assignItems": "اختصاص اقلام رسید",
+    "extractedItems": "اقلام استخراج شده توسط هوش مصنوعی",
+    "help": "تصاویر قبل از آپلود فشرده می شوند. پی دی اف ها به عنوان پیوست نگهداری می شوند و در یک برگه جدید باز می شوند.",
+    "open": "باز کردن",
+    "openInNewTab": "در یک برگه جدید باز کنید",
+    "pdfPreviewUnavailable": "پیش نمایش های PDF در یک برگه جداگانه باز می شوند.",
+    "pending": "در انتظار آپلود",
+    "preview": "پیش نمایش",
+    "previewAction": "پیش نمایش",
+    "previewNamed": "پیش نمایش {{name}}",
+    "receipt": "رسید فروشگاه",
+    "saveToAssignItems": "ابتدا هزینه را ذخیره کنید، سپس این موارد را به شرکت کنندگان اختصاص دهید.",
+    "scanComplete": "رسید اسکن شد",
+    "scanCompleteDescription": "موارد استخراج شده را به شرکت کنندگان اختصاص دهید.",
+    "scanError": "رسید اسکن نشد",
+    "scanWithAi": "اسکن با هوش مصنوعی",
+    "scanning": "در حال اسکن…",
+    "view": "مشاهده پیوست ها",
+    "attachment": "پیوست",
+    "onlyImagesPdf": "فقط تصاویر و فایل های PDF پشتیبانی می شوند."
+  },
+  "Backup": {
+    "downloaded": "نسخه پشتیبان دانلود شد.",
+    "export": "صادرات نسخه پشتیبان",
+    "failed": "پشتیبان گیری انجام نشد.",
+    "restore": "بازیابی نسخه پشتیبان",
+    "restoreFailed": "بازیابی انجام نشد.",
+    "restoreLabel": "بازیابی فایل پشتیبان",
+    "restored": "نسخه پشتیبان بازیابی شد. در حال بارگیری مجدد…"
+  },
+  "Common": {
+    "addGroup": "اضافه کردن گروه",
+    "close": "Close",
+    "closeDialog": "بستن گفتگو",
+    "dismiss": "Dismiss",
+    "dismissNotification": "رد اطلاعیه",
+    "error": "مشکلی پیش آمد",
+    "expenseNotFound": "هزینه پیدا نشد",
+    "loading": "در حال بارگیری…",
+    "menu": "منو",
+    "retry": "تلاش مجدد",
+    "select": "انتخاب…",
+    "unknown": "ناشناخته",
+    "user": "کاربر"
+  },
+  "CreateGroup": {
+    "approvalContact": "ایجاد گروه های هزینه جدید نیاز به مجوز از یک سرپرست دارد. لطفاً با سرپرست نمونه خود تماس بگیرید تا حساب خود را به ردیف Creator گروه ارتقا دهید.",
+    "approvalDescription": "حساب شما در حال حاضر در ردیف کاربر Sync است. می توانید در هر گروهی که با شما به اشتراک گذاشته شده است شرکت کنید و آنها را در همه دستگاه های خود همگام سازی کنید.",
+    "approvalTitle": "ایجاد گروه نیاز به تایید دارد",
+    "authRequiredDescription": "برای ایجاد گروه‌های هزینه جدید، لطفاً با یک حساب خارجی وارد شوید. شرکت‌کنندگان گروه دعوت‌شده همچنان می‌توانند بدون اصطکاک از طریق پیوند گروه شما بدون ورود به سیستم بپیوندند.",
+    "authRequiredTitle": "احراز هویت مورد نیاز است",
+    "returnToGroups": "به گروه های من برگردید",
+    "signIn": "برای ایجاد گروه وارد شوید"
+  },
+  "GroupTabs": {
+    "Expenses": "مخارج",
+    "Balances": "تراز ها",
+    "Information": "اطلاعات",
+    "Stats": "‍آمار‌ها",
+    "Activity": "فعالیت‌ها",
+    "Settings": "تنظیمات",
+    "label": "بخش های گروهی"
+  },
+  "Login": {
+    "title": "به Spliit وارد شوید",
+    "description": "با یک حساب خارجی وارد شوید تا همگام سازی گروه بین دستگاهی را فعال کنید.",
+    "google": "با گوگل ادامه دهید",
+    "github": "با GitHub ادامه دهید",
+    "noProviders": "هیچ ارائه دهنده OAuth پیکربندی نشده است. AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET را برای فعال کردن ورود به سیستم تنظیم کنید."
+  },
+  "NotFound": {
+    "title": "صفحه پیدا نشد",
+    "description": "URL را بررسی کنید و دوباره امتحان کنید.",
+    "groupTitle": "این گروه وجود ندارد.",
+    "groupDescription": "URL را بررسی کنید یا یک پیوند دعوت جدید بخواهید."
+  },
+  "SyncStatus": {
+    "offlinePending": "آفلاین - تغییرات در انتظار: {{count}}",
+    "offlineSaved": "آفلاین - نمایش داده های ذخیره شده",
+    "syncing": "در حال همگام سازی…",
+    "error": "خطای همگام سازی: {{error}}",
+    "retryToContinue": "برای ادامه دوباره تلاش کنید",
+    "conflicts": "تضادهای نیاز به بررسی: {{count}}",
+    "failed": "تغییراتی که همگام‌سازی نشدند: {{count}}",
+    "pending": "تغییرات در انتظار: {{count}}",
+    "retryFailed": "تلاش مجدد برای تغییرات ناموفق",
+    "discardFailed": "صرف‌نظر از تغییرات ناموفق",
+    "resolveConflicts": "تعارضات را حل کنید",
+    "syncNow": "اکنون همگام سازی کنید",
+    "dialogTitle": "تعارضات را حل کنید",
+    "dialogDescription": "این ویرایش‌ها همان رکوردها را در دستگاه دیگری تغییر داد. انتخاب کنید چه چیزی را نگه دارید.",
+    "noConflicts": "بدون درگیری برای حل کردن",
+    "serverVersion": "نسخه سرور {{version}} · ویرایش محلی در صف تداخل نگهداری می شود",
+    "keepMine": "نگه داشتن نسخه من",
+    "useServer": "از سرور استفاده کنید",
+    "duplicate": "کپی به عنوان جدید"
+  },
+  "Theme": {
+    "toggle": "تغییر موضوع",
+    "light": "روشن",
+    "dark": "تیره",
+    "system": "سیستم"
   }
 }

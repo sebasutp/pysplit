@@ -232,3 +232,71 @@ export function computeReceiptSplit(participantIds, optedOutParticipantIds, item
     all_opted_out: sharers.length === 0 && unassignedPool !== 0,
   }
 }
+
+/**
+ * Break one item into its participant/shared/unassigned destinations.
+ *
+ * Uses the same parsing and consumption as `computeReceiptSplit`, so the
+ * amounts here match the split exactly. Multiple portions for one participant
+ * are merged into a single destination with their quantities and amounts
+ * summed.
+ *
+ * @param {any} item
+ * @param {Iterable<string>} participantIds
+ * @returns {{target: string, participantId: string|null, quantityMilli: number, amount: number}[]}
+ */
+export function getItemDestinations(item, participantIds) {
+  const [split] = toReceiptSplitItems([item])
+  const participantSet = new Set([...participantIds].map(String))
+  const consumed = consumeItemPortions(split, participantSet)
+  const remaining = consumed.remaining || 0
+
+  /** @type {{target: string, participantId: string|null, quantityMilli: number}[]} */
+  const destinations = []
+  /** @type {number[]} */
+  const weights = []
+  let sharedWeight = 0
+
+  for (const current of consumed.portions) {
+    if (current.target === PARTICIPANT && current.participant_id != null) {
+      weights.push(current.quantity_milli)
+      destinations.push({
+        target: PARTICIPANT,
+        participantId: current.participant_id,
+        quantityMilli: current.quantity_milli,
+      })
+    } else {
+      sharedWeight += current.quantity_milli
+    }
+  }
+  if (sharedWeight > 0) {
+    weights.push(sharedWeight)
+    destinations.push({ target: SHARED, participantId: null, quantityMilli: sharedWeight })
+  }
+  if (remaining > 0) {
+    weights.push(remaining)
+    destinations.push({
+      target: 'UNASSIGNED',
+      participantId: null,
+      quantityMilli: remaining,
+    })
+  }
+
+  const amounts = weightedApportion(split.amount, weights)
+  /** @type {Map<string, {target: string, participantId: string|null, quantityMilli: number, amount: number}>} */
+  const merged = new Map()
+  destinations.forEach((destination, index) => {
+    const key =
+      destination.target === PARTICIPANT
+        ? `participant:${destination.participantId}`
+        : destination.target
+    const existing = merged.get(key)
+    if (existing) {
+      existing.quantityMilli += destination.quantityMilli
+      existing.amount += amounts[index] || 0
+    } else {
+      merged.set(key, { ...destination, amount: amounts[index] || 0 })
+    }
+  })
+  return [...merged.values()]
+}

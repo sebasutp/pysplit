@@ -1,7 +1,7 @@
 {
   "Homepage": {
     "title": "Partagez <strong>vos dépenses</strong> avec <strong>vos amis & votre famille</strong>",
-    "metaTitle": "Spliit · Share Expenses with Friends & Family",
+    "metaTitle": "Spliit · Partagez vos dépenses avec vos amis & votre famille",
     "description": "Bienvenue sur votre instance <strong>Spliit</strong> !",
     "button": {
       "groups": "Accéder aux groupes",
@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Groupes"
+    "groups": "Groupes",
+    "adminDashboard": "Tableau de bord d'administration",
+    "language": "Langue",
+    "signIn": "Connectez-vous",
+    "signOut": "Se déconnecter",
+    "userMenu": "Menu utilisateur"
   },
   "Footer": {
     "madeIn": "Fait à Zurich, Suisse 🇨🇭",
@@ -39,32 +44,47 @@
       "lastMonth": "Le mois dernier",
       "earlierThisYear": "Plus tôt cette année",
       "lastYear": "L'année dernière",
-      "older": "Plus ancien"
-    }
+      "older": "Plus ancien",
+      "today": "Aujourd'hui",
+      "week": "Plus tôt cette semaine",
+      "month": "Plus tôt ce mois-ci",
+      "year": "Plus tôt cette année"
+    },
+    "clearSearch": "Effacer",
+    "exportError": "Impossible d'exporter les dépenses",
+    "filterFrom": "Du",
+    "filterTo": "au",
+    "loadMore": "Charger plus",
+    "loading": "Chargement des dépenses…",
+    "loadingMore": "Chargement…",
+    "search": "Rechercher des dépenses",
+    "showingCount": "Affichage des dépenses {{shown}} sur {{total}}."
   },
   "ExpenseCard": {
     "paidBy": "Payé par <strong>{paidBy}</strong> pour <paidFor></paidFor>",
     "everyone": "tout le monde",
     "receivedBy": "Reçu par <strong>{paidBy}</strong> pour <paidFor></paidFor>",
     "yourBalance": "Votre solde :",
-    "notInvolved": "Vous n'êtes pas concerné"
+    "notInvolved": "Vous n'êtes pas concerné",
+    "paidByPlain": "Payé par {{paidBy}} pour {{paidFor}}",
+    "receivedByPlain": "Reçu par {{paidBy}} pour {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Mes groupes",
     "create": "Créer",
-    "createGroup": "Create group",
+    "createGroup": "Créer un groupe",
     "loadingRecent": "Chargement des groupes récents…",
     "NoRecent": {
       "description": "Vous n'avez visité aucun groupe récemment.",
-      "create": "Créer un groupe",
+      "create": "En créer un",
       "orAsk": "ou demandez à un ami de vous envoyer le lien d'un groupe existant."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Votre solde total",
+      "description": "Votre solde cumulé pour l'ensemble de vos groupes.",
+      "owedToYou": "On vous doit",
+      "youOwe": "Vous devez",
+      "settledUp": "Vos comptes sont réglés pour tous vos groupes."
     },
     "recent": "Groupes récents",
     "starred": "Groupes favoris",
@@ -83,21 +103,25 @@
       "title": "Ajouter un groupe par URL",
       "description": "Si un groupe a été partagé avec vous, vous pouvez coller son URL ici pour l'ajouter à votre liste.",
       "error": "Oups, nous ne pouvons pas trouver le groupe à partir de l'URL que vous avez fournie…",
-      "urlMode": "Enter URL",
-      "qrMode": "Scan QR",
+      "urlMode": "Entrer une URL",
+      "qrMode": "Scanner un QR code",
       "scanner": {
-        "startCamera": "Start Camera",
-        "stopScanning": "Stop Scanning",
-        "permissionDenied": "Camera permission denied. Please allow camera access to scan QR codes.",
-        "noCamera": "No camera found on this device.",
-        "cameraError": "Failed to start camera. Please try again.",
-        "permissionError": "Unable to access camera. Please check permissions."
+        "startCamera": "Lancer la caméra",
+        "stopScanning": "Arrêter l'analyse",
+        "permissionDenied": "Accès à la caméra refusé. Veuillez autoriser l'accès à la caméra pour scanner un QR code.",
+        "noCamera": "Aucune caméra n'a été trouvée sur l'appareil.",
+        "cameraError": "Impossible d'activer la caméra. Veuillez réessayer.",
+        "permissionError": "Impossible d'accéder à la caméra. Vérifiez les permissions."
       }
     },
     "NotFound": {
       "text": "Ce groupe n'existe pas.",
       "link": "Aller aux groupes récemment visités"
-    }
+    },
+    "moreOptions": "Plus d'options",
+    "participants": "participants",
+    "star": "Groupe d'étoiles",
+    "unstar": "Supprimer la star du groupe"
   },
   "GroupForm": {
     "title": "Informations sur le groupe",
@@ -129,7 +153,10 @@
       "add": "Ajouter un participant",
       "John": "Jean",
       "Jane": "Jeanne",
-      "Jack": "Jacques"
+      "Jack": "Jacques",
+      "cannotRemove": "Ce participant fait partie d'une dépense et ne peut être supprimé.",
+      "indexLabel": "Participant #{{index}}",
+      "remove": "Supprimer le participant {{index}}"
     },
     "Settings": {
       "title": "Paramètres locaux",
@@ -145,7 +172,8 @@
       "create": "Créer",
       "creating": "Création…",
       "cancel": "Annuler"
-    }
+    },
+    "saveError": "Impossible de sauvegarder le groupe."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,8 +247,8 @@
     "conversionUnavailable": "Pour définir une devise différente pour chaque dépense et convertir les montants, sélectionnez une devise non personnalisée pour le groupe.",
     "originalAmountField": {
       "label": "Montant à convertir",
-      "repaymentLabel": "Amount to transfer",
-      "repaymentDescription": "Converted from the amount above, which is what settles the balance."
+      "repaymentLabel": "Montant à transférer",
+      "repaymentDescription": "Converti à partir du montant ci-dessus, celui qui équilibre les comptes."
     },
     "conversionRateField": {
       "useApi": "Utiliser les taux de change de Frankfurter",
@@ -246,7 +274,7 @@
       "label": "Catégorie"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "Remarques"
     },
     "selectNone": "Tout désélectionner",
     "selectAll": "Tout sélectionner",
@@ -274,7 +302,15 @@
     "saving": "Sauvegarde…",
     "cancel": "Annuler",
     "reimbursement": "Remboursement",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Attribuer les articles du reçu",
+    "conflict": "Cette dépense a été modifiée par quelqu'un d'autre. Actualisez la page et réessayez.",
+    "conflictTitle": "Dépense modifiée ailleurs",
+    "deleteError": "Impossible de supprimer la dépense.",
+    "pendingReceiptTotal": "Un reçu numérisé hors ligne est prêt.",
+    "pendingReceiptTotalApply": "Utiliser le total numérisé",
+    "pendingReceiptTotalDismiss": "Rejeter",
+    "saveError": "Impossible d'économiser la dépense."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Un problème est survenu lors du téléchargement du document. Veuillez réessayer plus tard ou sélectionner un fichier différent.",
       "retry": "Réessayer"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "En file d'attente. Le reçu sera numérisé après votre reconnexion.",
+    "offline": "La numérisation reprend lorsque vous êtes en ligne.",
+    "scanFailed": "L'IA n'a pas pu lire ce reçu. Vérifiez la configuration de l'IA du serveur et réessayez.",
+    "scanning": "Numérisation…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Articles du reçu",
+    "backToExpense": "Retour aux dépenses",
+    "merchant": "Nom du magasin",
+    "printedTotal": "Total imprimé sur le reçu",
+    "noReceipt": "Aucun reçu n'est encore lié à cette dépense.",
+    "empty": "Aucun article pour l'instant. Ajoutez-en un pour commencer le fractionnement.",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "Impossible d'enregistrer votre modification",
+      "description": "Nous avons rechargé le reçu pour que vous puissiez réessayer."
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "Ajouter un article",
+    "quantitySummary": "{count} · {quantity} unités",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Ajouter un article",
+      "nameLabel": "Nom",
+      "quantityLabel": "Quantité",
+      "amountLabel": "Montant",
+      "sharedLabel": "Partagé (facture entière)",
+      "add": "Ajouter",
+      "cancel": "Annuler"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{assigned} de {total}",
+      "remaining": "{quantity} restant",
+      "assign": "Attribuer",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "removePortion": "Supprimer la part attribuée",
+      "editTitle": "Modifier l'élément",
+      "nameLabel": "Nom",
+      "quantityLabel": "Quantité",
+      "amountLabel": "Montant",
+      "save": "Sauvegarder",
+      "cancel": "Annuler",
+      "deleteConfirm": "Supprimer cet élément ?",
+      "deleteDescription": "Cela supprime l'élément et ses affectations."
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "Non attribué",
+      "unassignedHint": "Pas encore attribué à quelqu’un",
+      "shared": "Partagé",
+      "sharedHint": "Réparti équitablement entre tous",
+      "participantHint": "Articles attribués à {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "Attribuer un article",
+      "description": "Choisissez qui paie pour « {name} ».",
+      "whole": "Attribuer l’article entier",
+      "everyone": "Tout le monde (partagé)",
+      "even": "Répartir uniformément",
+      "evenHint": "Choisissez les participants entre lesquels répartir.",
+      "custom": "Partage personnalisé",
+      "customHint": "Entrez les quantités en unités pour chaque cible.",
+      "shared": "Partagé",
+      "selectParticipant": "Sélectionner un participant",
+      "exceeds": "La quantité affectée dépasse la quantité d'articles.",
+      "confirm": "Attribuer",
+      "cancel": "Annuler"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "Perso",
+      "shared": "Partagé",
+      "unassigned": "Non attribué",
+      "optOut": "Partage les éléments non attribués",
+      "reconciles": "Concorde",
+      "offBy": "Écart de {amount}",
+      "itemsTotal": "Total des articles du reçu",
+      "apply": "Appliquer à la dépense",
+      "allOptedOut": "Tout le monde s'est désinscrit, mais certains éléments ne sont toujours pas attribués.",
+      "negativeShare": "Un total négatif fait que quelqu’un doit moins que rien. Ajustez les articles avant d’appliquer.",
+      "divergent": "Les valeurs des reçus diffèrent · Appliquer à nouveau"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Dépense mise à jour",
+      "description": "Les éléments de reçu ont été appliqués à la dépense."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Impossible d'appliquer le reçu"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
+      "title": "Mettre à jour la dépense ?",
+      "description": "Le total des dépenses diffère du total des éléments de réception. L'application écrasera le montant de la dépense et sa répartition.",
       "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "cancel": "Annuler",
+      "confirm": "Appliquer"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Analyse en file d'attente",
+    "scanPendingDescription": "L'image est enregistrée sur cet appareil et sera numérisée lorsque vous serez de nouveau en ligne.",
+    "offlineQueue": "Vous êtes hors ligne. Joignez la photo maintenant et elle sera numérisée après votre reconnexion.",
+    "disabled": "Le partage intelligent n'est pas activé sur ce serveur. La numérisation des reçus est une fonctionnalité uniquement en ligne.",
+    "extracted": "Reçu scanné",
+    "extractedDescription": "Attribuez les éléments extraits ci-dessous.",
+    "loading": "Chargement du reçu…",
+    "optOutTitle": "Désinscriptions",
+    "scanError": "Le reçu n'a pas pu être numérisé.",
+    "scanUnavailable": "Vérifiez la configuration de l'IA du serveur et réessayez.",
+    "scanning": "Scanner le reçu…",
+    "upload": "Téléchargez une photo du reçu"
   },
   "Balances": {
     "title": "Équilibres",
@@ -415,20 +462,22 @@
       "description": "Voici des suggestions pour des remboursements optimisés entre les participants.",
       "noImbursements": "Les dépenses effectuées ne nécessitent pas d'équilibrage 😁",
       "owes": "<strong>{from}</strong> doit à <strong>{to}</strong>",
-      "markAsPaid": "Marquer comme payé"
-    }
+      "markAsPaid": "Marquer comme payé",
+      "owesPlain": "{{from}} doit {{to}}"
+    },
+    "loading": "Chargement des soldes…"
   },
   "Stats": {
     "title": "Statistiques",
     "range": {
-      "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "label": "Période",
+      "all": "Depuis le début",
+      "thisMonth": "Ce mois-ci",
+      "last30": "Les 30 derniers jours",
+      "thisYear": "Cette année",
+      "custom": "Période personnalisée",
+      "from": "Du",
+      "to": "au"
     },
     "Totals": {
       "title": "Totaux",
@@ -440,50 +489,53 @@
       "yourShare": "Votre part totale"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
-      "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
-      "activeSpan": "Active period"
+      "title": "Résumé",
+      "description": "Chiffres clés pour la période sélectionnée.",
+      "empty": "Il n'y a pas encore de dépenses.",
+      "expenseCount": "Dépenses",
+      "averageExpense": "Dépense moyenne",
+      "largestExpense": "Dépense la plus élevée",
+      "activeSpan": "Période active"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "title": "Dépenses au fil du temps",
+      "description": "Dépenses totales du groupe par mois. Sélectionnez un mois pour voir ses dépenses.",
+      "empty": "Il n'y a pas encore de dépenses.",
+      "showExpenses": "Afficher les dépenses de {month}",
+      "detailsDescription": "Dépenses de ce mois pour la période sélectionnée.",
+      "detailsEmpty": "Il n'y a aucune dépense pour ce mois.",
+      "showExpensesPlain": "Afficher les dépenses pour {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Dépenses par participant",
+      "description": "Combien chaque participant a payé et sa part des dépenses.",
+      "empty": "Il n'y a pas encore de dépenses.",
       "participant": "Participant",
-      "paid": "Paid",
-      "count": "Count",
-      "share": "Share"
+      "paid": "Payé",
+      "count": "Nombre",
+      "share": "Part"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
-      "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "title": "Dépenses par catégorie",
+      "description": "Montant total dépensé dans chaque catégorie. Sélectionnez une catégorie pour voir ses dépenses.",
+      "empty": "Il n'y a pas encore de dépenses.",
+      "showExpenses": "Afficher les dépenses de {category}",
+      "detailsDescription": "Dépenses de cette catégorie pour la période sélectionnée.",
+      "detailsEmpty": "Il n'y a aucune dépense dans cette catégorie.",
+      "showExpensesPlain": "Afficher les dépenses pour {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
-      "estimatedYearly": "{amount} per year",
+      "title": "Dépenses récurrentes",
+      "description": "Coût estimé des dépenses récurrentes actives du groupe.",
+      "estimatedMonthly": "Coût mensuel estimé",
+      "estimatedYearly": "{amount} par an",
       "period": {
-        "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
-        "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
-        "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
+        "DAILY": "{count, plural, one {# dépense quotidienne} other {# dépenses quotidiennes}}",
+        "WEEKLY": "{count, plural, one {# dépense hebdomadaire} other {# dépenses hebdomadaires}}",
+        "MONTHLY": "{count, plural, one {# dépense mensuelle} other {# dépenses mensuelles}}"
       }
-    }
+    },
+    "loading": "Chargement des statistiques…"
   },
   "Activity": {
     "title": "Activité",
@@ -504,28 +556,36 @@
       "earlierThisYear": "Plus tôt cette année",
       "lastYear": "L'année dernière",
       "older": "Plus ancien"
-    }
+    },
+    "loadMore": "Charger plus",
+    "loading": "Chargement de l'activité…",
+    "unknown": "Activité inconnue"
   },
   "Information": {
-    "title": "Information",
+    "title": "Informations",
     "description": "Utilisez cet espace pour ajouter toute information qui pourrait être pertinente pour les participants du groupe.",
     "empty": "Aucune information pour le moment."
   },
   "Settings": {
-    "title": "Paramètres"
+    "title": "Paramètres",
+    "saved": "Groupe mis à jour",
+    "savedDescription": "Vos modifications ont été enregistrées."
   },
   "Share": {
     "title": "Partager",
     "description": "Pour que d'autres participants puissent voir le groupe et ajouter des dépenses, partagez son URL avec eux.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Copier le lien",
+    "shareLink": "Partager le lien",
     "warning": "Avertissement !",
     "warningHelp": "Toute personne ayant l'URL du groupe pourra voir et modifier les dépenses. Partagez avec prudence !",
     "qrCode": {
-      "title": "Share via QR Code",
-      "description": "Scan this QR code to open the group on any device.",
-      "download": "Download QR Code"
-    }
+      "title": "Partager par QR code",
+      "description": "Scannez ce QR code pour ouvrir le groupe sur n'importe quel appareil.",
+      "download": "Télécharger le QR code"
+    },
+    "button": "Part",
+    "copy": "Copier le lien",
+    "url": "Lien de groupe"
   },
   "SchemaErrors": {
     "min1": "Entrez au moins un caractère.",
@@ -543,7 +603,10 @@
     "paidForMin1": "La dépense doit concerner au moins un participant.",
     "noZeroShares": "Toutes les parts doivent être supérieures à 0.",
     "amountSum": "La somme des montants doit être égale au montant de la dépense.",
-    "percentageSum": "La somme des pourcentages doit être égale à 100."
+    "percentageSum": "La somme des pourcentages doit être égale à 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Rechercher une catégorie…",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Mise à jour disponible",
+    "updateDescription": "Une nouvelle version de pysplit est disponible.",
+    "reload": "Recharger",
+    "updating": "Mise à jour…",
+    "offlineReady": "Prêt à travailler hors ligne",
+    "offlineReadyDescription": "Le shell de l'application est mis en cache. Ouvrez un groupe une fois en ligne pour conserver ses données.",
+    "dismiss": "Fermer",
+    "install": "Installer l'application",
+    "refreshApp": "Actualiser l'application",
+    "refreshAppHint": "Effacez les fichiers en cache et rechargez la dernière version. Vos données enregistrées restent sur cet appareil."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Tableau de bord d'administration",
+    "description": "Gérez les rôles des utilisateurs, les autorisations d'accès à la plateforme et surveillez les métriques du système.",
+    "totalGroups": "Total des groupes",
+    "totalExpenses": "Dépenses totales",
+    "registeredUsers": "Utilisateurs enregistrés",
+    "userManagement": "Gestion des utilisateurs et niveaux d'autorisation",
+    "accessDenied": "Accès refusé",
+    "accessDeniedDescription": "Le tableau de bord d'administration est réservé aux utilisateurs du niveau Administrateur.",
+    "delete": "Supprimer",
+    "deleteError": "Impossible de supprimer",
+    "email": "Courriel",
+    "expenses": "dépenses",
+    "groupDeleted": "Groupe supprimé",
+    "groupManagement": "Groupes",
+    "groupManagementDescription": "Supprimez des groupes et inspectez leur utilisation.",
+    "groups": "groupes",
+    "loadMoreGroups": "Charger plus de groupes",
+    "loadMoreUsers": "Charger plus d'utilisateurs",
+    "loading": "Chargement du tableau de bord…",
+    "loadingMore": "Chargement…",
+    "participants": "membres",
+    "preauthorize": "Préautoriser un utilisateur",
+    "preauthorizeAction": "Pré-autoriser",
+    "preauthorizeError": "Impossible de préautoriser l'utilisateur",
+    "preauthorized": "Utilisateur pré-autorisé",
+    "returnToGroups": "Revenir à Mes groupes",
+    "searchGroups": "Rechercher des groupes",
+    "searchUsers": "Rechercher des utilisateurs",
+    "signInDescription": "Le tableau de bord d'administration nécessite un compte administrateur.",
+    "signInTitle": "Connexion requise",
+    "tier": "Niveau",
+    "tierError": "Impossible de mettre à jour le niveau",
+    "tierFor": "Niveau pour",
+    "tierUpdated": "Niveau mis à jour",
+    "userDeleted": "Utilisateur supprimé",
+    "userTier": "Niveaux"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Stockage hors ligne",
+    "loading": "Vérification de cet appareil…",
+    "unsupported": "Ce navigateur ne peut pas signaler l'état du stockage.",
+    "usage": "{{used}} de {{quota}} utilisé",
+    "unknown": "inconnu",
+    "persisted": "Le stockage est persistant sur cet appareil.",
+    "notPersisted": "Le navigateur peut supprimer les données hors ligne si l'appareil manque d'espace.",
+    "keep": "Conserver les données sur cet appareil",
+    "refresh": "Actualiser",
+    "critical": "Le stockage est presque plein. Exportez une sauvegarde maintenant, puis supprimez les groupes inutilisés.",
+    "warning": "Le stockage se remplit. Une sauvegarde est recommandée."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Synchronisation en attente",
+    "expense": "Synchronisation en attente"
+  },
+  "Attachments": {
+    "assignItems": "Attribuer les articles du reçu",
+    "extractedItems": "Éléments extraits par l'IA",
+    "help": "Les images sont compressées avant le téléchargement. Les PDF sont conservés sous forme de pièces jointes et ouverts dans un nouvel onglet.",
+    "open": "Ouvrir",
+    "openInNewTab": "Ouvrir dans un nouvel onglet",
+    "pdfPreviewUnavailable": "Les aperçus PDF s'ouvrent dans un onglet séparé.",
+    "pending": "En attente de téléchargement",
+    "preview": "Aperçu",
+    "previewAction": "Aperçu",
+    "previewNamed": "Aperçu {{name}}",
+    "receipt": "Reçu du magasin",
+    "saveToAssignItems": "Enregistrez la dépense pour attribuer ces articles aux participants.",
+    "scanComplete": "Reçu scanné",
+    "scanCompleteDescription": "Attribuez les éléments extraits aux participants.",
+    "scanError": "Le reçu n'a pas pu être numérisé",
+    "scanWithAi": "Scanner avec l'IA",
+    "scanning": "Numérisation…",
+    "view": "Afficher les pièces jointes",
+    "attachment": "Pièce jointe",
+    "onlyImagesPdf": "Seules les images et les fichiers PDF sont pris en charge."
+  },
+  "Backup": {
+    "downloaded": "Sauvegarde téléchargée.",
+    "export": "Exporter la sauvegarde",
+    "failed": "La sauvegarde a échoué.",
+    "restore": "Restaurer la sauvegarde",
+    "restoreFailed": "La restauration a échoué.",
+    "restoreLabel": "Restaurer le fichier de sauvegarde",
+    "restored": "Sauvegarde restaurée. Rechargement…"
+  },
+  "Common": {
+    "addGroup": "Ajouter un groupe",
+    "close": "Fermer",
+    "closeDialog": "Fermer la boîte de dialogue",
+    "dismiss": "Ignorer",
+    "dismissNotification": "Rejeter la notification",
+    "error": "Un problème est survenu",
+    "expenseNotFound": "Dépense introuvable",
+    "loading": "Chargement…",
+    "menu": "Menu",
+    "retry": "Réessayer",
+    "select": "Sélectionnez…",
+    "unknown": "inconnu",
+    "user": "Utilisateur"
+  },
+  "CreateGroup": {
+    "approvalContact": "La création de nouveaux groupes de dépenses nécessite l'autorisation d'un administrateur. Veuillez contacter l'administrateur de votre instance pour promouvoir votre compte au niveau Créateur de groupe.",
+    "approvalDescription": "Votre compte est actuellement au niveau Sync User. Vous pouvez participer à tous les groupes partagés avec vous et les synchroniser sur tous vos appareils.",
+    "approvalTitle": "La création de groupe nécessite une approbation",
+    "authRequiredDescription": "Pour créer de nouveaux groupes de dépenses, veuillez vous connecter avec un compte externe. Les participants au groupe invités pourront toujours rejoindre le groupe sans problème via le lien de votre groupe sans se connecter.",
+    "authRequiredTitle": "Authentification requise",
+    "returnToGroups": "Revenir à Mes groupes",
+    "signIn": "Connectez-vous pour créer un groupe"
+  },
+  "GroupTabs": {
+    "Expenses": "Dépenses",
+    "Balances": "Équilibres",
+    "Information": "Informations",
+    "Stats": "Statistiques",
+    "Activity": "Activité",
+    "Settings": "Paramètres",
+    "label": "Sections de groupe"
+  },
+  "Login": {
+    "title": "Connectez-vous à Split",
+    "description": "Connectez-vous avec un compte externe pour activer la synchronisation des groupes entre appareils.",
+    "google": "Continuer avec Google",
+    "github": "Continuer avec GitHub",
+    "noProviders": "Aucun fournisseur OAuth n'est configuré. Définissez AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET pour activer la connexion."
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "description": "Vérifiez l'URL et réessayez.",
+    "groupTitle": "Ce groupe n'existe pas.",
+    "groupDescription": "Vérifiez l'URL ou demandez un nouveau lien d'invitation."
+  },
+  "SyncStatus": {
+    "offlinePending": "Hors ligne — modifications en attente : {{count}}",
+    "offlineSaved": "Hors ligne : affichage des données enregistrées",
+    "syncing": "Synchronisation…",
+    "error": "Erreur de synchronisation : {{error}}",
+    "retryToContinue": "réessayez de continuer",
+    "conflicts": "Conflits nécessitant un examen : {{count}}",
+    "failed": "Modifications qui n'ont pas pu être synchronisées : {{count}}",
+    "pending": "Modifications en attente : {{count}}",
+    "retryFailed": "Réessayer les modifications échouées",
+    "discardFailed": "Ignorer les modifications échouées",
+    "resolveConflicts": "Résoudre les conflits",
+    "syncNow": "Synchronisez maintenant",
+    "dialogTitle": "Résoudre les conflits",
+    "dialogDescription": "Ces modifications ont modifié les mêmes enregistrements sur un autre appareil. Choisissez ce que vous souhaitez conserver.",
+    "noConflicts": "Aucun conflit à résoudre.",
+    "serverVersion": "Version du serveur {{version}} · modification locale conservée dans la file d'attente des conflits",
+    "keepMine": "Conserver ma version",
+    "useServer": "Utiliser le serveur",
+    "duplicate": "Dupliquer comme neuf"
+  },
+  "Theme": {
+    "toggle": "Changer de thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
   }
 }

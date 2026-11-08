@@ -1,6 +1,6 @@
 /** /groups/:groupId/activity */
 
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 import { useGroupContext } from '../../components/groups/GroupLayout'
 import { ErrorState, LoadingState } from '../../components/common/States'
@@ -8,23 +8,47 @@ import { useActivities } from '../../hooks/useActivities'
 import { Button } from '../../components/ui/Button'
 
 /**
- * @param {any} activity
- * @param {string} participantName
- * @returns {string}
+ * @param {{activity: any, participantName: string}} props
+ * @returns {React.ReactNode}
  */
-function activityText(activity, participantName) {
+function ActivityText({ activity, participantName }) {
+  const { t } = useTranslation()
   const title = activity.expense?.title || activity.data || ''
   switch (activity.activity_type) {
     case 'CREATE_EXPENSE':
-      return `Expense “${title}” created by ${participantName}.`
+      return (
+        <Trans
+          i18nKey="Activity.expenseCreated"
+          values={{ expense: title, participant: participantName }}
+          components={{ em: <em />, strong: <strong /> }}
+        />
+      )
     case 'UPDATE_EXPENSE':
-      return `Expense “${title}” updated by ${participantName}.`
+      return (
+        <Trans
+          i18nKey="Activity.expenseUpdated"
+          values={{ expense: title, participant: participantName }}
+          components={{ em: <em />, strong: <strong /> }}
+        />
+      )
     case 'DELETE_EXPENSE':
-      return `Expense “${title}” deleted by ${participantName}.`
+      return (
+        <Trans
+          i18nKey="Activity.expenseDeleted"
+          values={{ expense: title, participant: participantName }}
+          components={{ em: <em />, strong: <strong /> }}
+        />
+      )
     case 'UPDATE_GROUP':
-      return `Group settings were modified by ${participantName}.`
+      return (
+        <Trans
+          i18nKey="Activity.settingsModified"
+          values={{ participant: participantName }}
+          components={{ strong: <strong /> }}
+        />
+      )
     default:
-      return title || activity.activity_type
+      return title || t('Activity.unknown', 'Unknown activity')
   }
 }
 
@@ -57,7 +81,9 @@ export function ActivityPage() {
               const time = new Date(activity.time)
               return (
                 <li key={activity.id} className="flex flex-col gap-1 p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-                  <span>{activityText(activity, actor)}</span>
+                  <span>
+                    <ActivityText activity={activity} participantName={actor} />
+                  </span>
                   <span className="text-xs text-muted-foreground">
                     {Number.isNaN(time.getTime())
                       ? ''

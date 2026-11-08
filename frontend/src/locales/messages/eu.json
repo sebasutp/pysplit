@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Taldeak"
+    "groups": "Taldeak",
+    "adminDashboard": "Admin panela",
+    "language": "Hizkuntza",
+    "signIn": "Hasi saioa",
+    "signOut": "Amaitu saioa",
+    "userMenu": "Erabiltzailearen menua"
   },
   "Footer": {
     "madeIn": "Zurichen egina, Suitza 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Aurreko hilabetean",
       "earlierThisYear": "Urte hasieran",
       "lastYear": "Iaz",
-      "older": "Zaharrena"
-    }
+      "older": "Zaharrena",
+      "today": "Gaur",
+      "week": "Aste honen hasieran",
+      "month": "Hilabete hasieran",
+      "year": "Urte hasieran"
+    },
+    "clearSearch": "Garbi",
+    "exportError": "Ezin izan dira gastuak esportatu",
+    "filterFrom": "Bertatik",
+    "filterTo": "Noiz arte",
+    "loadMore": "Gehiago kargatu",
+    "loading": "Gastuak kargatzen…",
+    "loadingMore": "Kargatzen…",
+    "search": "Bilatu gastuak",
+    "showingCount": "{{shown}} de {{total}} gastuak erakusten."
   },
   "ExpenseCard": {
     "paidBy": "<strong>{paidBy}</strong>-k ordaindua <paidFor></paidFor>-rentzat",
     "everyone": "denak",
     "receivedBy": "<strong>{paidBy}</strong>-k jasota <paidFor></paidFor>-rentzat",
     "yourBalance": "Zure saldoa:",
-    "notInvolved": "Ez duzu parte hartzen"
+    "notInvolved": "Ez duzu parte hartzen",
+    "paidByPlain": "{{paidBy}}-rekin ordainduta {{paidFor}}",
+    "receivedByPlain": "{{paidBy}}-k jaso du {{paidFor}}-rentzat"
   },
   "Groups": {
     "myGroups": "Nire taldeak",
@@ -60,11 +80,11 @@
       "orAsk": "edo eskatu lagun bati lehendik dagoen baten esteka bidaltzeko."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Zure saldo osoa",
+      "description": "Zure saldo konbinatua zure talde guztietan.",
+      "owedToYou": "Zorretan zaude",
+      "youOwe": "Zor duzu",
+      "settledUp": "Denak finkatuta zaudete zure taldeetan."
     },
     "recent": "Azken taldeak",
     "starred": "Gogoko taldeak",
@@ -83,7 +103,7 @@
       "title": "Gehitu talde bat URL bidez",
       "description": "Talde bat zurekin partekatu bada, hemen itsatsi dezakezu bere URLa zure zerrendara gehitzeko.",
       "error": "Oops, ezin dugu taldea aurkitu zuk emandako URLtik…",
-      "urlMode": "Enter URL",
+      "urlMode": "Sartu URLa",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Talde hori ez da existitzen.",
       "link": "Joan bisitatutako azken taldeetara"
-    }
+    },
+    "moreOptions": "Aukera gehiago",
+    "participants": "parte hartzaileak",
+    "star": "Izar taldea",
+    "unstar": "Desizar taldea"
   },
   "GroupForm": {
     "title": "Taldeko informazioa",
@@ -129,7 +153,10 @@
       "add": "Gehitu kidea",
       "John": "Jon",
       "Jane": "Jone",
-      "Jack": "Santi"
+      "Jack": "Santi",
+      "cannotRemove": "Parte-hartzaile hau gastu baten parte da eta ezin da kendu.",
+      "indexLabel": "#{{index}} parte-hartzailea",
+      "remove": "Kendu parte-hartzailea {{index}}"
     },
     "Settings": {
       "title": "Ezarpen lokalak",
@@ -145,7 +172,8 @@
       "create": "Sortu",
       "creating": "Sortzen…",
       "cancel": "Utzi"
-    }
+    },
+    "saveError": "Ezin izan da taldea gorde."
   },
   "ExpenseForm": {
     "Income": {
@@ -219,7 +247,7 @@
     "conversionUnavailable": "Gastu bakoitzeko moneta bat ezartzeko eta zenbatekoak bihurtzeko, hautatu taldearentzako moneta ez-pertsonalizatu bat.",
     "originalAmountField": {
       "label": "Bihurtzeko zenbatekoa",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Transferitu beharreko zenbatekoa",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -274,7 +302,15 @@
     "saving": "Gordetzen…",
     "cancel": "Utzi",
     "reimbursement": "Diru-itzultzea",
-    "itemizedSplit": "Itemized Split"
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Esleitu ordainagirien elementuak",
+    "conflict": "Gastu hori beste norbaitek aldatu zuen. Kargatu berriro orria eta saiatu berriro.",
+    "conflictTitle": "Gastua beste nonbait aldatu da",
+    "deleteError": "Ezin izan da gastua ezabatu.",
+    "pendingReceiptTotal": "Lineaz kanpo prest dagoen bitartean eskaneatutako ordainagiria.",
+    "pendingReceiptTotalApply": "Erabili eskaneatutako guztira",
+    "pendingReceiptTotalDismiss": "Baztertu",
+    "saveError": "Ezin izan da gastua aurreztu."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -313,99 +349,110 @@
       "description": "Dokumentua igotzean errore bat gertatu da. Saiatu berriro beranduago edo hautatu beste fitxategi bat.",
       "retry": "Saiatu berriro"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Ilaran jarrita. Ordainagiria eskaneatuko da berriro konektatu ondoren.",
+    "offline": "Lineatuta zaudenean eskaneatzeari ekiten zaio.",
+    "scanFailed": "AIak ezin izan du ordainagiri hau irakurri. Egiaztatu zerbitzariaren AI konfigurazioa eta saiatu berriro.",
+    "scanning": "Eskaneatzen…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Ordainagiriaren lerro-elementuak",
+    "backToExpense": "Itzuli gastuetara",
+    "merchant": "Dendaren izena",
+    "printedTotal": "Guztira inprimatutako ordainagirian",
+    "noReceipt": "Oraindik ez dago ordainagiririk gastu honekin lotuta.",
+    "empty": "Oraindik ez dago elementurik. Gehitu bat zatitzen hasteko.",
     "saveError": {
-      "title": "Couldn’t save your change",
+      "title": "Ezin izan da aldaketa gorde",
       "description": "We reloaded the receipt so you can try again."
     },
-    "addItem": "Add item",
+    "addItem": "Gehitu elementua",
     "quantitySummary": "{count} · {quantity} units",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Gehitu elementua",
+      "nameLabel": "Izena",
+      "quantityLabel": "Kantitatea",
+      "amountLabel": "Zenbatekoa",
+      "sharedLabel": "Partekatua (faktura osoa)",
+      "add": "Gehitu",
+      "cancel": "Utzi"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
+      "quantity": "{assigned} de {total}",
+      "remaining": "{quantity} geratzen da",
+      "assign": "Esleitu",
+      "edit": "Editatu",
+      "delete": "Ezabatu",
+      "removePortion": "Kendu esleitutako partekatzea",
+      "editTitle": "Editatu elementua",
       "nameLabel": "Name",
       "quantityLabel": "Quantity",
       "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "save": "Gorde",
+      "cancel": "Utzi",
+      "deleteConfirm": "Elementu hau ezabatu nahi duzu?",
+      "deleteDescription": "Honek elementua eta bere zereginak kentzen ditu."
     },
     "sections": {
-      "unassigned": "Unassigned",
+      "unassigned": "Esleitu gabe",
       "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
+      "shared": "Partekatua",
       "sharedHint": "Split equally by everyone",
       "participantHint": "Items assigned to {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
+      "title": "Esleitu elementua",
+      "description": "Aukeratu nork ordaintzen duen “{name}”.",
       "whole": "Assign the whole item",
       "everyone": "Everyone (shared)",
-      "even": "Split evenly",
+      "even": "Banatu uniformeki",
       "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
+      "custom": "Banaketa pertsonalizatua",
+      "customHint": "Idatzi helburu bakoitzerako kantitateak unitateetan.",
+      "shared": "Partekatua",
       "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "exceeds": "Esleitutako kantitateak elementuaren kantitatea gainditzen du.",
+      "confirm": "Esleitu",
+      "cancel": "Utzi"
     },
     "footer": {
       "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
+      "shared": "Partekatua",
+      "unassigned": "Esleitu gabe",
+      "optOut": "Esleitu gabeko elementuak partekatzen ditu",
+      "reconciles": "Orekatua",
+      "offBy": "{amount} aldea",
+      "itemsTotal": "Ordainagiri-elementuen guztira",
+      "apply": "Aplikatu gastuari",
+      "allOptedOut": "Guztiek ez dute aukera eman, baina elementu batzuk esleitu gabe daude oraindik.",
       "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "divergent": "Ordainagiriaren balioak desberdinak dira · Aplikatu berriro"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Gastu eguneratua",
+      "description": "Ordainagiriaren partidak gastuari aplikatu zaizkio."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Ezin izan da ordainagiria aplikatu"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Gastua eguneratu?",
+      "description": "Gastuen guztizkoa ordainagirien guztizkoaren araberakoa da. Aplikazioak gastuaren zenbatekoa eta zatiketa gainidatziko ditu.",
+      "total": "guztira {current} → {new}",
+      "cancel": "Utzi",
+      "confirm": "Aplikatu"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Eskaneatzea ilaran dago",
+    "scanPendingDescription": "Irudia gailu honetan gordetzen da eta sarera itzultzen zarenean eskaneatu egingo da.",
+    "offlineQueue": "Lineaz kanpo zaude. Erantsi argazkia orain eta berriro konektatu ondoren eskaneatuko da.",
+    "disabled": "Banaketa adimenduna ez dago gaituta zerbitzari honetan. Ordainagirien eskaneamendua linean soilik dagoen eginbide bat da.",
+    "extracted": "Ordainagiria eskaneatu da",
+    "extractedDescription": "Esleitu behean ateratako elementuak.",
+    "loading": "Ordainagiria kargatzen…",
+    "optOutTitle": "Baztertzea",
+    "scanError": "Ezin izan da ordainagiria eskaneatu.",
+    "scanUnavailable": "Egiaztatu zerbitzariaren AI konfigurazioa eta saiatu berriro.",
+    "scanning": "Ordainagiria eskaneatzen…",
+    "upload": "Kargatu ordainagiria argazki bat"
   },
   "Balances": {
     "title": "Saldoak",
@@ -415,20 +462,22 @@
       "description": "Hona hemen kideen arteko ditu-itzulketak optimizatzeko proposamenak.",
       "noImbursements": "Antza denez zure taldeak ez du diru-itzulketarik behar 😁",
       "owes": "<strong>{from}</strong> zor dio <strong>{to}</strong>-ri",
-      "markAsPaid": "Markatu ordainduta gisa"
-    }
+      "markAsPaid": "Markatu ordainduta gisa",
+      "owesPlain": "{{from}} zor dio {{to}}"
+    },
+    "loading": "Saldoak kargatzen…"
   },
   "Stats": {
     "title": "Estatistikak",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Denbora guztian",
+      "thisMonth": "Hilabete honetan",
+      "last30": "Azken 30 egunak",
+      "thisYear": "Aurten",
+      "custom": "Barruti pertsonalizatua",
+      "from": "Bertatik",
+      "to": "Noiz arte"
     },
     "Totals": {
       "title": "Denetara",
@@ -440,50 +489,53 @@
       "yourShare": "Zure parte osoa"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Laburpena",
+      "description": "Hautatutako aldiko datu nagusiak.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Gastuak",
+      "averageExpense": "Batez besteko gastua",
+      "largestExpense": "Gastu handiena",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Denboran zehar gastatzea",
+      "description": "Taldearen gastua guztira hilean. Hautatu hilabete bat bere gastuak ikusteko.",
+      "empty": "Oraindik ez dago gasturik.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Hautatutako aldirako hilabete honetako gastuak.",
+      "detailsEmpty": "Hilabete honetan ez dago gasturik.",
+      "showExpensesPlain": "Erakutsi {{month}}-ren gastuak"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Partaideen gastua",
+      "description": "Parte-hartzaile bakoitzak zenbat ordaindu duen eta gastuen zatia.",
+      "empty": "Oraindik ez dago gasturik.",
+      "participant": "Parte-hartzailea",
+      "paid": "Ordaindua",
       "count": "Count",
-      "share": "Share"
+      "share": "Partekatu"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Kategoriaren araberako gastua",
+      "description": "Kategoria bakoitzean gastatutako zenbatekoa guztira. Hautatu kategoria bat bere gastuak ikusteko.",
+      "empty": "Oraindik ez dago gasturik.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Aukeratutako aldirako kategoria honetako gastuak.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Erakutsi {{category}}-ren gastuak"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Aldizkako gastuak",
+      "description": "Taldearen ohiko gastu aktiboen kostu estimatua.",
+      "estimatedMonthly": "Hileroko kostu estimatua",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Estatistikak kargatzen…"
   },
   "Activity": {
     "title": "Jarduera",
@@ -504,7 +556,10 @@
       "earlierThisYear": "Urte honen hasieran",
       "lastYear": "Iaz",
       "older": "Zaharragoak"
-    }
+    },
+    "loadMore": "Gehiago kargatu",
+    "loading": "Jarduera kargatzen…",
+    "unknown": "Jarduera ezezaguna"
   },
   "Information": {
     "title": "Informazioa",
@@ -512,20 +567,25 @@
     "empty": "Oraindik ez dago taldearen informaziorik."
   },
   "Settings": {
-    "title": "Ezarpenak"
+    "title": "Ezarpenak",
+    "saved": "Taldea eguneratu da",
+    "savedDescription": "Zure aldaketak gorde dira."
   },
   "Share": {
     "title": "Partekatu",
     "description": "Beste kide batzuek taldea ikusteko eta gastuak gehitzeko, partekatu haiekin URLa.",
-    "copyLink": "Copy link",
-    "shareLink": "Share link",
+    "copyLink": "Kopiatu esteka",
+    "shareLink": "Partekatu esteka",
     "warning": "Kontuz!",
     "warningHelp": "Taldeko URLa duen edozein pertsonak gastuak ikusi eta editatu ahal izango ditu. Partekatu kontuz!",
     "qrCode": {
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Partekatu",
+    "copy": "Kopiatu esteka",
+    "url": "Taldearen esteka"
   },
   "SchemaErrors": {
     "min1": "Sartu gutxienez karaktere bat.",
@@ -543,7 +603,10 @@
     "paidForMin1": "Gastua gutxienez kide batek ordaindu behar du.",
     "noZeroShares": "Parte guztiek zero baino handiagoak izan behar dute.",
     "amountSum": "Zenbatekoen baturak gastuaren zenbatekoa berdindu behar du.",
-    "percentageSum": "Ehunekoen baturak 100 izan behar du."
+    "percentageSum": "Ehunekoen baturak 100 izan behar du.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Bilatu kategoria...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Eguneraketa eskuragarri",
+    "updateDescription": "Pysplit-en bertsio berri bat dago eskuragarri.",
+    "reload": "Birkargatu",
+    "updating": "Eguneratzen…",
+    "offlineReady": "Lineaz kanpo lan egiteko prest",
+    "offlineReadyDescription": "Aplikazio shell-a cachean dago. Ireki talde bat behin konektatuta zaudenean bere datuak gordetzeko.",
+    "dismiss": "Itxi",
+    "install": "Instalatu aplikazioa",
+    "refreshApp": "Freskatu aplikazioa",
+    "refreshAppHint": "Garbitu cacheko fitxategiak eta kargatu berriro azken bertsioa. Gordetako datuak gailu honetan geratzen dira."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Administrazio panela",
+    "description": "Kudeatu erabiltzailearen rolak, plataformarako sarbide-baimenak eta kontrolatu sistemaren neurketak.",
+    "totalGroups": "Taldeak guztira",
+    "totalExpenses": "Gastuak guztira",
+    "registeredUsers": "Erregistratutako Erabiltzaileak",
+    "userManagement": "Erabiltzaileen kudeaketa eta baimenen mailak",
+    "accessDenied": "Sarbidea ukatuta",
+    "accessDeniedDescription": "Administrazio panela Administratzaile mailan dauden erabiltzaileentzat mugatuta dago.",
+    "delete": "Ezabatu",
+    "deleteError": "Ezin izan da ezabatu",
+    "email": "Posta elektronikoa",
+    "expenses": "gastuak",
+    "groupDeleted": "Taldea ezabatu da",
+    "groupManagement": "Taldeak",
+    "groupManagementDescription": "Ezabatu taldeak eta ikuskatu erabilera.",
+    "groups": "taldeak",
+    "loadMoreGroups": "Kargatu talde gehiago",
+    "loadMoreUsers": "Kargatu erabiltzaile gehiago",
+    "loading": "Aginte-panela kargatzen…",
+    "loadingMore": "Kargatzen…",
+    "participants": "parte hartzaileak",
+    "preauthorize": "Aurrez baimendu erabiltzaile bati",
+    "preauthorizeAction": "Aurrez baimendu",
+    "preauthorizeError": "Ezin izan da erabiltzailea aurrez baimendu",
+    "preauthorized": "Erabiltzaileak aurrez baimenduta",
+    "returnToGroups": "Itzuli Nire taldeetara",
+    "searchGroups": "Bilatu taldeak",
+    "searchUsers": "Bilatu erabiltzaileak",
+    "signInDescription": "Administrazio panelak administratzaile kontu bat behar du.",
+    "signInTitle": "Saioa hasi behar da",
+    "tier": "Maila",
+    "tierError": "Ezin izan da maila eguneratu",
+    "tierFor": "Mailarako",
+    "tierUpdated": "Maila eguneratu da",
+    "userDeleted": "Erabiltzailea ezabatu da",
+    "userTier": "Mailak"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Lineaz kanpoko biltegiratzea",
+    "loading": "Gailu hau egiaztatzen…",
+    "unsupported": "Arakatzaile honek ezin du biltegiratze-egoera jakinarazi.",
+    "usage": "{{used}} de {{quota}} erabiltzen da",
+    "unknown": "ezezaguna",
+    "persisted": "Biltegiratzea iraunkorra da gailu honetan.",
+    "notPersisted": "Arakatzaileak konexiorik gabeko datuak kanporatu ditzake gailuak espazio gutxi geratzen bada.",
+    "keep": "Gorde datuak gailu honetan",
+    "refresh": "Eguneratu",
+    "critical": "Biltegia ia beteta dago. Esportatu babeskopia bat orain eta kendu erabili gabeko taldeak.",
+    "warning": "Biltegiratzea betetzen ari da. Babeskopia egitea gomendatzen da."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Sinkronizazioa zain",
+    "expense": "Sinkronizazioa zain"
+  },
+  "Attachments": {
+    "assignItems": "Esleitu ordainagirien elementuak",
+    "extractedItems": "AI ateratako elementuak",
+    "help": "Irudiak kargatu aurretik konprimitzen dira. PDFak eranskin gisa gordetzen dira eta fitxa berri batean irekitzen dira.",
+    "open": "Ireki",
+    "openInNewTab": "Ireki fitxa berri batean",
+    "pdfPreviewUnavailable": "PDF aurrebistak aparteko fitxa batean irekitzen dira.",
+    "pending": "Kargatzeko zain",
+    "preview": "Aurrebista",
+    "previewAction": "Aurrebista",
+    "previewNamed": "Aurrebista {{name}}",
+    "receipt": "Dendako ordainagiria",
+    "saveToAssignItems": "Gorde lehenik gastua, gero esleitu elementu hauek parte-hartzaileei.",
+    "scanComplete": "Ordainagiria eskaneatu da",
+    "scanCompleteDescription": "Esleitu ateratako elementuak parte-hartzaileei.",
+    "scanError": "Ezin izan da ordainagiria eskaneatu",
+    "scanWithAi": "Eskaneatu AIarekin",
+    "scanning": "Eskaneatzen…",
+    "view": "Ikusi eranskinak",
+    "attachment": "Eranskina",
+    "onlyImagesPdf": "Irudiak eta PDF fitxategiak soilik onartzen dira."
+  },
+  "Backup": {
+    "downloaded": "Deskargatu da babeskopia.",
+    "export": "Esportatu babeskopia",
+    "failed": "Babeskopia egiteak huts egin du.",
+    "restore": "Berrezarri babeskopia",
+    "restoreFailed": "Berreskuratu huts egin du.",
+    "restoreLabel": "Berreskuratu babeskopia fitxategia",
+    "restored": "Babeskopia leheneratu da. Berriro kargatzen…"
+  },
+  "Common": {
+    "addGroup": "Gehitu taldea",
+    "close": "Close",
+    "closeDialog": "Itxi elkarrizketa-koadroa",
+    "dismiss": "Dismiss",
+    "dismissNotification": "Baztertu jakinarazpena",
+    "error": "Zerbait gaizki joan da",
+    "expenseNotFound": "Ez da aurkitu gastua",
+    "loading": "Kargatzen…",
+    "menu": "Menua",
+    "retry": "Saiatu berriro",
+    "select": "Hautatu…",
+    "unknown": "ezezaguna",
+    "user": "Erabiltzailea"
+  },
+  "CreateGroup": {
+    "approvalContact": "Gastu-talde berriak sortzeko administratzaile baten baimena behar da. Jarri harremanetan instantziaren administratzailearekin zure kontua Talde-sortzaileen mailara sustatzeko.",
+    "approvalDescription": "Zure kontua Sync User mailan dago une honetan. Zurekin partekatutako edozein taldetan parte hartu dezakezu eta zure gailu guztietan sinkroniza ditzakezu.",
+    "approvalTitle": "Taldeak sortzeko onarpena behar da",
+    "authRequiredDescription": "Gastu-talde berriak sortzeko, hasi saioa kanpoko kontu batekin. Gonbidatutako taldeetako parte-hartzaileek marruskadurarik gabe sartu ahal izango dute zure taldearen estekaren bidez saioa hasi gabe.",
+    "authRequiredTitle": "Autentifikazioa beharrezkoa",
+    "returnToGroups": "Itzuli Nire taldeetara",
+    "signIn": "Hasi saioa Sortu taldea"
+  },
+  "GroupTabs": {
+    "Expenses": "Gastuak",
+    "Balances": "Saldoak",
+    "Information": "Informazioa",
+    "Stats": "Estatistikak",
+    "Activity": "Jarduera",
+    "Settings": "Ezarpenak",
+    "label": "Taldeko atalak"
+  },
+  "Login": {
+    "title": "Hasi saioa Split-en",
+    "description": "Hasi saioa kanpoko kontu batekin gailuen arteko taldeen sinkronizazioa gaitzeko.",
+    "google": "Jarraitu Google-rekin",
+    "github": "Jarraitu GitHub-ekin",
+    "noProviders": "Ez dago OAuth hornitzailerik konfiguratuta. Ezarri AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET saioa hastea gaitzeko."
+  },
+  "NotFound": {
+    "title": "Ez da orria aurkitu",
+    "description": "Egiaztatu URLa eta saiatu berriro.",
+    "groupTitle": "Talde hori ez da existitzen.",
+    "groupDescription": "Egiaztatu URLa edo eskatu gonbidapen-esteka berri bat."
+  },
+  "SyncStatus": {
+    "offlinePending": "Lineaz kanpo — aldaketak zain daude: {{count}}",
+    "offlineSaved": "Lineaz kanpo — gordetako datuak erakusten",
+    "syncing": "Sinkronizatzen…",
+    "error": "Sinkronizazio errorea: {{error}}",
+    "retryToContinue": "berriro saiatu jarraitzeko",
+    "conflicts": "Berrikusi behar duten gatazkak: {{count}}",
+    "failed": "Sinkronizatu ezin diren aldaketak: {{count}}",
+    "pending": "Aldaketak zain: {{count}}",
+    "retryFailed": "Saiatu huts egindako aldaketak berriro",
+    "discardFailed": "Baztertu huts egindako aldaketak",
+    "resolveConflicts": "Gatazkak konpontzea",
+    "syncNow": "Sinkronizatu orain",
+    "dialogTitle": "Gatazkak konpontzea",
+    "dialogDescription": "Aldaketa hauek beste gailu batean erregistro berdinak aldatu dituzte. Aukeratu zer gorde.",
+    "noConflicts": "Ez dago gatazkarik konpontzeko.",
+    "serverVersion": "{{version}} zerbitzariaren bertsioa · tokiko edizioa gatazka-ilaran gordeta",
+    "keepMine": "Gorde nire bertsioa",
+    "useServer": "Erabili zerbitzaria",
+    "duplicate": "Bikoiztu berri gisa"
+  },
+  "Theme": {
+    "toggle": "Aldatu gaia",
+    "light": "Argia",
+    "dark": "Iluna",
+    "system": "Sistema"
   }
 }

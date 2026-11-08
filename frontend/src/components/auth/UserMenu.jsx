@@ -12,9 +12,9 @@ import { Badge, Skeleton } from '../ui/Feedback'
 import { LoginDialog } from './LoginDialog'
 
 const TIER_LABELS = /** @type {Record<string, string>} */ ({
-  admin: 'Admin',
-  group_creators: 'Creator',
-  sync_users: 'Sync',
+  admin: 'Auth.admin',
+  group_creators: 'Auth.groupCreator',
+  sync_users: 'Auth.syncUser',
 })
 
 export function UserMenu() {
@@ -69,7 +69,7 @@ export function UserMenu() {
         onClick={() => setOpen((value) => !value)}
       >
         {user.image ? (
-          <img src={user.image} alt={user.name || 'User'} className="h-8 w-8 object-cover" />
+          <img src={user.image} alt={user.name || t('Common.user', 'User')} className="h-8 w-8 object-cover" />
         ) : (
           initial
         )}
@@ -81,7 +81,7 @@ export function UserMenu() {
         >
           <div className="flex items-start justify-between gap-2 px-2 py-1.5">
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{user.name || 'User'}</p>
+              <p className="truncate text-sm font-medium">{user.name || t('Common.user', 'User')}</p>
               {user.email ? (
                 <p className="truncate text-xs text-muted-foreground">{user.email}</p>
               ) : null}
@@ -95,7 +95,7 @@ export function UserMenu() {
                     : 'secondary'
               }
             >
-              {TIER_LABELS[user.tier] || user.tier}
+              {TIER_LABELS[user.tier] ? t(TIER_LABELS[user.tier]) : user.tier}
             </Badge>
           </div>
           {isAdmin ? (

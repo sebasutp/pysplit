@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useToast } from './useToast'
 import { repository } from '../services/repository'
-import { EXPENSE_ERROR_LABELS, expenseFormSchema } from '../schemas/expense'
+import { EXPENSE_ERROR_LABELS, createExpenseFormSchema } from '../schemas/expense'
 import {
   COMMON_CURRENCIES,
   currencyLabel,
@@ -19,6 +19,7 @@ import {
   majorUnits,
   parseAmount,
 } from '../utils/currency'
+import { decimalDigits } from '../utils/domain/currency'
 import { isIncome } from '../utils/expenses'
 import { prepareUpload } from '../utils/attachments'
 
@@ -62,12 +63,13 @@ function readDefaults(groupId) {
  * }} props
  */
 export function useExpenseForm({ group, categories, expense = null, activeUserId = null }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { toast } = useToast()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const editing = Boolean(expense)
   const currency = getCurrencyFromGroup(group)
+  const locale = i18n.resolvedLanguage || 'en-US'
   const repayment = searchParams.get('reimbursement') === 'yes'
 
   const defaults = useMemo(() => (editing ? null : readDefaults(group.id)), [editing, group.id])
@@ -90,7 +92,7 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
         let share = ''
         if (expense.split_mode === 'BY_SHARES') share = String(row.shares)
         else if (expense.split_mode === 'BY_PERCENTAGE') share = String(row.shares / 100)
-        else if (expense.split_mode === 'BY_AMOUNT') share = majorUnits(row.shares)
+        else if (expense.split_mode === 'BY_AMOUNT') share = majorUnits(row.shares, currency.code)
         next[participant.id] = { checked: true, share }
       }
       return next
@@ -114,16 +116,16 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
       }
     }
     return next
-  }, [group.participants, editing, expense, repayment, searchParams, defaults])
+  }, [group.participants, editing, expense, repayment, searchParams, defaults, currency.code])
 
   const [title, setTitle] = useState(
     expense?.title || (repayment ? t('ExpenseForm.reimbursement', 'Reimbursement') : ''),
   )
   const [amountInput, setAmountInput] = useState(() => {
-    if (expense) return majorUnits(expense.amount)
+    if (expense) return majorUnits(expense.amount, currency.code)
     if (repayment) {
       const minor = Number(searchParams.get('amount') || 0)
-      return majorUnits(minor)
+      return majorUnits(minor, currency.code)
     }
     return ''
   })
@@ -151,7 +153,12 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
     expense?.original_currency || group.currency_code || '',
   )
   const [originalAmountInput, setOriginalAmountInput] = useState(
-    expense?.original_amount ? majorUnits(expense.original_amount) : '',
+    expense?.original_amount
+      ? majorUnits(
+          expense.original_amount,
+          expense.original_currency || group.currency_code,
+        )
+      : '',
   )
   const [conversionRateInput, setConversionRateInput] = useState(
     expense?.conversion_rate ? String(expense.conversion_rate) : '',
@@ -197,7 +204,7 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
   }, [editing, group.id])
 
   const foreign = Boolean(selectedCurrency && selectedCurrency !== group.currency_code)
-  const income = isIncome(parseAmount(amountInput))
+  const income = isIncome(parseAmount(amountInput, currency.code, locale))
   const rate = useCustomRate
     ? Number(String(conversionRateInput).replace(',', '.')) || null
     : rateState.rate
@@ -208,7 +215,11 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
   // the rate has already been fetched.
   const repaymentOriginal =
     repayment && foreign && rate && Number.isFinite(rate)
-      ? (parseAmount(amountInput) / rate / 100).toFixed(2)
+      ? (
+          parseAmount(amountInput, currency.code, locale) /
+          10 ** decimalDigits(currency.code) /
+          rate
+        ).toFixed(decimalDigits(selectedCurrency))
       : null
   const displayedOriginalAmount = repaymentOriginal ?? originalAmountInput
 
@@ -265,9 +276,25 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
     // until the user actually changes the foreign amount.
     if (editing && !originalTouched) return
     if (originalAmountInput === '') return
-    setAmountInput(majorUnits(parseAmount(originalAmountInput) * rate))
+    const foreignMajor =
+      parseAmount(originalAmountInput, selectedCurrency, locale) /
+      10 ** decimalDigits(selectedCurrency)
+    const groupMinor = Math.round(
+      foreignMajor * rate * 10 ** decimalDigits(currency.code),
+    )
+    setAmountInput(majorUnits(groupMinor, currency.code))
     setConversionRateInput(String(rate))
-  }, [foreign, rate, originalAmountInput, repayment, editing, originalTouched])
+  }, [
+    foreign,
+    rate,
+    originalAmountInput,
+    repayment,
+    editing,
+    originalTouched,
+    selectedCurrency,
+    locale,
+    currency.code,
+  ])
 
   /** @param {string} participantId @param {boolean} checked */
   function setParticipantChecked(participantId, checked) {
@@ -321,12 +348,15 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
         return next
       }
       if (mode === 'BY_AMOUNT') {
-        const total = parseAmount(amountInput)
+        const total = parseAmount(amountInput, currency.code, locale)
         const cents = Math.floor(total / checked.length)
         checked.forEach((/** @type {any} */ participant, /** @type {number} */ index) => {
           const value =
             index === checked.length - 1 ? total - cents * (checked.length - 1) : cents
-          next[participant.id] = { ...next[participant.id], share: majorUnits(value) }
+          next[participant.id] = {
+            ...next[participant.id],
+            share: majorUnits(value, currency.code),
+          }
         })
       }
       return next
@@ -358,10 +388,10 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
       result.total != null
         ? Number(result.total)
         : result.amount != null
-          ? Math.round(Number(result.amount) * 100)
+          ? Math.round(Number(result.amount) * 10 ** decimalDigits(currency.code))
           : null
     if (minorAmount != null && Number.isFinite(minorAmount)) {
-      setAmountInput(majorUnits(Math.round(minorAmount)))
+      setAmountInput(majorUnits(Math.round(minorAmount), currency.code))
     }
     if (result.date) setExpenseDate(result.date)
     if (result.category_id != null) setCategoryId(String(result.category_id))
@@ -393,7 +423,7 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
 
   /** @returns {string[]} */
   function validate() {
-    const parsed = expenseFormSchema.safeParse({
+    const parsed = createExpenseFormSchema(currency.code, locale).safeParse({
       title,
       amount: amountInput,
       expenseDate,
@@ -412,14 +442,15 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
       notes,
     })
     if (!parsed.success) {
-      return parsed.error.issues.map(
-        (issue) => EXPENSE_ERROR_LABELS[issue.message] || issue.message,
-      )
+      return parsed.error.issues.map((issue) => {
+        const key = EXPENSE_ERROR_LABELS[issue.message]
+        return key ? t(key) : issue.message
+      })
     }
 
     /** @type {string[]} */
     const errors = []
-    const amount = parseAmount(amountInput)
+    const amount = parseAmount(amountInput, currency.code, locale)
     const checked = (group.participants || []).filter(
       (/** @type {any} */ participant) => paidFor[participant.id]?.checked,
     )
@@ -429,15 +460,17 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
           sum + (Number(String(paidFor[participant.id]?.share ?? '').replace(',', '.')) || 0),
         0,
       )
-      if (Math.abs(total - 100) > 0.0001) errors.push('Sum of percentages must equal 100.')
+      if (Math.abs(total - 100) > 0.0001)
+        errors.push(t('SchemaErrors.percentageSum', 'Sum of percentages must equal 100.'))
     }
     if (splitMode === 'BY_AMOUNT') {
       const total = checked.reduce(
         (/** @type {number} */ sum, /** @type {any} */ participant) =>
-          sum + parseAmount(paidFor[participant.id]?.share ?? ''),
+          sum + parseAmount(paidFor[participant.id]?.share ?? '', currency.code, locale),
         0,
       )
-      if (total !== amount) errors.push('The sum of amounts must equal the total amount.')
+      if (total !== amount)
+        errors.push(t('SchemaErrors.amountSum', 'Sum of amounts must equal the expense amount.'))
     }
     return errors
   }
@@ -459,7 +492,10 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
       const paidForPayload = checked.map((/** @type {any} */ participant) => {
         const raw = paidFor[participant.id]?.share ?? ''
         if (splitMode === 'BY_AMOUNT') {
-          return { participant_id: participant.id, amount: parseAmount(raw) }
+          return {
+            participant_id: participant.id,
+            amount: parseAmount(raw, currency.code, locale),
+          }
         }
         if (splitMode === 'BY_PERCENTAGE') {
           return {
@@ -481,8 +517,10 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
         expense_date: expenseDate,
         title: title.trim(),
         category_id: Number(categoryId) || 0,
-        amount: parseAmount(amountInput),
-        original_amount: foreign ? parseAmount(displayedOriginalAmount) : null,
+        amount: parseAmount(amountInput, currency.code, locale),
+        original_amount: foreign
+          ? parseAmount(displayedOriginalAmount, selectedCurrency, locale)
+          : null,
         original_currency: foreign ? selectedCurrency : null,
         conversion_rate: foreign && rate ? String(rate) : null,
         paid_by_id: paidById,
@@ -566,7 +604,7 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
       const detail =
         caught && typeof caught === 'object' && 'detail' in caught
           ? String(caught.detail)
-          : 'Could not save the expense.'
+          : t('ExpenseForm.saveError', 'Could not save the expense.')
       setError(detail)
       toast({ title: t('ExpenseForm.saveError', 'Could not save the expense'), description: detail })
     } finally {
@@ -581,7 +619,11 @@ export function useExpenseForm({ group, categories, expense = null, activeUserId
       await repository.expenses.remove(group.id, expense.id)
       navigate(`/groups/${group.id}/expenses`)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not delete the expense.')
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : t('ExpenseForm.deleteError', 'Could not delete the expense.'),
+      )
     } finally {
       setPending(false)
       setDeleteOpen(false)

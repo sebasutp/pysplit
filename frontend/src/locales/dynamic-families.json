@@ -1,0 +1,7 @@
+{
+  "ExpenseForm.Expense.recurrenceRule.": ["none", "daily", "weekly", "monthly"],
+  "Expenses.Groups.": ["today", "week", "month", "lastMonth", "year", "lastYear", "older"],
+  "Theme.": ["light", "dark", "system"],
+  "GroupTabs.": ["Expenses", "Balances", "Information", "Stats", "Activity", "Settings"],
+  "Stats.range.": ["all", "thisMonth", "last30", "thisYear", "custom"]
+}

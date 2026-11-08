@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { balanceForParticipant, categoryIcon, paidForLabel } from '../../utils/expenses'
 import { formatCurrency, getCurrencyFromGroup } from '../../utils/currency'
+import { formatExpenseDate } from '../../utils/date-groups'
 
 /**
  * @param {{
@@ -23,7 +24,11 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
   const category = categories.find((item) => item.id === expense.category_id)
   const paidBy =
     participants.find((participant) => participant.id === expense.paid_by_id)?.name || '—'
-  const forLabel = paidForLabel(expense.paid_for, participants)
+  const forLabel = paidForLabel(
+    expense.paid_for,
+    participants,
+    t('ExpenseCard.everyone', 'everyone'),
+  )
   const income = expense.amount < 0
   const balance = balanceForParticipant(expense, activeUserId)
   const involved =
@@ -81,7 +86,7 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
             ) : null}
             {expense.pending ? (
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] text-amber-900">
-                Pending sync
+                {t('Pending.expense', 'Pending sync')}
               </span>
             ) : null}
           </div>
@@ -96,7 +101,9 @@ export function ExpenseCard({ expense, participants, categories, group, activeUs
                   paidFor: forLabel,
                 })}
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{expense.expense_date}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {formatExpenseDate(expense.expense_date, locale)}
+          </p>
           {attachments.length ? (
             <p className="mt-0.5 text-xs text-muted-foreground">
               📎 {attachments.length}{' '}

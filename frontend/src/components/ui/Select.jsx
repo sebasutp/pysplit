@@ -7,6 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 /** @typedef {{value: string|number, label: string, disabled?: boolean}} SelectOption */
 
@@ -28,12 +29,13 @@ export function Select({
   value,
   options,
   onChange,
-  placeholder = 'Select…',
+  placeholder,
   disabled = false,
   className = '',
   testId,
   ariaLabel,
 }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const container = useRef(/** @type {HTMLDivElement|null} */ (null))
   const selected = options.find((option) => String(option.value) === String(value))
@@ -77,7 +79,7 @@ export function Select({
         onClick={() => setOpen((current) => !current)}
       >
         <span className={selected ? 'truncate' : 'truncate text-muted-foreground'}>
-          {selected ? selected.label : placeholder}
+          {selected ? selected.label : (placeholder ?? t('Common.select', 'Select…'))}
         </span>
         <span aria-hidden="true" className="text-xs text-muted-foreground">
           ▾

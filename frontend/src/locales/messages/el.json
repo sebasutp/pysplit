@@ -9,7 +9,12 @@
     }
   },
   "Header": {
-    "groups": "Ομάδες"
+    "groups": "Ομάδες",
+    "adminDashboard": "Πίνακας ελέγχου διαχειριστή",
+    "language": "Γλώσσα",
+    "signIn": "Συνδεθείτε",
+    "signOut": "Αποσυνδεθείτε",
+    "userMenu": "Μενού χρήστη"
   },
   "Footer": {
     "madeIn": "Φτιαγμένο στη Ζυρίχη, Ελβετία 🇨🇭",
@@ -39,15 +44,30 @@
       "lastMonth": "Προηγούμενος μήνας",
       "earlierThisYear": "Νωρίτερα αυτόν τον χρόνο",
       "lastYear": "Προηγούμενο χρόνο",
-      "older": "Παλαιότερα"
-    }
+      "older": "Παλαιότερα",
+      "today": "Σήμερα",
+      "week": "Νωρίτερα αυτή την εβδομάδα",
+      "month": "Νωρίτερα αυτό το μήνα",
+      "year": "Νωρίτερα αυτόν τον χρόνο"
+    },
+    "clearSearch": "Καθαρό",
+    "exportError": "Δεν ήταν δυνατή η εξαγωγή των εξόδων",
+    "filterFrom": "Από",
+    "filterTo": "προς",
+    "loadMore": "Φορτώστε περισσότερα",
+    "loading": "Φόρτωση εξόδων…",
+    "loadingMore": "Φόρτωση…",
+    "search": "Αναζήτηση εξόδων",
+    "showingCount": "Εμφάνιση {{shown}} από τα έξοδα {{total}}."
   },
   "ExpenseCard": {
     "paidBy": "Πληρώθηκε από <strong>{paidBy}</strong> για <paidFor></paidFor>",
-    "everyone": "όλοι",
+    "everyone": "όλους",
     "receivedBy": "Ελήφθη από <strong>{paidBy}</strong> για <paidFor></paidFor>",
     "yourBalance": "Το υπόλοιπο σας:",
-    "notInvolved": "Δεν εμπλέκεστε"
+    "notInvolved": "Δεν εμπλέκεστε",
+    "paidByPlain": "Πληρωμή από {{paidBy}} για {{paidFor}}",
+    "receivedByPlain": "Λήφθηκε από {{paidBy}} για {{paidFor}}"
   },
   "Groups": {
     "myGroups": "Οι ομάδες μου",
@@ -60,11 +80,11 @@
       "orAsk": "ή ρωτήστε έναν φίλο να σας στείλει τον σύνδεσμο σε μια ήδη υπάρχον."
     },
     "GlobalBalance": {
-      "title": "Your total balance",
-      "description": "Your combined balance across all your groups.",
-      "owedToYou": "You are owed",
-      "youOwe": "You owe",
-      "settledUp": "You are all settled up across your groups."
+      "title": "Το συνολικό σας υπόλοιπο",
+      "description": "Το συνδυασμένο υπόλοιπό σας σε όλες τις ομάδες σας.",
+      "owedToYou": "Σου οφείλεις",
+      "youOwe": "χρωστάς",
+      "settledUp": "Είστε όλοι εγκατεστημένοι στις ομάδες σας."
     },
     "recent": "Πρόσφατες ομάδες",
     "starred": "Ομάδες με αστερίσκο",
@@ -83,7 +103,7 @@
       "title": "Προσθήκη μιας ομάδας μέσω URL",
       "description": "Αν μια ομάδα έχει κονιοποιηθεί με εσένα, μπορείς να κάνεις επικόλληση του URL της εδώ για να την προσθέσεις στην λίστα σου.",
       "error": "Ουπς, δεν μπορέσαμε να βρούμε την ομάδα από το URL που δώσατε…",
-      "urlMode": "Enter URL",
+      "urlMode": "Εισαγάγετε τη διεύθυνση URL",
       "qrMode": "Scan QR",
       "scanner": {
         "startCamera": "Start Camera",
@@ -97,7 +117,11 @@
     "NotFound": {
       "text": "Αυτή η ομάδα δεν υπάρχει.",
       "link": "Πήγαινε στις πρόσφατες επισκεπτόμενες ομάδες"
-    }
+    },
+    "moreOptions": "Περισσότερες επιλογές",
+    "participants": "συμμετέχοντες",
+    "star": "Ομάδα αστεριών",
+    "unstar": "Καταργήστε το αστέρι της ομάδας"
   },
   "GroupForm": {
     "title": "Πληροφορίες ομάδας",
@@ -116,20 +140,23 @@
       "description": "Θα το χρησιμοποιήσουμε για να προβάλλουμε ποσά."
     },
     "CurrencyCodeField": {
-      "label": "Main currency",
-      "createDescription": "All amounts and balances will be in this currency.",
+      "label": "Κύριο νόμισμα",
+      "createDescription": "Όλα τα ποσά και τα υπόλοιπα θα είναι σε αυτό το νόμισμα.",
       "editDescription": "All amounts and balances will be in this currency. Changing this will NOT convert expenses already entered, except when the currency has different \"minor units\" than the current one (e.g. changing from US Dollar to Japanese Yen)",
       "customOption": "Custom"
     },
     "Participants": {
-      "title": "Participants",
+      "title": "Συμμετέχοντες",
       "description": "Enter the name for each participant.",
       "protectedParticipant": "This participant is part of expenses, and can not be removed.",
-      "new": "New",
-      "add": "Add participant",
+      "new": "Νέο",
+      "add": "Προσθήκη συμμετέχοντος",
       "John": "John",
       "Jane": "Jane",
-      "Jack": "Jack"
+      "Jack": "Jack",
+      "cannotRemove": "Αυτός ο συμμετέχων αποτελεί μέρος μιας δαπάνης και δεν μπορεί να αφαιρεθεί.",
+      "indexLabel": "Συμμετέχων #{{index}}",
+      "remove": "Κατάργηση συμμετέχοντα {{index}}"
     },
     "Settings": {
       "title": "Local settings",
@@ -142,22 +169,23 @@
       },
       "save": "Save",
       "saving": "Saving…",
-      "create": "Create",
-      "creating": "Creating…",
-      "cancel": "Cancel"
-    }
+      "create": "Δημιουργία",
+      "creating": "Δημιουργία…",
+      "cancel": "Ακύρωση"
+    },
+    "saveError": "Δεν ήταν δυνατή η αποθήκευση της ομάδας."
   },
   "ExpenseForm": {
     "Income": {
-      "create": "Create income",
-      "edit": "Edit income",
+      "create": "Δημιουργία εισοδήματος",
+      "edit": "Επεξεργασία εισοδήματος",
       "TitleField": {
-        "label": "Income title",
+        "label": "Τίτλος εισοδήματος",
         "placeholder": "Monday evening restaurant",
         "description": "Enter a description for the income."
       },
       "DateField": {
-        "label": "Income date",
+        "label": "Ημερομηνία εισοδήματος",
         "description": "Enter the date the income was received."
       },
       "currencyField": {
@@ -166,7 +194,7 @@
       },
       "categoryFieldDescription": "Select the income category.",
       "paidByField": {
-        "label": "Received by",
+        "label": "Παραλήφθηκε από",
         "description": "Select the participant who received the income."
       },
       "paidFor": {
@@ -177,49 +205,49 @@
       "attachDescription": "See and attach receipts to the income."
     },
     "Expense": {
-      "create": "Create expense",
-      "edit": "Edit expense",
+      "create": "Δημιουργία δαπάνης",
+      "edit": "Επεξεργασία εξόδων",
       "TitleField": {
-        "label": "Expense title",
-        "placeholder": "Monday evening restaurant",
+        "label": "Τίτλος εξόδων",
+        "placeholder": "Δευτέρα βράδυ εστιατόριο",
         "description": "Enter a description for the expense."
       },
       "DateField": {
-        "label": "Expense date",
+        "label": "Ημερομηνία εξόδων",
         "description": "Enter the date the expense was paid."
       },
       "currencyField": {
-        "label": "Currency of expense",
+        "label": "Νόμισμα δαπάνης",
         "description": "The currency in which the expense was paid."
       },
       "categoryFieldDescription": "Select the expense category.",
       "paidByField": {
-        "label": "Paid by",
+        "label": "Πληρώθηκε από",
         "placeholder": "Select a participant",
         "description": "Select the participant who paid the expense."
       },
       "recurrenceRule": {
-        "label": "Expense Recurrence",
+        "label": "Επαναφορά εξόδων",
         "description": "Select how often the expense should repeat.",
-        "none": "None",
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+        "none": "Κανένα",
+        "daily": "Καθημερινά",
+        "weekly": "Εβδομαδιαία",
+        "monthly": "Μηνιαία"
       },
       "paidFor": {
-        "title": "Paid for",
+        "title": "Πληρωμένη",
         "description": "Select who the expense was paid for."
       },
       "splitModeDescription": "Select how to split the expense.",
       "attachDescription": "See and attach receipts to the expense."
     },
     "amountField": {
-      "label": "Amount"
+      "label": "Ποσό"
     },
     "conversionUnavailable": "Για να ορίσετε διαφορετικό νόμισμα για κάθε δαπάνη και να μετατρέψετε τα ποσά, επιλέξτε ένα νόμισμα που δεν είναι προσαρμοσμένο για την ομάδα.",
     "originalAmountField": {
       "label": "Ποσό προς μετατροπή",
-      "repaymentLabel": "Amount to transfer",
+      "repaymentLabel": "Ποσό προς μεταφορά",
       "repaymentDescription": "Converted from the amount above, which is what settles the balance."
     },
     "conversionRateField": {
@@ -230,51 +258,59 @@
     "conversionRateState": {
       "loading": "Λήψη συναλλαγματικών ισοτιμιών…",
       "success": "Ληπτούμενες ισοτιμίες:",
-      "error": "Oops, we could not get the most recent rates.",
+      "error": "Ωχ, δεν μπορέσαμε να λάβουμε τις πιο πρόσφατες τιμές.",
       "staleRate": "Using rate:",
-      "noRate": "Enter a custom rate below.",
+      "noRate": "Εισαγάγετε μια προσαρμοσμένη τιμή παρακάτω.",
       "currencyNotFound": "Oops, Frankfurter does not have the rate for this currency at this day.",
       "noDate": "Enter the expense date to get a conversion rate.",
       "dateMismatch": "Rates from date: {date}",
-      "refresh": "Refresh",
+      "refresh": "Ανανέωση",
       "customRate": "Using custom rate"
     },
     "isReimbursementField": {
-      "label": "This is a reimbursement"
+      "label": "Αυτό είναι μια αποζημίωση"
     },
     "categoryField": {
-      "label": "Category"
+      "label": "Κατηγορία"
     },
     "notesField": {
-      "label": "Notes"
+      "label": "Σημειώσεις"
     },
-    "selectNone": "Select none",
-    "selectAll": "Select all",
-    "shares": "share(s)",
-    "advancedOptions": "Advanced splitting options…",
+    "selectNone": "Επιλέξτε κανένα",
+    "selectAll": "Επιλέξτε όλα",
+    "shares": "μετοχές",
+    "advancedOptions": "Προηγμένες επιλογές διαχωρισμού…",
     "SplitModeField": {
-      "label": "Split mode",
-      "evenly": "Evenly",
-      "byShares": "Unevenly – By shares",
-      "byPercentage": "Unevenly – By percentage",
-      "byAmount": "Unevenly – By amount",
-      "saveAsDefault": "Save as default splitting options"
+      "label": "Λειτουργία διαχωρισμού",
+      "evenly": "Ομοιόμορφα",
+      "byShares": "Ανομοιόμορφα – Με μετοχές",
+      "byPercentage": "Ανομοιόμορφα – Κατά ποσοστό",
+      "byAmount": "Ανομοιόμορφα – Κατά ποσό",
+      "saveAsDefault": "Αποθήκευση ως προεπιλεγμένες επιλογές διαχωρισμού"
     },
     "DeletePopup": {
-      "label": "Delete",
-      "title": "Delete this expense?",
-      "description": "Do you really want to delete this expense? This action is irreversible.",
-      "yes": "Yes",
-      "cancel": "Cancel"
+      "label": "Διαγραφή",
+      "title": "Διαγραφή αυτής της δαπάνης;",
+      "description": "Θέλετε πραγματικά να διαγράψετε αυτήν τη δαπάνη; Αυτή η ενέργεια είναι μη αναστρέψιμη.",
+      "yes": "Ναι",
+      "cancel": "Ακύρωση"
     },
-    "attachDocuments": "Attach documents",
-    "create": "Create",
-    "creating": "Creating…",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "reimbursement": "Reimbursement",
-    "itemizedSplit": "Itemized Split"
+    "attachDocuments": "Επισυνάψτε έγγραφα",
+    "create": "Δημιουργία",
+    "creating": "Δημιουργία…",
+    "save": "Αποθήκευση",
+    "saving": "Αποθήκευση…",
+    "cancel": "Ακύρωση",
+    "reimbursement": "Αποζημίωση",
+    "itemizedSplit": "Itemized Split",
+    "assignItems": "Κατανομή στοιχείων απόδειξης",
+    "conflict": "Αυτή η δαπάνη άλλαξε από κάποιον άλλο. Φορτώστε ξανά τη σελίδα και δοκιμάστε ξανά.",
+    "conflictTitle": "Τα έξοδα άλλαξαν αλλού",
+    "deleteError": "Δεν ήταν δυνατή η διαγραφή της δαπάνης.",
+    "pendingReceiptTotal": "Μια απόδειξη σαρώθηκε ενώ είναι εκτός σύνδεσης είναι έτοιμη.",
+    "pendingReceiptTotalApply": "Χρησιμοποιήστε το σαρωμένο σύνολο",
+    "pendingReceiptTotalDismiss": "Απόρριψη",
+    "saveError": "Δεν ήταν δυνατή η αποθήκευση των εξόδων."
   },
   "ExpenseDocumentsInput": {
     "TooBigToast": {
@@ -282,8 +318,8 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
-      "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
+      "title": "Σφάλμα κατά τη μεταφόρτωση του εγγράφου",
+      "description": "Συνέβη κάτι λάθος κατά τη μεταφόρτωση του εγγράφου. Δοκιμάστε ξανά αργότερα ή επιλέξτε διαφορετικό αρχείο.",
       "retry": "Retry"
     },
     "queued": "Pending upload",
@@ -291,7 +327,7 @@
   },
   "CreateFromReceipt": {
     "Dialog": {
-      "triggerTitle": "Create expense from receipt",
+      "triggerTitle": "Δημιουργία εξόδων από την παραλαβή",
       "title": "Create from receipt",
       "description": "Extract the expense information from a receipt photo.",
       "body": "Upload the photo of a receipt, and we’ll scan it to extract the expense information if we can.",
@@ -309,191 +345,207 @@
       "description": "The maximum file size you can upload is {maxSize}. Yours is {size}."
     },
     "ErrorToast": {
-      "title": "Error while uploading document",
+      "title": "Σφάλμα κατά τη μεταφόρτωση του εγγράφου",
       "description": "Something wrong happened when uploading the document. Please retry later or select a different file.",
       "retry": "Retry"
     },
-    "queued": "Queued. The receipt will be scanned after you reconnect.",
-    "offline": "Scanning resumes when you are online."
+    "queued": "Σε ουρά. Η απόδειξη θα σαρωθεί αφού συνδεθείτε ξανά.",
+    "offline": "Η σάρωση συνεχίζεται όταν είστε συνδεδεμένοι.",
+    "scanFailed": "Το AI δεν μπορούσε να διαβάσει αυτήν την απόδειξη. Ελέγξτε τη διαμόρφωση AI του διακομιστή και δοκιμάστε ξανά.",
+    "scanning": "Σάρωση…"
   },
   "ReceiptItems": {
-    "title": "Receipt items",
-    "backToExpense": "Back to expense",
-    "merchant": "Merchant",
-    "printedTotal": "Printed total",
-    "noReceipt": "No receipt is linked to this expense yet.",
-    "empty": "No items yet. Add one to start splitting.",
+    "title": "Στοιχεία απόδειξης",
+    "backToExpense": "Επιστροφή στα έξοδα",
+    "merchant": "Όνομα καταστήματος",
+    "printedTotal": "Σύνολο τυπωμένο στην απόδειξη",
+    "noReceipt": "Καμία απόδειξη δεν συνδέεται ακόμη με αυτό το κόστος.",
+    "empty": "Δεν υπάρχουν ακόμη στοιχεία. Προσθέστε ένα για να αρχίσετε να χωρίζετε.",
     "saveError": {
-      "title": "Couldn’t save your change",
-      "description": "We reloaded the receipt so you can try again."
+      "title": "Δεν ήταν δυνατή η αποθήκευση της αλλαγής σας",
+      "description": "Φορτώσαμε ξανά την απόδειξη για να μπορέσετε να δοκιμάσετε ξανά."
     },
-    "addItem": "Add item",
-    "quantitySummary": "{count} · {quantity} units",
+    "addItem": "Προσθήκη στοιχείου",
+    "quantitySummary": "{count} · {quantity} μονάδες",
     "AddItemDialog": {
-      "title": "Add item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "sharedLabel": "Shared (whole-bill charge)",
-      "add": "Add",
-      "cancel": "Cancel"
+      "title": "Προσθήκη στοιχείου",
+      "nameLabel": "Όνομα",
+      "quantityLabel": "Ποσότητα",
+      "amountLabel": "Ποσό",
+      "sharedLabel": "Κοινόχρηστο (χρέωση ολόκληρου του λογαριασμού)",
+      "add": "Προσθήκη",
+      "cancel": "Ακύρωση"
     },
     "item": {
-      "quantity": "{assigned} of {total}",
-      "remaining": "{quantity} left",
-      "assign": "Assign",
-      "edit": "Edit",
-      "delete": "Delete",
-      "removePortion": "Remove portion",
-      "editTitle": "Edit item",
-      "nameLabel": "Name",
-      "quantityLabel": "Quantity",
-      "amountLabel": "Amount",
-      "save": "Save",
-      "cancel": "Cancel",
-      "deleteConfirm": "Delete this item?",
-      "deleteDescription": "This removes the item and its assignments."
+      "quantity": "{assigned} από {total}",
+      "remaining": "Απομένουν {quantity}",
+      "assign": "Κατανομή",
+      "edit": "Επεξεργασία",
+      "delete": "Διαγραφή",
+      "removePortion": "Κατάργηση του εκχωρημένου μεριδίου",
+      "editTitle": "Επεξεργασία στοιχείου",
+      "nameLabel": "Όνομα",
+      "quantityLabel": "Ποσότητα",
+      "amountLabel": "Ποσό",
+      "save": "Αποθήκευση",
+      "cancel": "Ακύρωση",
+      "deleteConfirm": "Διαγραφή αυτού του στοιχείου;",
+      "deleteDescription": "Αυτό καταργεί το στοιχείο και τις εκχωρήσεις του."
     },
     "sections": {
-      "unassigned": "Unassigned",
-      "unassignedHint": "Not assigned to anyone yet",
-      "shared": "Shared",
-      "sharedHint": "Split equally by everyone",
-      "participantHint": "Items assigned to {name}"
+      "unassigned": "Χωρίς ανάθεση",
+      "unassignedHint": "Δεν έχει ανατεθεί ακόμη σε κανέναν",
+      "shared": "Κοινή χρήση",
+      "sharedHint": "Μοιράζεται εξίσου σε όλους",
+      "participantHint": "Στοιχεία που έχουν εκχωρηθεί σε {name}"
     },
     "assign": {
-      "title": "Assign item",
-      "description": "Choose who pays for “{name}”.",
-      "whole": "Assign the whole item",
-      "everyone": "Everyone (shared)",
-      "even": "Split evenly",
-      "evenHint": "Choose the participants to split between.",
-      "custom": "Custom split",
-      "customHint": "Enter quantities in units for each target.",
-      "shared": "Shared",
-      "selectParticipant": "Select a participant",
-      "exceeds": "The assigned quantity exceeds the item quantity.",
-      "confirm": "Assign",
-      "cancel": "Cancel"
+      "title": "Εκχώρηση αντικειμένου",
+      "description": "Επιλέξτε ποιος πληρώνει για \"{name}\".",
+      "whole": "Εκχώρηση ολόκληρου του στοιχείου",
+      "everyone": "Όλοι (κοινόχρηστο)",
+      "even": "Χωρίστε ομοιόμορφα",
+      "evenHint": "Επιλέξτε τους συμμετέχοντες για την κατανομή.",
+      "custom": "Προσαρμοσμένη διαίρεση",
+      "customHint": "Εισαγάγετε ποσότητες σε μονάδες για κάθε στόχο.",
+      "shared": "Κοινή χρήση",
+      "selectParticipant": "Επιλέξτε συμμετέχοντα",
+      "exceeds": "Η εκχωρηθείσα ποσότητα υπερβαίνει την ποσότητα του είδους.",
+      "confirm": "Κατανομή",
+      "cancel": "Ακύρωση"
     },
     "footer": {
-      "own": "Own",
-      "shared": "Shared",
-      "unassigned": "Unassigned",
-      "optOut": "Shares unassigned items",
-      "reconciles": "Reconciles",
-      "offBy": "Off by {amount}",
-      "itemsTotal": "Items total",
-      "apply": "Apply to expense",
-      "allOptedOut": "Everyone opted out, but some items are still unassigned.",
-      "negativeShare": "A negative total leaves someone owing less than nothing. Adjust the items before applying.",
-      "divergent": "Receipt values differ · Apply again"
+      "own": "Δικό μου",
+      "shared": "Κοινή χρήση",
+      "unassigned": "Χωρίς ανάθεση",
+      "optOut": "Μοιράζεται στοιχεία χωρίς ανάθεση",
+      "reconciles": "Ισορροπημένο",
+      "offBy": "Διαφορά {amount}",
+      "itemsTotal": "Σύνολο στοιχείων απόδειξης",
+      "apply": "Εφαρμογή στη δαπάνη",
+      "allOptedOut": "Όλοι εξαιρέθηκαν, αλλά ορισμένα στοιχεία εξακολουθούν να μην έχουν εκχωρηθεί.",
+      "negativeShare": "Ένα αρνητικό σύνολο αφήνει κάποιον να οφείλει λιγότερο από το μηδέν. Προσαρμόστε τα στοιχεία πριν την εφαρμογή.",
+      "divergent": "Οι τιμές παραλαβής διαφέρουν · Εφαρμόστε ξανά"
     },
     "applySuccess": {
-      "title": "Expense updated",
-      "description": "The receipt items were applied to the expense."
+      "title": "Ενημερώθηκε το κόστος",
+      "description": "Τα στοιχεία απόδειξης εφαρμόστηκαν στη δαπάνη."
     },
     "applyError": {
-      "title": "Couldn’t apply the receipt"
+      "title": "Δεν ήταν δυνατή η εφαρμογή της απόδειξης"
     },
     "applyConfirm": {
-      "title": "Update the expense?",
-      "description": "The expense total differs from the receipt items total. Applying will overwrite the expense amount and its split.",
-      "total": "total {current} → {new}",
-      "cancel": "Cancel",
-      "confirm": "Apply"
+      "title": "Ενημέρωση της δαπάνης;",
+      "description": "Το σύνολο των εξόδων διαφέρει από το σύνολο των ειδών απόδειξης. Με την εφαρμογή θα αντικατασταθεί το ποσό της δαπάνης και ο διαχωρισμός του.",
+      "total": "σύνολο {current} → {new}",
+      "cancel": "Ακύρωση",
+      "confirm": "Εφαρμογή"
     },
-    "scanPending": "Scan queued",
-    "scanPendingDescription": "The image is saved on this device and will be scanned when you are back online.",
-    "offlineQueue": "You are offline. Attach the photo now and it will be scanned after you reconnect."
+    "scanPending": "Η σάρωση βρίσκεται στην ουρά",
+    "scanPendingDescription": "Η εικόνα αποθηκεύεται σε αυτήν τη συσκευή και θα σαρωθεί όταν συνδεθείτε ξανά.",
+    "offlineQueue": "Είστε εκτός σύνδεσης. Επισυνάψτε τη φωτογραφία τώρα και θα σαρωθεί αφού συνδεθείτε ξανά.",
+    "disabled": "Το Smart split δεν είναι ενεργοποιημένο σε αυτόν τον διακομιστή. Η σάρωση αποδείξεων είναι μια λειτουργία μόνο στο διαδίκτυο.",
+    "extracted": "Η απόδειξη σαρώθηκε",
+    "extractedDescription": "Αντιστοιχίστε τα εξαγόμενα στοιχεία παρακάτω.",
+    "loading": "Φόρτωση απόδειξης…",
+    "optOutTitle": "Εξαιρέσεις",
+    "scanError": "Δεν ήταν δυνατή η σάρωση της απόδειξης.",
+    "scanUnavailable": "Ελέγξτε τη διαμόρφωση AI του διακομιστή και δοκιμάστε ξανά.",
+    "scanning": "Σάρωση απόδειξης…",
+    "upload": "Ανεβάστε μια φωτογραφία απόδειξης"
   },
   "Balances": {
-    "title": "Balances",
-    "description": "This is the amount that each participant paid or was paid for.",
+    "title": "Υπόλοιπα",
+    "description": "Αυτό είναι το ποσό που πλήρωσε ή πληρώθηκε κάθε συμμετέχων.",
     "Reimbursements": {
-      "title": "Suggested reimbursements",
-      "description": "Here are suggestions for optimized reimbursements between participants.",
-      "noImbursements": "It looks like your group doesn’t need any reimbursement 😁",
+      "title": "Προτεινόμενες αποζημιώσεις",
+      "description": "Ακολουθούν προτάσεις για βελτιστοποιημένες αποζημιώσεις μεταξύ των συμμετεχόντων.",
+      "noImbursements": "Φαίνεται ότι η ομάδα σας δεν χρειάζεται αποζημίωση 😁",
       "owes": "<strong>{from}</strong> owes <strong>{to}</strong>",
-      "markAsPaid": "Mark as paid"
-    }
+      "markAsPaid": "Επισήμανση ως πληρωμένη",
+      "owesPlain": "{{from}} οφείλει {{to}}"
+    },
+    "loading": "Φόρτωση υπολοίπων…"
   },
   "Stats": {
-    "title": "Stats",
+    "title": "Στατιστικά στοιχεία",
     "range": {
       "label": "Period",
-      "all": "All time",
-      "thisMonth": "This month",
-      "last30": "Last 30 days",
-      "thisYear": "This year",
-      "custom": "Custom range",
-      "from": "From",
-      "to": "To"
+      "all": "Όλο το χρόνο",
+      "thisMonth": "Αυτόν τον μήνα",
+      "last30": "Τελευταίες 30 ημέρες",
+      "thisYear": "Φέτος",
+      "custom": "Προσαρμοσμένο εύρος",
+      "from": "Από",
+      "to": "προς"
     },
     "Totals": {
-      "title": "Totals",
-      "description": "Spending summary of the entire group.",
-      "groupSpendings": "Total group spendings",
+      "title": "Σύνολα",
+      "description": "Περίληψη δαπανών ολόκληρης της ομάδας.",
+      "groupSpendings": "Συνολικές δαπάνες ομάδας",
       "groupEarnings": "Total group earnings",
-      "yourSpendings": "Your total spendings",
+      "yourSpendings": "Οι συνολικές σας δαπάνες",
       "yourEarnings": "Your total earnings",
-      "yourShare": "Your total share"
+      "yourShare": "Το συνολικό σας μερίδιο"
     },
     "Summary": {
-      "title": "Summary",
-      "description": "Key figures for the selected period.",
+      "title": "Περίληψη",
+      "description": "Βασικά στοιχεία για την επιλεγμένη περίοδο.",
       "empty": "There are no expenses yet.",
-      "expenseCount": "Expenses",
-      "averageExpense": "Average expense",
-      "largestExpense": "Largest expense",
+      "expenseCount": "Έξοδα",
+      "averageExpense": "Μέση δαπάνη",
+      "largestExpense": "Μεγαλύτερη δαπάνη",
       "activeSpan": "Active period"
     },
     "OverTime": {
-      "title": "Spending over time",
-      "description": "Total group spending per month. Select a month to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Δαπάνες με την πάροδο του χρόνου",
+      "description": "Συνολικές δαπάνες ομάδας ανά μήνα. Επιλέξτε ένα μήνα για να δείτε τα έξοδά του.",
+      "empty": "Δεν υπάρχουν ακόμη έξοδα.",
       "showExpenses": "Show expenses for {month}",
-      "detailsDescription": "Expenses in this month for the selected period.",
-      "detailsEmpty": "There are no expenses in this month."
+      "detailsDescription": "Έξοδα αυτού του μήνα για την επιλεγμένη περίοδο.",
+      "detailsEmpty": "Δεν υπάρχουν έξοδα αυτόν τον μήνα.",
+      "showExpensesPlain": "Εμφάνιση εξόδων για {{month}}"
     },
     "ByParticipant": {
-      "title": "Spending by participant",
-      "description": "How much each participant paid and their share of the expenses.",
-      "empty": "There are no expenses yet.",
-      "participant": "Participant",
-      "paid": "Paid",
+      "title": "Δαπάνες ανά συμμετέχοντα",
+      "description": "Πόσα πλήρωσε ο κάθε συμμετέχων και το μερίδιό του στα έξοδα.",
+      "empty": "Δεν υπάρχουν ακόμη έξοδα.",
+      "participant": "Συμμετέχων",
+      "paid": "Πληρωμένη",
       "count": "Count",
-      "share": "Share"
+      "share": "Κοινή χρήση"
     },
     "ByCategory": {
-      "title": "Spending by category",
-      "description": "Total amount spent in each category. Select a category to see its expenses.",
-      "empty": "There are no expenses yet.",
+      "title": "Δαπάνες ανά κατηγορία",
+      "description": "Συνολικό ποσό που δαπανήθηκε σε κάθε κατηγορία. Επιλέξτε μια κατηγορία για να δείτε τα έξοδά της.",
+      "empty": "Δεν υπάρχουν ακόμη έξοδα.",
       "showExpenses": "Show expenses for {category}",
-      "detailsDescription": "Expenses in this category for the selected period.",
-      "detailsEmpty": "There are no expenses in this category."
+      "detailsDescription": "Έξοδα αυτής της κατηγορίας για την επιλεγμένη περίοδο.",
+      "detailsEmpty": "There are no expenses in this category.",
+      "showExpensesPlain": "Εμφάνιση εξόδων για {{category}}"
     },
     "Recurring": {
-      "title": "Recurring expenses",
-      "description": "Estimated cost of the group's active recurring expenses.",
-      "estimatedMonthly": "Estimated monthly cost",
+      "title": "Επαναλαμβανόμενα έξοδα",
+      "description": "Εκτιμώμενο κόστος των ενεργών επαναλαμβανόμενων εξόδων του ομίλου.",
+      "estimatedMonthly": "Εκτιμώμενο μηνιαίο κόστος",
       "estimatedYearly": "{amount} per year",
       "period": {
         "DAILY": "{count, plural, one {# daily expense} other {# daily expenses}}",
         "WEEKLY": "{count, plural, one {# weekly expense} other {# weekly expenses}}",
         "MONTHLY": "{count, plural, one {# monthly expense} other {# monthly expenses}}"
       }
-    }
+    },
+    "loading": "Φόρτωση στατιστικών…"
   },
   "Activity": {
-    "title": "Activity",
-    "description": "Overview of all activity in this group.",
-    "noActivity": "There is not yet any activity in your group.",
-    "someone": "Someone",
-    "settingsModified": "Group settings were modified by <strong>{participant}</strong>.",
-    "expenseCreated": "Expense <em>{expense}</em> created by <strong>{participant}</strong>.",
-    "expenseUpdated": "Expense <em>{expense}</em> updated by <strong>{participant}</strong>.",
-    "expenseDeleted": "Expense <em>{expense}</em> deleted by <strong>{participant}</strong>.",
+    "title": "Δραστηριότητα",
+    "description": "Επισκόπηση όλων των δραστηριοτήτων σε αυτήν την ομάδα.",
+    "noActivity": "Δεν υπάρχει ακόμη καμία δραστηριότητα στην ομάδα σας.",
+    "someone": "Κάποιος",
+    "settingsModified": "Οι ρυθμίσεις ομάδας τροποποιήθηκαν από <strong>{participant}</strong>.",
+    "expenseCreated": "Έξοδα <em>{expense}</em> που δημιουργήθηκε από <strong>{participant}</strong>.",
+    "expenseUpdated": "Το κόστος <em>{expense}</em> ενημερώθηκε από <strong>{participant}</strong>.",
+    "expenseDeleted": "Έξοδα <em>{expense}</em> διαγράφηκαν από <strong>{participant}</strong>.",
     "Groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -504,19 +556,24 @@
       "earlierThisYear": "Earlier this year",
       "lastYear": "Last year",
       "older": "Older"
-    }
+    },
+    "loadMore": "Φορτώστε περισσότερα",
+    "loading": "Φόρτωση δραστηριότητας…",
+    "unknown": "Άγνωστη δραστηριότητα"
   },
   "Information": {
-    "title": "Information",
-    "description": "Use this place to add any information that can be relevant to the group participants.",
-    "empty": "No group information yet."
+    "title": "Πληροφορίες",
+    "description": "Χρησιμοποιήστε αυτό το μέρος για να προσθέσετε οποιαδήποτε πληροφορία μπορεί να είναι σχετική με τους συμμετέχοντες της ομάδας.",
+    "empty": "Δεν υπάρχουν ακόμη πληροφορίες για την ομάδα."
   },
   "Settings": {
-    "title": "Settings"
+    "title": "Ρυθμίσεις",
+    "saved": "Η ομάδα ενημερώθηκε",
+    "savedDescription": "Οι αλλαγές σας έχουν αποθηκευτεί."
   },
   "Share": {
-    "title": "Share",
-    "description": "For other participants to see the group and add expenses, share its URL with them.",
+    "title": "Κοινή χρήση",
+    "description": "Για να δουν οι άλλοι συμμετέχοντες την ομάδα και να προσθέσουν έξοδα, μοιραστείτε τη διεύθυνση URL μαζί τους.",
     "copyLink": "Copy link",
     "shareLink": "Share link",
     "warning": "Warning!",
@@ -525,7 +582,10 @@
       "title": "Share via QR Code",
       "description": "Scan this QR code to open the group on any device.",
       "download": "Download QR Code"
-    }
+    },
+    "button": "Κοινή χρήση",
+    "copy": "Αντιγραφή συνδέσμου",
+    "url": "Σύνδεσμος ομάδας"
   },
   "SchemaErrors": {
     "min1": "Enter at least one character.",
@@ -542,8 +602,11 @@
     "paidByRequired": "You must select a participant.",
     "paidForMin1": "The expense must be paid for at least one participant.",
     "noZeroShares": "All shares must be higher than 0.",
-    "amountSum": "Sum of amounts must equal the expense amount.",
-    "percentageSum": "Sum of percentages must equal 100."
+    "amountSum": "Το άθροισμα των ποσών πρέπει να ισούται με το ποσό της δαπάνης.",
+    "percentageSum": "Το άθροισμα των ποσοστών πρέπει να είναι ίσο με 100.",
+    "length3": "Use a three-letter currency code.",
+    "dateRequired": "Choose an expense date.",
+    "participantsRequired": "Select at least one participant."
   },
   "Categories": {
     "search": "Search category...",
@@ -628,14 +691,16 @@
     }
   },
   "Pwa": {
-    "updateTitle": "Update available",
-    "updateDescription": "A new version of pysplit is available.",
-    "reload": "Reload",
-    "updating": "Updating…",
-    "offlineReady": "Ready to work offline",
-    "offlineReadyDescription": "The application shell is cached. Open a group once while online to keep its data.",
-    "dismiss": "Dismiss",
-    "install": "Install app"
+    "updateTitle": "Διαθέσιμη ενημέρωση",
+    "updateDescription": "Μια νέα έκδοση του pysplit είναι διαθέσιμη.",
+    "reload": "Επαναφόρτωση",
+    "updating": "Ενημέρωση…",
+    "offlineReady": "Έτοιμο για εργασία εκτός σύνδεσης",
+    "offlineReadyDescription": "Το κέλυφος της εφαρμογής αποθηκεύεται προσωρινά. Ανοίξτε μια ομάδα μια φορά ενώ είστε συνδεδεμένοι για να διατηρήσετε τα δεδομένα της.",
+    "dismiss": "Κλείσιμο",
+    "install": "Εγκαταστήστε την εφαρμογή",
+    "refreshApp": "Ανανέωση εφαρμογής",
+    "refreshAppHint": "Εκκαθαρίστε τα αποθηκευμένα αρχεία και φορτώστε ξανά την πιο πρόσφατη έκδοση. Τα αποθηκευμένα δεδομένα σας παραμένουν σε αυτήν τη συσκευή."
   },
   "Auth": {
     "signIn": "Sign in",
@@ -646,27 +711,162 @@
     "adminDashboard": "Admin Dashboard"
   },
   "Admin": {
-    "title": "Administration Dashboard",
-    "description": "Manage user roles, platform access permissions, and monitor system metrics.",
-    "totalGroups": "Total Groups",
-    "totalExpenses": "Total Expenses",
-    "registeredUsers": "Registered Users",
-    "userManagement": "User Management & Permission Tiers"
+    "title": "Πίνακας ελέγχου διαχείρισης",
+    "description": "Διαχειριστείτε τους ρόλους των χρηστών, τα δικαιώματα πρόσβασης πλατφόρμας και παρακολουθήστε τις μετρήσεις του συστήματος.",
+    "totalGroups": "Σύνολο Ομάδων",
+    "totalExpenses": "Συνολικά Έξοδα",
+    "registeredUsers": "Εγγεγραμμένοι Χρήστες",
+    "userManagement": "Διαχείριση χρηστών & Επίπεδα αδειών",
+    "accessDenied": "Δεν επιτρέπεται η πρόσβαση",
+    "accessDeniedDescription": "Ο Πίνακας ελέγχου διαχείρισης περιορίζεται σε χρήστες στο επίπεδο διαχειριστή.",
+    "delete": "Διαγραφή",
+    "deleteError": "Δεν ήταν δυνατή η διαγραφή",
+    "email": "Email",
+    "expenses": "έξοδα",
+    "groupDeleted": "Η ομάδα διαγράφηκε",
+    "groupManagement": "Ομάδες",
+    "groupManagementDescription": "Διαγράψτε ομάδες και ελέγξτε τη χρήση.",
+    "groups": "ομάδες",
+    "loadMoreGroups": "Φόρτωση περισσότερων ομάδων",
+    "loadMoreUsers": "Φόρτωση περισσότερων χρηστών",
+    "loading": "Φόρτωση πίνακα ελέγχου…",
+    "loadingMore": "Φόρτωση…",
+    "participants": "συμμετέχοντες",
+    "preauthorize": "Προέγκριση χρήστη",
+    "preauthorizeAction": "προέγκριση",
+    "preauthorizeError": "Δεν ήταν δυνατή η προέγκριση του χρήστη",
+    "preauthorized": "Ο χρήστης έχει προεγκριθεί",
+    "returnToGroups": "Επιστροφή στις Ομάδες μου",
+    "searchGroups": "Αναζήτηση ομάδων",
+    "searchUsers": "Αναζήτηση χρηστών",
+    "signInDescription": "Ο πίνακας ελέγχου διαχείρισης απαιτεί λογαριασμό διαχειριστή.",
+    "signInTitle": "Απαιτείται σύνδεση",
+    "tier": "Επίπεδο",
+    "tierError": "Δεν ήταν δυνατή η ενημέρωση του επιπέδου",
+    "tierFor": "Επίπεδο για",
+    "tierUpdated": "Το επίπεδο ενημερώθηκε",
+    "userDeleted": "Ο χρήστης διαγράφηκε",
+    "userTier": "Επίπεδα"
   },
   "Storage": {
-    "title": "Offline storage",
-    "loading": "Checking this device…",
-    "unsupported": "This browser cannot report storage status.",
-    "usage": "{{used}} of {{quota}} used",
-    "unknown": "unknown",
-    "persisted": "Storage is persistent on this device.",
-    "notPersisted": "The browser may evict offline data if the device runs low on space.",
-    "keep": "Keep data on this device",
-    "refresh": "Refresh",
-    "critical": "Storage is almost full. Export a backup now, then remove unused groups.",
-    "warning": "Storage is getting full. A backup is recommended."
+    "title": "Αποθηκευτικός χώρος εκτός σύνδεσης",
+    "loading": "Έλεγχος αυτής της συσκευής…",
+    "unsupported": "Αυτό το πρόγραμμα περιήγησης δεν μπορεί να αναφέρει την κατάσταση αποθήκευσης.",
+    "usage": "Χρησιμοποιούνται {{used}} από {{quota}}",
+    "unknown": "άγνωστο",
+    "persisted": "Ο χώρος αποθήκευσης είναι μόνιμος σε αυτήν τη συσκευή.",
+    "notPersisted": "Το πρόγραμμα περιήγησης μπορεί να εξάγει δεδομένα εκτός σύνδεσης εάν η συσκευή εξαντληθεί.",
+    "keep": "Διατηρήστε δεδομένα σε αυτήν τη συσκευή",
+    "refresh": "Ανανέωση",
+    "critical": "Ο αποθηκευτικός χώρος είναι σχεδόν γεμάτος. Εξάγετε ένα αντίγραφο ασφαλείας τώρα και, στη συνέχεια, αφαιρέστε τις ομάδες που δεν χρησιμοποιούνται.",
+    "warning": "Ο αποθηκευτικός χώρος γεμίζει. Συνιστάται ένα αντίγραφο ασφαλείας."
   },
   "Pending": {
-    "participant": "Pending sync"
+    "participant": "Εκκρεμεί συγχρονισμός",
+    "expense": "Εκκρεμεί συγχρονισμός"
+  },
+  "Attachments": {
+    "assignItems": "Κατανομή στοιχείων απόδειξης",
+    "extractedItems": "Αντικείμενα που εξήχθησαν με AI",
+    "help": "Οι εικόνες συμπιέζονται πριν από τη μεταφόρτωση. Τα PDF διατηρούνται ως συνημμένα και ανοίγουν σε μια νέα καρτέλα.",
+    "open": "Άνοιγμα",
+    "openInNewTab": "Άνοιγμα σε νέα καρτέλα",
+    "pdfPreviewUnavailable": "Οι προεπισκοπήσεις PDF ανοίγουν σε ξεχωριστή καρτέλα.",
+    "pending": "Εκκρεμεί μεταφόρτωση",
+    "preview": "Προεπισκόπηση",
+    "previewAction": "Προεπισκόπηση",
+    "previewNamed": "Προεπισκόπηση {{name}}",
+    "receipt": "Απόδειξη καταστήματος",
+    "saveToAssignItems": "Αποθηκεύστε πρώτα τα έξοδα και μετά εκχωρήστε αυτά τα στοιχεία στους συμμετέχοντες.",
+    "scanComplete": "Η απόδειξη σαρώθηκε",
+    "scanCompleteDescription": "Αναθέστε τα εξαγόμενα στοιχεία στους συμμετέχοντες.",
+    "scanError": "Δεν ήταν δυνατή η σάρωση της απόδειξης",
+    "scanWithAi": "Σάρωση με AI",
+    "scanning": "Σάρωση…",
+    "view": "Προβολή συνημμένων",
+    "attachment": "Συνημμένο",
+    "onlyImagesPdf": "Υποστηρίζονται μόνο εικόνες και αρχεία PDF."
+  },
+  "Backup": {
+    "downloaded": "Έγινε λήψη του αντιγράφου ασφαλείας.",
+    "export": "Εξαγωγή αντιγράφων ασφαλείας",
+    "failed": "Η δημιουργία αντιγράφων ασφαλείας απέτυχε.",
+    "restore": "Επαναφορά αντιγράφου ασφαλείας",
+    "restoreFailed": "Η επαναφορά απέτυχε.",
+    "restoreLabel": "Επαναφορά αρχείου αντιγράφου ασφαλείας",
+    "restored": "Έγινε επαναφορά του αντιγράφου ασφαλείας. Επαναφόρτωση…"
+  },
+  "Common": {
+    "addGroup": "Προσθήκη ομάδας",
+    "close": "Κλείσιμο",
+    "closeDialog": "Κλείσιμο διαλόγου",
+    "dismiss": "Απόρριψη",
+    "dismissNotification": "Παράβλεψη ειδοποίησης",
+    "error": "Κάτι πήγε στραβά",
+    "expenseNotFound": "Τα έξοδα δεν βρέθηκαν",
+    "loading": "Φόρτωση…",
+    "menu": "Μενού",
+    "retry": "Επανάληψη",
+    "select": "Επιλέξτε…",
+    "unknown": "άγνωστο",
+    "user": "Χρήστης"
+  },
+  "CreateGroup": {
+    "approvalContact": "Η δημιουργία νέων ομάδων δαπανών απαιτεί εξουσιοδότηση από έναν διαχειριστή. Επικοινωνήστε με τον διαχειριστή της παρουσίας σας για να προωθήσετε τον λογαριασμό σας στο επίπεδο Group Creator.",
+    "approvalDescription": "Ο λογαριασμός σας βρίσκεται αυτήν τη στιγμή στο επίπεδο Συγχρονισμός χρήστη. Μπορείτε να συμμετέχετε σε οποιεσδήποτε ομάδες μοιράζονται μαζί σας και να τις συγχρονίζετε σε όλες τις συσκευές σας.",
+    "approvalTitle": "Η δημιουργία ομάδας απαιτεί έγκριση",
+    "authRequiredDescription": "Για να δημιουργήσετε νέες ομάδες δαπανών, συνδεθείτε με έναν εξωτερικό λογαριασμό. Οι προσκεκλημένοι συμμετέχοντες της ομάδας θα εξακολουθούν να μπορούν να συμμετέχουν χωρίς τριβές μέσω του συνδέσμου της ομάδας σας χωρίς να συνδεθούν.",
+    "authRequiredTitle": "Απαιτείται έλεγχος ταυτότητας",
+    "returnToGroups": "Επιστροφή στις Ομάδες μου",
+    "signIn": "Συνδεθείτε για να δημιουργήσετε ομάδα"
+  },
+  "GroupTabs": {
+    "Expenses": "Έξοδα",
+    "Balances": "Υπόλοιπα",
+    "Information": "Πληροφορίες",
+    "Stats": "Στατιστικά στοιχεία",
+    "Activity": "Δραστηριότητα",
+    "Settings": "Ρυθμίσεις",
+    "label": "Ομαδικές ενότητες"
+  },
+  "Login": {
+    "title": "Συνδεθείτε στο Spliit",
+    "description": "Συνδεθείτε με έναν εξωτερικό λογαριασμό για να ενεργοποιήσετε τον συγχρονισμό ομάδων μεταξύ συσκευών.",
+    "google": "Συνεχίστε με την Google",
+    "github": "Συνεχίστε με το GitHub",
+    "noProviders": "Δεν έχουν διαμορφωθεί πάροχοι OAuth. Ορίστε το AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET για να ενεργοποιήσετε τη σύνδεση."
+  },
+  "NotFound": {
+    "title": "Η σελίδα δεν βρέθηκε",
+    "description": "Ελέγξτε τη διεύθυνση URL και δοκιμάστε ξανά.",
+    "groupTitle": "Αυτή η ομάδα δεν υπάρχει.",
+    "groupDescription": "Ελέγξτε τη διεύθυνση URL ή ζητήστε έναν νέο σύνδεσμο πρόσκλησης."
+  },
+  "SyncStatus": {
+    "offlinePending": "Εκτός σύνδεσης — αλλαγές σε εκκρεμότητα: {{count}}",
+    "offlineSaved": "Εκτός σύνδεσης — εμφάνιση αποθηκευμένων δεδομένων",
+    "syncing": "Συγχρονισμός…",
+    "error": "Σφάλμα συγχρονισμού: {{error}}",
+    "retryToContinue": "προσπαθήστε ξανά να συνεχίσετε",
+    "conflicts": "Συγκρούσεις που χρειάζονται έλεγχο: {{count}}",
+    "failed": "Αλλαγές που δεν ήταν δυνατός ο συγχρονισμός: {{count}}",
+    "pending": "Εκκρεμείς αλλαγές: {{count}}",
+    "retryFailed": "Επανάληψη αποτυχημένων αλλαγών",
+    "discardFailed": "Απόρριψη αποτυχημένων αλλαγών",
+    "resolveConflicts": "Επίλυση συγκρούσεων",
+    "syncNow": "Συγχρονισμός τώρα",
+    "dialogTitle": "Επίλυση συγκρούσεων",
+    "dialogDescription": "Αυτές οι τροποποιήσεις άλλαξαν τις ίδιες εγγραφές σε άλλη συσκευή. Επιλέξτε τι να κρατήσετε.",
+    "noConflicts": "Δεν υπάρχουν συγκρούσεις προς επίλυση.",
+    "serverVersion": "Έκδοση διακομιστή {{version}} · η τοπική επεξεργασία διατηρείται στην ουρά διένεξης",
+    "keepMine": "Διατήρηση της δικής μου έκδοσης",
+    "useServer": "Χρήση διακομιστή",
+    "duplicate": "Διπλότυπο ως νέο"
+  },
+  "Theme": {
+    "toggle": "Εναλλαγή θέματος",
+    "light": "Φωτεινό",
+    "dark": "Σκοτεινό",
+    "system": "Σύστημα"
   }
 }
